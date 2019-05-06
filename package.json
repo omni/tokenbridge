@@ -6,11 +6,14 @@
   "author": "rzadp <przemek@ethworks.io>",
   "license": "MIT",
   "private": true,
+  "devDependencies": {
+    "wsrun": "^3.6.5"
+  },
   "workspaces": [
     "token-bridge"
   ],
   "scripts": {
-    "lint": "yarn workspace token-bridge run lint",
-    "test": "yarn workspace token-bridge run test"
+    "lint": "yarn wsrun lint",
+    "test": "yarn wsrun test"
   }
 }
