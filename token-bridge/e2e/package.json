@@ -1,0 +1,26 @@
+{
+  "name": "bridge-e2e",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "node deploy.js",
+    "start": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "dotenv": "^6.0.0",
+    "mocha": "^5.2.0",
+    "promise-retry": "^1.1.1",
+    "shelljs": "^0.8.2",
+    "tree-kill": "^1.2.0",
+    "web3": "1.0.0-beta.34",
+    "websocket": "^1.0.28"
+  },
+  "engines": {
+    "node": ">= 8.9"
+  },
+  "devDependencies": {}
+}

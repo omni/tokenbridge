@@ -1,0 +1,60 @@
+{
+  "name": "bridge-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "watcher:signature-request": "./scripts/start-worker.sh watcher signature-request-watcher",
+    "watcher:collected-signatures": "./scripts/start-worker.sh watcher collected-signatures-watcher",
+    "watcher:affirmation-request": "./scripts/start-worker.sh watcher affirmation-request-watcher",
+    "sender:home": "./scripts/start-worker.sh sender home-sender",
+    "sender:foreign": "./scripts/start-worker.sh sender foreign-sender",
+    "dev": "concurrently -n 'watcher:signature-request,watcher:collected-signatures,watcher:affirmation-request,sender:home,sender:foreign' -c 'red,green,yellow,blue,magenta' 'npm run watcher:signature-request' 'npm run watcher:collected-signatures' 'npm run watcher:affirmation-request' 'npm run sender:home' 'npm run sender:foreign'",
+    "test": "NODE_ENV=test mocha",
+    "test:watch": "NODE_ENV=test mocha --watch --reporter=min",
+    "coverage": "NODE_ENV=test nyc --reporter=text --reporter=html mocha",
+    "postinstall": "npm install --prefix e2e && mkdir -p logs"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqp-connection-manager": "^2.0.0",
+    "amqplib": "^0.5.2",
+    "bignumber.js": "^7.2.1",
+    "dotenv": "^5.0.1",
+    "http-list-provider": "0.0.5",
+    "ioredis": "^3.2.2",
+    "lodash": "^4.17.10",
+    "node-fetch": "^2.1.2",
+    "pino": "^4.17.3",
+    "pino-pretty": "^2.0.1",
+    "promise-limit": "^2.7.0",
+    "promise-retry": "^1.1.1",
+    "redlock": "^3.1.2",
+    "web3": "1.0.0-beta.34",
+    "web3-utils": "1.0.0-beta.34"
+  },
+  "devDependencies": {
+    "bn-chai": "^1.0.1",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "concurrently": "^3.6.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-prettier": "^2.6.0",
+    "mocha": "^5.2.0",
+    "ndjson": "^1.5.0",
+    "nyc": "^12.0.2",
+    "prettier": "^1.12.1",
+    "proxyquire": "^2.0.1",
+    "simple-statistics": "^6.1.0",
+    "sinon": "^6.1.0"
+  },
+  "engines": {
+    "node": ">= 8.9"
+  }
+}
