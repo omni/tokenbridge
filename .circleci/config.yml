@@ -19,7 +19,7 @@ jobs:
       - run: yarn run test
 workflows:
   version: 2
-  poa-bridge-monorepo:
+  tokenbridge:
     jobs:
       - lint
       - test
