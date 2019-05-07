@@ -1,8 +1,6 @@
 
 # POA TokenBridge
 
-[![Gitter](https://badges.gitter.im/poanetwork/poa-bridge.svg)](https://gitter.im/poanetwork/poa-bridge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 The TokenBridge is deployed on specified validator nodes (only nodes whose private keys correspond to addresses specified in the smart contracts) in the network. It connects to two chains via a Remote Procedure Call (RPC) and is responsible for:
 - listening to events related to bridge contracts
 - sending transactions to authorize asset transfers
@@ -281,13 +279,13 @@ When running the processes, the following commands can be used to test functiona
 
 ## Contributing
 
-See the [CONTRIBUTING](CONTRIBUTING.md) document for contribution, testing and pull request protocol.
+See the [CONTRIBUTING](../CONTRIBUTING.md) document for contribution, testing and pull request protocol.
 
 ## License
 
 [![License: LGPL v3.0](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
-This project is licensed under the GNU Lesser General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Lesser General Public License v3.0. See the [LICENSE](../LICENSE) file for details.
 
 ## References
 
