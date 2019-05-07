@@ -1,6 +1,38 @@
-# tokenbridge
-Monorepository for the token bridge
-
 [![CircleCI](https://circleci.com/gh/poanetwork/tokenbridge.svg?style=svg)](https://circleci.com/gh/poanetwork/tokenbridge)
 [![Gitter](https://badges.gitter.im/poanetwork/poa-bridge.svg)](https://gitter.im/poanetwork/poa-bridge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: LGPL v3.0](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
+# Tokenbridge
+Monorepository for the token bridge.
+
+## Structure
+
+Sub-repositories maintained within this monorepo are listed below.
+
+| Sub-repository | Description |
+| --- | --- |
+| [token-bridge](token-bridge/README.md) | Oracle responsible for listening to bridge related events and authorizing asset transfers |
+
+## Building, running, linting & tests
+
+To install dependencies:
+
+`yarn install`
+
+Running linter for all projects:
+
+`yarn lint`
+
+Running run tests for all projects:
+
+`yarn test`
+
+For details on building, running and developing please refer to respective READMEs in sub-repositories.
+
+## Contributing
+
+See the [CONTRIBUTING](CONTRIBUTING.md) document for contribution, testing and pull request protocol.
+
+## License
+
+This project is licensed under the GNU Lesser General Public License v3.0. See the [LICENSE](LICENSE) file for details.
