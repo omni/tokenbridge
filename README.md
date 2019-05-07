@@ -11,7 +11,7 @@ Sub-repositories maintained within this monorepo are listed below.
 
 | Sub-repository | Description |
 | --- | --- |
-| [token-bridge](token-bridge/README.md) | Oracle responsible for listening to bridge related events and authorizing asset transfers |
+| [oracle](oracle/README.md) | Oracle responsible for listening to bridge related events and authorizing asset transfers |
 
 ## Building, running, linting & tests
 
