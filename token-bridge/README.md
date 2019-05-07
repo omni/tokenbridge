@@ -1,7 +1,6 @@
 
 # POA TokenBridge
 
-[![Build Status](https://travis-ci.org/poanetwork/token-bridge.svg)](https://travis-ci.org/poanetwork/token-bridge)
 [![Gitter](https://badges.gitter.im/poanetwork/poa-bridge.svg)](https://gitter.im/poanetwork/poa-bridge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 The TokenBridge is deployed on specified validator nodes (only nodes whose private keys correspond to addresses specified in the smart contracts) in the network. It connects to two chains via a Remote Procedure Call (RPC) and is responsible for:
