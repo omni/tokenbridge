@@ -36,3 +36,8 @@ See the [CONTRIBUTING](CONTRIBUTING.md) document for contribution, testing and p
 ## License
 
 This project is licensed under the GNU Lesser General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+
+## References
+
+* [Additional Documentation](https://forum.poa.network/c/tokenbridge)
+* [POA Bridge FAQ](https://poanet.zendesk.com/hc/en-us/categories/360000349273-POA-Bridge)
