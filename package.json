@@ -1,0 +1,19 @@
+{
+  "name": "tokenbridge",
+  "version": "0.0.1",
+  "description": "Monorepository for token bridge",
+  "repository": "https://github.com/poanetwork/tokenbridge.git",
+  "author": "rzadp <przemek@ethworks.io>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "wsrun": "^3.6.5"
+  },
+  "workspaces": [
+    "token-bridge"
+  ],
+  "scripts": {
+    "lint": "yarn wsrun lint",
+    "test": "yarn wsrun test"
+  }
+}

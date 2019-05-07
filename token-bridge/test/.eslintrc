@@ -1,0 +1,12 @@
+{
+  "extends": "../.eslintrc",
+  "globals": {
+    "describe": false,
+    "it": false,
+    "beforeEach": false,
+    "afterEach": false
+  },
+  "rules": {
+    "node/no-unpublished-require": "off"
+  }
+}
