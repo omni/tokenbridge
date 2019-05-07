@@ -1,7 +1,7 @@
 
-# POA TokenBridge
+# POA Token Bridge - Oracle
 
-The TokenBridge is deployed on specified validator nodes (only nodes whose private keys correspond to addresses specified in the smart contracts) in the network. It connects to two chains via a Remote Procedure Call (RPC) and is responsible for:
+The Token Bridge Oracle is deployed on specified validator nodes (only nodes whose private keys correspond to addresses specified in the smart contracts) in the network. It connects to two chains via a Remote Procedure Call (RPC) and is responsible for:
 - listening to events related to bridge contracts
 - sending transactions to authorize asset transfers
 

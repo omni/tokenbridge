@@ -10,7 +10,7 @@
     "wsrun": "^3.6.5"
   },
   "workspaces": [
-    "token-bridge"
+    "oracle"
   ],
   "scripts": {
     "lint": "yarn wsrun lint",
