@@ -1,0 +1,1 @@
+This role sets up remote logging for services.

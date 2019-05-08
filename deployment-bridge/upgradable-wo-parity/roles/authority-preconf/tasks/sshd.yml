@@ -1,0 +1,33 @@
+- name: Save old SSH port to variable
+  set_fact:
+    old_port: "{{ ansible_port | default(22) }}"
+
+- name: Setup new SSH port
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^Port"
+    line: "Port {{ custom_ssh_port }}"
+  notify: restart sshd
+  
+- name: Preconf - run handlers immediately
+  meta: flush_handlers
+  
+- name: Doublecheck if computer is listening custom SSH port before removing old port access
+  become: no
+  wait_for: port="{{ custom_ssh_port }}" state="started" host="{{ inventory_hostname }}" connect_timeout="3" timeout="4" 
+  delegate_to: "localhost" 
+  register: port_used
+
+- name: Preconf.UFW - remove default ssh access
+  ufw:
+    delete: yes
+    rule: "allow"
+    port: "{{ old_port }}"
+    proto: "tcp"
+  when: port_used is defined and old_port!=custom_ssh_port
+  notify:
+    - restart ufw
+    
+- name: Set inventory ansible_port to custom
+  set_fact: ansible_port="{{ custom_ssh_port }}"
+  

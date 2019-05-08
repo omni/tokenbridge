@@ -1,0 +1,1 @@
+This role gets the start blocks for both home and foreign networks.

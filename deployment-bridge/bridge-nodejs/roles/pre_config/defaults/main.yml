@@ -1,0 +1,6 @@
+bridge_path: "/home/{{ compose_service_user }}/bridge"
+
+ALLOW_HTTP: no
+QUEUE_URL: amqp://rabbit
+REDIS_URL: redis://redis
+REDIS_LOCK_TTL: 1000
