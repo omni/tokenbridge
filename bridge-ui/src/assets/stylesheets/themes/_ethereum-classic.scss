@@ -1,0 +1,152 @@
+$theme-name: 'ethereum-classic';
+
+// base colors
+$primary-color: #31f896;
+$primary-color-dark: #352d59;
+$primary-color-darker: #17132b;
+$secondary-color: #2be187;
+$secondary-color-dark: #64a231;
+$tertiary-color: #ffaa07;
+$danger-color: #f13662;
+$blue-color: #3ab9fe;
+
+$text-color: #fff;
+$link-color: $secondary-color;
+
+$gradient-color-1: #352d59;
+$gradient-color-2: #352d59;
+
+// main
+$main-background-color: #17132b;
+$main-font-family: 'Nunito', sans-serif;
+
+// header
+$header-background-color: #221c3f;
+$header-logo-width: 224px;
+$header-logo-height: 41px;
+
+// header menu
+$header-menu-icon-color: $primary-color;
+$header-menu-text-color: #fff;
+
+// daily quota
+$daily-quota-background: rgba(255, 255, 255, 0.2);
+$daily-quota-progress: $primary-color;
+
+// footer
+$footer-background-color: #221c3f;
+$footer-logo-width: 158px;
+$footer-logo-height: 29px;
+$footer-text-color: #fff;
+
+// separator
+$separator-color: #333;
+
+// background
+$pattern-background-image: $base-images-path + '/themes/' + $theme-name + '/background/bg-pattern.svg';
+
+// social icons
+$social-icons-background-color: #343053;
+$social-icons-icon-color: #b9b0e1;
+
+// logo
+$logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo.svg';
+
+// home logo
+$home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.svg';
+$home-logo-image-modal: $home-logo-image;
+$home-logo-width: 25px;
+$home-logo-height: 39px;
+
+// foreign logo
+$foreign-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-foreign.svg';
+$foreign-logo-image-modal: $foreign-logo-image;
+$foreign-logo-width: 24px;
+$foreign-logo-height: 38px;
+
+// buttons
+$button-background-color: $secondary-color;
+$button-text-color: #fff;
+
+$button-background-color-2: $secondary-color;
+$button-text-color-2: #fff;
+
+$button-background-color-3: $secondary-color-dark;
+$button-text-color-3: #fff;
+
+$button-background-color-4: $primary-color-dark;
+$button-text-color-4: #fff;
+
+$button-bordered-background-color: #fff;
+$button-bordered-text-color: $primary-color-dark;
+$button-bordered-border-color: $primary-color-dark;
+
+// modals
+$modal-background-color: #fff;
+$modal-overlay-background-color: rgba($primary-color-darker, 0.9);
+$modal-title-color: $primary-color-dark;
+$modal-text-color: #352d59;
+$modal-link-color: $secondary-color;
+
+// mobile menu
+$mobile-menu-background-color: $primary-color-darker;
+$mobile-menu-overlay-color: rgba($primary-color-darker, 0.9);
+
+// loading
+$loading-item-background-color: $secondary-color;
+$loading-item-text-color: #fff;
+$loading-logo: $base-images-path + '/themes/' + $theme-name + '/logos/logo-loading.svg';
+
+// bridge section
+$bridge-gradient-start: #fff;
+$bridge-gradient-end: #fff;
+$bridge-logo-background-color: #fff;
+$bridge-link-color: $secondary-color;
+$bridge-balance-color: #352d59;
+$bridge-button-background-color: $button-background-color;
+$bridge-button-text-color: $button-text-color;
+$bridge-textfield-background: #f7f6ff;
+$bridge-input-label-color: rgba(53, 45, 89, 0.5);
+$bridge-label-color: $primary-color-dark;
+$bridge-textfield-color: $primary-color-dark;
+$bridge-textfield-placeholder-color: #666;
+$bridge-side-image-width: 272px;
+$bridge-side-image-height: 276px;
+$bridge-image-center-pointing-left: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
+$bridge-image-center-pointing-right: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
+$bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
+$bridge-image-left: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-1.png';
+$bridge-image-right: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-2.png';
+$bridge-transfer-title-color: $modal-text-color;
+
+// bridge alert
+$alert-logo-box-background-color: $primary-color;
+
+// copy icon
+$copy-icon-color: $primary-color;
+
+// status section
+$status-text-color: $text-color;
+$status-authority-number-color: $text-color;
+$status-authority-address-color: $primary-color;
+
+$status-authority-logo-0: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-0.svg';
+$status-authority-logo-1: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-1.svg';
+$status-authority-logo-2: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-2.svg';
+
+// datablock
+$datablock-value-color: $primary-color;
+$datablock-type-color: $primary-color;
+$datablock-text-color: $text-color;
+
+// statistics
+$statistics-title-color: $text-color;
+
+// events
+$events-title-color: $text-color;
+$events-filter-color: #333;
+$events-select-color: #333;
+$events-column-title-color: $text-color;
+$events-recipient-label-color: $text-color;
+$events-value-color: $text-color;
+$events-block-color: $text-color;

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="59" height="59">
+    <path fill="#AEA4D7" fill-rule="evenodd" d="M6 0h47a6 6 0 0 1 6 6v47a6 6 0 0 1-6 6H6a6 6 0 0 1-6-6V6a6 6 0 0 1 6-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M18.333 42H24v6h-5.667v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M18.333 48c-3.129 0-5.666-2.686-5.666-6h5.666v6z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M12.667 36h5.666v6h-5.666v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M18.333 36h-5.666v-6c3.129 0 5.666 2.686 5.666 6z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M12.667 36C9.537 36 7 33.314 7 30h5.667v6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M7 30c0-3.314 2.537-6 5.667-6v6H7z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M12.667 30v-6h5.666c0 3.314-2.537 6-5.666 6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M12.667 18h5.666v6h-5.666v-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M12.667 18c0-3.314 2.537-6 5.666-6v6h-5.666z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M18.333 12H24v6h-5.667v-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M35 12h5.656v6H35v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M46.344 18h-5.688v-5.998l.016-.002c3.132 0 5.672 2.686 5.672 6z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M40.656 18h5.688v6h-5.688v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M46.344 29.998l-.016.002c-3.132 0-5.672-2.686-5.672-6h5.688v5.998z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M46.344 24.002C49.469 24.011 52 26.692 52 30h-5.656v-5.998z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M46.344 35.998V30H52c0 3.308-2.531 5.989-5.656 5.998z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M46.344 36h-5.688c0-3.314 2.54-6 5.672-6l.016.002V36z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M40.656 36h5.688v6h-5.688v-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M40.672 48l-.016-.002V42h5.688c0 3.314-2.54 6-5.672 6z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M35 42h5.656v6H35v-6z"/>
+</svg>

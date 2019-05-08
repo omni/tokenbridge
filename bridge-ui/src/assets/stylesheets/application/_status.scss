@@ -1,0 +1,126 @@
+.status-page {
+  display: flex;
+  justify-content: center;
+
+  .status-page-container {
+    display: flex;
+    flex-direction: column;
+    max-width: $container-width;
+    width: 70%;
+    padding-bottom: 25px;
+
+    @media screen and (max-width: $tablet-width-landscape) {
+      width: 100%;
+    }
+
+    @media screen and (max-width: $tablet-width) {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+
+    .status-title {
+      color: $status-text-color;
+      font-size: 24px;
+      line-height: 3;
+      text-align: left;
+    }
+
+    .status-configuration-container {
+      display: flex;
+      flex-direction: column;
+      padding-top: 30px;
+
+      .status-configuration-data {
+        display: flex;
+        justify-content: space-evenly;
+
+        @media screen and (max-width: $tablet-width) {
+          column-gap: 30px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          row-gap: 20px;
+        }
+      }
+    }
+
+    .status-authorities-container {
+      display: flex;
+      flex-direction: column;
+      margin-top: 80px;
+
+      .status-authorities-title {
+        padding-bottom: 30px;
+      }
+
+      .status-authorities-data {
+        display: flex;
+        flex-direction: column;
+
+        .authority {
+          display: flex;
+          padding-bottom: 20px;
+
+          .authority-number {
+            color: $status-authority-number-color;
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 59px;
+            padding-right: 20px;
+            text-align: left;
+
+            @media screen and (max-width: $tablet-width) {
+              padding-right: 5px;
+            }
+          }
+
+          .authority-logo {
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+            background-size: contain;
+            height: 59px;
+            margin-left: 20px;
+            width: 59px;
+
+            &.authority-logo-0 {
+              background-image: url('#{ $status-authority-logo-0 }');
+            }
+            &.authority-logo-1 {
+              background-image: url('#{ $status-authority-logo-1 }');
+            }
+            &.authority-logo-2 {
+              background-image: url('#{ $status-authority-logo-2 }');
+            }
+
+            @media screen and (max-width: $tablet-width) {
+              display: none;
+            }
+          }
+
+          .authority-address {
+            color: $status-authority-address-color;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 59px;
+            padding-left: 20px;
+            text-align: left;
+
+            @media screen and (max-width: $tablet-width) {
+              font-size: 12px;
+              padding-left: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .status-left-container {
+    margin-right: auto;
+    padding-top: 25px;
+    width: 15%;
+
+    @media screen and (max-width: $tablet-width-landscape) {
+      display: none;
+    }
+  }
+}

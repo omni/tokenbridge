@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="59" height="59">
+    <path fill="#E6EAEC" fill-rule="evenodd" d="M6 0h47a6 6 0 0 1 6 6v47a6 6 0 0 1-6 6H6a6 6 0 0 1-6-6V6a6 6 0 0 1 6-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M19.344 42H25v6h-5.656v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M19.344 47.998l-.016.002c-3.132 0-5.672-2.686-5.672-6h5.688v5.998z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M13.656 36h5.688v6h-5.688v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M19.344 36h-5.688v-5.998l.016-.002c3.132 0 5.672 2.686 5.672 6z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M13.656 35.998C10.531 35.989 8 33.308 8 30h5.656v5.998z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M13.656 24.002V30H8c0-3.308 2.531-5.989 5.656-5.998z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M13.672 30l-.016-.002V24h5.688c0 3.314-2.54 6-5.672 6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M13.656 18h5.688v6h-5.688v-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M19.344 18h-5.688c0-3.314 2.54-6 5.672-6l.016.002V18z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M19.344 12H25v6h-5.656v-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M36 12h5.656v6H36v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M47.344 18h-5.688v-5.998l.016-.002c3.132 0 5.672 2.686 5.672 6z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M41.656 18h5.688v6h-5.688v-6z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M47.344 29.998l-.016.002c-3.132 0-5.672-2.686-5.672-6h5.688v5.998z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M47.344 24.002C50.469 24.011 53 26.692 53 30h-5.656v-5.998z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M47.344 35.998V30H53c0 3.308-2.531 5.989-5.656 5.998z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M47.344 36h-5.688c0-3.314 2.54-6 5.672-6l.016.002V36z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M41.656 36h5.688v6h-5.688v-6z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M41.672 48l-.016-.002V42h5.688c0 3.314-2.54 6-5.672 6z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M36 42h5.656v6H36v-6z"/>
+</svg>

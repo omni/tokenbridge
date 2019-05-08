@@ -1,0 +1,76 @@
+@keyframes fadeOut {
+    0% {
+        opacity: .2;
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: .2;
+        transform: scale(0.3);
+    }
+}
+
+.loading-logo {
+    background-image: url('#{ $loading-logo }');
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 50px;
+    width: 234px;
+}
+
+.loading {
+    &-container {
+        align-items: center;
+        background-color: $modal-overlay-background-color;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        left: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 1000000;
+    }
+
+    &-i {
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        animation-name: fadeOut;
+        animation-timing-function: linear;
+        background-color: $loading-item-background-color;
+        border-radius: 1px;
+        height: 50px;
+        opacity: .2;
+        width: 2px;
+
+        &:nth-child(2) {
+            animation-delay: .1s;
+        }
+    }
+
+    &-text {
+        color: $loading-item-text-color;
+        font-size: 24px;
+        font-stretch: normal;
+        font-style: normal;
+        font-weight: normal;
+        letter-spacing: normal;
+        line-height: 3;
+        text-align: center;
+        width: 500px;
+
+        @media screen and (max-width: $mobile-width) {
+            font-size: 18px;
+        }
+    }
+}
+
+.mobile-container {
+    @media screen and (max-width: $mobile-width) {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,125 @@
+.statistics-page {
+  display: flex;
+  justify-content: center;
+
+  .statistics-page-container {
+    display: flex;
+    flex-direction: column;
+    max-width: $container-width;
+    padding-bottom: 25px;
+    width: 70%;
+
+    @media screen and (max-width: $tablet-width-landscape) {
+      width: 100%;
+    }
+
+    @media screen and (max-width: $tablet-width) {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+
+    .statistics-title {
+      color: $statistics-title-color;
+      display: block;
+      font-size: 24px;
+      line-height: 1.5;
+      margin: 0 0 20px;
+      text-align: left;
+    }
+
+    .statistics-bridge-container {
+      display: flex;
+      flex-direction: column;
+      padding-top: 30px;
+
+      .statistics-bridge-data {
+        display: flex;
+        justify-content: space-evenly;
+
+        @media screen and (max-width: $tablet-width) {
+          column-gap: 30px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          row-gap: 20px;
+        }
+      }
+    }
+
+    .statistics-fee-container {
+      display: flex;
+      flex-direction: column;
+      padding-top: 90px;
+      width: 50%;
+
+      @media screen and (max-width: $tablet-width) {
+        width: auto;
+        padding-top: 45px;
+      }
+
+      .statistics-fee-data {
+        display: flex;
+        justify-content: space-evenly;
+
+        @media screen and (max-width: $tablet-width) {
+          width: auto;
+          column-gap: 30px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          row-gap: 20px;
+        }
+      }
+    }
+
+    .statistics-transaction-container {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 90px;
+
+      @media screen and (max-width: $tablet-width) {
+        flex-direction: column;
+        padding-top: 45px;
+      }
+
+      .statistics-deposit-container {
+        width: 40%;
+
+        @media screen and (max-width: $tablet-width) {
+          margin-bottom: 40px;
+          width: auto;
+        }
+
+      }
+
+      .statistics-withdraw-container {
+        width: 40%;
+
+        @media screen and (max-width: $tablet-width) {
+          width: auto;
+        }
+      }
+
+      .statistics-bridge-data {
+        display: flex;
+        justify-content: space-evenly;
+
+        @media screen and (max-width: $tablet-width) {
+          column-gap: 30px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          row-gap: 20px;
+        }
+      }
+    }
+
+  }
+
+  .statistics-left-container {
+    margin-right: auto;
+    padding-top: 25px;
+    width: 15%;
+
+    @media screen and (max-width: $tablet-width-landscape) {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360">
+    <path fill="#343053" fill-rule="evenodd" d="M120 300h60v60h-60v-60z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M120 360c-33.137 0-60-26.863-60-60h60v60z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M60 240h60v60H60v-60z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M120 240H60v-60c33.137 0 60 26.863 60 60z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M60 240c-33.137 0-60-26.863-60-60h60v60z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M0 180c0-33.137 26.863-60 60-60v60H0z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M60 180v-60h60c0 33.137-26.863 60-60 60z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M60 60h60v60H60V60z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M60 60c0-33.137 26.863-60 60-60v60H60z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M120 0h60v60h-60V0z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M300 300h60v60h-60v-60z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M300 360c-33.137 0-60-26.863-60-60h60v60z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M240 240h60v60h-60v-60z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M300 240h-60v-60c33.137 0 60 26.863 60 60z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M240 240c-33.137 0-60-26.863-60-60h60v60z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M180 180c0-33.137 26.863-60 60-60v60h-60z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M240 180v-60h60c0 33.137-26.863 60-60 60z"/>
+    <path fill="#453E6A" fill-rule="evenodd" d="M240 60h60v60h-60V60z"/>
+    <path fill="#6D649B" fill-rule="evenodd" d="M240 60c0-33.137 26.863-60 60-60v60h-60z"/>
+    <path fill="#343053" fill-rule="evenodd" d="M300 0h60v60h-60V0z"/>
+</svg>

@@ -1,0 +1,104 @@
+html,
+body,
+p, h1, h2, h3 {
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  display: flex;
+  min-height: 100%;
+}
+
+body {
+  background-color: $main-background-color;
+  box-sizing: border-box;
+  font-family: $main-font-family;
+  padding-bottom: $footer-height_desktop;
+  position: relative;
+  width: 100%;
+
+  @media screen and (max-width: $tablet-width) {
+    padding-bottom: $footer-height_mobile;
+  }
+}
+
+a {
+  color: $link-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+button {
+  color: #08b3f2;
+  cursor: pointer;
+  margin-left: 5px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+input,
+button {
+  border: 0;
+  font-size: 14px;
+  margin: 0;
+  outline: none;
+  padding: 0;
+}
+
+strong {
+  font-weight: 700;
+}
+
+.hidden {
+  overflow: hidden;
+}
+
+.container {
+  @extend %container;
+}
+
+.label {
+  font-weight: 700;
+  margin-bottom: 7px;
+  margin-top: 15px;
+}
+
+.description {
+  color: #8197a2;
+  line-height: 24px;
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.separator {
+  background-color: $separator-color;
+  height: 51px;
+  width: 1px;
+
+  @media screen and (max-width: $tablet-width) {
+    display: none;
+  }
+}
+
+.app-container {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  width: 100%;
+}
+
+.only-mobile {
+  display: none;
+  @media screen and (max-width: $tablet-width) {
+    display: inherit;
+  }
+}

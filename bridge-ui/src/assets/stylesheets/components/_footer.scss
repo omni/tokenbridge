@@ -1,0 +1,39 @@
+.footer {
+  @extend %full-width;
+  background-color: $footer-background-color;
+  bottom: 0;
+  color: $footer-text-color;
+  padding: 18px 0;
+  position: absolute;
+
+  .container {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    @media screen and (max-width: $tablet-width) {
+      flex-direction: column;
+    }
+  }
+
+  .social-icons {
+    order: 2;
+
+    @media screen and (max-width: $tablet-width) {
+      margin-top: 15px;
+      order: 1;
+    }
+  }
+
+  &-logo {
+    background-image: url('#{ $logo-image }');
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: block;
+    height: $footer-logo-height;
+    left: 0;
+    order: 0;
+    width: $footer-logo-width;
+  }
+}

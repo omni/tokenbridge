@@ -1,0 +1,70 @@
+.network-modal {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  overflow-y: scroll;
+
+  .modal {
+    border-radius: 10px;
+    min-height: 410px;
+    min-width: 558px;
+    position: relative;
+
+    @media screen and (max-width: $tablet-width) {
+      top: 30px;
+    }
+
+    @media screen and (max-width: 600px) {
+      top: 60px;
+    }
+
+    @media screen and (max-width: $mobile-width) {
+      min-width: 100%;
+      top: 0;
+    }
+
+    .title {
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .description {
+      color: #8197a2;
+      font-size: 13px;
+      line-height: 24px;
+      margin-bottom: 25px;
+    }
+
+    .close-button {
+      padding: 15px;
+      position: absolute;
+      right: -40px;
+      top: 40px;
+      z-index: 400000;
+
+      i {
+        &.icon {
+          &:before {
+            content: url("../images/modal/close.svg");
+          }
+        }
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      @media screen and (max-width: 600px) {
+        right: -10px;
+      }
+
+      @media screen and (max-width: $mobile-width) {
+        top: -40px;
+        right: 0;
+      }
+    }
+
+  }
+}

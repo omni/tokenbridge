@@ -1,0 +1,33 @@
+.mobile-menu {
+    @media screen and (max-width: $mobile-width) {
+        background-color: $mobile-menu-background-color;
+        height: 172px;
+    }
+}
+
+.mobile-menu-links {
+    display: none;
+    @media screen and (max-width: $mobile-width) {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-evenly;
+    }
+}
+
+.mobile-menu-open {
+    @media screen and (max-width: $mobile-width) {
+        background-color: $mobile-menu-overlay-color;
+        height: 100%;
+        position: fixed;
+        width: 100%;
+        z-index: 1000000;
+    }
+}
+
+.mobile-menu-is-open {
+    min-height: 100%;
+    position: fixed;
+    width: 100%;
+}

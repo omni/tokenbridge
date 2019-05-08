@@ -1,0 +1,62 @@
+{
+  "name": "bridge",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://poanetwork.github.io/",
+  "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.4.0",
+    "bignumber.js": "^6.0.0",
+    "chromedriver": "^2.35.0",
+    "coveralls": "^3.0.0",
+    "customize-cra": "^0.2.12",
+    "dotenv": "^7.0.0",
+    "fs-extra": "^5.0.0",
+    "gh-pages": "^1.1.0",
+    "mobx": "^4.0.2",
+    "mobx-react": "^5.0.0",
+    "mocha": "^5.1.1",
+    "node-sass-chokidar": "^1.0.1",
+    "numeral": "^2.0.6",
+    "react": "^16.2.0",
+    "react-app-rewire-mobx": "^1.0.7",
+    "react-app-rewired": "^2.0.3",
+    "react-copy-to-clipboard": "^5.0.1",
+    "react-dom": "^16.2.0",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "2.1.8",
+    "react-transition-group": "^2.2.1",
+    "selenium-webdriver": "^3.6.0",
+    "sweetalert": "^2.1.0",
+    "web3": "1.0.0-beta.30",
+    "web3-utils": "1.0.0-beta.30"
+  },
+  "scripts": {
+    "select-css-theme": "node scripts/selectTheme.js",
+    "build-css": "node-sass-chokidar src/assets/stylesheets -o src/assets/stylesheets --output-style=compressed -m application*.css",
+    "watch-css": "nodemon -e scss -x \"npm run build-css\"",
+    "start": "npm run build-css && npm run select-css-theme && react-app-rewired start",
+    "build": "npm run compile:contracts && npm run build-css && npm run select-css-theme && react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom",
+    "startE2e": "mocha -b ./e2e-script/test.js",
+    "start:blocks": "node ./e2e-script/scripts/blocks.js",
+    "coverage": "react-app-rewired test --env=jsdom --coverage",
+    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
+    "eject": "react-app-rewired eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build -o origin",
+    "compile:contracts": "cd submodules/poa-bridge-contracts && npm install && npm run compile && cd ../../ && rm -r -f src/contracts && cp -r submodules/poa-bridge-contracts/build/contracts src/contracts",
+    "postinstall": "cp lib/web3-eth/index.js node_modules/web3-eth/src && npm run compile:contracts"
+  },
+  "devDependencies": {
+    "jest-dom": "^3.0.1",
+    "nodemon": "^1.18.11",
+    "react-testing-library": "^5.4.4"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
