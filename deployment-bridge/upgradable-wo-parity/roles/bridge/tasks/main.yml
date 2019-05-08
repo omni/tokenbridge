@@ -1,0 +1,128 @@
+---
+- name: "Bridge - create bridge folder"
+  file:
+    path: "{{ bridge_path }}"
+    state: directory
+    mode: 0700
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+
+- name: "Bridge - download bridge binary"
+  get_url:
+    url: "{{ bridge_bin_url }}"
+    checksum: "sha256:{{ bridge_bin_sha256 }}"
+    dest: "{{ bridge_path }}/bridge"
+    mode: "0700"
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+  notify:
+    - restart {{ bridge_service_name }}
+
+- name: "Bridge - create keystore folder"
+  file:
+    path: "{{ bridge_path }}/{{ bridge_keystore_folder }}"
+    state: directory
+    mode: 0700
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+
+# - name: "Bridge - create keystore files"
+#   template:
+#     src: "{{ item }}.j2"
+#     dest: "{{ bridge_path }}/{{ bridge_keystore_folder }}/{{ item }}"
+#   with_items:
+#     - foreign-keystore.json
+#     - home-keystore.json
+#   notify:
+#     - restart bridge
+
+- name: "Bridge - create home keystore file"
+  template:
+    src: "home-keystore.json.j2"
+    dest: "{{ bridge_path }}/{{ bridge_keystore_folder }}/home-keystore.json"
+    mode: 0600
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+  notify:
+    - restart bridge
+
+- name: "Bridge - create home password file"
+  template:
+    src: "home-password.txt.j2"
+    dest: "{{ bridge_path }}/{{ bridge_home_password_file }}"
+    mode: 0600
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+  notify:
+    - restart bridge
+
+- name: "Bridge - create foreign keystore file"
+  template:
+    src: "foreign-keystore.json.j2"
+    dest: "{{ bridge_path }}/{{ bridge_keystore_folder }}/foreign-keystore.json"
+    mode: 0600
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+  notify:
+    - restart bridge
+  when: home_signer_address != foreign_signer_address
+
+- name: "Bridge - create home password file"
+  template:
+    src: "foreign-password.txt.j2"
+    dest: "{{ bridge_path }}/{{ bridge_foreign_password_file }}"
+    mode: 0600
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+  notify:
+    - restart bridge
+  when: bridge_home_password_file != bridge_foreign_password_file
+
+- name: "Bridge - create bridge config"
+  template:
+    src: config.toml.j2
+    dest: "{{ bridge_path }}/config.toml"
+    mode: 0600
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+  notify:
+    - restart bridge
+
+- name: "Bridge - create db.toml file from template"
+  template:
+    src: "db.toml.j2"
+    dest: "{{ bridge_path }}/db.toml"
+    mode: 0600
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+    force: no
+  when: db_toml_location == ""
+
+- name: "Bridge - copy db.toml file from local machine"
+  copy:
+    src: "{{ db_toml_location }}"
+    dest: "{{ bridge_path }}/db.toml"
+    force: no
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+    mode: 0600
+  when: db_toml_location != ""
+
+- name: "Bridge - install bridge service"
+  template:
+    src: bridge.service.j2
+    dest: /etc/systemd/system/{{ bridge_service_name }}.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart {{ bridge_service_name }}
+
+- name: "Bridge - enable bridge service to start at boot"
+  command: "systemctl enable {{ bridge_service_name }}.service"
+
+- name: "Bridge - ensure bridge service is running"
+  systemd:
+    name: "{{ bridge_service_name }}.service"
+    state: started
+    enabled: yes

@@ -1,0 +1,5 @@
+{
+    "disable-legacy-registry": true,
+    "live-restore": true,
+    "no-new-privileges": true
+}

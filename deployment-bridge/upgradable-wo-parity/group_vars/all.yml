@@ -1,0 +1,6 @@
+### global settings
+base_path: "/home/{{ service_user }}/poa-bridge"
+
+become_method: sudo
+
+service_user: bridgeuser

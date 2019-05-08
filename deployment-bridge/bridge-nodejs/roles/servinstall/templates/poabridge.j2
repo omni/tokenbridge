@@ -1,0 +1,94 @@
+#! /bin/bash
+
+### BEGIN INIT INFO
+# Provides:          poabridge
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+
+WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridge_path if bridge_path[:1] != "/" else bridge_path }}"
+
+#Getting path to private key file and variable name for parsing key file
+keyfile="{{ keyfile_path }}"
+vaddr="VALIDATOR_ADDRESS="
+vkey="VALIDATOR_ADDRESS_PRIVATE_KEY="
+
+#Parsing file content and add key to variable
+while read -r line
+do
+    case $line in
+        $vaddr*)
+            vaddr=${line#$vaddr}
+            ;;
+        $vkey*)
+            vkey=${line#$vkey}
+            ;;
+    esac
+done < $keyfile
+
+start(){
+    echo "Starting bridge.."
+    cd $WORKDIR
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
+    sudo -u "{{ compose_service_user }}" VALIDATOR_ADDRESS=$vaddr VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose  up  --detach
+}
+
+stop(){
+    echo "Stopping bridge.."
+    cd $WORKDIR
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
+    sleep 2
+}
+
+status(){
+    echo "Bridge status:"
+    cd $WORKDIR
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  ps
+}
+
+rebuild(){
+    echo "Rebuild bridge.."
+    cd $WORKDIR
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
+    sudo -u "{{ compose_service_user }}" VALIDATOR_ADDRESS=$vaddr VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose  up  --detach --force-recreate --no-deps --build
+}
+
+
+case "$1" in
+
+  start)
+      start
+    ;;
+
+  stop)
+      stop
+    ;;
+
+  status)
+      status
+    ;;
+
+  restart)
+    echo "Restarting bridge.."
+    stop
+    start
+    ;;
+
+  rebuild)
+    rebuild
+    ;;
+
+  *)
+    echo $"Usage: $0 {start|stop|restart|rebuild|status}"
+    exit 1
+    ;;
+
+esac
+
+exit 0

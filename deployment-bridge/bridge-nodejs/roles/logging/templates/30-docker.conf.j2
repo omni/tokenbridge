@@ -1,0 +1,12 @@
+$FileCreateMode 0644
+template(name="DockerLogFileName" type="list") {
+   constant(value="/var/log/docker/")
+   property(name="syslogtag" securepath="replace" regex.type="ERE" regex.submatch="1" regex.expression="bridge_(.*)\\/[a-zA-Z0-9]+\\[")
+   constant(value="/docker.log")
+}
+
+if $programname startswith 'bridge_' then \
+  ?DockerLogFileName
+else
+  /var/log/docker/no_tag/docker.log
+$FileCreateMode 0600

@@ -1,0 +1,2 @@
+bridge_path: "/home/{{ compose_service_user }}/bridge"
+syslog_server_port: udp://127.0.0.1:514

@@ -1,0 +1,16 @@
+/var/log/docker/*/docker.log {
+  rotate 5
+  size 1G
+  compress
+  missingok
+  delaycompress
+  copytruncate
+}
+/var/log/docker/*.log {
+  rotate 5
+  size 1G
+  compress
+  missingok
+  delaycompress
+  copytruncate
+}

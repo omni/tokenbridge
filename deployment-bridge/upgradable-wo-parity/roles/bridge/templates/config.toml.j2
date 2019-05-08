@@ -1,0 +1,57 @@
+keystore = "{{ bridge_keystore_folder }}"
+
+[home]
+account = "{{ home_signer_address }}"
+required_confirmations = {{ bridge_home_required_confirmations }}
+poll_interval = {{ bridge_home_poll_interval }}
+{% if bridge_home_request_timeout > -1 %}
+request_timeout = {{ bridge_home_request_timeout }}
+{% endif %}
+rpc_host = "{{ home_rpc_url }}"
+rpc_port = {{ home_rpc_port }}
+password = "{{ bridge_home_password_file }}"
+
+{% if bridge_home_gas_price_oracle_url != "" %}
+gas_price_oracle_url = "{{ bridge_home_gas_price_oracle_url }}"
+{% if bridge_home_gas_price_timeout > -1 %}
+gas_price_timeout = {{ bridge_home_gas_price_timeout }}
+{% endif %}
+{% if bridge_home_gas_price_speed != "" %}
+gas_price_speed = "{{ bridge_home_gas_price_speed }}"
+{% endif %}
+{% endif %}
+{% if bridge_home_default_gas_price > -1 %}
+default_gas_price = {{ bridge_home_default_gas_price }}
+{% endif %}
+
+[foreign]
+account = "{{ foreign_signer_address }}"
+required_confirmations = {{ bridge_foreign_required_confirmations }}
+poll_interval = {{ bridge_foreign_poll_interval }}
+{% if bridge_foreign_request_timeout > -1 %}
+request_timeout = {{ bridge_foreign_request_timeout }}
+{% endif %}
+rpc_host = "{{ foreign_rpc_url }}"
+rpc_port = {{ foreign_rpc_port }}
+password = "{{ bridge_foreign_password_file }}"
+
+{% if bridge_foreign_gas_price_oracle_url != "" %}
+gas_price_oracle_url = "{{ bridge_foreign_gas_price_oracle_url }}"
+{% if bridge_foreign_gas_price_timeout > -1 %}
+gas_price_timeout = {{ bridge_foreign_gas_price_timeout }}
+{% endif %}
+{% if bridge_foreign_gas_price_speed != "" %}
+gas_price_speed = "{{ bridge_foreign_gas_price_speed }}"
+{% endif %}
+{% endif %}
+{% if bridge_foreign_default_gas_price > -1 %}
+default_gas_price = {{ bridge_foreign_default_gas_price }}
+{% endif %}
+
+[authorities]
+required_signatures = {{ bridge_authorities_requires_signatures }}
+
+[transactions]
+deposit_relay = { gas = {{ bridge_deposit_relay_gas }} }
+withdraw_relay = { gas = {{ bridge_withdraw_relay_gas }} }
+withdraw_confirm = { gas = {{ bridge_withdraw_confirm_gas }} }

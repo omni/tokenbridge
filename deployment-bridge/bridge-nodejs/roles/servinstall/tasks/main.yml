@@ -1,0 +1,14 @@
+---
+- name: "Set poabridge service"
+  template:
+    src: poabridge.j2
+    dest: "/etc/init.d/poabridge"
+    owner: root
+    mode: 755
+    
+- name: "Start/Enable poabridge service"
+  service:
+    name: "poabridge"
+    state: started
+    enabled: yes
+    use: service

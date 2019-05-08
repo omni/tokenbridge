@@ -1,0 +1,5 @@
+---
+- name: "restart {{ bridge_service_name }}"
+  service:
+    name: "{{ bridge_service_name }}"
+    state: restarted
