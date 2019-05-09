@@ -1,0 +1,17 @@
+.home-logo {
+    background-image: url('#{ $home-logo-image }');
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: $home-logo-height;
+    width: $home-logo-width;
+
+    &.home-logo-modal {
+        background-image: url('#{ $home-logo-image-modal }');
+    }
+
+    .alert-logo-box & {
+        max-height: 75%;
+        max-width: 75%;
+    }
+}

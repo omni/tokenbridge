@@ -10,10 +10,11 @@
     "wsrun": "^3.6.5"
   },
   "workspaces": [
-    "oracle"
+    "oracle",
+    "bridge-ui"
   ],
   "scripts": {
-    "lint": "yarn wsrun lint",
-    "test": "yarn wsrun test"
+    "lint": "yarn wsrun --exclude bridge-ui lint",
+    "test": "yarn wsrun --exclude bridge-ui test"
   }
 }

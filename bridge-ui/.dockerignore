@@ -1,0 +1,5 @@
+node_modules
+e2e-script
+.git
+.env
+.dockerignore

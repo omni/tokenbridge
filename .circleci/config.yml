@@ -5,6 +5,7 @@ jobs:
       - image: circleci/node:10.15
     steps:
       - checkout
+      - run: git submodule update --init
       - run: yarn
       - run: yarn run lint
   test:
@@ -15,6 +16,7 @@ jobs:
       FOREIGN_RPC_URL: http://example.com
     steps:
       - checkout
+      - run: git submodule update --init
       - run: yarn
       - run: yarn run test
 workflows:

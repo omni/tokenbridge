@@ -1,0 +1,63 @@
+.daily-quota-modal-container {
+
+    @media screen and (max-width: $tablet-width) {
+        display: none
+    }
+
+    .daily-quota-modal-arrow {
+        border-bottom: 10px solid #000;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: none;
+        content: " ";
+        position: absolute;
+        top: -10px;
+        z-index: 9999;
+    }
+
+    .daily-quota-modal {
+        background-color: #fff;
+        border-radius: 3px;
+        border: solid 1px #e4e4e9;
+        box-shadow: 0 16px 20px 0 rgba(0, 0, 0, 0.05);
+        height: 102px;
+        position: fixed;
+        width: 219px;
+        z-index: 999;
+
+        .modal-container {
+            display: flex;
+            flex-direction: column;
+            height: 72px;
+            justify-content: space-between;
+            padding: 15px;
+
+            .daily-quota-title {
+                color: $primary-color;
+                font-size: 14px;
+                font-weight: bold;
+                text-align: left;
+            }
+
+            .daily-quota-description {
+                color: $modal-text-color;
+                font-size: 12px;
+                height: 45px;
+                text-align: left;
+                width: 172px;
+            }
+        }
+    }
+
+    .daily-quota-modal:after {
+        border-bottom: 6px solid #e4e4e9;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: none;
+        content: " ";
+        position: absolute;
+        right: 105px;
+        top: -6px;
+    }
+
+}

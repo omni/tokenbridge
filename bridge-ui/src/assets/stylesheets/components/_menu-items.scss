@@ -1,0 +1,26 @@
+.menu-items {
+    font-weight: bold;
+    line-height: 16px;
+    margin: 0 15px;
+    text-decoration: none;
+
+    @media screen and (max-width: $mobile-width) {
+        margin-left: 0;
+    }
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.menu-items-text {
+    color: $header-menu-text-color;
+    margin-left: 10px;
+}
+
+.menu-items-icon {
+    float: left;
+    path {
+        fill: $header-menu-icon-color;
+    }
+}

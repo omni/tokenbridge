@@ -1,0 +1,17 @@
+.foreign-logo {
+    background-image: url('#{ $foreign-logo-image }');
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: $foreign-logo-height;
+    width: $foreign-logo-width;
+
+    &.foreign-logo-modal {
+        background-image: url('#{ $foreign-logo-image-modal }');
+    }
+
+    .alert-logo-box & {
+        max-height: 75%;
+        max-width: 75%;
+    }
+}

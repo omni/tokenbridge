@@ -1,0 +1,28 @@
+.datablock-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    @media screen and (max-width: $tablet-width) {
+      align-items: normal;
+      justify-content: flex-start;
+    }
+
+    .datablock-value {
+      color: $datablock-value-color;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .datablock-type {
+      color: $datablock-type-color;
+      font-size: 18px;
+      margin-left: 10px;
+    }
+
+    .datablock-description {
+      color: $datablock-text-color;
+      font-size: 14px;
+    }
+  }
