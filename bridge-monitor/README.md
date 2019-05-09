@@ -1,11 +1,17 @@
-# Bridge Monitor
-Deployed version:
-https://bridge-monitoring.poa.net/
+# POA Token Bridge / Monitor
+Tool for checking balances and unprocessed events in bridged networks.
+
+## Overview
+Please refer to the [POA Token Bridge](../README.md) overview first of all.
+
+- Deployed version: https://bridge-monitoring.poa.net/
 
 This tools allows you to spin up node.js server to monitor for 2 contracts on
 Home and Foreign Eth networks to check for balance difference.
 On Home network it checks for `HOME_BRIDGE_ADDRESS` balance.
 On Foreign network it checks for the `ERC20 token` total supply for the `FOREIGN_BRIDGE_ADDRESS`.
+
+## Examples
 
 Example of an API 
 
