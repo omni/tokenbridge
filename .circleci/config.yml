@@ -10,7 +10,7 @@ jobs:
       - run: yarn run lint
   ansible-lint:
     docker:
-      - image: tomonorimatsumura/ubuntu18-ansible:stable
+      - image: particlekit/ansible-lint
     steps:
       - checkout
       - run: ./deployment/lint.sh
