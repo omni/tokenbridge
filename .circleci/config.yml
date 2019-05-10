@@ -1,5 +1,13 @@
 version: 2
 jobs:
+  build:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - run: yarn
+      - run: yarn run build
   lint:
     docker:
       - image: circleci/node:10.15

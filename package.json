@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "yarn workspace ui run build",
-    "lint": "yarn wsrun --exclude ui lint",
-    "test": "yarn wsrun --exclude ui test"
+    "lint": "yarn wsrun lint",
+    "test": "yarn wsrun test"
   }
 }
