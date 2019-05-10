@@ -52,7 +52,7 @@ Running linter for all projects:
 
 `yarn lint`
 
-Running run tests for all projects:
+Running tests for all projects:
 
 `yarn test`
 
