@@ -25,6 +25,12 @@ The Rust bridge is not currently in production, but an Ansible playbook is devel
 
 The playbooks automatically install `Docker`, `docker-compose`, `Python`, `Git`and it dependencies (such as `curl`, `ca-certificates`, `apt-transport-https`, etc.). Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) to launch playbooks.
 
+## Linting
+
+- [ansible-lint](https://github.com/ansible/ansible-lint) is required
+
+`yarn ansible-lint`
+
 ## Configuration
 
 Please see the [bridge-nodejs README](bridge-nodejs/README.md) for configuration and execution details. 

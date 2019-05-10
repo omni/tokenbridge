@@ -3,13 +3,17 @@ jobs:
   lint:
     docker:
       - image: circleci/node:10.15
-    orbs:
-        ansible: orbss/ansible@0.2.3
     steps:
       - checkout
       - run: git submodule update --init
       - run: yarn
       - run: yarn run lint
+  ansible-lint:
+    docker:
+      - image: tomonorimatsumura/ubuntu18-ansible:stable
+    steps:
+      - checkout
+      - run: yarn run ansible-lint
   test:
     docker:
       - image: circleci/node:10.15
@@ -27,3 +31,4 @@ workflows:
     jobs:
       - lint
       - test
+      - ansible-lint
