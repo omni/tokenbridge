@@ -1,3 +1,3 @@
 #!/bin/bash
 cd $(dirname $0)
-ansible-lint ./oracle/roles/**
+ansible-lint -t bug ./oracle/roles/**
