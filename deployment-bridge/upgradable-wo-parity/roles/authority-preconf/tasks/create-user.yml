@@ -1,5 +1,0 @@
----
-- name: Preconf.Create user
-  user:
-    name: "{{ service_user }}"
-    shell: "/bin/bash"
