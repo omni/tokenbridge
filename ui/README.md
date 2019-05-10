@@ -1,26 +1,13 @@
-# POA Bridge - User Interface (UI) Application
+# POA Token Bridge / UI
+DApp interface to transfer tokens and coins between chains.
 
 [![Build Status](https://travis-ci.org/poanetwork/bridge-ui.svg?branch=master)](https://travis-ci.org/poanetwork/bridge-ui)
 [![Gitter](https://badges.gitter.im/poanetwork/poa-bridge.svg)](https://gitter.im/poanetwork/poa-bridge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Coverage Status](https://coveralls.io/repos/github/poanetwork/bridge-ui/badge.svg?branch=master)](https://coveralls.io/github/poanetwork/bridge-ui?branch=master)
 [![dependencies Status](https://david-dm.org/poanetwork/bridge-ui/status.svg)](https://david-dm.org/poanetwork/bridge-ui)
 
-Welcome to the POA Bridge! Following is an overview of the POA Bridge and Bridge UI Application, as well as [basic instructions for getting started](#getting-started).
-
-## POA Bridge Overview
-
-The POA Bridge allows users to transfer assets between two chains in the Ethereum ecosystem. It is composed of several elements which are located in different POA Network repositories. 
-
-For a complete picture of the POA Bridge functionality, it is useful to explore each repository.
-
-**Bridge Elements**
-1. Bridge UI Application. A DApp interface to transfer tokens and coins between chains, located in this repository.
-2. [Bridge Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts). Solidity contracts used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
-3. [Token Bridge](https://github.com/poanetwork/token-bridge). The token bridge oracle written in NodeJS.
-4. [Bridge Monitor](https://github.com/poanetwork/bridge-monitor). A tool for checking balances and unprocessed events in bridged networks.
-5. [Bridge Deployment Playbooks](https://github.com/poanetwork/deployment-bridge). Manages configuration instructions for remote deployments and allows you to deploy separate bridge instances for validators.
-
-## Bridge UI Application
+## Overview
+Please refer to the [POA Token Bridge](../README.md) overview first of all.
 
 The UI provides an intuitive interface for assets transfer between networks running the Bridge smart contracts. Users can connect to a web3 wallet such as [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/) and complete the transfer through a web browser.
 
