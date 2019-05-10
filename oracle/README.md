@@ -230,10 +230,18 @@ Command | Description
 `redis-cli ping`     | check if redis is running.  
 `redis-server`       | start redis server.  
 
-## Testing
+## linting & tests
+
+Running linter for all projects:
 
 ```bash
-npm test
+yarn lint
+```
+
+Running tests:
+
+```bash
+yarn test
 ```
 
 ### E2E tests
