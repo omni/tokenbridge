@@ -1,7 +1,0 @@
-###### Accepts the following parametrs:
-#
-# syslog_server_port           server:port to forward syslog to (port is required, commonly port is 514)
-#
----
-syslog_server_port: ""
-custom_ssh_port: ""

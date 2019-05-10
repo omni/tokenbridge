@@ -16,6 +16,7 @@
   "scripts": {
     "build": "yarn workspace ui run build",
     "lint": "yarn wsrun lint",
-    "test": "yarn wsrun test"
+    "test": "yarn wsrun test",
+    "ansible-lint": "./deployment/lint.sh"
   }
 }
