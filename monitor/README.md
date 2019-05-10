@@ -154,6 +154,15 @@ You can create cron job to run workers (see `crontab.example` for reference):
 
 You can run web interface via [pm2](https://www.npmjs.com/package/pm2) or similar supervisor program.
 
+## Linting
+
+Running linter:
+
+```bash
+yarn lint
+```
+
+
 ## Contributing
 
 See the [CONTRIBUTING](../CONTRIBUTING.md) document for contribution, testing and pull request protocol.

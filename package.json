@@ -11,10 +11,11 @@
   },
   "workspaces": [
     "oracle",
-    "bridge-ui"
+    "bridge-ui",
+    "monitor"
   ],
   "scripts": {
     "lint": "yarn wsrun --exclude bridge-ui lint",
-    "test": "yarn wsrun --exclude bridge-ui test"
+    "test": "yarn wsrun --exclude bridge-ui --exclude monitor test"
   }
 }
