@@ -11,7 +11,7 @@
   },
   "workspaces": [
     "oracle",
-    "bridge-ui"
+    "ui"
   ],
   "scripts": {
     "lint": "yarn wsrun --exclude bridge-ui lint",
