@@ -230,20 +230,10 @@ Command | Description
 `redis-cli ping`     | check if redis is running.  
 `redis-server`       | start redis server.  
 
-## linting & tests
-
-Running linter:
-
-- [ansible-lint](https://github.com/ansible/ansible-lint) is required
+## Testing
 
 ```bash
-yarn lint
-```
-
-Running tests:
-
-```bash
-yarn test
+npm test
 ```
 
 ### E2E tests
