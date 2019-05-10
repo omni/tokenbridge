@@ -1,12 +1,15 @@
-version: 2
+version: 2.1
+orbs:
+  ansible: orbss/ansible@0.2.3
 jobs:
   lint:
     docker:
       - image: circleci/node:10.15
-    orbs:
-        ansible: orbss/ansible@0.2.3
     steps:
       - checkout
+      - run:
+          name: Show ansible-lint version
+          command: ansible-lint --version
       - run: git submodule update --init
       - run: yarn
       - run: yarn run lint
@@ -22,7 +25,6 @@ jobs:
       - run: yarn
       - run: yarn run test
 workflows:
-  version: 2
   tokenbridge:
     jobs:
       - lint
