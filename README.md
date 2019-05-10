@@ -48,9 +48,15 @@ To install dependencies:
 
 `yarn install`
 
-Running linter for all projects:
+Running linter for all JS projects:
 
 `yarn lint`
+
+Running linter for all Ansible playbooks:
+
+- [ansible-lint](https://github.com/ansible/ansible-lint) is required
+
+`yarn ansible-lint`
 
 Running tests for all projects:
 

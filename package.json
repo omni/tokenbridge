@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "lint": "yarn wsrun --exclude bridge-ui lint",
+    "ansible-lint": "./deployment/lint.sh",
     "test": "yarn wsrun --exclude bridge-ui test"
   }
 }

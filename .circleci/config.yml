@@ -8,6 +8,12 @@ jobs:
       - run: git submodule update --init
       - run: yarn
       - run: yarn run lint
+  ansible-lint:
+    docker:
+      - image: particlekit/ansible-lint
+    steps:
+      - checkout
+      - run: ./deployment/lint.sh
   test:
     docker:
       - image: circleci/node:10.15
@@ -25,3 +31,4 @@ workflows:
     jobs:
       - lint
       - test
+      - ansible-lint
