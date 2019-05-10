@@ -198,9 +198,17 @@ To run tests
 
 `npm run test`
 
+To run linting
+
+`npm run lint`
+
 To run tests with coverage
 
 `npm run coverage`
+
+To build the project
+
+`npm run build`
 
 ## Contributing
 

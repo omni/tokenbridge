@@ -14,7 +14,8 @@
     "ui"
   ],
   "scripts": {
-    "lint": "yarn wsrun --exclude bridge-ui lint",
-    "test": "yarn wsrun --exclude bridge-ui test"
+    "build": "yarn workspace ui run build",
+    "lint": "yarn wsrun --exclude ui lint",
+    "test": "yarn wsrun --exclude ui test"
   }
 }

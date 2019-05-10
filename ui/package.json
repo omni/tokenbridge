@@ -32,6 +32,7 @@
     "web3-utils": "1.0.0-beta.30"
   },
   "scripts": {
+    "lint": "eslint .",
     "select-css-theme": "node scripts/selectTheme.js",
     "build-css": "node-sass-chokidar src/assets/stylesheets -o src/assets/stylesheets --output-style=compressed -m application*.css",
     "watch-css": "nodemon -e scss -x \"npm run build-css\"",
@@ -51,7 +52,14 @@
   "devDependencies": {
     "jest-dom": "^3.0.1",
     "nodemon": "^1.18.11",
-    "react-testing-library": "^5.4.4"
+    "react-testing-library": "^5.4.4",
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-prettier": "^2.6.2",
+    "prettier": "^1.14.3"
   },
   "browserslist": [
     ">0.2%",

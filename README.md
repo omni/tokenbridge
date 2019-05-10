@@ -19,6 +19,10 @@ To install dependencies:
 
 `yarn install`
 
+To build all projects:
+
+`yarn run build`
+
 Running linter for all projects:
 
 `yarn lint`
