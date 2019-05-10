@@ -14,7 +14,7 @@
     "bridge-ui"
   ],
   "scripts": {
-    "lint": "yarn wsrun --exclude bridge-ui lint",
+    "lint": "yarn wsrun --exclude bridge-ui lint && ./deployment/lint.sh",
     "test": "yarn wsrun --exclude bridge-ui test"
   }
 }

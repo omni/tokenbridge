@@ -232,7 +232,9 @@ Command | Description
 
 ## linting & tests
 
-Running linter for all projects:
+Running linter:
+
+- [ansible-lint](https://github.com/ansible/ansible-lint) is required
 
 ```bash
 yarn lint

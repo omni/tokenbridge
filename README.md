@@ -21,6 +21,8 @@ To install dependencies:
 
 Running linter for all projects:
 
+- [ansible-lint](https://github.com/ansible/ansible-lint) is required
+
 `yarn lint`
 
 Running run tests for all projects:
