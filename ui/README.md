@@ -125,8 +125,9 @@ If successful, you will see bridge processes run when you issue a command. For e
 `git submodule update --init --recursive` 
     * Install dependencies  
 `yarn install`
-    * Go to UI sub-repository
+    * Go to UI sub-repository  
 `cd ui`
+
 _**Note**: The bridge UI configuration should be performed with an unprivileged Linux account or with the following flag `npm install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
     * Create a .env file from the example file [.env.example](.env.example)  
 `cp .env.example .env`  
