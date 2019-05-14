@@ -212,7 +212,7 @@ npm test
 
 ### E2E tests
 
-See the [E2E README](/e2e) for instructions. 
+See the [E2E README](../oracle-e2e/README.md) for instructions. 
 
 *Notice*: for docker-based installations do not forget to add `docker-compose exec bridge_affirmation` before the test commands listed below.
 
