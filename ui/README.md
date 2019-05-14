@@ -1,7 +1,6 @@
 # POA Token Bridge / UI
 DApp interface to transfer tokens and coins between chains.
 
-[![Gitter](https://badges.gitter.im/poanetwork/poa-bridge.svg)](https://gitter.im/poanetwork/poa-bridge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Coverage Status](https://coveralls.io/repos/github/poanetwork/bridge-ui/badge.svg?branch=master)](https://coveralls.io/github/poanetwork/bridge-ui?branch=master)
 [![dependencies Status](https://david-dm.org/poanetwork/bridge-ui/status.svg)](https://david-dm.org/poanetwork/bridge-ui)
 
