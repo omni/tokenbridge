@@ -92,9 +92,10 @@ The following is an example setup using the POA Sokol testnet as the Home networ
       * `FOREIGN_RPC_URL`=https://kovan.infura.io/mew
     * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `poa-bridge-contracts/deploy` directory and includes the bridge contract addresses.  
 
-5. Install and run the POA Token Bridge.
-    * Got to the `sokol-kovan-bridge` folder and `git clone https://github.com/poanetwork/token-bridge`
-    * Follow instructions in the [POA Token Bridge repo](https://github.com/poanetwork/token-bridge).
+5. Install and run the POA Token Bridge Oracle.
+    * Go to the `sokol-kovan-bridge` folder and `git clone https://github.com/poanetwork/tokenbridge`
+    * `cd tokenbridge/oracle`
+    * Follow instructions in the [Oracle](../oracle/README.md).
 
 If successful, you will see bridge processes run when you issue a command. For example, run `npm run watcher:signature-request`
 
@@ -118,12 +119,14 @@ If successful, you will see bridge processes run when you issue a command. For e
 
 6. Keep the bridge processes running. Open a separate terminal window and go to the `sokol-kovan-bridge` folder to install and unpack this repository.
 
-    * `git clone https://github.com/poanetwork/bridge-ui.git`  
-    * `cd bridge-ui`
+    * `git clone https://github.com/poanetwork/tokenbridge`  
+    * `cd tokenbridge`
     * Update submodules  
 `git submodule update --init --recursive` 
     * Install dependencies  
-`npm install`  
+`yarn install`
+    * Go to UI sub-repository
+`cd ui`
 _**Note**: The bridge UI configuration should be performed with an unprivileged Linux account or with the following flag `npm install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
     * Create a .env file from the example file [.env.example](.env.example)  
 `cp .env.example .env`  
