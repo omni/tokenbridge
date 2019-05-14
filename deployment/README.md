@@ -23,7 +23,7 @@ The playbooks automatically install `Docker`, `docker-compose`, `Python`, `Git`a
 
 ## Configuration
 
-Please see the [bridge-nodejs README](bridge-nodejs/README.md) for configuration and execution details. 
+Please see the [Oracle](../oracle/README.md) for configuration and execution details. 
 
 ## Bridge service commands
 
