@@ -20,9 +20,9 @@ Sub-repositories maintained within this monorepo are listed below.
 | Sub-repository | Description |
 | --- | --- |
 | [Oracle](oracle/README.md) | Oracle responsible for listening to bridge related events and authorizing asset transfers. |
-| [UI](bridge-ui/README.md) | DApp interface to transfer tokens and coins between chains. |
-| [Monitor](bridge-monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
-| [Deployment](deployment-bridge/README.md) | Ansible playbooks for deploying cross-chain bridges. |
+| [UI](ui/README.md) | DApp interface to transfer tokens and coins between chains. |
+| [Monitor](monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
+| [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
 
 Additionally there are [Solidity contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
 
