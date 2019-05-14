@@ -61,7 +61,7 @@ The following is an example setup using the POA Sokol testnet as the Home networ
 ### Dependencies
 
 - [poa-bridge-contracts](https://github.com/poanetwork/poa-bridge-contracts)
-- [token-bridge](https://github.com/poanetwork/token-bridge)
+- [oracle](../oracle/README.md)
 - [node.js](https://nodejs.org/en/download/)
 - [AlphaWallet](https://alphawallet.github.io/AlphaWallet-Download-Page/) or [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/)
 
