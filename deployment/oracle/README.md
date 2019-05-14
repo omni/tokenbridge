@@ -53,7 +53,7 @@ cp hosts.yml.example hosts.yml
 
 1. The `group_vars/<bridge_name>.yml` file contains the public bridge parameters. This file is prepared by administrators for each bridge. The validator only needs to add the required bridge name in the hosts.yml file to tell Ansible which file to use.
 
-   `group_vars/example.yml` shows an example configuration for the POA/Sokol - POA/Sokol bridge. Parameter values should match values from the .env file for the token-bridge. See [Configuration parameters](../../oracle/README.md#configuration-parameters) https://github.com/poanetwork/token-bridge#configuration-parameters for details.
+   `group_vars/example.yml` shows an example configuration for the POA/Sokol - POA/Sokol bridge. Parameter values should match values from the .env file for the token-bridge. See [Configuration parameters](../../oracle/README.md#configuration-parameters) for details.
 
 2. You can also add the following parameters in the `group_vars` to change the default behavior of `deployment-bridge` playbooks:
 
