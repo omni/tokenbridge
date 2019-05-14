@@ -11,12 +11,13 @@
   },
   "workspaces": [
     "oracle",
-    "ui"
+    "ui",
+    "monitor"
   ],
   "scripts": {
     "build": "yarn workspace ui run build",
     "lint": "yarn wsrun lint",
-    "test": "yarn wsrun test",
+    "test": "yarn wsrun --exclude monitor test",
     "ansible-lint": "./deployment/lint.sh"
   }
 }
