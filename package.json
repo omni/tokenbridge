@@ -23,5 +23,6 @@
     "ansible-lint": "./deployment/lint.sh",
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules"
-  }
+  },
+  "postinstall": "ln -s $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
 }
