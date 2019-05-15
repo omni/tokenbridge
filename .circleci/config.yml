@@ -33,6 +33,14 @@ jobs:
       - run: git submodule update --init
       - run: yarn
       - run: yarn run test
+  oracle-e2e:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+        - checkout
+        - setup_remote_docker
+        - run: yarn run oracle-e2e
+
 workflows:
   version: 2
   tokenbridge:
@@ -40,3 +48,4 @@ workflows:
       - lint
       - test
       - ansible-lint
+      - oracle-e2e

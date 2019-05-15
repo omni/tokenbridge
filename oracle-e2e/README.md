@@ -1,6 +1,6 @@
-# bridge-e2e
+# oracle-e2e
 
-End to end tests for the NodeJS Bridge.
+End to end tests for the POA Token Bridge [Oracle](../oracle/README.md).
 
 ## Prerequisites
 
@@ -13,8 +13,7 @@ so that you can use the CLI without sudo.
 
 ## Running
 
-To run the bridge end-to-end tests, you just have to go to the `e2e` directory
-and run:
+To run the bridge end-to-end tests, you just have to run:
 
 ```
 $ ./run-tests.sh

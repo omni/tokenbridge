@@ -14,7 +14,7 @@
     "test": "NODE_ENV=test mocha",
     "test:watch": "NODE_ENV=test mocha --watch --reporter=min",
     "coverage": "NODE_ENV=test nyc --reporter=text --reporter=html mocha",
-    "postinstall": "npm install --prefix e2e && mkdir -p logs"
+    "postinstall": "mkdir -p logs"
   },
   "author": "",
   "license": "ISC",
