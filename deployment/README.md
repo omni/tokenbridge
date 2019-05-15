@@ -4,12 +4,7 @@ Ansible playbooks for deploying cross-chain bridges.
 ## Overview
 Please refer to the [POA Token Bridge](../README.md) overview first of all.
 
-These playbooks are designed to automate the deployment process for cross-chain bridges on bridge validator nodes. This process installs the bridge as a service and sets .env configurations on a remote server. Playbooks for the current token-bridge deployment are located in the [bridge-nodejs](bridge-nodejs) folder.
-
-
-### Rust Bridge Playbooks
-
-The Rust bridge is not currently in production, but an Ansible playbook is developed for this implementation. It is available in the [upgradable-wo-parity](upgradable-wo-parity)folder. 
+These playbooks are designed to automate the deployment process for cross-chain bridges on bridge validator nodes. This process installs the bridge as a service and sets .env configurations on a remote server. Playbooks for the current Token Bridge Oracle deployment are located in the [Oracle](oracle) folder.
 
 ## Dependencies
 
@@ -23,7 +18,7 @@ The playbooks automatically install `Docker`, `docker-compose`, `Python`, `Git`a
 
 ## Configuration
 
-Please see the [bridge-nodejs README](bridge-nodejs/README.md) for configuration and execution details. 
+Please see the [Oracle](../oracle/README.md) for configuration and execution details. 
 
 ## Bridge service commands
 
