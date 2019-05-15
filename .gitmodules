@@ -1,6 +1,6 @@
 [submodule "oracle/submodules/poa-bridge-contracts"]
 	path = oracle/submodules/poa-bridge-contracts
 	url = https://github.com/poanetwork/poa-bridge-contracts.git
-[submodule "bridge-ui/submodules/poa-bridge-contracts"]
-	path = bridge-ui/submodules/poa-bridge-contracts
+[submodule "ui/submodules/poa-bridge-contracts"]
+	path = ui/submodules/poa-bridge-contracts
 	url = https://github.com/poanetwork/poa-bridge-contracts.git

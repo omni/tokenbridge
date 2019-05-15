@@ -1,5 +1,5 @@
 {
-  "name": "bridge-ui",
+  "name": "ui",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://poanetwork.github.io/",
@@ -32,12 +32,14 @@
     "web3-utils": "1.0.0-beta.30"
   },
   "scripts": {
+    "lint": "eslint .",
     "select-css-theme": "node scripts/selectTheme.js",
     "build-css": "node-sass-chokidar src/assets/stylesheets -o src/assets/stylesheets --output-style=compressed -m application*.css",
     "watch-css": "nodemon -e scss -x \"npm run build-css\"",
     "start": "npm run build-css && npm run select-css-theme && react-app-rewired start",
     "build": "npm run compile:contracts && npm run build-css && npm run select-css-theme && react-app-rewired build",
-    "test": "react-app-rewired test --env=jsdom",
+    "test": "react-app-rewired test --env=jsdom --no-watch",
+    "test:watch": "react-app-rewired test --env=jsdom",
     "startE2e": "mocha -b ./e2e-script/test.js",
     "start:blocks": "node ./e2e-script/scripts/blocks.js",
     "coverage": "react-app-rewired test --env=jsdom --coverage",
@@ -49,8 +51,20 @@
     "postinstall": "cp lib/web3-eth/index.js ../node_modules/web3-eth/src && npm run compile:contracts"
   },
   "devDependencies": {
+    "eslint": "5.12.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-config-react-app": "^4.0.1",
+    "eslint-plugin-flowtype": "^3.8.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-prettier": "^2.6.2",
+    "eslint-plugin-react": "^7.13.0",
+    "eslint-plugin-react-hooks": "^1.6.0",
     "jest-dom": "^3.0.1",
     "nodemon": "^1.18.11",
+    "prettier": "^1.14.3",
     "react-testing-library": "^5.4.4"
   },
   "browserslist": [

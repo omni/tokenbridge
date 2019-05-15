@@ -14,22 +14,22 @@ function createMessage({
   expectedMessageLength
 }) {
   recipient = strip0x(recipient)
-  assert.equal(recipient.length, 20 * 2)
+  assert.strictEqual(recipient.length, 20 * 2)
 
   value = Web3Utils.numberToHex(value)
   value = Web3Utils.padLeft(value, 32 * 2)
 
   value = strip0x(value)
-  assert.equal(value.length, 64)
+  assert.strictEqual(value.length, 64)
 
   transactionHash = strip0x(transactionHash)
-  assert.equal(transactionHash.length, 32 * 2)
+  assert.strictEqual(transactionHash.length, 32 * 2)
 
   bridgeAddress = strip0x(bridgeAddress)
-  assert.equal(bridgeAddress.length, 20 * 2)
+  assert.strictEqual(bridgeAddress.length, 20 * 2)
 
   const message = `0x${recipient}${value}${transactionHash}${bridgeAddress}`
-  assert.equal(message.length, 2 + 2 * expectedMessageLength)
+  assert.strictEqual(message.length, 2 + 2 * expectedMessageLength)
   return message
 }
 
@@ -64,7 +64,7 @@ function parseMessage(message) {
 }
 
 function signatureToVRS(signature) {
-  assert.equal(signature.length, 2 + 32 * 2 + 32 * 2 + 2)
+  assert.strictEqual(signature.length, 2 + 32 * 2 + 32 * 2 + 2)
   signature = strip0x(signature)
   const v = parseInt(signature.substr(64 * 2), 16)
   const r = `0x${signature.substr(0, 32 * 2)}`
