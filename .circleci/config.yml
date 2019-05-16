@@ -58,4 +58,4 @@ workflows:
       - test
       - ansible-lint
       - oracle-e2e
-      - ui-e2e
+      # - ui-e2e
