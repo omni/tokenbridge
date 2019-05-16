@@ -13,14 +13,16 @@
     "oracle",
     "oracle-e2e",
     "ui",
-    "monitor"
+    "monitor",
+    "contracts"
   ],
   "scripts": {
-    "build": "yarn workspace ui run build",
-    "lint": "yarn wsrun --exclude oracle-e2e lint",
+    "build": "yarn workspace poa-parity-bridge-contracts run compile && yarn workspace ui run build",
+    "lint": "yarn wsrun --exclude oracle-e2e --exclude poa-parity-bridge-contracts lint",
     "test": "yarn wsrun --exclude monitor --exclude oracle-e2e test",
     "ansible-lint": "./deployment/lint.sh",
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
-    "clean": "rm -rf ./node_modules ./**/node_modules"
+    "clean": "rm -rf ./node_modules ./**/node_modules",
+    "postinstall": "ln -s $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
   }
 }
