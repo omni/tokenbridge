@@ -127,12 +127,12 @@ class MetaMask extends Page {
     let url;
     switch (provider) {
       case 77: {
-        url = "http://10.1.0.102:8545";
+        url = "http://localhost:8541";
         networks.push(177);
         break;
       }
       case 42: {
-        url = "http://10.1.0.103:8545";
+        url = "http://localhost:8542";
         networks.push(142);
         break;
       }

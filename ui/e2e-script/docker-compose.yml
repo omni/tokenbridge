@@ -2,33 +2,21 @@ version: '3'
 services:
   parity1:
     build: parity
-    networks:
-      testnet:
-        ipv4_address: 10.1.0.102
     ports:
     - "8541:8545"
   parity2:
     build:
       context: parity
       dockerfile: Dockerfile-foreign
-    networks:
-      testnet:
-        ipv4_address: 10.1.0.103
     ports:
     - "8542:8545"
   contracts:
     build: contracts
-    networks:
-    - testnet
     command: "true"
   redis:
     image: "redis:4"
-    networks:
-    - testnet
   rabbit:
     image: "rabbitmq:3-management"
-    networks:
-    - testnet
     ports:
     - "15672:15672"
   bridge:
@@ -57,8 +45,6 @@ services:
     - HOME_POLLING_INTERVAL=500
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
-    networks:
-    - testnet
     command: "true"
   bridge-erc20:
     build: bridge
@@ -87,8 +73,6 @@ services:
     - HOME_POLLING_INTERVAL=500
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
-    networks:
-    - testnet
     command: "true"
   bridge-erc20-native:
     build: bridge
@@ -117,16 +101,14 @@ services:
     - HOME_POLLING_INTERVAL=500
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
-    networks:
-    - testnet
     command: "true"
   ui:
     build: ..
     environment:
     - REACT_APP_HOME_BRIDGE_ADDRESS=0x32198D570fffC7033641F8A9094FFDCaAEF42624
     - REACT_APP_FOREIGN_BRIDGE_ADDRESS=0x2B6871b9B02F73fa24F4864322CdC78604207769
-    - REACT_APP_FOREIGN_HTTP_PARITY_URL=http://10.1.0.103:8545
-    - REACT_APP_HOME_HTTP_PARITY_URL=http://10.1.0.102:8545
+    - REACT_APP_FOREIGN_HTTP_PARITY_URL=http://localhost:8542
+    - REACT_APP_HOME_HTTP_PARITY_URL=http://localhost:8541
     - REACT_APP_HOME_NATIVE_NAME=POA
     - REACT_APP_HOME_NETWORK_NAME=Sokol
     - REACT_APP_FOREIGN_NETWORK_NAME=Kovan
@@ -142,19 +124,14 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_SPEED_TYPE=standard
     - REACT_APP_FOREIGN_GAS_PRICE_FALLBACK=5000000000
     - REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL=15000
-    ports:
-    - "3000:3000"
-    networks:
-      testnet:
-        ipv4_address: 10.1.0.101
     command: "true"
   ui-erc20:
     build: ..
     environment:
     - REACT_APP_HOME_BRIDGE_ADDRESS=0x1feB40aD9420b186F019A717c37f5546165d411E
     - REACT_APP_FOREIGN_BRIDGE_ADDRESS=0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127
-    - REACT_APP_FOREIGN_HTTP_PARITY_URL=http://10.1.0.103:8545
-    - REACT_APP_HOME_HTTP_PARITY_URL=http://10.1.0.102:8545
+    - REACT_APP_FOREIGN_HTTP_PARITY_URL=http://localhost:8542
+    - REACT_APP_HOME_HTTP_PARITY_URL=http://localhost:8541
     - REACT_APP_HOME_NATIVE_NAME=POA
     - REACT_APP_HOME_NETWORK_NAME=Sokol
     - REACT_APP_FOREIGN_NETWORK_NAME=Kovan
@@ -170,19 +147,14 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_SPEED_TYPE=standard
     - REACT_APP_FOREIGN_GAS_PRICE_FALLBACK=5000000000
     - REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL=15000
-    ports:
-    - "3001:3000"
-    networks:
-      testnet:
-        ipv4_address: 10.1.0.104
     command: "true"
   ui-erc20-native:
     build: ..
     environment:
     - REACT_APP_HOME_BRIDGE_ADDRESS=0x488Af810997eD1730cB3a3918cD83b3216E6eAda
     - REACT_APP_FOREIGN_BRIDGE_ADDRESS=0x488Af810997eD1730cB3a3918cD83b3216E6eAda
-    - REACT_APP_FOREIGN_HTTP_PARITY_URL=http://10.1.0.103:8545
-    - REACT_APP_HOME_HTTP_PARITY_URL=http://10.1.0.102:8545
+    - REACT_APP_FOREIGN_HTTP_PARITY_URL=http://localhost:8542
+    - REACT_APP_HOME_HTTP_PARITY_URL=http://localhost:8541
     - REACT_APP_HOME_NATIVE_NAME=POA
     - REACT_APP_HOME_NETWORK_NAME=Sokol
     - REACT_APP_FOREIGN_NETWORK_NAME=Kovan
@@ -198,16 +170,4 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_SPEED_TYPE=standard
     - REACT_APP_FOREIGN_GAS_PRICE_FALLBACK=5000000000
     - REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL=15000
-    ports:
-    - "3002:3000"
-    networks:
-      testnet:
-        ipv4_address: 10.1.0.105
     command: "true"
-networks:
-  testnet:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: 10.1.0.0/24

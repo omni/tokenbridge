@@ -1,7 +1,7 @@
 {
-  "startUrl" : "http://10.1.0.101:3000",
-  "erc20Url" : "http://10.1.0.104:3000",
-  "erc20NativeUrl" : "http://10.1.0.105:3000",
+  "startUrl" : "http://localhost:3000",
+  "erc20Url" : "http://localhost:3001",
+  "erc20NativeUrl" : "http://localhost:3002",
   "homeAccount": "./e2e-script/accounts/user77_7FC1.json",
   "foreignAccount": "./e2e-script/accounts/user42_7FC1.json"
 }
