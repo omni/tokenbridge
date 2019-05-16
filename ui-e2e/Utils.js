@@ -1,7 +1,7 @@
 const webdriver = require('selenium-webdriver'),
   chrome = require('selenium-webdriver/chrome');
 const fs = require('fs-extra');
-const configFile = './e2e-script/config.json';
+const configFile = './config.json';
 
 class Utils {
 
@@ -51,7 +51,7 @@ class Utils {
   }
 
   static async startBrowserWithMetamask() {
-    let source = './e2e-script/MetaMask.crx';
+    let source = './MetaMask.crx';
     let options = new chrome.Options();
     await options.addExtensions(source);
     await options.addArguments('disable-popup-blocking');
