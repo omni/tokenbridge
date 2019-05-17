@@ -46,6 +46,10 @@ The POA TokenBridge provides three operational modes:
 
 ## Building, running, linting & tests
 
+To initialize submodules:
+
+`git submodule update --init`
+
 To install dependencies:
 
 `yarn install`
