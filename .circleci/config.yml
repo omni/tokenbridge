@@ -61,4 +61,5 @@ workflows:
   version: 2
   tokenbridge:
     jobs:
+      - oracle-e2e
       - ui-e2e
