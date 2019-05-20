@@ -41,21 +41,24 @@ jobs:
         - setup_remote_docker
         - run: yarn run oracle-e2e
   ui-e2e:
-    docker:
-      - image: circleci/node:10.15-browsers
+    machine:
+      image: circleci/classic:latest
     steps:
-        - checkout
-        - run: git submodule update --init
-        - run: yarn
-        - setup_remote_docker
-        - run: yarn run ui-e2e
-
+      - checkout
+      - run: |
+          echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+          echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run: nvm install 11.4.0 && nvm alias default 11.4.0
+      - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      - run: sudo apt-get update && sudo apt-get install yarn
+      - run: wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
+      - run: git submodule update --init
+      - run: yarn
+      - run: yarn run ui-e2e
 workflows:
   version: 2
   tokenbridge:
     jobs:
-      - lint
-      - test
-      - ansible-lint
-      - oracle-e2e
-      # - ui-e2e
+      - ui-e2e
