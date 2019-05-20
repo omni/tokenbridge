@@ -21,6 +21,12 @@ docker-compose run -d -p 3002:3000 ui-erc20-native npm start
 
 yarn mocha -b ./test.js
 rc=$?
+
+if [ $CI ]
+then
+  exit $rc
+fi
+
 ps | grep node | grep -v grep | awk '{print "kill " $1}' | sh
 docker-compose down
 exit $rc
