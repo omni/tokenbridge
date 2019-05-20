@@ -1,12 +1,12 @@
 version: '3'
 services:
   parity1:
-    build: parity
+    build: ../parity
     ports:
     - "8541:8545"
   parity2:
     build:
-      context: parity
+      context: ../parity
       dockerfile: Dockerfile-foreign
     ports:
     - "8542:8545"
