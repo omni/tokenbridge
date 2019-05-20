@@ -15,9 +15,9 @@ docker-compose run -d bridge-erc20-native npm run watcher:collected-signatures
 docker-compose run -d bridge-erc20-native npm run watcher:affirmation-request
 docker-compose run -d bridge npm run sender:home
 docker-compose run -d bridge npm run sender:foreign
-docker-compose run -d -p 3000:3000 ui npm start
-docker-compose run -d -p 3001:3000 ui-erc20 npm start
-docker-compose run -d -p 3002:3000 ui-erc20-native npm start
+docker-compose run -d -p 3000:3000 ui yarn workspace ui run start
+docker-compose run -d -p 3001:3000 ui-erc20 yarn workspace ui run start
+docker-compose run -d -p 3002:3000 ui-erc20-native yarn workspace ui run start
 
 yarn mocha -b ./test.js
 rc=$?
