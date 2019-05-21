@@ -15,5 +15,6 @@ RUN yarn install
 COPY . .
 
 RUN yarn workspace poa-parity-bridge-contracts run compile
+RUN cd contracts-2.2.0 && npm install && npm run compile:contracts && cd deploy && rm -f package-lock.json && npm install
 RUN yarn workspace ui run compile:contracts
 RUN cd contracts/deploy && rm -f package-lock.json && npm install

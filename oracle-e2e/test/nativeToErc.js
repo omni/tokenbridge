@@ -5,7 +5,7 @@ const promiseRetry = require('promise-retry')
 const { user, validator, temp } = require('../constants.json')
 const { generateNewBlock } = require('../utils/utils')
 
-const abisDir = path.join(__dirname, '..', '../contracts/build/contracts')
+const abisDir = path.join(__dirname, '..', '../contracts-2.2.0/build/contracts')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))

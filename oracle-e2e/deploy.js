@@ -2,7 +2,7 @@ const path = require('path')
 const shell = require('shelljs')
 
 const envsDir = path.join(__dirname, 'envs')
-const deployContractsDir = path.join(__dirname, '../contracts/deploy')
+const deployContractsDir = path.join(__dirname, '../contracts-2.2.0/deploy')
 const erc20ScriptDir = path.join(__dirname, 'scripts')
 
 shell.cp(path.join(envsDir, 'contracts-deploy.env'), path.join(deployContractsDir, '.env'))

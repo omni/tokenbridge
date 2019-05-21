@@ -7,3 +7,6 @@
 [submodule "contracts"]
 	path = contracts
 	url = https://github.com/poanetwork/poa-bridge-contracts.git
+[submodule "contracts-2.2.0"]
+	path = contracts-2.2.0
+	url = https://github.com/poanetwork/poa-bridge-contracts.git
