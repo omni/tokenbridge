@@ -171,3 +171,6 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_FALLBACK=5000000000
     - REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL=15000
     command: "true"
+  e2e:
+    build: ../
+    command: "true"

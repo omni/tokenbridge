@@ -5,7 +5,7 @@ docker-compose down
 docker-compose up -d --build --force-recreate
 node ./scripts/blocks.js &
 
-docker-compose run contracts ./deploy.sh
+docker-compose run e2e yarn workspace ui-e2e run deploy
 docker-compose run -d bridge npm run watcher:signature-request
 docker-compose run -d bridge npm run watcher:collected-signatures
 docker-compose run -d bridge npm run watcher:affirmation-request
