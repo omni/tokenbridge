@@ -1,6 +1,8 @@
 cd $(dirname $0)
 
+docker-compose down
 docker-compose up -d --build --force-recreate
+
 docker-compose run e2e yarn workspace oracle-e2e run deploy
 docker-compose run -d bridge npm run watcher:signature-request
 docker-compose run -d bridge npm run watcher:collected-signatures
