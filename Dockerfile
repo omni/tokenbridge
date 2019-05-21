@@ -10,6 +10,9 @@ COPY monitor/package.json ./monitor/
 COPY contracts/package.json ./contracts/
 COPY ui/lib/web3-eth/index.js ./ui/lib/web3-eth/index.js
 COPY yarn.lock .
+
 RUN yarn install
 COPY . .
+
 RUN yarn workspace ui run compile:contracts
+RUN cd contracts/deploy && rm -f package-lock.json && npm install

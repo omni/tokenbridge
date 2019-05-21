@@ -45,7 +45,7 @@
     "eject": "react-app-rewired eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build -o origin",
-    "compile:contracts": "cd submodules/poa-bridge-contracts && npm install && npm run compile && cd ../../ && rm -r -f src/contracts && cp -r submodules/poa-bridge-contracts/build/contracts src/contracts",
+    "compile:contracts": "rm -r -f src/contracts && cp -r ../contracts/build/contracts src/contracts",
     "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src || cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
   },
   "devDependencies": {
