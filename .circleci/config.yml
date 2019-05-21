@@ -38,6 +38,8 @@ jobs:
       - image: circleci/node:10.15
     steps:
         - checkout
+        - run: git submodule update --init
+        - run: yarn
         - setup_remote_docker
         - run: yarn run oracle-e2e
   ui-e2e:
