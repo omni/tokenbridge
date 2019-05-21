@@ -1,6 +1,7 @@
-### e2e script for bridge-ui
-Configure startURL, homeAccount, foreignAccount in ```config.json```
+### ui-e2e
+End to end tests for the UI
 
+- Configure startURL, homeAccount, foreignAccount in ```config.json```
 
 #### Tests
 
@@ -16,11 +17,4 @@ Configure startURL, homeAccount, foreignAccount in ```config.json```
 7. User is able to send tokens from Foreign account to Home account
 8. Foreign POA balance has correctly changed after transaction
 9. Home account has received correct amount of tokens after transaction
-
 ```
-
-
- 
- 
- 
- 

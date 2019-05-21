@@ -40,6 +40,15 @@ jobs:
         - checkout
         - setup_remote_docker
         - run: yarn run oracle-e2e
+  ui-e2e:
+    docker:
+      - image: circleci/node:10.15-browsers
+    steps:
+        - checkout
+        - run: git submodule update --init
+        - run: yarn
+        - setup_remote_docker
+        - run: yarn run ui-e2e
 
 workflows:
   version: 2
@@ -49,3 +58,4 @@ workflows:
       - test
       - ansible-lint
       - oracle-e2e
+      # - ui-e2e

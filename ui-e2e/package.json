@@ -1,0 +1,9 @@
+{
+  "name": "ui-e2e",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "mocha": "^5.1.1"
+  }
+}

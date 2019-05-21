@@ -23,6 +23,8 @@ Sub-repositories maintained within this monorepo are listed below.
 | [UI](ui/README.md) | DApp interface to transfer tokens and coins between chains. |
 | [Monitor](monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
 | [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
+| [Oracle-E2E]() | End to end tests for the Oracle |
+| [UI-E2E]() | End to end tests for the UI |
 
 Additionally there are [Solidity contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
 
