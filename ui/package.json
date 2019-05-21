@@ -46,7 +46,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build -o origin",
     "compile:contracts": "rm -r -f src/contracts && cp -r ../contracts/build/contracts src/contracts",
-    "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src || cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
+    "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src && cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
   },
   "devDependencies": {
     "eslint": "5.12.0",
