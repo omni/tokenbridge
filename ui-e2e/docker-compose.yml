@@ -10,9 +10,6 @@ services:
       dockerfile: Dockerfile-foreign
     ports:
     - "8542:8545"
-  contracts:
-    build: contracts
-    command: "true"
   redis:
     image: "redis:4"
   rabbit:
