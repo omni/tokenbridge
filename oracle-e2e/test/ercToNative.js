@@ -2,10 +2,10 @@ const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user } = require('../constants.json')
+const { user, contractsPath } = require('../constants.json')
 const { generateNewBlock } = require('../utils/utils')
 
-const abisDir = path.join(__dirname, '..', '../contracts-2.2.0/build/contracts')
+const abisDir = path.join(__dirname, '..', contractsPath, 'build/contracts')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))

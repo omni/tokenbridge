@@ -1,20 +1,20 @@
 /* eslint import/no-unresolved: 0  node/no-missing-require: 0 */
 const path = require('path')
+const { contractsPath, user } = require('../constants.json')
 require('dotenv').config({
-  path: path.join(__dirname, '../../contracts-2.2.0/deploy/.env')
+  path: path.join(__dirname, '..', contractsPath, '/deploy/.env')
 })
 
 const {
   deployContract,
   sendRawTx,
   privateKeyToAddress
-} = require('../../contracts-2.2.0/deploy/src/deploymentUtils')
+} = require(`../${contractsPath}/deploy/src/deploymentUtils`)
 const {
   web3Foreign,
   deploymentPrivateKey
-} = require('../../contracts-2.2.0/deploy/src/web3')
-const POA20 = require('../../contracts-2.2.0/build/contracts/ERC677BridgeToken.json')
-const { user } = require('../constants.json')
+} = require(`../${contractsPath}/deploy/src/web3`)
+const POA20 = require(`../${contractsPath}/build/contracts/ERC677BridgeToken.json`)
 
 const { DEPLOYMENT_ACCOUNT_PRIVATE_KEY } = process.env
 const DEPLOYMENT_ACCOUNT_ADDRESS = privateKeyToAddress(DEPLOYMENT_ACCOUNT_PRIVATE_KEY)
