@@ -2,7 +2,6 @@
   "extends": [
     "plugin:node/recommended",
     "airbnb-base",
-    "plugin:prettier/recommended",
     "../.eslintrc"
   ],
   "plugins": ["node"],
