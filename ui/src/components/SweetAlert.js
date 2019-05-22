@@ -1,13 +1,13 @@
-import React from 'react';
-import swal from 'sweetalert';
-import { inject, observer } from "mobx-react";
+import React from 'react'
+import swal from 'sweetalert'
+import { inject, observer } from 'mobx-react'
 
-@inject("RootStore")
+@inject('RootStore')
 @observer
 export class SweetAlert extends React.Component {
-  componentWillReact(){
+  componentWillReact() {
     const { alertStore } = this.props.RootStore
-    if(alertStore.alerts.length > 0){
+    if (alertStore.alerts.length > 0) {
       const alert = alertStore.alerts.slice()[0]
       swal(alert).then(() => {
         alertStore.remove(alert)
@@ -23,10 +23,8 @@ export class SweetAlert extends React.Component {
     }
   }
 
-  render(){
+  render() {
     this.logErrors()
-    return (
-      <div style={{display: 'none'}} />
-    )
+    return <div style={{ display: 'none' }} />
   }
 }

@@ -4,6 +4,6 @@ export const setItem = (key, data) => {
   localStorage.setItem(key, data)
 }
 
-export const getItem = (key) => {
+export const getItem = key => {
   return localStorage.getItem(key)
 }

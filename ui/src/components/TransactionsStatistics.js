@@ -4,11 +4,7 @@ import { DataBlock } from './DataBlock'
 
 export const TransactionsStatistics = ({ txNumber, value, type }) => (
   <div className="statistics-bridge-data">
-    <DataBlock
-      description="Transactions"
-      value={numeral(txNumber).format('0,0 a')}
-      type=''
-    />
+    <DataBlock description="Transactions" value={numeral(txNumber).format('0,0 a')} type="" />
     <div className="separator" />
     <DataBlock
       description="Total Value"
