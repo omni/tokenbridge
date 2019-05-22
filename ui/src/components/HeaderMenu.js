@@ -1,5 +1,5 @@
-import React from "react";
-import { MenuItems } from "./MenuItems";
+import React from 'react'
+import { MenuItems } from './MenuItems'
 import { Wallet } from './Wallet'
 
 export const HeaderMenu = ({ withoutEvents }) => (
@@ -7,4 +7,4 @@ export const HeaderMenu = ({ withoutEvents }) => (
     <MenuItems withoutEvents={withoutEvents} />
     <Wallet />
   </div>
-);
+)

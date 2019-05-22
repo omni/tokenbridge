@@ -1,24 +1,24 @@
-import React from "react"
-import { IconGithub, IconPOA, IconTelegram, IconTwitter } from "./social-icons"
+import React from 'react'
+import { IconGithub, IconPOA, IconTelegram, IconTwitter } from './social-icons'
 
 export const SocialIcons = () => {
   const socialItems = [
     {
       icon: <IconPOA />,
-      link: "https://poa.network",
+      link: 'https://poa.network'
     },
     {
       icon: <IconTwitter />,
-      link: "https://twitter.com/poanetwork",
+      link: 'https://twitter.com/poanetwork'
     },
     {
       icon: <IconTelegram />,
-      link: "https://t.me/poa_network",
+      link: 'https://t.me/poa_network'
     },
     {
       icon: <IconGithub />,
-      link: "https://github.com/poanetwork/token-bridge",
-    },
+      link: 'https://github.com/poanetwork/token-bridge'
+    }
   ]
 
   return (

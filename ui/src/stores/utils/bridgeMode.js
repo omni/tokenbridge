@@ -22,7 +22,7 @@ export const ERC_TYPES = {
   ERC20: 'ERC20'
 }
 
-export const getBridgeABIs = (bridgeMode) => {
+export const getBridgeABIs = bridgeMode => {
   let HOME_ABI = null
   let FOREIGN_ABI = null
   if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC) {
@@ -41,7 +41,7 @@ export const getBridgeABIs = (bridgeMode) => {
   return { HOME_ABI, FOREIGN_ABI }
 }
 
-export const decodeBridgeMode = (bridgeModeHash)  => {
+export const decodeBridgeMode = bridgeModeHash => {
   switch (bridgeModeHash) {
     case '0x92a8d7fe':
       return BRIDGE_MODES.NATIVE_TO_ERC
@@ -54,7 +54,7 @@ export const decodeBridgeMode = (bridgeModeHash)  => {
   }
 }
 
-export const getUnit = (bridgeMode) => {
+export const getUnit = bridgeMode => {
   let unitHome = null
   let unitForeign = null
   if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC) {
@@ -73,7 +73,7 @@ export const getUnit = (bridgeMode) => {
   return { unitHome, unitForeign }
 }
 
-export const decodeFeeManagerMode = (managerModeHash)  => {
+export const decodeFeeManagerMode = managerModeHash => {
   switch (managerModeHash) {
     case '0xf2aed8f7':
       return FEE_MANAGER_MODE.ONE_DIRECTION

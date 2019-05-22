@@ -1,5 +1,5 @@
-import { observable, computed } from "mobx";
-import { toHex } from 'web3-utils';
+import { observable, computed } from 'mobx'
+import { toHex } from 'web3-utils'
 import { fetchGasPrice, fetchGasPriceFromOracle } from './utils/gas'
 
 const HOME_GAS_PRICE_FALLBACK = process.env.REACT_APP_HOME_GAS_PRICE_FALLBACK
@@ -58,4 +58,4 @@ class GasPriceStore {
   }
 }
 
-export default GasPriceStore;
+export default GasPriceStore

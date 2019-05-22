@@ -26,7 +26,8 @@ describe('FeeStatistics', () => {
       <FeeStatistics
         depositFeeCollected={depositFeeCollected}
         withdrawFeeCollected={withdrawFeeCollected}
-      />)
+      />
+    )
 
     // Then
     const container = queryByTestId('fee-statistics')
@@ -63,7 +64,8 @@ describe('FeeStatistics', () => {
       <FeeStatistics
         depositFeeCollected={depositFeeCollected}
         withdrawFeeCollected={withdrawFeeCollected}
-      />)
+      />
+    )
 
     // Then
     const container = queryByTestId('fee-statistics')
@@ -97,7 +99,8 @@ describe('FeeStatistics', () => {
       <FeeStatistics
         depositFeeCollected={depositFeeCollected}
         withdrawFeeCollected={withdrawFeeCollected}
-      />)
+      />
+    )
 
     // Then
     const container = queryByTestId('fee-statistics')
@@ -131,7 +134,8 @@ describe('FeeStatistics', () => {
       <FeeStatistics
         depositFeeCollected={depositFeeCollected}
         withdrawFeeCollected={withdrawFeeCollected}
-      />)
+      />
+    )
 
     // Then
     const container = queryByTestId('fee-statistics')

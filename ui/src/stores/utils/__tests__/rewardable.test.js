@@ -30,13 +30,13 @@ describe('getFeeToApply', () => {
     const homeFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.BOTH_DIRECTIONS,
       homeFee: new BN(0.01),
-      foreignFee: new BN(0.02),
+      foreignFee: new BN(0.02)
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
     const homeToForeignDirection = true
@@ -53,13 +53,13 @@ describe('getFeeToApply', () => {
     const homeFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.BOTH_DIRECTIONS,
       homeFee: new BN(0.01),
-      foreignFee: new BN(0.02),
+      foreignFee: new BN(0.02)
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
     const homeToForeignDirection = false
@@ -76,13 +76,13 @@ describe('getFeeToApply', () => {
     const homeFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.ONE_DIRECTION,
       homeFee: new BN(0),
-      foreignFee: new BN(0.02),
+      foreignFee: new BN(0.02)
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.ONE_DIRECTION,
       homeFee: new BN(0.01),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
     const homeToForeignDirection = true
@@ -99,13 +99,13 @@ describe('getFeeToApply', () => {
     const homeFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.ONE_DIRECTION,
       homeFee: new BN(0),
-      foreignFee: new BN(0.02),
+      foreignFee: new BN(0.02)
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.ONE_DIRECTION,
       homeFee: new BN(0.01),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
     const homeToForeignDirection = false
@@ -122,13 +122,13 @@ describe('getFeeToApply', () => {
     const homeFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
     const homeToForeignDirection = true
@@ -144,13 +144,13 @@ describe('getFeeToApply', () => {
     const homeFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
-      foreignFee: new BN(0),
+      foreignFee: new BN(0)
     }
 
     const homeToForeignDirection = false
@@ -173,14 +173,13 @@ describe('getRewardableData', () => {
       foreignHistoricFee: [{ blockNumber: 10, fee: new BN(0.02) }]
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
       foreignFee: new BN(0),
       homeHistoricFee: [],
       foreignHistoricFee: []
     }
-
 
     // When
     const result = getRewardableData(homeFeeManager, foreignFeeManager)
@@ -205,14 +204,13 @@ describe('getRewardableData', () => {
       foreignHistoricFee: [{ blockNumber: 10, fee: new BN(0.02) }]
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.ONE_DIRECTION,
       homeFee: new BN(0.01),
       foreignFee: new BN(0),
       homeHistoricFee: [{ blockNumber: 10, fee: new BN(0.01) }],
       foreignHistoricFee: []
     }
-
 
     // When
     const result = getRewardableData(homeFeeManager, foreignFeeManager)
@@ -237,7 +235,7 @@ describe('getRewardableData', () => {
       foreignHistoricFee: [{ blockNumber: 10, fee: new BN(0.02) }]
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.UNDEFINED,
       homeFee: new BN(0),
       foreignFee: new BN(0),
@@ -271,7 +269,7 @@ describe('getRewardableData', () => {
       foreignHistoricFee: []
     }
 
-    const foreignFeeManager =  {
+    const foreignFeeManager = {
       feeManagerMode: FEE_MANAGER_MODE.ONE_DIRECTION,
       homeFee: new BN(0.01),
       foreignFee: new BN(0),

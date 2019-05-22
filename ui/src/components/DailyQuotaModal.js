@@ -1,9 +1,8 @@
 import React from 'react'
-import { inject, observer } from "mobx-react"
+import { inject, observer } from 'mobx-react'
 import numeral from 'numeral'
 
-
-@inject("RootStore")
+@inject('RootStore')
 @observer
 export class DailyQuotaModal extends React.Component {
   state = {
@@ -17,11 +16,11 @@ export class DailyQuotaModal extends React.Component {
 
   getPosition = () => {
     const offsetsElement = document.getElementsByClassName('header-wallet')
-    if(offsetsElement.length > 0) {
-      const offsets =  offsetsElement[0].getBoundingClientRect();
-      const height = offsets.height;
-      const left = offsets.left;
-      this.setState({left, top: height + 20})
+    if (offsetsElement.length > 0) {
+      const offsets = offsetsElement[0].getBoundingClientRect()
+      const height = offsets.height
+      const left = offsets.left
+      this.setState({ left, top: height + 20 })
     } else {
       setTimeout(this.getPosition, 100)
     }
@@ -38,18 +37,18 @@ export class DailyQuotaModal extends React.Component {
     const to = isHome ? foreignStore.symbol : homeStore.symbol
     const networkNameFrom = isHome ? homeStore.networkName : foreignStore.networkName
     const networkNameTo = isHome ? foreignStore.networkName : homeStore.networkName
-    const description = limit && limit !== '0' ? `${numeral(value).format('0,0.0', Math.floor)} ${from} on ${networkNameFrom + ' '}
+    const description =
+      limit && limit !== '0'
+        ? `${numeral(value).format('0,0.0', Math.floor)} ${from} on ${networkNameFrom + ' '}
             remaining for transfer to ${to + ' '}
             on ${networkNameTo}`
-      : `No limit configured`
+        : `No limit configured`
     return (
       <div className="daily-quota-modal-container">
-        <div className="daily-quota-modal" style={{left, top}}>
-          <div className='modal-container'>
+        <div className="daily-quota-modal" style={{ left, top }}>
+          <div className="modal-container">
             <span className="daily-quota-title">Daily Quota</span>
-            <span className="daily-quota-description">
-              {description}
-            </span>
+            <span className="daily-quota-description">{description}</span>
           </div>
         </div>
       </div>

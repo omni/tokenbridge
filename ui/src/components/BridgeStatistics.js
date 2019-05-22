@@ -2,13 +2,17 @@ import React from 'react'
 import numeral from 'numeral'
 import { DataBlock } from './DataBlock'
 
-export const BridgeStatistics = ({ users, totalBridged, homeBalance, homeNativeSupplyTitle, foreignSupply, homeSymbol, foreignSymbol }) => (
+export const BridgeStatistics = ({
+  users,
+  totalBridged,
+  homeBalance,
+  homeNativeSupplyTitle,
+  foreignSupply,
+  homeSymbol,
+  foreignSymbol
+}) => (
   <div className="statistics-bridge-data">
-    <DataBlock
-      description="Users"
-      value={numeral(users).format('0,0')}
-      type=''
-    />
+    <DataBlock description="Users" value={numeral(users).format('0,0')} type="" />
     <div className="separator" />
     <DataBlock
       description={`Total ${foreignSymbol} Bridged`}
@@ -28,4 +32,4 @@ export const BridgeStatistics = ({ users, totalBridged, homeBalance, homeNativeS
       type={foreignSymbol}
     />
   </div>
-);
+)

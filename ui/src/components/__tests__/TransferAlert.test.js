@@ -6,7 +6,7 @@ import BN from 'bignumber.js'
 
 afterEach(cleanup)
 
-describe('TransferAlert', function () {
+describe('TransferAlert', function() {
   it('does not render fee information if not provided', async () => {
     const data = {
       from: 'Sokol',
@@ -19,7 +19,7 @@ describe('TransferAlert', function () {
       reverse: false
     }
 
-    const { getByTestId } = render(<TransferAlert { ...data } />)
+    const { getByTestId } = render(<TransferAlert {...data} />)
 
     expect(getByTestId('transfer-description')).not.toHaveTextContent('Fee')
   })
@@ -40,7 +40,7 @@ describe('TransferAlert', function () {
       reverse: false
     }
 
-    const { getByTestId } = render(<TransferAlert { ...data } />)
+    const { getByTestId } = render(<TransferAlert {...data} />)
 
     expect(getByTestId('transfer-description')).toHaveTextContent('Fee')
     expect(getByTestId('transfer-description')).toHaveTextContent(fee.toString())

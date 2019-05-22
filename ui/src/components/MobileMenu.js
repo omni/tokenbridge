@@ -1,5 +1,5 @@
-import React from "react";
-import { MenuItems } from "./MenuItems";
+import React from 'react'
+import { MenuItems } from './MenuItems'
 
 export const MobileMenu = ({ onMenuToggle, withoutEvents }) => (
   <div className="mobile-menu">
@@ -7,4 +7,4 @@ export const MobileMenu = ({ onMenuToggle, withoutEvents }) => (
       <MenuItems withoutEvents={withoutEvents} onMenuToggle={onMenuToggle} />
     </div>
   </div>
-);
+)
