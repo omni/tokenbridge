@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "lint": "eslint .",
+    "lint": "eslint . && prettier --check \"./**/*.js\"",
     "lint:fix": "eslint . --fix"
   },
   "author": "",
