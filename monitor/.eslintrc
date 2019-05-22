@@ -1,5 +1,5 @@
 {
-  "plugins": ["node", "prettier"],
+  "plugins": ["node"],
   "extends": [
     "plugin:node/recommended",
     "airbnb-base",
