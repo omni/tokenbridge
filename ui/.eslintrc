@@ -1,5 +1,12 @@
 {
-  "extends": "react-app",
+  "extends": [
+    "react-app",
+    "plugin:prettier/recommended",
+    "../.eslintrc"
+  ],
+  "rules": {
+    "no-use-before-define": "off"
+  },
   "parserOptions": {
     "ecmaFeatures": {
       "legacyDecorators": true
