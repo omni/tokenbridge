@@ -1,0 +1,17 @@
+node_modules
+**/node_modules
+**/**/node_modules
+
+.git
+**/.git
+**/**/.git
+
+submodules
+**/submodules
+**/**/submodules
+
+.gitmodules
+
+oracle-e2e/Dockerfile
+oracle-e2e/.dockerignore
+oracle-e2e/docker-compose.yml
