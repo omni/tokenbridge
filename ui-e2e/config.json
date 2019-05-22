@@ -3,5 +3,6 @@
   "erc20Url" : "http://localhost:3001",
   "erc20NativeUrl" : "http://localhost:3002",
   "homeAccount": "./accounts/user77_7FC1.json",
-  "foreignAccount": "./accounts/user42_7FC1.json"
+  "foreignAccount": "./accounts/user42_7FC1.json",
+  "contractsPath": "../contracts-2.1.0"
 }

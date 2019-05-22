@@ -1,6 +1,6 @@
 const path = require('path')
 const shell = require('shelljs')
-const { contractsPath } = require('../constants.json')
+const { contractsPath } = require('./constants.json')
 
 const envsDir = path.join(__dirname, 'envs')
 const deployContractsDir = path.join(__dirname, contractsPath, 'deploy')
