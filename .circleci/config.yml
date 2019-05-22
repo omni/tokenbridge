@@ -59,8 +59,23 @@ jobs:
       - run: git submodule update --init
       - run: yarn
       - run: yarn run ui-e2e
+  cover:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - run: yarn
+      - run: yarn workspace ui run coverage
+      - run: yarn workspace ui run coveralls
 workflows:
   version: 2
+  coverage:
+    jobs:
+      - cover:
+          filters:
+            branches:
+              only: master
   tokenbridge:
     jobs:
       - build
