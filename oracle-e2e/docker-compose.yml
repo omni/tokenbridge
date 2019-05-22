@@ -98,5 +98,7 @@ services:
       - ALLOW_HTTP=yes
     command: "true"
   e2e:
-    build: ../
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
     command: "true"

@@ -100,7 +100,9 @@ services:
     - ALLOW_HTTP=yes
     command: "true"
   ui:
-    build: ..
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
     environment:
     - REACT_APP_HOME_BRIDGE_ADDRESS=0x32198D570fffC7033641F8A9094FFDCaAEF42624
     - REACT_APP_FOREIGN_BRIDGE_ADDRESS=0x2B6871b9B02F73fa24F4864322CdC78604207769
@@ -123,7 +125,9 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL=15000
     command: "true"
   ui-erc20:
-    build: ..
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
     environment:
     - REACT_APP_HOME_BRIDGE_ADDRESS=0x1feB40aD9420b186F019A717c37f5546165d411E
     - REACT_APP_FOREIGN_BRIDGE_ADDRESS=0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127
@@ -146,7 +150,9 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL=15000
     command: "true"
   ui-erc20-native:
-    build: ..
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
     environment:
     - REACT_APP_HOME_BRIDGE_ADDRESS=0x488Af810997eD1730cB3a3918cD83b3216E6eAda
     - REACT_APP_FOREIGN_BRIDGE_ADDRESS=0x488Af810997eD1730cB3a3918cD83b3216E6eAda
@@ -169,5 +175,7 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL=15000
     command: "true"
   e2e:
-    build: ../
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
     command: "true"
