@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "arrow-body-style": "off",
+    "func-names": "off",
+    "no-await-in-loop": "off",
+    "no-console": "off",
+    "no-else-return": "off",
+    "no-param-reassign": "off",
+    "no-plusplus": "off",
+    "no-restricted-syntax": "off",
+    "no-shadow": "off",
+    "no-use-before-define": ["error", { "functions": false }],
+    "import/no-dynamic-require": "off",
+    "prefer-template": "off",
+    "no-underscore-dangle": "off"
+  }
+}

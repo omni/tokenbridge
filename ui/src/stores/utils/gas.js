@@ -13,7 +13,7 @@ export async function fetchGasPrice({ oracleFn }) {
 }
 
 export async function fetchGasPriceFromOracle(oracleUrl, speedType) {
-  if(!oracleUrl) {
+  if (!oracleUrl) {
     throw new Error(`Gas Price Oracle url not defined`)
   }
   const response = await fetch(oracleUrl)

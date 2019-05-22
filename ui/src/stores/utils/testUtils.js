@@ -3,7 +3,7 @@ let pendingTransaction = 0
 
 export const balanceLoaded = () => {
   balanceCount++
-  if(balanceCount > 1) {
+  if (balanceCount > 1) {
     document.getElementById('root').classList.add('web3-loaded')
   }
 }
@@ -15,7 +15,7 @@ export const addPendingTransaction = () => {
 
 export const removePendingTransaction = () => {
   pendingTransaction--
-  if(!pendingTransaction) {
+  if (!pendingTransaction) {
     document.getElementById('root').classList.remove('pending-transaction')
   }
 }

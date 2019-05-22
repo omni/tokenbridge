@@ -1,19 +1,19 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 
 export class PreventExit extends Component {
-  onUnload = (e) => {
-    e.returnValue = "Are you sure?"
+  onUnload = e => {
+    e.returnValue = 'Are you sure?'
   }
 
-  componentDidMount () {
+  componentDidMount() {
     window.addEventListener('beforeunload', this.onUnload)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('beforeunload', this.onUnload)
   }
 
-  render () {
+  render() {
     return <div />
   }
 }

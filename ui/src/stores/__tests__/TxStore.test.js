@@ -1,7 +1,7 @@
 import TxStore from '../TxStore'
 import Web3 from 'web3'
 
-describe('TxStore', function () {
+describe('TxStore', function() {
   let txStore
   beforeEach(() => {
     const rootStore = {
@@ -11,7 +11,7 @@ describe('TxStore', function () {
     }
     txStore = new TxStore(rootStore)
   })
-  describe('isStatusSuccess', function () {
+  describe('isStatusSuccess', function() {
     it('should return true if status field is 0x1', () => {
       // Given
       const tx = {
@@ -60,9 +60,7 @@ describe('TxStore', function () {
     it('should return true if status field not present and logs length > 0', () => {
       // Given
       const tx = {
-        logs: [
-            {}
-          ]
+        logs: [{}]
       }
 
       // When

@@ -1,9 +1,9 @@
-export { Header } from './Header';
-export { Bridge } from './Bridge';
-export { RelayEvents } from './RelayEvents';
-export { Footer } from './Footer';
-export { SweetAlert } from './SweetAlert';
-export { Loading } from './Loading';
+export { Header } from './Header'
+export { Bridge } from './Bridge'
+export { RelayEvents } from './RelayEvents'
+export { Footer } from './Footer'
+export { SweetAlert } from './SweetAlert'
+export { Loading } from './Loading'
 export { Fade } from './Fade'
 export { BridgeForm } from './BridgeForm'
 export { BridgeNetwork } from './BridgeNetwork'

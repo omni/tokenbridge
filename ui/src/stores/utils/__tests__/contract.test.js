@@ -60,4 +60,3 @@ describe('getTokenType', () => {
     expect(type).toEqual(ERC_TYPES.ERC20)
   })
 })
-
