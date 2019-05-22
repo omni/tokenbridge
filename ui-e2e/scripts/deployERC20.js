@@ -8,12 +8,12 @@ require('dotenv').config({
 const {
   deployContract,
   sendRawTx
-} = require('..', contractsPath, 'deploy/src/deploymentUtils')
+} = require(path.join('..', contractsPath, 'deploy/src/deploymentUtils'))
 const {
   web3Foreign,
   deploymentPrivateKey
-} = require('..', contractsPath, 'deploy/src/web3')
-const POA20 = require('..', contractsPath, 'build/contracts/ERC677BridgeToken.json')
+} = require(path.join('..', contractsPath, 'deploy/src/web3'))
+const POA20 = require(path.join('..', contractsPath, 'build/contracts/ERC677BridgeToken.json'))
 const user = '0x7FC1442AB55Da569940Eb750AaD2BAA63DA4010E'
 
 const { DEPLOYMENT_ACCOUNT_ADDRESS } = process.env
