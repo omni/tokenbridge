@@ -56,9 +56,8 @@ jobs:
       - checkout
       - run: git submodule update --init
       - run: yarn
-      - run: yarn workspace ui run build
-      - run: yarn workspace ui run build coverage
-      - run: yarn workspace ui run build coveralls
+      - run: yarn workspace ui run coverage
+      - run: yarn workspace ui run coveralls
 workflows:
   version: 2
   coverage:

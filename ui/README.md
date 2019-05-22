@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/poanetwork/tokenbridge/badge.svg?branch=master)](https://coveralls.io/github/poanetwork/tokenbridge?branch=master)
+
 # POA Token Bridge / UI
 DApp interface to transfer tokens and coins between chains.
 
