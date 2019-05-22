@@ -49,9 +49,24 @@ jobs:
         - run: yarn
         - setup_remote_docker
         - run: yarn run ui-e2e
-
+  cover:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - run: yarn
+      - run: yarn workspace ui run build
+      - run: yarn workspace ui run build coverage
+      - run: yarn workspace ui run build coveralls
 workflows:
   version: 2
+  coverage:
+    jobs:
+      - cover:
+          filters:
+            branches:
+              only: master
   tokenbridge:
     jobs:
       - lint
