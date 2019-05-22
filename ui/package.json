@@ -32,7 +32,7 @@
     "web3-utils": "1.0.0-beta.30"
   },
   "scripts": {
-    "lint": "eslint . && prettier --check \"./src/**/*.js\"",
+    "lint": "eslint . --ignore-path ../.eslintignore",
     "select-css-theme": "node scripts/selectTheme.js",
     "build-css": "node-sass-chokidar src/assets/stylesheets -o src/assets/stylesheets --output-style=compressed -m application*.css",
     "watch-css": "nodemon -e scss -x \"npm run build-css\"",
