@@ -7,8 +7,8 @@
 **/.git
 **/docs
 **/*.md
-**/*.png
-**/*.jpg
 
 contracts/test
 oracle/test
+oracle/**/*.png
+oracle/**/*.jpg
