@@ -1,7 +1,15 @@
 **/node_modules
-**/.git
 **/submodules
 **/Dockerfile
 **/.dockerignore
 **/docker-compose.yml
 .gitmodules
+**/.git
+**/.env*
+**/docs
+**/*.md
+**/*.png
+**/*.jpg
+
+contracts/test
+oracle/test
