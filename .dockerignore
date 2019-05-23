@@ -5,7 +5,6 @@
 **/docker-compose.yml
 .gitmodules
 **/.git
-**/.env*
 **/docs
 **/*.md
 **/*.png
