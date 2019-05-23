@@ -31,7 +31,9 @@ services:
   bridge_request:
     cpus: 0.1
     mem_limit: 500m
-    build: .
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     command: 'true'
     env_file: ./.env
     environment: 
@@ -45,7 +47,9 @@ services:
   bridge_collected:
     cpus: 0.1
     mem_limit: 500m
-    build: .
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     command: 'true'
     env_file: ./.env
     environment: 
@@ -59,7 +63,9 @@ services:
   bridge_affirmation:
     cpus: 0.1
     mem_limit: 500m
-    build: .
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     command: 'true'
     env_file: ./.env
     environment: 
@@ -73,7 +79,9 @@ services:
   bridge_senderhome:
     cpus: 0.1
     mem_limit: 500m
-    build: .
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     command: 'true'
     env_file: ./.env
     environment: 
@@ -87,7 +95,9 @@ services:
   bridge_senderforeign:
     cpus: 0.1
     mem_limit: 500m
-    build: .
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     command: 'true'
     env_file: ./.env
     environment: 

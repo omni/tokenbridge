@@ -1,6 +1,0 @@
-**/node_modules
-**/submodules
-**/Dockerfile
-**/.dockerignore
-**/docker-compose.yml
-.gitmodules
