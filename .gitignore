@@ -1,6 +1,44 @@
+# dependencies
 node_modules
+
+# testing
+coverage
+
+# production
+build
+
+# misc
+.DS_Store
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .idea
 .nyc_output
-coverage/
 logs/
+responses/*
+!responses/.gitkeep
+*.err
+*.out
+data
+
+# contracts build
+ui/src/contracts
+
+# compiled css
+*.css
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+#deployment
+*.retry
+hosts.yml
+hosts
+*.log
+Vagrantfile
+vagrant-hosts.yml
+.vagrant
+

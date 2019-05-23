@@ -1,7 +1,0 @@
-.env
-node_modules
-responses/*
-!responses/.gitkeep
-*.err
-*.out
-.idea
