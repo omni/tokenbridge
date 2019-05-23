@@ -5,3 +5,6 @@ node_modules
 **/.git
 **/**/.git
 .gitmodules
+**/.env*
+**/docs
+**/README.md
