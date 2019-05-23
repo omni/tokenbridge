@@ -8,6 +8,7 @@ const User = require("./User.js").User;
 test.describe('e2e-test for bridge.poa, version 1.5.0', async function () {
 	this.timeout(5 * 60000);
 	this.slow(1 * 60000);
+	this.retries(2);
 
 	const maxAmountPerTransactionLimit = 1;
 	let startURL;

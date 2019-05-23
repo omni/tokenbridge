@@ -38,15 +38,15 @@
     "watch-css": "nodemon -e scss -x \"npm run build-css\"",
     "start": "npm run build-css && npm run select-css-theme && react-app-rewired start",
     "build": "npm run compile:contracts && npm run build-css && npm run select-css-theme && react-app-rewired build",
-    "test": "react-app-rewired test --env=jsdom --no-watch",
+    "test": "npm run compile:contracts && react-app-rewired test --env=jsdom --no-watch",
     "test:watch": "react-app-rewired test --env=jsdom",
     "coverage": "react-app-rewired test --env=jsdom --coverage",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "eject": "react-app-rewired eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build -o origin",
-    "compile:contracts": "cd submodules/poa-bridge-contracts && npm install && npm run compile && cd ../../ && rm -r -f src/contracts && cp -r submodules/poa-bridge-contracts/build/contracts src/contracts",
-    "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src || cp lib/web3-eth/index.js ./node_modules/web3-eth/src) && npm run compile:contracts"
+    "compile:contracts": "rm -r -f src/contracts && cp -r ../contracts/build/contracts src/contracts",
+    "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src && cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
   },
   "devDependencies": {
     "eslint": "5.12.0",

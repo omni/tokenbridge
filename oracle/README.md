@@ -51,7 +51,7 @@ For more information on the Redis/RabbitMQ requirements, see [#90](/../../issues
 
 ## Installation and Deployment
 
-**Note:** The following steps detail the bridge deployment process for development and testing. For deployment in a production environment we recommend using the [Bridge Deployment Playbooks](https://github.com/poanetwork/deployment-bridge/tree/master/bridge-nodejs). 
+**Note:** The following steps detail the bridge deployment process for development and testing. For deployment in a production environment we recommend using the [Bridge Deployment Playbooks](../deployment/README.md). 
 
 #### Deploy the Bridge Contracts
 

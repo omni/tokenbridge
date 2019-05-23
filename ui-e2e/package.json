@@ -5,5 +5,8 @@
   "private": true,
   "devDependencies": {
     "mocha": "^5.1.1"
+  },
+  "scripts": {
+    "deploy": "node ./scripts/deploy.js"
   }
 }
