@@ -7,7 +7,7 @@ require('dotenv').config({
 
 const {
   deployContract,
-  sendRawTx,
+  sendRawTxForeign,
   privateKeyToAddress
 } = require(`../${contractsPath}/deploy/src/deploymentUtils`)
 const {
@@ -34,7 +34,7 @@ async function deployErc20() {
     const mintData = await poa20foreign.methods
       .mint(user.address, '1000000000000000000')
       .encodeABI({ from: DEPLOYMENT_ACCOUNT_ADDRESS })
-    await sendRawTx({
+    await sendRawTxForeign({
       data: mintData,
       nonce: foreignNonce,
       to: poa20foreign.options.address,
