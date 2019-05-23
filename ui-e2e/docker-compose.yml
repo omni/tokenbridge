@@ -17,7 +17,9 @@ services:
     ports:
     - "15672:15672"
   bridge:
-    build: ../oracle
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     environment:
     - NODE_ENV=production
     - BRIDGE_MODE=NATIVE_TO_ERC
@@ -44,7 +46,9 @@ services:
     - ALLOW_HTTP=yes
     command: "true"
   bridge-erc20:
-    build: ../oracle
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     environment:
     - NODE_ENV=production
     - BRIDGE_MODE=ERC_TO_ERC
@@ -72,7 +76,9 @@ services:
     - ALLOW_HTTP=yes
     command: "true"
   bridge-erc20-native:
-    build: ../oracle
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     environment:
     - NODE_ENV=production
     - BRIDGE_MODE=ERC_TO_NATIVE
