@@ -1,7 +1,0 @@
-*.retry
-hosts.yml
-hosts
-*.log
-Vagrantfile
-vagrant-hosts.yml
-.vagrant
