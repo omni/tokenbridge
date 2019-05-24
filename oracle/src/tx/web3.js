@@ -1,8 +1,8 @@
+const { hexToNumber } = require('web3-utils')
 const logger = require('../services/logger').child({
   module: 'web3'
 })
 const { sendRawTx } = require('./sendTx')
-const { hexToNumber } = require('web3-utils')
 
 async function getNonce(web3, address) {
   try {
