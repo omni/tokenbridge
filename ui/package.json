@@ -23,7 +23,7 @@
     "react-dom": "^16.2.0",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "2.1.8",
+    "react-scripts": "3.0.1",
     "react-transition-group": "^2.2.1",
     "selenium-webdriver": "^3.6.0",
     "sweetalert": "^2.1.0",
