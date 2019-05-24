@@ -48,11 +48,6 @@
     "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src && cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
   },
   "devDependencies": {
-    "eslint-config-react-app": "^4.0.1",
-    "eslint-plugin-react": "^7.13.0",
-    "eslint-plugin-react-hooks": "^1.6.0",
-    "eslint-plugin-flowtype": "^3.8.1",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
     "jest-dom": "^3.0.1",
     "nodemon": "^1.18.11",
     "react-testing-library": "^5.4.4"
