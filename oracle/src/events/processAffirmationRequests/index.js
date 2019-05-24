@@ -1,7 +1,9 @@
 require('dotenv').config()
+const promiseLimit = require('promise-limit')
+const { HttpListProviderError } = require('http-list-provider')
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
-const promiseLimit = require('promise-limit')
+
 const bridgeValidatorsABI = require('../../../abis/BridgeValidators.abi')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
@@ -10,7 +12,6 @@ const {
   AlreadySignedError,
   InvalidValidatorError
 } = require('../../utils/errors')
-const { HttpListProviderError } = require('http-list-provider')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
