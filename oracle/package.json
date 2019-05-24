@@ -14,6 +14,7 @@
     "test": "NODE_ENV=test mocha",
     "test:watch": "NODE_ENV=test mocha --watch --reporter=min",
     "coverage": "NODE_ENV=test nyc --reporter=text --reporter=html mocha",
+    "import:contracts": "rm -r -f ./abis && cp -r ../contracts/build/contracts ./abis/",
     "postinstall": "mkdir -p logs"
   },
   "author": "",

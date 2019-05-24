@@ -25,6 +25,8 @@ data
 
 # contracts build
 ui/src/contracts
+oracle/abis
+monitor/abis
 
 # compiled css
 *.css

@@ -47,7 +47,7 @@ const ERC677_ABI = [
     type: 'function'
   }
 ]
-const BRIDGE_ABI = require('../../abis/ForeignBridgeNativeToErc.abi')
+const BRIDGE_ABI = require('../../abis/ForeignBridgeNativeToErc').abi
 
 async function main() {
   const bridge = new web3Foreign.eth.Contract(BRIDGE_ABI, FOREIGN_BRIDGE_ADDRESS)

@@ -1,6 +1,6 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
-const bridgeValidatorsAbi = require('../abis/BridgeValidators.abi')
+const bridgeValidatorsAbi = require('../abis/BridgeValidators').abi
 const logger = require('../logger')('validatorsUtils')
 const { getPastEvents } = require('./contract')
 

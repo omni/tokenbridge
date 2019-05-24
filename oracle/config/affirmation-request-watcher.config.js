@@ -1,6 +1,6 @@
 require('dotenv').config()
 const baseConfig = require('./base.config')
-const erc20Abi = require('../abis/ERC20.abi')
+const erc20Abi = require('../abis/ERC20').abi
 const { ERC_TYPES } = require('../src/utils/constants')
 
 const initialChecksJson = process.argv[3]

@@ -6,7 +6,7 @@ const Web3Utils = require('web3-utils')
 const { web3Home } = require('../../src/services/web3')
 const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
 const { isValidAmount } = require('../utils/utils')
-const BRIDGE_ABI = require('../../abis/HomeBridgeErcToNative.abi')
+const BRIDGE_ABI = require('../../abis/HomeBridgeErcToNative').abi
 
 const {
   USER_ADDRESS,

@@ -4,14 +4,14 @@ const { toBN } = require('web3').utils
 const { web3Home, web3Foreign } = require('../src/services/web3')
 const { privateKeyToAddress } = require('../src/utils/utils')
 
-const homeNativeErcAbi = require('../abis/HomeBridgeNativeToErc.abi')
-const foreignNativeErcAbi = require('../abis/ForeignBridgeNativeToErc.abi')
+const homeNativeErcAbi = require('../abis/HomeBridgeNativeToErc').abi
+const foreignNativeErcAbi = require('../abis/ForeignBridgeNativeToErc').abi
 
-const homeErcErcAbi = require('../abis/HomeBridgeErcToErc.abi')
-const foreignErc677Erc677Abi = require('../abis/ForeignBridgeErc677ToErc677.abi')
+const homeErcErcAbi = require('../abis/HomeBridgeErcToErc').abi
+const foreignErc677Erc677Abi = require('../abis/ForeignBridgeErc677ToErc677').abi
 
-const homeErcNativeAbi = require('../abis/HomeBridgeErcToNative.abi')
-const foreignErcNativeAbi = require('../abis/ForeignBridgeErcToNative.abi')
+const homeErcNativeAbi = require('../abis/HomeBridgeErcToNative').abi
+const foreignErcNativeAbi = require('../abis/ForeignBridgeErcToNative').abi
 
 const { VALIDATOR_ADDRESS, VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 

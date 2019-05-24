@@ -15,8 +15,8 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const HOME_ERC_TO_ERC_ABI = require('../abis/HomeBridgeErcToErc.abi')
-const ERC20_ABI = require('../abis/ERC20.abi')
+const HOME_ERC_TO_ERC_ABI = require('../abis/HomeBridgeErcToErc').abi
+const ERC20_ABI = require('../abis/ERC20').abi
 const { getPastEvents, getBlockNumber } = require('./contract')
 
 async function main() {

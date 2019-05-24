@@ -13,6 +13,12 @@ COPY contracts/package.json ./contracts/
 COPY oracle/package.json ./oracle/
 COPY yarn.lock .
 RUN yarn install --production
+
+COPY ./contracts ./contracts
+RUN yarn run compile:contracts
+RUN yarn workspace oracle run import:contracts
+RUN rm -rf ./contracts
+
 COPY ./oracle ./oracle
 WORKDIR /mono/oracle
 CMD echo "To start a bridge process run:" \

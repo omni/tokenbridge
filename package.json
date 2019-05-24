@@ -25,6 +25,10 @@
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
     "ui-e2e": "./ui-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build",
+    "compile:contracts": "yarn workspace poa-parity-bridge-contracts run compile",
+    "import:contracts": "yarn workspace oracle run import:contracts && yarn workspace ui run import:contracts && yarn workspace monitor run import:contracts",
+    "prepare:contracts": "yarn run compile:contracts && yarn run import:contracts",
+    "install:deploy": "cd contracts/deploy && rm -f package-lock.json && npm install --silent",
     "postinstall": "ln -s $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
   }
 }

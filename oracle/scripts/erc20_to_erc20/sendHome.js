@@ -49,7 +49,7 @@ const BRIDGEABLE_TOKEN_ABI = [
   }
 ]
 
-const BRIDGE_ABI = require('../../abis/HomeBridgeErcToErc.abi')
+const BRIDGE_ABI = require('../../abis/HomeBridgeErcToErc').abi
 
 const homeRpcUrl = rpcUrlsManager.homeUrls[0]
 const homeProvider = new Web3.providers.HttpProvider(homeRpcUrl)
