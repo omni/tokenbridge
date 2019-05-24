@@ -40,16 +40,10 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "concurrently": "^3.6.0",
-    "eslint": "5.12.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-config-prettier": "^2.9.0",
-    "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-prettier": "^2.6.0",
+    
     "mocha": "^5.2.0",
     "ndjson": "^1.5.0",
     "nyc": "^12.0.2",
-    "prettier": "^1.12.1",
     "proxyquire": "^2.0.1",
     "simple-statistics": "^6.1.0",
     "sinon": "^6.1.0"
