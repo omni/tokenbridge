@@ -78,4 +78,9 @@ workflows:
               only: master
   tokenbridge:
     jobs:
+      - build
+      - lint
+      - ansible-lint
+      - test
       - oracle-e2e
+      - ui-e2e
