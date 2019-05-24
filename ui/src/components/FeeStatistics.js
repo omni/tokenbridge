@@ -16,9 +16,8 @@ export const FeeStatistics = ({ depositFeeCollected, withdrawFeeCollected }) => 
           dataTestid="deposit-fees-block"
         />
       )}
-      {depositFeeCollected.shouldDisplay && withdrawFeeCollected.shouldDisplay && (
-        <div className="separator" />
-      )}
+      {depositFeeCollected.shouldDisplay &&
+        withdrawFeeCollected.shouldDisplay && <div className="separator" />}
       {withdrawFeeCollected.shouldDisplay && (
         <DataBlock
           description="Withdrawal Fees"
