@@ -112,6 +112,9 @@ There are two options to run the TokenBridge processes:
 
 All [watcher](#watcher) & [sender](#sender) services launch when `docker-compose` is called. 
 
+Redis and RabbitMQ data are placed in `~/bridge_data` directory.
+In case you need to reset your bridge or setup a new one (with different configuration) you must delete this directory to prevent old data from being read.
+
 **Note**: To view the Docker logs:
 * `chdir` to the directory containing the `docker-compose.yml` file used to run the bridge instance
 * [View the logs](https://docs.docker.com/v17.09/compose/reference/logs/) : `docker-compose logs`
