@@ -50,7 +50,7 @@ The same address is used to send a coin from the Home network and receive a toke
 - Wallet Resources
   - [MetaMask](https://consensys.zendesk.com/hc/en-us/categories/360001045692-Using-MetaMask)
   - [Nifty Wallet](https://poanet.zendesk.com/hc/en-us/articles/360008957634-Nifty-Wallet)
-  - [AlphaWallet (iOS and Android)](https://alphawallet.github.io/AlphaWallet-Download-Page/)
+  - [AlphaWallet (iOS and Android)](https://alphawallet.com/)
 
 ## Getting Started
 
@@ -61,7 +61,7 @@ The following is an example setup using the POA Sokol testnet as the Home networ
 - [poa-bridge-contracts](https://github.com/poanetwork/poa-bridge-contracts)
 - [oracle](../oracle/README.md)
 - [node.js](https://nodejs.org/en/download/)
-- [AlphaWallet](https://alphawallet.github.io/AlphaWallet-Download-Page/) or [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/)
+- [AlphaWallet](https://alphawallet.com/) or [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/)
 
 ### Example Setup
 
