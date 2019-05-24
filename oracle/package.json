@@ -41,7 +41,6 @@
     "chai-as-promised": "^7.1.1",
     "concurrently": "^3.6.0",
     
-    "mocha": "^5.2.0",
     "ndjson": "^1.5.0",
     "nyc": "^12.0.2",
     "proxyquire": "^2.0.1",
