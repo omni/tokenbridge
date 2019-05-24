@@ -49,11 +49,6 @@
   },
   "devDependencies": {
     "eslint-config-react-app": "^4.0.1",
-    "eslint-plugin-flowtype": "^3.8.1",
-
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    
-    
     "eslint-plugin-react": "^7.13.0",
     "eslint-plugin-react-hooks": "^1.6.0",
     "jest-dom": "^3.0.1",
