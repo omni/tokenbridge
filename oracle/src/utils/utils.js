@@ -1,6 +1,7 @@
 const BigNumber = require('bignumber.js')
 const promiseRetry = require('promise-retry')
 const Web3 = require('web3')
+const { GAS_PRICE_OPTIONS } = require('./constants')
 
 async function syncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
@@ -96,6 +97,22 @@ function privateKeyToAddress(privateKey) {
     : null
 }
 
+function generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed }) {
+  let gasPriceOptions = null
+  if (dataType === GAS_PRICE_OPTIONS.GAS_PRICE) {
+    gasPriceOptions = {
+      type: dataType,
+      value: gasPrice
+    }
+  } else if (dataType === GAS_PRICE_OPTIONS.SPEED) {
+    gasPriceOptions = {
+      type: dataType,
+      value: gasPriceSpeed
+    }
+  }
+  return gasPriceOptions
+}
+
 module.exports = {
   syncForEach,
   checkHTTPS,
@@ -103,5 +120,6 @@ module.exports = {
   addExtraGas,
   setIntervalAndRun,
   watchdog,
-  privateKeyToAddress
+  privateKeyToAddress,
+  generateGasPriceOptions
 }

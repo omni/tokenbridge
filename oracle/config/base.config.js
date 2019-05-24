@@ -13,6 +13,9 @@ const foreignErc677Erc677Abi = require('../abis/ForeignBridgeErc677ToErc677.abi'
 const homeErcNativeAbi = require('../abis/HomeBridgeErcToNative.abi')
 const foreignErcNativeAbi = require('../abis/ForeignBridgeErcToNative.abi')
 
+const homeAMBAbi = require('../abis/HomeAMB.abi')
+const foreignAMBAbi = require('../abis/ForeignAMB.abi')
+
 const { VALIDATOR_ADDRESS, VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
 let homeAbi
@@ -34,6 +37,11 @@ switch (process.env.BRIDGE_MODE) {
     homeAbi = homeErcNativeAbi
     foreignAbi = foreignErcNativeAbi
     id = 'erc-native'
+    break
+  case 'ARBITRARY_MESSAGE':
+    homeAbi = homeAMBAbi
+    foreignAbi = foreignAMBAbi
+    id = 'amb'
     break
   default:
     if (process.env.NODE_ENV !== 'test') {

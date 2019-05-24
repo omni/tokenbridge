@@ -3,7 +3,8 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const BigNumber = require('bignumber.js')
 const proxyquire = require('proxyquire')
-const { addExtraGas, syncForEach } = require('../src/utils/utils')
+const { addExtraGas, syncForEach, generateGasPriceOptions } = require('../src/utils/utils')
+const { GAS_PRICE_OPTIONS, ORACLE_GAS_PRICE_SPEEDS } = require('../src/utils/constants')
 
 chai.use(chaiAsPromised)
 const { expect } = chai
@@ -132,6 +133,56 @@ describe('utils', () => {
       return expect(promise).to.be.fulfilled.then(() => {
         expect(xs).to.deep.equal([])
       })
+    })
+  })
+  describe('generateGasPriceOptions', () => {
+    it('should work for GAS_PRICE option', () => {
+      // given
+      const dataType = GAS_PRICE_OPTIONS.GAS_PRICE
+      const gasPrice = BigNumber('0000000000000000000000000000000000000000000000000000000165a0bc00')
+      const gasPriceSpeed = null
+
+      const expectedResult = {
+        type: dataType,
+        value: gasPrice
+      }
+
+      // when
+      const gasPriceOptions = generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed })
+
+      // then
+      expect(gasPriceOptions.type).to.be.equal(expectedResult.type)
+      expect(gasPriceOptions.value).to.be.equal(expectedResult.value)
+    })
+    it('should work for SPEED option', () => {
+      // given
+      const dataType = GAS_PRICE_OPTIONS.SPEED
+      const gasPrice = null
+      const gasPriceSpeed = ORACLE_GAS_PRICE_SPEEDS.STANDARD
+
+      const expectedResult = {
+        type: dataType,
+        value: gasPriceSpeed
+      }
+
+      // when
+      const gasPriceOptions = generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed })
+
+      // then
+      expect(gasPriceOptions.type).to.be.equal(expectedResult.type)
+      expect(gasPriceOptions.value).to.be.equal(expectedResult.value)
+    })
+    it('should return null option for undefined option', () => {
+      // given
+      const dataType = GAS_PRICE_OPTIONS.UNDEFINED
+      const gasPrice = null
+      const gasPriceSpeed = null
+
+      // when
+      const gasPriceOptions = generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed })
+
+      // then
+      expect(gasPriceOptions).to.be.equal(null)
     })
   })
 })

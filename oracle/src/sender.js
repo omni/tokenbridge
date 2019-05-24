@@ -99,7 +99,6 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
 
     const txArray = JSON.parse(msg.content)
     logger.info(`Msg received with ${txArray.length} Tx to send`)
-    const gasPrice = GasPrice.getPrice()
 
     const ttl = REDIS_LOCK_TTL * txArray.length
 
@@ -114,6 +113,7 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
     logger.debug(`Sending ${txArray.length} transactions`)
     await syncForEach(txArray, async job => {
       const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE)
+      const gasPrice = GasPrice.getPrice(job.gasPriceOptions)
 
       try {
         logger.info(`Sending transaction with nonce ${nonce}`)
@@ -121,7 +121,7 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
           chain: config.id,
           data: job.data,
           nonce,
-          gasPrice: gasPrice.toString(10),
+          gasPrice,
           amount: '0',
           gasLimit,
           privateKey: VALIDATOR_ADDRESS_PRIVATE_KEY,
