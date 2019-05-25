@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "lint": "eslint . --ignore-path ../.eslintignore",
-    "lint:fix": "eslint . --fix",
-    "import:contracts": "rm -r -f ./abis && cp -r ../contracts/build/contracts ./abis/"
+    "lint:fix": "eslint . --fix"
   },
   "author": "",
   "license": "ISC",

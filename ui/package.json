@@ -36,15 +36,14 @@
     "build-css": "node-sass-chokidar src/assets/stylesheets -o src/assets/stylesheets --output-style=compressed -m application*.css",
     "watch-css": "nodemon -e scss -x \"npm run build-css\"",
     "start": "npm run build-css && npm run select-css-theme && react-app-rewired start",
-    "build": "npm run import:contracts && npm run build-css && npm run select-css-theme && react-app-rewired build",
-    "test": "npm run import:contracts && react-app-rewired test --env=jsdom --no-watch",
+    "build": "npm run build-css && npm run select-css-theme && react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom --no-watch",
     "test:watch": "react-app-rewired test --env=jsdom",
     "coverage": "react-app-rewired test --env=jsdom --coverage",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "eject": "react-app-rewired eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build -o origin",
-    "import:contracts": "rm -r -f src/contracts && cp -r ../contracts/build/contracts src/contracts",
     "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src && cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
   },
   "devDependencies": {

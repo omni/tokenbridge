@@ -15,7 +15,7 @@ jobs:
       - checkout
       - run: git submodule update --init
       - run: yarn
-      - run: yarn prepare:contracts
+      - run: yarn compile:contracts
       - run: yarn run lint
   ansible-lint:
     docker:
@@ -33,7 +33,7 @@ jobs:
       - checkout
       - run: git submodule update --init
       - run: yarn
-      - run: yarn prepare:contracts
+      - run: yarn compile:contracts
       - run: yarn run test
   oracle-e2e:
     docker:

@@ -15,8 +15,6 @@ COPY yarn.lock .
 RUN yarn install
 COPY ./contracts ./contracts
 RUN yarn install:deploy
-
-RUN mkdir -p oracle/abis monitor/abis ui/src/contracts
-RUN yarn prepare:contracts
+RUN yarn compile:contracts
 
 COPY . .
