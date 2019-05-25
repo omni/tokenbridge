@@ -12,7 +12,9 @@ const FOREIGN_GAS_PRICE_SPEED_TYPE = process.env.REACT_APP_FOREIGN_GAS_PRICE_SPE
 const FOREIGN_GAS_PRICE_UPDATE_INTERVAL = process.env.REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL
 
 class GasPriceStore {
-  @observable gasPrice = null
+  @observable
+  gasPrice = null
+
   oracleUrl = null
   speedType = null
   updateInterval = null
@@ -53,7 +55,8 @@ class GasPriceStore {
     setTimeout(() => this.updateGasPrice(), this.updateInterval)
   }
 
-  @computed get gasPriceInHex() {
+  @computed
+  get gasPriceInHex() {
     return toHex(this.gasPrice)
   }
 }
