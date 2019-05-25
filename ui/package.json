@@ -14,7 +14,6 @@
     "gh-pages": "^1.1.0",
     "mobx": "^4.0.2",
     "mobx-react": "^5.0.0",
-    "mocha": "^5.1.1",
     "node-sass-chokidar": "^1.0.1",
     "numeral": "^2.0.6",
     "react": "^16.2.0",
@@ -24,7 +23,7 @@
     "react-dom": "^16.2.0",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "2.1.8",
+    "react-scripts": "3.0.1",
     "react-transition-group": "^2.2.1",
     "selenium-webdriver": "^3.6.0",
     "sweetalert": "^2.1.0",
@@ -49,20 +48,9 @@
     "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src && cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
   },
   "devDependencies": {
-    "eslint": "5.12.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-prettier": "^3.1.0",
-    "eslint-config-react-app": "^4.0.1",
-    "eslint-plugin-flowtype": "^3.8.1",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-prettier": "^2.6.2",
-    "eslint-plugin-react": "^7.13.0",
-    "eslint-plugin-react-hooks": "^1.6.0",
+    "babel-eslint": "^10.0.1",
     "jest-dom": "^3.0.1",
     "nodemon": "^1.18.11",
-    "prettier": "^1.14.3",
     "react-testing-library": "^5.4.4"
   },
   "browserslist": [
