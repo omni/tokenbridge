@@ -14,7 +14,7 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const ERC20_ABI = require('./abis/ERC20').abi
+const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
 const { getTokenType } = require('./utils/ercUtils')
 const { getPastEvents, getBlockNumber } = require('./utils/contract')
 

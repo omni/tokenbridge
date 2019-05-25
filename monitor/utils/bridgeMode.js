@@ -1,9 +1,9 @@
-const HOME_NATIVE_TO_ERC_ABI = require('../abis/HomeBridgeNativeToErc').abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require('../abis/ForeignBridgeNativeToErc').abi
-const HOME_ERC_TO_ERC_ABI = require('../abis/HomeBridgeErcToErc').abi
-const FOREIGN_ERC_TO_ERC_ABI = require('../abis/ForeignBridgeErc677ToErc677').abi
-const HOME_ERC_TO_NATIVE_ABI = require('../abis/HomeBridgeErcToNative').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('../abis/ForeignBridgeErcToNative').abi
+const HOME_NATIVE_TO_ERC_ABI = require('../../contracts/build/contracts/HomeBridgeNativeToErc').abi
+const FOREIGN_NATIVE_TO_ERC_ABI = require('../../contracts/build/contracts/ForeignBridgeNativeToErc').abi
+const HOME_ERC_TO_ERC_ABI = require('../../contracts/build/contracts/HomeBridgeErcToErc').abi
+const FOREIGN_ERC_TO_ERC_ABI = require('../../contracts/build/contracts/ForeignBridgeErc677ToErc677').abi
+const HOME_ERC_TO_NATIVE_ABI = require('../../contracts/build/contracts/HomeBridgeErcToNative').abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../../contracts/build/contracts/ForeignBridgeErcToNative').abi
 
 const BRIDGE_MODES = {
   NATIVE_TO_ERC: 'NATIVE_TO_ERC',

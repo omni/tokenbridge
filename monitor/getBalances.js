@@ -14,14 +14,14 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const ERC20_ABI = require('./abis/ERC20').abi
-const ERC677_ABI = require('./abis/ERC677').abi
-const HOME_ERC_TO_ERC_ABI = require('./abis/HomeBridgeErcToErc').abi
-const HOME_ERC_TO_NATIVE_ABI = require('./abis/HomeBridgeErcToNative').abi
-const BLOCK_REWARD_ABI = require('./abis/IBlockReward').abi
-const FOREIGN_ERC_TO_ERC_ABI = require('./abis/ForeignBridgeErcToErc').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('./abis/ForeignBridgeErcToNative').abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require('./abis/ForeignBridgeNativeToErc').abi
+const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
+const ERC677_ABI = require('../contracts/build/contracts/ERC677').abi
+const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
+const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
+const BLOCK_REWARD_ABI = require('../contracts/build/contracts/IBlockReward').abi
+const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErcToErc').abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative').abi
+const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc').abi
 
 async function main(bridgeMode) {
   try {

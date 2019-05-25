@@ -26,7 +26,7 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const BRIDGE_VALIDATORS_ABI = require('./abis/BridgeValidators').abi
+const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi
 
 const asyncForEach = async (array, callback) => {
   for (let index = 0; index < array.length; index++) {

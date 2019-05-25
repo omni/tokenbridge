@@ -3,7 +3,7 @@ require('dotenv').config({
   path: path.join(__dirname, '../.env')
 })
 const Web3 = require('web3')
-const bridgeValidatorsABI = require('../abis/BridgeValidators').abi
+const bridgeValidatorsABI = require('../../contracts/build/contracts/BridgeValidators').abi
 
 const rpcUrlsManager = require('../src/services/getRpcUrlsManager')
 

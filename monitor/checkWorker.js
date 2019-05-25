@@ -11,7 +11,7 @@ const { HOME_BRIDGE_ADDRESS, HOME_RPC_URL } = process.env
 const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
-const HOME_ERC_TO_ERC_ABI = require('./abis/HomeBridgeErcToErc').abi
+const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
 
 async function checkWorker() {
   try {
