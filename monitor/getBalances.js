@@ -20,8 +20,10 @@ const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcT
 const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
 const BLOCK_REWARD_ABI = require('../contracts/build/contracts/IBlockReward').abi
 const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErcToErc').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative').abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc').abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative')
+  .abi
+const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc')
+  .abi
 
 async function main(bridgeMode) {
   try {

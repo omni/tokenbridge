@@ -8,7 +8,8 @@ const homeNativeErcAbi = require('../../contracts/build/contracts/HomeBridgeNati
 const foreignNativeErcAbi = require('../../contracts/build/contracts/ForeignBridgeNativeToErc').abi
 
 const homeErcErcAbi = require('../../contracts/build/contracts/HomeBridgeErcToErc').abi
-const foreignErc677Erc677Abi = require('../../contracts/build/contracts/ForeignBridgeErc677ToErc677').abi
+const foreignErc677Erc677Abi = require('../../contracts/build/contracts/ForeignBridgeErc677ToErc677')
+  .abi
 
 const homeErcNativeAbi = require('../../contracts/build/contracts/HomeBridgeErcToNative').abi
 const foreignErcNativeAbi = require('../../contracts/build/contracts/ForeignBridgeErcToNative').abi
