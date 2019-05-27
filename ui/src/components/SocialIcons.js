@@ -17,7 +17,7 @@ export const SocialIcons = () => {
     },
     {
       icon: <IconGithub />,
-      link: 'https://github.com/poanetwork/token-bridge'
+      link: 'https://github.com/poanetwork/tokenbridge'
     }
   ]
 

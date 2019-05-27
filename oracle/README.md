@@ -134,7 +134,7 @@ In case you need to reset your bridge or setup a new one (with different configu
 
 ### Bridge UI
 
-See the [Bridge UI installation instructions](https://github.com/poanetwork/bridge-ui/) to configure and use the optional Bridge UI.
+See the [UI instructions](../ui/README.md) to configure and use the optional Bridge UI.
 
 ## Rollback the Last Processed Block in Redis
 
