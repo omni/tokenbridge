@@ -48,29 +48,41 @@ The POA TokenBridge provides three operational modes:
 
 To initialize submodules:
 
-`git submodule update --init`
+```
+git submodule update --init
+```
 
 To install dependencies:
 
-`yarn install`
+```
+yarn install && yarn install:deploy
+```
 
-To build all projects:
+To build all projects and compile contracts:
 
-`yarn run build`
+```
+yarn build
+```
 
 Running linter for all JS projects:
 
-`yarn lint`
+```
+yarn lint
+```
 
 Running linter for all Ansible playbooks:
 
 - [ansible-lint](https://github.com/ansible/ansible-lint) is required
 
-`yarn ansible-lint`
+```
+yarn ansible-lint
+```
 
 Running tests for all projects:
 
-`yarn test`
+```
+yarn test
+```
 
 For details on building, running and developing please refer to respective READMEs in sub-repositories.
 
