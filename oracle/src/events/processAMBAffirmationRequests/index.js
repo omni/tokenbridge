@@ -61,7 +61,8 @@ function processAffirmationRequestsBuilder(config) {
             homeBridge,
             validatorContract,
             message,
-            address: config.validatorAddress
+            address: config.validatorAddress,
+            gasPrice
           })
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {

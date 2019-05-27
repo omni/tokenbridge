@@ -3,6 +3,7 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const BigNumber = require('bignumber.js')
 const proxyquire = require('proxyquire')
+const Web3Utils = require('web3-utils')
 const { addExtraGas, syncForEach, generateGasPriceOptions } = require('../src/utils/utils')
 const { GAS_PRICE_OPTIONS, ORACLE_GAS_PRICE_SPEEDS } = require('../src/utils/constants')
 
@@ -139,12 +140,14 @@ describe('utils', () => {
     it('should work for GAS_PRICE option', () => {
       // given
       const dataType = GAS_PRICE_OPTIONS.GAS_PRICE
-      const gasPrice = BigNumber('0000000000000000000000000000000000000000000000000000000165a0bc00')
+      const gasPrice = Web3Utils.toBN(
+        '0000000000000000000000000000000000000000000000000000000165a0bc00'
+      )
       const gasPriceSpeed = null
 
       const expectedResult = {
         type: dataType,
-        value: gasPrice
+        value: Web3Utils.hexToNumberString(gasPrice)
       }
 
       // when

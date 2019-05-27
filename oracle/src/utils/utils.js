@@ -1,6 +1,7 @@
 const BigNumber = require('bignumber.js')
 const promiseRetry = require('promise-retry')
 const Web3 = require('web3')
+const Web3Utils = require('web3-utils')
 const { GAS_PRICE_OPTIONS } = require('./constants')
 
 async function syncForEach(array, callback) {
@@ -102,7 +103,7 @@ function generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed }) {
   if (dataType === GAS_PRICE_OPTIONS.GAS_PRICE) {
     gasPriceOptions = {
       type: dataType,
-      value: gasPrice
+      value: Web3Utils.hexToNumberString(gasPrice)
     }
   } else if (dataType === GAS_PRICE_OPTIONS.SPEED) {
     gasPriceOptions = {

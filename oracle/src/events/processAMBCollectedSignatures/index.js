@@ -90,7 +90,8 @@ function processCollectedSignaturesBuilder(config) {
               message,
               numberOfCollectedSignatures: NumberOfCollectedSignatures,
               txHash,
-              address: config.validatorAddress
+              address: config.validatorAddress,
+              gasPrice
             })
             logger.debug({ gasEstimate }, 'Gas estimated')
           } catch (e) {
