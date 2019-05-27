@@ -89,9 +89,21 @@ The following is an example setup using the POA Sokol testnet as the Home networ
     * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `poa-bridge-contracts/deploy` directory and includes the bridge contract addresses.  
 
 5. Install and run the POA Token Bridge Oracle.
-    * Go to the `sokol-kovan-bridge` folder and `git clone https://github.com/poanetwork/tokenbridge`
-    * `cd tokenbridge/oracle`
-    * Follow instructions in the [Oracle](../oracle/README.md).
+  * Go to the `sokol-kovan-bridge` folder and clone the repository
+
+```
+git clone --recursive https://github.com/poanetwork/tokenbridge && cd tokenbridge
+```
+
+  * Install dependencies and compile Smart Contracts
+
+```
+yarn install && yarn install:deploy && yarn compile:contracts
+```
+  * Go to Oracle sub-repository and follow instructions in the [Oracle](../oracle/README.md).
+```
+cd oracle
+```
 
 If successful, you will see bridge processes run when you issue a command. For example, run `npm run watcher:signature-request`
 
@@ -115,19 +127,27 @@ If successful, you will see bridge processes run when you issue a command. For e
 
 6. Keep the bridge processes running. Open a separate terminal window and go to the `sokol-kovan-bridge` folder to install and unpack this repository.
 
-    * `git clone https://github.com/poanetwork/tokenbridge`  
-    * `cd tokenbridge`
-    * Update submodules  
-`git submodule update --init --recursive` 
-    * Install dependencies  
-`yarn install`
-    * Go to UI sub-repository  
-`cd ui`
+  * Clone the repository
+
+```
+git clone --recursive https://github.com/poanetwork/tokenbridge && cd tokenbridge
+```
+
+  * Install dependencies and compile Smart Contracts
+
+```
+yarn install && yarn install:deploy && yarn compile:contracts
+```
+  * Go to UI sub-repository  
+```
+cd ui
+```
 
 _**Note**: The bridge UI configuration should be performed with an unprivileged Linux account or with the following flag `npm install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
-    * Create a .env file from the example file [.env.example](.env.example)  
+
+  * Create a .env file from the example file [.env.example](.env.example)  
 `cp .env.example .env`  
-    * Insert the addresses from the bridgeDeploymentResults.json file (from step 4) into the .env file. No other changes are needed, see [Env Parameter Details](#env-parameter-details) for information about each parameter.
+  * Insert the addresses from the bridgeDeploymentResults.json file (from step 4) into the .env file. No other changes are needed, see [Env Parameter Details](#env-parameter-details) for information about each parameter.
 `cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json`  
 ```bash
     # HomeBridge address in bridgeDeploymentResults.json
@@ -140,7 +160,7 @@ _**Note**: The bridge UI configuration should be performed with an unprivileged 
     REACT_APP_HOME_HTTP_PARITY_URL=https://sokol.poa.network 
 ```
 
-  * Run `npm run start`
+  * Run `yarn start`
   * Make sure your web3 wallet (Nifty Wallet, AlphaWallet or MetaMask) is funded and connected to the POA Sokol Network (see step 2)
   * Specify an amount and click `Transfer` to complete a cross-chain transaction from Sokol to Kovan
 
