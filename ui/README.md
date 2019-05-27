@@ -8,13 +8,7 @@ Please refer to the [POA Token Bridge](../README.md) overview first of all.
 
 The UI provides an intuitive interface for assets transfer between networks running the Bridge smart contracts. Users can connect to a web3 wallet such as [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/) and complete the transfer through a web browser.
 
-The current implementation allows for several bridge modes.
-
-  1. `Native-to-ERC20` Coins on a Home network can be converted to ERC20-compatible tokens on a Foreign network. Coins are locked on the Home side and the corresponding amount of ERC20 tokens are minted on the Foreign side. When the operation is reversed, tokens are burnt on the Foreign side and unlocked in the Home network.
-  2. `ERC20-to-ERC20` ERC20-compatible tokens on the Foreign network are locked and minted as ERC20-compatible tokens (ERC677 tokens) on the Home network. When transferred from Home to Foreign, they are burnt on the Home side and unlocked in the Foreign network. This can be considered a form of atomic swap when a user swaps the token "X" in network "A" to the token "Y" in network "B".
-  3. `ERC20-to-Native` Pre-existing tokens in the Foreign network are locked and coins are minted in the Home network. In this mode, the Home network consensus engine invokes Parity's Block Reward contract to mint coins per the bridge contract request. 
-
-  ![Bridge UI](bridge-ui.png)
+![Bridge UI](bridge-ui.png)
 
 ### UI Features
 - Shows daily limits in both networks
