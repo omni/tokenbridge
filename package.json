@@ -40,6 +40,6 @@
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build",
     "compile:contracts": "yarn workspace poa-parity-bridge-contracts run compile",
     "install:deploy": "cd contracts/deploy && npm install --silent",
-    "postinstall": "ln -s $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
+    "postinstall": "ln -sf $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
   }
 }
