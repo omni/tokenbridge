@@ -1,6 +1,6 @@
 - name: Slurp docker compose file
   slurp:
-    src: "{{ bridge_path }}/docker-compose.yml"
+    src: "{{ bridge_path }}/oracle/docker-compose.yml"
   register: docker_compose_slurp
 
 - name: Parse docker compose file
@@ -15,7 +15,7 @@
 - name: Write new docker-compose file
   copy:
     content: "{{ docker_compose_parsed | to_yaml }}"
-    dest: "{{ bridge_path }}/docker-compose.yml"
+    dest: "{{ bridge_path }}/oracle/docker-compose.yml"
 
 - name: Set the local container logs configuration file
   template:

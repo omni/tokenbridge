@@ -1,5 +1,5 @@
 - name: Launch container
   docker_service:
-    project_src: "{{ bridge_path }}"
+    project_src: "{{ bridge_path }}/oracle"
     state: present
     build: yes
