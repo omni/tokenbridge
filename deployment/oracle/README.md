@@ -13,7 +13,7 @@
 
 1. Clone this repository and go to the `deployment/oracle` folder
 ```
-git clone https://github.com/poanetwork/tokenbridge
+git clone --recursive https://github.com/poanetwork/tokenbridge
 cd tokenbridge/deployment/oracle
 ```
 2. Create the file `hosts.yml` from `hosts.yml.example`
@@ -96,6 +96,8 @@ To be used with the ansible-playbook command, for example:
 * `-e "<variable>=<value>"` - override default variable.
 
 * `--private-key=<file_name>` - if private keyfile is required to connect to the ubuntu instance.
+
+* `--user=<username>` - connect as this username
 
 ## Bridge service commands
 
