@@ -26,7 +26,7 @@ Sub-repositories maintained within this monorepo are listed below.
 | [Oracle-E2E]() | End to end tests for the Oracle |
 | [UI-E2E]() | End to end tests for the UI |
 
-Additionally there are [Solidity contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
+Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
 
 ## Network Definitions
 
