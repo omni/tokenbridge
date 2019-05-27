@@ -108,7 +108,7 @@ cd oracle
 If successful, you will see bridge processes run when you issue a command.  
 For example, run `yarn watcher:signature-request`.
 
-**Example NPM Output:**
+**Example Yarn Output:**
 ```bash
 [1539195000507] INFO (watcher-signature-request): Connected to redis
 [1539195000545] INFO (watcher-signature-request): Connected to amqp Broker
@@ -209,25 +209,25 @@ APP_STYLES | The set of styles to render the bridge UI page. Currently only `cla
 To run tests
 
 ```
-npm run test
+yarn test
 ```
 
 To run linting
 
 ```
-npm run lint
+yarn lint
 ```
 
 To run tests with coverage
 
 ```
-npm run coverage
+yarn coverage
 ```
 
 To build the project
 
 ```
-npm run build
+yarn build
 ```
 
 ## Contributing

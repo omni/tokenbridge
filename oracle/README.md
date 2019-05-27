@@ -109,7 +109,7 @@ cp .env.example .env
 
 There are two options to run the TokenBridge processes:
 1. Docker containers. This requires [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/). If you are on Linux, it's also recommended that you [create a docker group and add your user to it](https://docs.docker.com/install/linux/linux-postinstall/), so that you can use the CLI without sudo.
-2. NodeJs Package Manager (NPM).
+2. Yarn Package Manager.
 
 ### Docker 
 
@@ -126,15 +126,15 @@ In case you need to reset your bridge or setup a new one (with different configu
 * [View the logs](https://docs.docker.com/v17.09/compose/reference/logs/) : `docker-compose logs`
 
 
-### NPM
+### Yarn
 
   - `redis-server` starts Redis. redis-cli ping will return a pong if Redis is running.
   - `rabbitmq-server` starts RabbitMQ. Use rabbitmqctl status to check if RabbitMQ is running.
-  - `npm run watcher:signature-request`
-  - `npm run watcher:collected-signatures`
-  - `npm run watcher:affirmation-request`
-  - `npm run sender:home`
-  - `npm run sender:foreign`
+  - `yarn watcher:signature-request`
+  - `yarn watcher:collected-signatures`
+  - `yarn watcher:affirmation-request`
+  - `yarn sender:home`
+  - `yarn sender:foreign`
 
 ### Bridge UI
 
@@ -146,7 +146,7 @@ If the bridge does not handle an event properly (i.e. a transaction stalls due t
 
 Execute this command in the bridge root directory:
 
-for NPM installation:
+for local installation:
 ```shell
 bash ./reset-lastBlock.sh <watcher> <block num>
 ```
@@ -216,7 +216,7 @@ Command | Description
 ## Testing
 
 ```bash
-npm test
+yarn test
 ```
 
 ### E2E tests

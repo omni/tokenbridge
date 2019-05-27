@@ -40,7 +40,7 @@ services:
       - NODE_ENV=production 
       - VALIDATOR_ADDRESS_PRIVATE_KEY=${VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
-    entrypoint: npm run watcher:signature-request
+    entrypoint: yarn watcher:signature-request
     networks:
       - net_db_bridge_request
       - net_rabbit_bridge_request
@@ -56,7 +56,7 @@ services:
       - NODE_ENV=production 
       - VALIDATOR_ADDRESS=${VALIDATOR_ADDRESS}
     restart: unless-stopped
-    entrypoint: npm run watcher:collected-signatures
+    entrypoint: yarn watcher:collected-signatures
     networks:
       - net_db_bridge_collected
       - net_rabbit_bridge_collected
@@ -72,7 +72,7 @@ services:
       - NODE_ENV=production 
       - VALIDATOR_ADDRESS=${VALIDATOR_ADDRESS}
     restart: unless-stopped
-    entrypoint: npm run watcher:affirmation-request
+    entrypoint: yarn watcher:affirmation-request
     networks:
       - net_db_bridge_affirmation
       - net_rabbit_bridge_affirmation
@@ -88,7 +88,7 @@ services:
       - NODE_ENV=production 
       - VALIDATOR_ADDRESS_PRIVATE_KEY=${VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
-    entrypoint: npm run sender:home
+    entrypoint: yarn sender:home
     networks:
       - net_db_bridge_senderhome
       - net_rabbit_bridge_senderhome
@@ -104,7 +104,7 @@ services:
       - NODE_ENV=production 
       - VALIDATOR_ADDRESS_PRIVATE_KEY=${VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
-    entrypoint: npm run sender:foreign
+    entrypoint: yarn sender:foreign
     networks:
       - net_db_bridge_senderforeign
       - net_rabbit_bridge_senderforeign
