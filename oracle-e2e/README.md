@@ -1,4 +1,4 @@
-# oracle-e2e
+# POA Token Bridge / Oracle-E2E
 
 End to end tests for the POA Token Bridge [Oracle](../oracle/README.md).
 
@@ -16,7 +16,7 @@ so that you can use the CLI without sudo.
 To run the bridge end-to-end tests, you just have to run:
 
 ```
-$ ./run-tests.sh
+./run-tests.sh
 ```
 
 If this is the first time that you do this, it will take some time to build the

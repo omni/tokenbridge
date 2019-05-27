@@ -1,7 +1,16 @@
-### ui-e2e
-End to end tests for the UI
+# POA Token Bridge / UI-E2E
+
+End to end tests for the POA Token Bridge [UI](../UI/README.md).
 
 - Configure startURL, homeAccount, foreignAccount in ```config.json```
+
+## Running
+
+To run the bridge end-to-end tests, you just have to run:
+
+```
+./run-tests.sh
+```
 
 #### Tests
 

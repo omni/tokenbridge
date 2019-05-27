@@ -97,7 +97,11 @@ For more information on the Redis/RabbitMQ requirements, see [#90](/../../issues
 
 ## Configuration
 
-1. Create a `.env` file: `cp .env.example .env`
+1. Create a `.env` file: 
+```
+cp .env.example .env
+```
+
 
 2. Fill in the required information using the JSON output data. Check the tables with the [set of parameters](#configuration-parameters) below to see their explanation. 
 

@@ -121,7 +121,12 @@ Example of an API
 ```
 
 # How to run
-Create .env file (see `.env.example` for parameters reference)
+Create .env file:
+```
+cp .env.example .env
+```
+
+#### Example:
 ```bash
 HOME_RPC_URL=https://sokol.poa.network
 FOREIGN_RPC_URL=https://kovan.infura.io/mew
@@ -133,17 +138,25 @@ GAS_PRICE_FALLBACK=21
 LEFT_TX_THRESHOLD=100
 ```
 
-```bash
-npm i
-# check balances of contracts and validators
+## Check balances of contracts and validators
+```
 node checkWorker.js
-# check unprocessed events
+```
+
+## Check unprocessed events
+```
 node checkWorker2.js
-# check stuck transfers called by transfer, not transferAndCall
-# only applicable for bridge-rust-v1-native-to-erc
+```
+
+## Check stuck transfers called by transfer, not transferAndCall
+- Only applicable for bridge-rust-v1-native-to-erc
+```
 node checkWorker3.js
-# run web interface
-node index.js
+```
+
+## Run web interface
+```
+yarn start
 ```
 
 To enabled debug logging, set `DEBUG=1` env variable.

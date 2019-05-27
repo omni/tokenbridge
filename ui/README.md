@@ -105,7 +105,8 @@ yarn install && yarn install:deploy && yarn compile:contracts
 cd oracle
 ```
 
-If successful, you will see bridge processes run when you issue a command. For example, run `npm run watcher:signature-request`
+If successful, you will see bridge processes run when you issue a command.  
+For example, run `yarn watcher:signature-request`.
 
 **Example NPM Output:**
 ```bash
@@ -146,9 +147,14 @@ cd ui
 _**Note**: The bridge UI configuration should be performed with an unprivileged Linux account or with the following flag `npm install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
 
   * Create a .env file from the example file [.env.example](.env.example)  
-`cp .env.example .env`  
+```
+cp .env.example .env
+````
   * Insert the addresses from the bridgeDeploymentResults.json file (from step 4) into the .env file. No other changes are needed, see [Env Parameter Details](#env-parameter-details) for information about each parameter.
-`cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json`  
+```
+cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json
+```
+
 ```bash
     # HomeBridge address in bridgeDeploymentResults.json
     REACT_APP_HOME_BRIDGE_ADDRESS=0x.. 
@@ -160,7 +166,11 @@ _**Note**: The bridge UI configuration should be performed with an unprivileged 
     REACT_APP_HOME_HTTP_PARITY_URL=https://sokol.poa.network 
 ```
 
-  * Run `yarn start`
+  * Run the dApp
+```
+yarn start
+```
+
   * Make sure your web3 wallet (Nifty Wallet, AlphaWallet or MetaMask) is funded and connected to the POA Sokol Network (see step 2)
   * Specify an amount and click `Transfer` to complete a cross-chain transaction from Sokol to Kovan
 
@@ -198,19 +208,27 @@ APP_STYLES | The set of styles to render the bridge UI page. Currently only `cla
 
 To run tests
 
-`npm run test`
+```
+npm run test
+```
 
 To run linting
 
-`npm run lint`
+```
+npm run lint
+```
 
 To run tests with coverage
 
-`npm run coverage`
+```
+npm run coverage
+```
 
 To build the project
 
-`npm run build`
+```
+npm run build
+```
 
 ## Contributing
 
