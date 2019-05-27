@@ -5,5 +5,7 @@
     "../.eslintrc"
   ],
   "plugins": ["node"],
-  "rules": {}
+  "rules": {
+    "node/no-unpublished-require": "off"
+  }
 }

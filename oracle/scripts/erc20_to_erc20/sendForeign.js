@@ -17,8 +17,8 @@ const {
 
 const NUMBER_OF_DEPOSITS_TO_SEND = process.argv[2] || process.env.NUMBER_OF_DEPOSITS_TO_SEND || 1
 
-const ERC20_ABI = require('../../abis/ERC20.abi')
-const BRIDGE_ABI = require('../../abis/ForeignBridgeErcToErc.abi')
+const ERC20_ABI = require('../../../contracts/build/contracts/ERC20').abi
+const BRIDGE_ABI = require('../../../contracts/build/contracts/ForeignBridgeErcToErc').abi
 
 const foreignRpcUrl = rpcUrlsManager.foreignUrls[0]
 const foreignProvider = new Web3.providers.HttpProvider(foreignRpcUrl)

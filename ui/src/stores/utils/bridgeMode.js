@@ -1,9 +1,9 @@
-import { abi as HOME_NATIVE_TO_ERC_ABI } from '../../contracts/HomeBridgeNativeToErc.json'
-import { abi as FOREIGN_NATIVE_TO_ERC_ABI } from '../../contracts/ForeignBridgeNativeToErc.json'
-import { abi as HOME_ERC_TO_ERC_ABI } from '../../contracts/HomeBridgeErcToErc.json'
-import { abi as FOREIGN_ERC_TO_ERC_ABI } from '../../contracts/ForeignBridgeErcToErc.json'
-import { abi as HOME_ERC_TO_NATIVE_ABI } from '../../contracts/HomeBridgeErcToNative.json'
-import { abi as FOREIGN_ERC_TO_NATIVE_ABI } from '../../contracts/ForeignBridgeErcToNative.json'
+import { abi as HOME_NATIVE_TO_ERC_ABI } from '../../../../contracts/build/contracts/HomeBridgeNativeToErc.json'
+import { abi as FOREIGN_NATIVE_TO_ERC_ABI } from '../../../../contracts/build/contracts/ForeignBridgeNativeToErc.json'
+import { abi as HOME_ERC_TO_ERC_ABI } from '../../../../contracts/build/contracts/HomeBridgeErcToErc.json'
+import { abi as FOREIGN_ERC_TO_ERC_ABI } from '../../../../contracts/build/contracts/ForeignBridgeErcToErc.json'
+import { abi as HOME_ERC_TO_NATIVE_ABI } from '../../../../contracts/build/contracts/HomeBridgeErcToNative.json'
+import { abi as FOREIGN_ERC_TO_NATIVE_ABI } from '../../../../contracts/build/contracts/ForeignBridgeErcToNative.json'
 
 export const BRIDGE_MODES = {
   NATIVE_TO_ERC: 'NATIVE_TO_ERC',

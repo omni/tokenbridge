@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../contracts/BridgeValidators.json'
-import { abi as ERC677_ABI } from '../contracts/ERC677BridgeToken.json'
-import { abi as BLOCK_REWARD_ABI } from '../contracts/IBlockReward'
+import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators.json'
+import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
+import { abi as BLOCK_REWARD_ABI } from '../../../contracts/build/contracts/IBlockReward'
 import { getBlockNumber, getBalance } from './utils/web3'
 import { fromDecimals } from './utils/decimals'
 import {

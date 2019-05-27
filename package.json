@@ -31,13 +31,15 @@
     "contracts"
   ],
   "scripts": {
-    "build": "yarn workspace poa-parity-bridge-contracts run compile && yarn workspace ui run build",
+    "build": "yarn run compile:contracts && yarn workspace ui run build",
     "lint": "yarn wsrun --exclude oracle-e2e --exclude ui-e2e --exclude poa-parity-bridge-contracts lint",
-    "test": "yarn workspace poa-parity-bridge-contracts run compile && yarn wsrun --exclude monitor --exclude oracle-e2e --exclude ui-e2e test",
+    "test": "yarn run compile:contracts && yarn wsrun --exclude monitor --exclude oracle-e2e --exclude ui-e2e test",
     "ansible-lint": "./deployment/lint.sh",
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
     "ui-e2e": "./ui-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build",
+    "compile:contracts": "yarn workspace poa-parity-bridge-contracts run compile",
+    "install:deploy": "cd contracts/deploy && rm -f package-lock.json && npm install --silent",
     "postinstall": "ln -s $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
   }
 }

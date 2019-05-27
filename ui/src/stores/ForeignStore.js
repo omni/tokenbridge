@@ -1,5 +1,5 @@
 import { action, observable } from 'mobx'
-import { abi as ERC677_ABI } from '../contracts/ERC677BridgeToken.json'
+import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
 import { getBlockNumber } from './utils/web3'
 import {
   getMaxPerTxLimit,
@@ -30,7 +30,7 @@ import {
   decodeFeeManagerMode,
   FEE_MANAGER_MODE
 } from './utils/bridgeMode'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../contracts/BridgeValidators'
+import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators'
 import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import BN from 'bignumber.js'
 import { processLargeArrayAsync } from './utils/array'
