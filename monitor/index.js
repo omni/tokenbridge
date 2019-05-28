@@ -98,6 +98,6 @@ app.get('/stuckTransfers', async (req, res, next) => {
 })
 */
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3003
 app.set('port', port)
-app.listen(port, () => console.log('Monitoring app listening on port 3000!'))
+app.listen(port, () => console.log(`Monitoring app listening on port ${port}!`))
