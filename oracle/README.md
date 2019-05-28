@@ -49,11 +49,9 @@ For more information on the Redis/RabbitMQ requirements, see [#90](/../../issues
 
 # How to Use
 
-## Installation and Deployment
+## Deploy the Bridge Contracts
 
 **Note:** The following steps detail the bridge deployment process for development and testing. For deployment in a production environment we recommend using the [Bridge Deployment Playbooks](../deployment/README.md). 
-
-#### Deploy the Bridge Contracts
 
 1. [Deploy the bridge contracts](https://github.com/poanetwork/poa-bridge-contracts/blob/master/deploy/README.md)
 
@@ -95,13 +93,19 @@ For more information on the Redis/RabbitMQ requirements, see [#90](/../../issues
    }
    ```
 
-## Configuration
+## Install and configure the Oracle
 
-1. Create a `.env` file: 
+1. [Initialize](../README.md#initializing-the-monorepository) the monorepository.
+
+2. Go to the oracle sub-repository:
+```
+cd oracle
+```
+
+3. Create a `.env` file: 
 ```
 cp .env.example .env
 ```
-
 
 2. Fill in the required information using the JSON output data. Check the tables with the [set of parameters](#configuration-parameters) below to see their explanation. 
 

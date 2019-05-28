@@ -121,7 +121,17 @@ Example of an API
 ```
 
 # How to run
-Create .env file:
+
+## Setup
+
+1. [Initialize](../README.md#initializing-the-monorepository) the monorepository.
+
+2. Go to the monitor sub-repository:
+```
+cd monitor
+```
+
+3. Create .env file:
 ```
 cp .env.example .env
 ```

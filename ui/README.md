@@ -89,21 +89,10 @@ The following is an example setup using the POA Sokol testnet as the Home networ
     * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `poa-bridge-contracts/deploy` directory and includes the bridge contract addresses.  
 
 5. Install and run the Token Bridge Oracle.
-  * Go to the `sokol-kovan-bridge` folder and clone the repository
-
-```
-git clone --recursive https://github.com/poanetwork/tokenbridge && cd tokenbridge
-```
-
-  * Install dependencies and compile Smart Contracts
-
-```
-yarn install && yarn install:deploy && yarn compile:contracts
-```
-  * Go to Oracle sub-repository and follow instructions in the [Oracle](../oracle/README.md).
-```
-cd oracle
-```
+  * Go to the `sokol-kovan-bridge` folder
+  * [Initialize](../README.md#initializing-the-monorepository) the monorepository
+  * Go to `oracle` sub-repository
+  * Follow the [Oracle instructions](../oracle/README.md).
 
 If successful, you will see bridge processes run when you issue a command.  
 For example, run `yarn watcher:signature-request`.
@@ -126,26 +115,10 @@ For example, run `yarn watcher:signature-request`.
 {"level":30,"time":1539366885587,"msg":"Found 0 UserRequestForSignature events","validator":"0x..........","name":"watcher-signature-request","v":1}
 ```
 
-6. Keep the bridge processes running. Open a separate terminal window and go to the `sokol-kovan-bridge` folder to install and unpack this repository.
+6. Keep the bridge processes running. Open a separate terminal window and go to the `sokol-kovan-bridge` folder to install and run the UI.
 
-  * Clone the repository
-
-```
-git clone --recursive https://github.com/poanetwork/tokenbridge && cd tokenbridge
-```
-
-  * Install dependencies and compile Smart Contracts
-
-```
-yarn install && yarn install:deploy && yarn compile:contracts
-```
-  * Go to UI sub-repository  
-```
-cd ui
-```
-
-_**Note**: The bridge UI configuration should be performed with an unprivileged Linux account or with the following flag `npm install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
-
+  * Go to the `sokol-kovan-bridge/tokenbridge` monorepository that was initialized in step **5.**
+  * Go to `ui` sub-repository
   * Create a .env file from the example file [.env.example](.env.example)  
 ```
 cp .env.example .env
