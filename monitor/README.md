@@ -148,12 +148,6 @@ node checkWorker.js
 node checkWorker2.js
 ```
 
-## Check stuck transfers called by transfer, not transferAndCall
-- Only applicable for bridge-rust-v1-native-to-erc
-```
-node checkWorker3.js
-```
-
 ## Run web interface
 ```
 yarn start
