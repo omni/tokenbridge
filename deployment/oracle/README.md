@@ -57,13 +57,13 @@ cp hosts.yml.example hosts.yml
 
 2. You can also add the following parameters in the `group_vars` to change the default behavior of `deployment-bridge` playbooks:
 
-2.1 `compose_service_user` - specifies users to be created by playbooks. This user will be used to run POA Bridge Oracle.
+2.1 `compose_service_user` - specifies users to be created by playbooks. This user will be used to run Token Bridge Oracle.
 
 2.2 `bridge_repo` contains address of Token Bridge Oracle repository. The default value is  https://github.com/poanetwork/tokenbridge.
 
 2.3 `bridge_repo_branch` points to the specific branch or commit to use with the `bridge_repo`. If `bridge_repo_branch` is not specified, the default (`master`) branch is used.
 
-2.4 `bridge_path` set the path where POA Bridge Oracle would be installed. By default it point to the home folder of `compose_service_user`
+2.4 `bridge_path` set the path where Token Bridge Oracle would be installed. By default it point to the home folder of `compose_service_user`
 
 2.5 `docker_compose_version` - specifies a version of docker-compose to be installed.
 
