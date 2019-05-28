@@ -88,7 +88,7 @@ The following is an example setup using the POA Sokol testnet as the Home networ
       * `FOREIGN_RPC_URL`=https://kovan.infura.io/mew
     * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `poa-bridge-contracts/deploy` directory and includes the bridge contract addresses.  
 
-5. Install and run the POA Token Bridge Oracle.
+5. Install and run the Token Bridge Oracle.
   * Go to the `sokol-kovan-bridge` folder and clone the repository
 
 ```
