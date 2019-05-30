@@ -40,10 +40,8 @@ async function checkWorker() {
       JSON.stringify(vBalances, null, 4)
     )
     logger.debug('Done')
-    return status
   } catch (e) {
     logger.error(e)
-    throw e
   }
 }
 checkWorker()

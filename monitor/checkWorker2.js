@@ -21,10 +21,8 @@ async function checkWorker2() {
       JSON.stringify(_alerts, null, 4)
     )
     logger.debug('Done x2')
-    return evStats
   } catch (e) {
-    logger.error('checkWorker2.js', e)
-    throw e
+    logger.error(e)
   }
 }
 checkWorker2()
