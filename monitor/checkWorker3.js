@@ -14,10 +14,8 @@ async function checkWorker3() {
       JSON.stringify(transfers, null, 4)
     )
     logger.debug('Done')
-    return transfers
   } catch (e) {
     logger.error('checkWorker3.js', e)
-    throw e
   }
 }
 checkWorker3()

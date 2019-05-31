@@ -83,6 +83,16 @@ app.get('/alerts', async (req, res, next) => {
   }
 })
 
+app.get('/stuckTransfers', async (req, res, next) => {
+  try {
+    const results = await readFile('./responses/stuckTransfers.json')
+    results.ok = results.total.length === 0
+    res.json(results)
+  } catch (e) {
+    next(e)
+  }
+})
+
 const port = process.env.PORT || 3003
 app.set('port', port)
 app.listen(port, () => console.log(`Monitoring app listening on port ${port}!`))
