@@ -16,7 +16,7 @@ services:
     image: "rabbitmq:3-management"
     ports:
     - "15672:15672"
-  bridge:
+  oracle:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -45,7 +45,7 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
-  bridge-erc20:
+  oracle-erc20:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -75,7 +75,7 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
-  bridge-erc20-native:
+  oracle-erc20-native:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
