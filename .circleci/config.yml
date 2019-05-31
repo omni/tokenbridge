@@ -1,5 +1,28 @@
 version: 2
 jobs:
+  initialize:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - restore_cache:
+           name: Restore Yarn Package Cache
+           keys:
+             - yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: yarn install
+      - run: yarn install:deploy
+      - run: yarn compile:contracts
+      - save_cache:
+           name: Save Yarn Package Cache
+           key: yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
+      - save_cache:
+          name: Save initialized project
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/project
   build:
     docker:
       - image: circleci/node:10.15
@@ -72,14 +95,13 @@ jobs:
       - run: yarn workspace ui run coveralls
 workflows:
   version: 2
-  coverage:
+  tokenbridge:
     jobs:
+      - initialize
       - cover:
           filters:
             branches:
               only: master
-  tokenbridge:
-    jobs:
       - build
       - lint
       - ansible-lint
