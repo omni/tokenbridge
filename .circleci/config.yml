@@ -27,18 +27,15 @@ jobs:
     docker:
       - image: circleci/node:10.15
     steps:
-      - checkout
-      - run: git submodule update --init
-      - run: yarn
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run build
   lint:
     docker:
       - image: circleci/node:10.15
     steps:
-      - checkout
-      - run: git submodule update --init
-      - run: yarn
-      - run: yarn compile:contracts
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run lint
   ansible-lint:
     docker:
@@ -53,10 +50,8 @@ jobs:
       HOME_RPC_URL: http://example.com
       FOREIGN_RPC_URL: http://example.com
     steps:
-      - checkout
-      - run: git submodule update --init
-      - run: yarn
-      - run: yarn compile:contracts
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run test
   oracle-e2e:
     docker:
@@ -88,9 +83,8 @@ jobs:
     docker:
       - image: circleci/node:10.15
     steps:
-      - checkout
-      - run: git submodule update --init
-      - run: yarn
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
 workflows:
@@ -98,13 +92,21 @@ workflows:
   tokenbridge:
     jobs:
       - initialize
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
       - cover:
+          requires:
+            - initialize
           filters:
             branches:
               only: master
-      - build
-      - lint
       - ansible-lint
-      - test
       - oracle-e2e
       - ui-e2e
