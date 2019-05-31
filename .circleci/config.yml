@@ -11,7 +11,9 @@ jobs:
            keys:
              - yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
       - run: yarn install --frozen-lockfile
-      - run: yarn install:deploy
+      - run: mkdir /tmp/artifacts && yarn install:deploy &> /tmp/artifacts/install_deploy.log
+      - store_artifacts:
+          path: /tmp/artifacts/install_deploy.log
       - run: yarn compile:contracts
       - save_cache:
            name: Save Yarn Package Cache
