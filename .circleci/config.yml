@@ -10,7 +10,7 @@ jobs:
            name: Restore Yarn Package Cache
            keys:
              - yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
       - run: yarn install:deploy
       - run: yarn compile:contracts
       - save_cache:
@@ -59,8 +59,8 @@ jobs:
     steps:
         - checkout
         - run: git submodule update --init
-        - run: yarn
-        - setup_remote_docker
+        - setup_remote_docker:
+            docker_layer_caching: true
         - run: yarn run oracle-e2e
   ui-e2e:
     machine:
@@ -77,7 +77,7 @@ jobs:
       - run: wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
       - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
       - run: git submodule update --init
-      - run: yarn
+      - run: yarn install --frozen-lockfile
       - run: yarn run ui-e2e
   cover:
     docker:
