@@ -1,4 +1,4 @@
 - name: Install .env config
   template:
     src: .env.j2
-    dest: "{{ bridge_path }}/.env"
+    dest: "{{ bridge_path }}/oracle/.env"
