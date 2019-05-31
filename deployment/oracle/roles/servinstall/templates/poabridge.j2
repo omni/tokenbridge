@@ -10,7 +10,7 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridge_path if bridge_path[:1] != "/" else bridge_path }}"
+WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridge_path + '/oracle' if bridge_path[:1] != "/" else bridge_path + '/oracle' }}"
 
 #Getting path to private key file and variable name for parsing key file
 keyfile="{{ keyfile_path }}"

@@ -10,7 +10,7 @@
     "watcher:affirmation-request": "./scripts/start-worker.sh watcher affirmation-request-watcher",
     "sender:home": "./scripts/start-worker.sh sender home-sender",
     "sender:foreign": "./scripts/start-worker.sh sender foreign-sender",
-    "dev": "concurrently -n 'watcher:signature-request,watcher:collected-signatures,watcher:affirmation-request,sender:home,sender:foreign' -c 'red,green,yellow,blue,magenta' 'npm run watcher:signature-request' 'npm run watcher:collected-signatures' 'npm run watcher:affirmation-request' 'npm run sender:home' 'npm run sender:foreign'",
+    "dev": "concurrently -n 'watcher:signature-request,watcher:collected-signatures,watcher:affirmation-request,sender:home,sender:foreign' -c 'red,green,yellow,blue,magenta' 'yarn watcher:signature-request' 'yarn watcher:collected-signatures' 'yarn watcher:affirmation-request' 'yarn sender:home' 'yarn sender:foreign'",
     "test": "NODE_ENV=test mocha",
     "test:watch": "NODE_ENV=test mocha --watch --reporter=min",
     "coverage": "NODE_ENV=test nyc --reporter=text --reporter=html mocha",
