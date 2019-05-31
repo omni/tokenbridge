@@ -13,67 +13,57 @@ const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 async function main() {
-  try {
-    const {
-      foreignDeposits,
-      homeDeposits,
-      homeWithdrawals,
-      foreignWithdrawals
-    } = await eventsInfo()
+  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals } = await eventsInfo()
 
-    const xSignatures = foreignDeposits.filter(findDifferences(homeDeposits))
-    const xAffirmations = homeWithdrawals.filter(findDifferences(foreignWithdrawals))
+  const xSignatures = foreignDeposits.filter(findDifferences(homeDeposits))
+  const xAffirmations = homeWithdrawals.filter(findDifferences(foreignWithdrawals))
 
-    logger.debug('building misbehavior blocks')
-    const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
+  logger.debug('building misbehavior blocks')
+  const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
-    const baseRange = [false, false, false, false, false]
-    const xSignaturesMisbehavior = buildRangesObject(
-      xSignatures.map(findMisbehaviorRange(foreignBlockNumber)).reduce(mergeRanges, baseRange)
-    )
-    const xAffirmationsMisbehavior = buildRangesObject(
-      xAffirmations.map(findMisbehaviorRange(homeBlockNumber)).reduce(mergeRanges, baseRange)
-    )
+  const baseRange = [false, false, false, false, false]
+  const xSignaturesMisbehavior = buildRangesObject(
+    xSignatures.map(findMisbehaviorRange(foreignBlockNumber)).reduce(mergeRanges, baseRange)
+  )
+  const xAffirmationsMisbehavior = buildRangesObject(
+    xAffirmations.map(findMisbehaviorRange(homeBlockNumber)).reduce(mergeRanges, baseRange)
+  )
 
-    logger.debug('extracting most recent transactionHash')
-    const { transactionHash: xSignaturesMostRecentTxHash = '' } =
-      xSignatures.sort(sortEvents).reverse()[0] || {}
-    const { transactionHash: xAffirmationsMostRecentTxHash = '' } =
-      xAffirmations.sort(sortEvents).reverse()[0] || {}
+  logger.debug('extracting most recent transactionHash')
+  const { transactionHash: xSignaturesMostRecentTxHash = '' } =
+    xSignatures.sort(sortEvents).reverse()[0] || {}
+  const { transactionHash: xAffirmationsMostRecentTxHash = '' } =
+    xAffirmations.sort(sortEvents).reverse()[0] || {}
 
-    logger.debug('building transaction objects')
-    const foreignValidators = await Promise.all(
-      xSignatures.map(event => findTxSender(web3Foreign)(event))
-    )
-    const homeValidators = await Promise.all(
-      xAffirmations.map(event => findTxSender(web3Home)(event))
-    )
+  logger.debug('building transaction objects')
+  const foreignValidators = await Promise.all(
+    xSignatures.map(event => findTxSender(web3Foreign)(event))
+  )
+  const homeValidators = await Promise.all(
+    xAffirmations.map(event => findTxSender(web3Home)(event))
+  )
 
-    const xSignaturesTxs = xSignatures
-      .map(normalizeEventInformation)
-      .reduce(buildTxList(foreignValidators), {})
-    const xAffirmationsTxs = xAffirmations
-      .map(normalizeEventInformation)
-      .reduce(buildTxList(homeValidators), {})
+  const xSignaturesTxs = xSignatures
+    .map(normalizeEventInformation)
+    .reduce(buildTxList(foreignValidators), {})
+  const xAffirmationsTxs = xAffirmations
+    .map(normalizeEventInformation)
+    .reduce(buildTxList(homeValidators), {})
 
-    logger.debug('Done')
+  logger.debug('Done')
 
-    return {
-      executeSignatures: {
-        misbehavior: xSignaturesMisbehavior,
-        mostRecentTxHash: xSignaturesMostRecentTxHash,
-        transactions: xSignaturesTxs
-      },
-      executeAffirmations: {
-        misbehavior: xAffirmationsMisbehavior,
-        mostRecentTxHash: xAffirmationsMostRecentTxHash,
-        transactions: xAffirmationsTxs
-      },
-      lastChecked: Math.floor(Date.now() / 1000)
-    }
-  } catch (e) {
-    logger.error(e)
-    throw e
+  return {
+    executeSignatures: {
+      misbehavior: xSignaturesMisbehavior,
+      mostRecentTxHash: xSignaturesMostRecentTxHash,
+      transactions: xSignaturesTxs
+    },
+    executeAffirmations: {
+      misbehavior: xAffirmationsMisbehavior,
+      mostRecentTxHash: xAffirmationsMostRecentTxHash,
+      transactions: xAffirmationsTxs
+    },
+    lastChecked: Math.floor(Date.now() / 1000)
   }
 }
 
