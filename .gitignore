@@ -17,8 +17,8 @@ build
 .idea
 .nyc_output
 logs/
-responses/*
-!responses/.gitkeep
+
+
 *.err
 *.out
 data
@@ -44,3 +44,6 @@ Vagrantfile
 vagrant-hosts.yml
 .vagrant
 
+#monitor
+monitor/responses/*
+!monitor/.gitkeep

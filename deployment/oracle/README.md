@@ -13,7 +13,7 @@
 
 1. Clone this repository and go to the `deployment/oracle` folder
 ```
-git clone https://github.com/poanetwork/tokenbridge
+git clone --recursive https://github.com/poanetwork/tokenbridge
 cd tokenbridge/deployment/oracle
 ```
 2. Create the file `hosts.yml` from `hosts.yml.example`
@@ -53,17 +53,17 @@ cp hosts.yml.example hosts.yml
 
 1. The `group_vars/<bridge_name>.yml` file contains the public bridge parameters. This file is prepared by administrators for each bridge. The validator only needs to add the required bridge name in the hosts.yml file to tell Ansible which file to use.
 
-   `group_vars/example.yml` shows an example configuration for the POA/Sokol - POA/Sokol bridge. Parameter values should match values from the .env file for the token-bridge. See [Configuration parameters](../../oracle/README.md#configuration-parameters) for details.
+   `group_vars/example.yml` shows an example configuration for the POA/Sokol - POA/Sokol bridge. Parameter values should match values from the .env file for the Oracle. See [Configuration parameters](../../oracle/README.md#configuration-parameters) for details.
 
 2. You can also add the following parameters in the `group_vars` to change the default behavior of `deployment-bridge` playbooks:
 
-2.1 `compose_service_user` - specifies users to be created by playbooks. This user will be used to run POA bridge.
+2.1 `compose_service_user` - specifies users to be created by playbooks. This user will be used to run Token Bridge Oracle.
 
-2.2 `bridge_repo` contains address of token-bridge repository. The default value is  https://github.com/poanetwork/token-bridge.
+2.2 `bridge_repo` contains address of Token Bridge Oracle repository. The default value is  https://github.com/poanetwork/tokenbridge.
 
 2.3 `bridge_repo_branch` points to the specific branch or commit to use with the `bridge_repo`. If `bridge_repo_branch` is not specified, the default (`master`) branch is used.
 
-2.4 `bridge_path` set the path where token-bridge would be installed. By default it point to the home folder of `compose_service_user`
+2.4 `bridge_path` set the path where Token Bridge Oracle would be installed. By default it point to the home folder of `compose_service_user`
 
 2.5 `docker_compose_version` - specifies a version of docker-compose to be installed.
 
@@ -96,6 +96,8 @@ To be used with the ansible-playbook command, for example:
 * `-e "<variable>=<value>"` - override default variable.
 
 * `--private-key=<file_name>` - if private keyfile is required to connect to the ubuntu instance.
+
+* `--user=<username>` - connect as this username
 
 ## Bridge service commands
 
