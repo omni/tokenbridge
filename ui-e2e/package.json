@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "private": true,
-  "devDependencies": {},
+  "devDependencies": {
+    "selenium-webdriver": "3.6.0"
+  },
   "scripts": {
     "deploy": "node ./scripts/deploy.js"
   }
