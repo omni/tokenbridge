@@ -30,16 +30,12 @@ while [ "$1" != "" ]; do
     docker-compose run -d -p 3002:3000 ui-erc20-native yarn workspace ui run start
   fi
 
-  if [ "$1" == "oracle-deploy" ]; then
-    docker-compose run e2e yarn workspace oracle-e2e run deploy
-  fi
-
-  if [ "$1" == "ui-deploy" ]; then
-    docker-compose run e2e yarn workspace ui-e2e run deploy
-  fi
-
   if [ "$1" == "deploy" ]; then
     docker-compose run e2e e2e-commons/scripts/deploy.sh
+  fi
+
+  if [ "$1" == "blocks" ]; then
+    node ./scripts/blocks.js &
   fi
 
   shift # Shift all the parameters down by one

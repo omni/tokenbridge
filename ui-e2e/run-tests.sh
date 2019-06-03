@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 cd $(dirname $0)
 
-../e2e-commons/up.sh oracle ui deploy
+../e2e-commons/up.sh oracle ui deploy blocks
 
-node ./scripts/blocks.js &
 yarn mocha -b ./test.js
 rc=$?
 if [ $CI ]; then exit $rc; fi
