@@ -38,5 +38,9 @@ while [ "$1" != "" ]; do
     docker-compose run e2e yarn workspace ui-e2e run deploy
   fi
 
+  if [ "$1" == "deploy" ]; then
+    docker-compose run e2e e2e-commons/scripts/deploy.sh
+  fi
+
   shift # Shift all the parameters down by one
 done
