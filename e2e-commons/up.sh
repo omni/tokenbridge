@@ -24,6 +24,18 @@ while [ "$1" != "" ]; do
 
   if [ "$1" == "ui" ]; then
     docker-compose up -d ui ui-erc20 ui-erc20-native
+
+    docker-compose run -d -p 3000:3000 ui yarn workspace ui run start
+    docker-compose run -d -p 3001:3000 ui-erc20 yarn workspace ui run start
+    docker-compose run -d -p 3002:3000 ui-erc20-native yarn workspace ui run start
+  fi
+
+  if [ "$1" == "oracle-deploy" ]; then
+    docker-compose run e2e yarn workspace oracle-e2e run deploy
+  fi
+
+  if [ "$1" == "ui-deploy" ]; then
+    docker-compose run e2e yarn workspace ui-e2e run deploy
   fi
 
   shift # Shift all the parameters down by one
