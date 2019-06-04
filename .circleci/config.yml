@@ -1,21 +1,53 @@
 version: 2
 jobs:
-  build:
+  initialize:
     docker:
       - image: circleci/node:10.15
     steps:
       - checkout
       - run: git submodule update --init
-      - run: yarn
+      - restore_cache:
+           name: Restore Yarn Package Cache
+           keys:
+             - yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: git submodule status > submodule.status 
+      - restore_cache:
+           name: Restore contracts submodule with compiled contracts
+           keys:
+             - contracts-{{ checksum "submodule.status" }}
+      - run: yarn install --frozen-lockfile
+      - save_cache:
+           name: Save Yarn Package Cache
+           key: yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
+      - run: touch install_deploy.log; test -d contracts/build/contracts || yarn install:deploy &> install_deploy.log
+      - store_artifacts:
+          path: install_deploy.log
+      - run: test -d contracts/build/contracts || yarn compile:contracts
+      - save_cache:
+           name: Save contracts submodule with compiled contracts
+           key: contracts-{{ checksum "submodule.status" }}
+           paths:
+             - contracts
+      - save_cache:
+          name: Save initialized project for subsequent jobs
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/project
+  build:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run build
   lint:
     docker:
       - image: circleci/node:10.15
     steps:
-      - checkout
-      - run: git submodule update --init
-      - run: yarn
-      - run: yarn compile:contracts
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run lint
   ansible-lint:
     docker:
@@ -30,10 +62,8 @@ jobs:
       HOME_RPC_URL: http://example.com
       FOREIGN_RPC_URL: http://example.com
     steps:
-      - checkout
-      - run: git submodule update --init
-      - run: yarn
-      - run: yarn compile:contracts
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run test
   oracle-e2e:
     docker:
@@ -41,12 +71,13 @@ jobs:
     steps:
         - checkout
         - run: git submodule update --init
-        - run: yarn
-        - setup_remote_docker
+        - setup_remote_docker:
+            docker_layer_caching: true
         - run: yarn run oracle-e2e
   ui-e2e:
     machine:
       image: circleci/classic:latest
+      docker_layer_caching: true
     steps:
       - checkout
       - run: |
@@ -59,30 +90,45 @@ jobs:
       - run: wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
       - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
       - run: git submodule update --init
-      - run: yarn
+      - restore_cache:
+           name: Restore Machine Yarn Package Cache
+           keys:
+             - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: yarn install --frozen-lockfile
+      - save_cache:
+           name: Save Machine Yarn Package Cache
+           key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
       - run: yarn run ui-e2e
   cover:
     docker:
       - image: circleci/node:10.15
     steps:
-      - checkout
-      - run: git submodule update --init
-      - run: yarn
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
 workflows:
   version: 2
-  coverage:
+  tokenbridge:
     jobs:
+      - initialize
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
       - cover:
+          requires:
+            - initialize
           filters:
             branches:
               only: master
-  tokenbridge:
-    jobs:
-      - build
-      - lint
       - ansible-lint
-      - test
       - oracle-e2e
       - ui-e2e
