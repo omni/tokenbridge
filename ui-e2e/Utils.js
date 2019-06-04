@@ -8,52 +8,31 @@ const configFile = './config.json';
 class Utils {
 
   static async getHomeAccount() {
-    try {
-      return {
-        account: user.address,
-        privateKey: user.privateKey,
-        networkID: config.homeNetworkID
-      }
-      return config.homeAccount;
-    } catch (err) {
-      return null;
+    return {
+      account: user.address,
+      privateKey: user.privateKey,
+      networkID: config.homeNetworkID
     }
   }
 
   static async getForeignAccount() {
-    try {
-      return {
-        account: user.address,
-        privateKey: user.privateKey,
-        networkID: config.foreignNetworkID
-      }
-    } catch (err) {
-      return null;
+    return {
+      account: user.address,
+      privateKey: user.privateKey,
+      networkID: config.foreignNetworkID
     }
   }
 
   static async getStartURL() {
-    try {
-      return config.startUrl;
-    } catch (err) {
-      return null;
-    }
+    return config.startUrl;
   }
 
   static async getErc20StartURL() {
-    try {
-      return config.erc20Url;
-    } catch (err) {
-      return null;
-    }
+    return config.erc20Url;
   }
 
   static async getErc20NativeStartURL() {
-    try {
-      return config.erc20NativeUrl;
-    } catch (err) {
-      return null;
-    }
+    return config.erc20NativeUrl;
   }
 
   static async startBrowserWithMetamask() {
