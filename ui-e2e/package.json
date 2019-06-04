@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "mocha": "^5.1.1"
+    "selenium-webdriver": "3.6.0"
   },
   "scripts": {
     "deploy": "node ./scripts/deploy.js"

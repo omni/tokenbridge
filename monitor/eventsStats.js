@@ -57,38 +57,33 @@ function compareTransferForeign(home) {
 }
 
 async function main() {
-  try {
-    const {
-      foreignDeposits,
-      homeDeposits,
-      homeWithdrawals,
-      foreignWithdrawals,
-      isExternalErc20
-    } = await eventsInfo()
+  const {
+    foreignDeposits,
+    homeDeposits,
+    homeWithdrawals,
+    foreignWithdrawals,
+    isExternalErc20
+  } = await eventsInfo()
 
-    const onlyInHomeDeposits = homeDeposits.filter(compareDepositsHome(foreignDeposits))
-    const onlyInForeignDeposits = foreignDeposits
-      .concat([])
-      .filter(compareDepositsForeign(homeDeposits))
+  const onlyInHomeDeposits = homeDeposits.filter(compareDepositsHome(foreignDeposits))
+  const onlyInForeignDeposits = foreignDeposits
+    .concat([])
+    .filter(compareDepositsForeign(homeDeposits))
 
-    const onlyInHomeWithdrawals = isExternalErc20
-      ? homeWithdrawals.filter(compareTransferHome(foreignWithdrawals))
-      : homeWithdrawals.filter(compareDepositsForeign(foreignWithdrawals))
-    const onlyInForeignWithdrawals = isExternalErc20
-      ? foreignWithdrawals.filter(compareTransferForeign(homeWithdrawals))
-      : foreignWithdrawals.filter(compareDepositsHome(homeWithdrawals))
+  const onlyInHomeWithdrawals = isExternalErc20
+    ? homeWithdrawals.filter(compareTransferHome(foreignWithdrawals))
+    : homeWithdrawals.filter(compareDepositsForeign(foreignWithdrawals))
+  const onlyInForeignWithdrawals = isExternalErc20
+    ? foreignWithdrawals.filter(compareTransferForeign(homeWithdrawals))
+    : foreignWithdrawals.filter(compareDepositsHome(homeWithdrawals))
 
-    logger.debug('Done')
-    return {
-      onlyInHomeDeposits,
-      onlyInForeignDeposits,
-      onlyInHomeWithdrawals,
-      onlyInForeignWithdrawals,
-      lastChecked: Math.floor(Date.now() / 1000)
-    }
-  } catch (e) {
-    logger.error(e)
-    throw e
+  logger.debug('Done')
+  return {
+    onlyInHomeDeposits,
+    onlyInForeignDeposits,
+    onlyInHomeWithdrawals,
+    onlyInForeignWithdrawals,
+    lastChecked: Math.floor(Date.now() / 1000)
   }
 }
 

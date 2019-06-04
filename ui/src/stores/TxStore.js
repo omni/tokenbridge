@@ -5,7 +5,8 @@ import { getUnit } from './utils/bridgeMode'
 import yn from '../components/utils/yn'
 
 class TxStore {
-  @observable txsValues = {}
+  @observable
+  txsValues = {}
 
   constructor(rootStore) {
     this.web3Store = rootStore.web3Store

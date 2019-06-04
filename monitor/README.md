@@ -94,34 +94,23 @@ Example of an API
 }
 ```
 
-* `GET /stuckTransfers` - check stucked transfers that wasnot called by transferAndCall
-```json
-{
-    
-    "stuckTransfers": [
-        {
-            "address": "0x6758B7d441a9739b98552B373703d8d3d14f9e62",
-            "blockNumber": 5964312,
-            "transactionHash": "0x74413ba79509a292d5d0d6edd364b3617c83a57b13d603de9deb6c8e6b6c6daf",
-            ...
-            "returnValues": {
-                "0": "0x8D4bbc1B533aB9e3a743210870b6e3c4c0f7E935",
-                "1": "0xd819E948b14cA6AAD2b7Ffd333cCDf732b129EeD",
-                "2": "10000000000000000000000",
-                "from": "0x8D4bbc1B533aB9e3a743210870b6e3c4c0f7E935",
-                "to": "0xd819E948b14cA6AAD2b7Ffd333cCDf732b129EeD",
-                "value": "10000000000000000000000"
-            },
-            ...
-        }
-    ],
-    "total": 2,
-    "lastChecked": 1535058662
-}
+# How to run
+
+## Setup
+
+1. [Initialize](../README.md#initializing-the-monorepository) the monorepository.
+
+2. Go to the monitor sub-repository:
+```
+cd monitor
 ```
 
-# How to run
-Create .env file (see `.env.example` for parameters reference)
+3. Create .env file:
+```
+cp .env.example .env
+```
+
+#### Example:
 ```bash
 HOME_RPC_URL=https://sokol.poa.network
 FOREIGN_RPC_URL=https://kovan.infura.io/mew
@@ -133,17 +122,19 @@ GAS_PRICE_FALLBACK=21
 LEFT_TX_THRESHOLD=100
 ```
 
-```bash
-npm i
-# check balances of contracts and validators
+## Check balances of contracts and validators
+```
 node checkWorker.js
-# check unprocessed events
+```
+
+## Check unprocessed events
+```
 node checkWorker2.js
-# check stuck transfers called by transfer, not transferAndCall
-# only applicable for bridge-rust-v1-native-to-erc
-node checkWorker3.js
-# run web interface
-node index.js
+```
+
+## Run web interface
+```
+yarn start
 ```
 
 To enabled debug logging, set `DEBUG=1` env variable.

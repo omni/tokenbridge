@@ -1,11 +1,21 @@
 import { action, observable } from 'mobx'
 
 class AlertStore {
-  @observable alerts = []
-  @observable showLoading = false
-  @observable loadingStepIndex = -1
-  @observable blockConfirmations = 0
-  @observable showDailyQuotaInfo = false
+  @observable
+  alerts = []
+
+  @observable
+  showLoading = false
+
+  @observable
+  loadingStepIndex = -1
+
+  @observable
+  blockConfirmations = 0
+
+  @observable
+  showDailyQuotaInfo = false
+
   homeConnectionErrorSended = false
   foreignConnectionErrorSended = false
 

@@ -69,7 +69,7 @@ URL, `http://localhost:8546` as the foreign RPC URL and
 `0xaaB52d66283F7A1D5978bcFcB55721ACB467384b` as the deployer and validator.
 Deploy the contracts.
 
-To start the bridge, you can do `npm run dev`, or you can start all the scripts
+To start the bridge, you can do `yarn dev`, or you can start all the scripts
 separately.
 
 ## Generate a block with several transactions

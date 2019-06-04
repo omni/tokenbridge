@@ -17,14 +17,16 @@ build
 .idea
 .nyc_output
 logs/
-responses/*
-!responses/.gitkeep
+
+
 *.err
 *.out
 data
 
 # contracts build
 ui/src/contracts
+oracle/abis
+monitor/abis
 
 # compiled css
 *.css
@@ -42,3 +44,6 @@ Vagrantfile
 vagrant-hosts.yml
 .vagrant
 
+#monitor
+monitor/responses/*
+!monitor/.gitkeep

@@ -6,6 +6,7 @@
     "../.eslintrc"
   ],
   "rules": {
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "node/no-unpublished-require": "off"
   }
 }

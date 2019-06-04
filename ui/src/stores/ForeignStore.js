@@ -1,5 +1,5 @@
 import { action, observable } from 'mobx'
-import { abi as ERC677_ABI } from '../contracts/ERC677BridgeToken.json'
+import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
 import { getBlockNumber } from './utils/web3'
 import {
   getMaxPerTxLimit,
@@ -30,34 +30,76 @@ import {
   decodeFeeManagerMode,
   FEE_MANAGER_MODE
 } from './utils/bridgeMode'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../contracts/BridgeValidators'
+import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators'
 import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import BN from 'bignumber.js'
 import { processLargeArrayAsync } from './utils/array'
 import { fromDecimals } from './utils/decimals'
 
 class ForeignStore {
-  @observable state = null
-  @observable loading = true
-  @observable events = []
-  @observable totalSupply = ''
-  @observable symbol = 'NOSYM'
-  @observable tokenName = ''
-  @observable balance = ''
-  @observable filter = false
-  @observable maxCurrentDeposit = ''
-  @observable maxPerTx = ''
-  @observable minPerTx = ''
-  @observable latestBlockNumber = 0
-  @observable validators = []
-  @observable validatorsCount = 0
-  @observable foreignBridgeValidators = ''
-  @observable requiredSignatures = 0
-  @observable dailyLimit = 0
-  @observable totalSpentPerDay = 0
-  @observable tokenAddress = ''
-  @observable feeEventsFinished = false
-  @observable tokenType = ''
+  @observable
+  state = null
+
+  @observable
+  loading = true
+
+  @observable
+  events = []
+
+  @observable
+  totalSupply = ''
+
+  @observable
+  symbol = 'NOSYM'
+
+  @observable
+  tokenName = ''
+
+  @observable
+  balance = ''
+
+  @observable
+  filter = false
+
+  @observable
+  maxCurrentDeposit = ''
+
+  @observable
+  maxPerTx = ''
+
+  @observable
+  minPerTx = ''
+
+  @observable
+  latestBlockNumber = 0
+
+  @observable
+  validators = []
+
+  @observable
+  validatorsCount = 0
+
+  @observable
+  foreignBridgeValidators = ''
+
+  @observable
+  requiredSignatures = 0
+
+  @observable
+  dailyLimit = 0
+
+  @observable
+  totalSpentPerDay = 0
+
+  @observable
+  tokenAddress = ''
+
+  @observable
+  feeEventsFinished = false
+
+  @observable
+  tokenType = ''
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)

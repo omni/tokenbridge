@@ -4,7 +4,7 @@ const { HttpListProviderError } = require('http-list-provider')
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
 
-const bridgeValidatorsABI = require('../../../abis/BridgeValidators.abi')
+const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
 const {

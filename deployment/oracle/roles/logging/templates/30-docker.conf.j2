@@ -5,7 +5,7 @@ template(name="DockerLogFileName" type="list") {
    constant(value="/docker.log")
 }
 
-if $programname startswith 'bridge_' then \
+if $programname startswith 'oracle_bridge_' then \
   ?DockerLogFileName
 else
   /var/log/docker/no_tag/docker.log

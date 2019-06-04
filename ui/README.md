@@ -8,13 +8,7 @@ Please refer to the [POA Token Bridge](../README.md) overview first of all.
 
 The UI provides an intuitive interface for assets transfer between networks running the Bridge smart contracts. Users can connect to a web3 wallet such as [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/) and complete the transfer through a web browser.
 
-The current implementation allows for several bridge modes.
-
-  1. `Native-to-ERC20` Coins on a Home network can be converted to ERC20-compatible tokens on a Foreign network. Coins are locked on the Home side and the corresponding amount of ERC20 tokens are minted on the Foreign side. When the operation is reversed, tokens are burnt on the Foreign side and unlocked in the Home network.
-  2. `ERC20-to-ERC20` ERC20-compatible tokens on the Foreign network are locked and minted as ERC20-compatible tokens (ERC677 tokens) on the Home network. When transferred from Home to Foreign, they are burnt on the Home side and unlocked in the Foreign network. This can be considered a form of atomic swap when a user swaps the token "X" in network "A" to the token "Y" in network "B".
-  3. `ERC20-to-Native` Pre-existing tokens in the Foreign network are locked and coins are minted in the Home network. In this mode, the Home network consensus engine invokes Parity's Block Reward contract to mint coins per the bridge contract request. 
-
-  ![Bridge UI](bridge-ui.png)
+![Bridge UI](bridge-ui.png)
 
 ### UI Features
 - Shows daily limits in both networks
@@ -58,9 +52,9 @@ The following is an example setup using the POA Sokol testnet as the Home networ
 
 ### Dependencies
 
-- [poa-bridge-contracts](https://github.com/poanetwork/poa-bridge-contracts)
-- [oracle](../oracle/README.md)
-- [node.js](https://nodejs.org/en/download/)
+- [Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts)
+- [Oracle](../oracle/README.md)
+- [Node.js](https://nodejs.org/en/download/)
 - [AlphaWallet](https://alphawallet.com/) or [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/)
 
 ### Example Setup
@@ -94,14 +88,16 @@ The following is an example setup using the POA Sokol testnet as the Home networ
       * `FOREIGN_RPC_URL`=https://kovan.infura.io/mew
     * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `poa-bridge-contracts/deploy` directory and includes the bridge contract addresses.  
 
-5. Install and run the POA Token Bridge Oracle.
-    * Go to the `sokol-kovan-bridge` folder and `git clone https://github.com/poanetwork/tokenbridge`
-    * `cd tokenbridge/oracle`
-    * Follow instructions in the [Oracle](../oracle/README.md).
+5. Install and run the Token Bridge Oracle.
+  * Go to the `sokol-kovan-bridge` folder
+  * [Initialize](../README.md#initializing-the-monorepository) the monorepository
+  * Go to `oracle` sub-repository
+  * Follow the [Oracle instructions](../oracle/README.md).
 
-If successful, you will see bridge processes run when you issue a command. For example, run `npm run watcher:signature-request`
+If successful, you will see bridge processes run when you issue a command.  
+For example, run `yarn watcher:signature-request`.
 
-**Example NPM Output:**
+**Example Yarn Output:**
 ```bash
 [1539195000507] INFO (watcher-signature-request): Connected to redis
 [1539195000545] INFO (watcher-signature-request): Connected to amqp Broker
@@ -119,22 +115,19 @@ If successful, you will see bridge processes run when you issue a command. For e
 {"level":30,"time":1539366885587,"msg":"Found 0 UserRequestForSignature events","validator":"0x..........","name":"watcher-signature-request","v":1}
 ```
 
-6. Keep the bridge processes running. Open a separate terminal window and go to the `sokol-kovan-bridge` folder to install and unpack this repository.
+6. Keep the bridge processes running. Open a separate terminal window and go to the `sokol-kovan-bridge` folder to install and run the UI.
 
-    * `git clone https://github.com/poanetwork/tokenbridge`  
-    * `cd tokenbridge`
-    * Update submodules  
-`git submodule update --init --recursive` 
-    * Install dependencies  
-`yarn install`
-    * Go to UI sub-repository  
-`cd ui`
+  * Go to the `sokol-kovan-bridge/tokenbridge` monorepository that was initialized in step **5.**
+  * Go to `ui` sub-repository
+  * Create a .env file from the example file [.env.example](.env.example)  
+```
+cp .env.example .env
+````
+  * Insert the addresses from the bridgeDeploymentResults.json file (from step 4) into the .env file. No other changes are needed, see [Env Parameter Details](#env-parameter-details) for information about each parameter.
+```
+cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json
+```
 
-_**Note**: The bridge UI configuration should be performed with an unprivileged Linux account or with the following flag `npm install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
-    * Create a .env file from the example file [.env.example](.env.example)  
-`cp .env.example .env`  
-    * Insert the addresses from the bridgeDeploymentResults.json file (from step 4) into the .env file. No other changes are needed, see [Env Parameter Details](#env-parameter-details) for information about each parameter.
-`cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json`  
 ```bash
     # HomeBridge address in bridgeDeploymentResults.json
     REACT_APP_HOME_BRIDGE_ADDRESS=0x.. 
@@ -146,7 +139,11 @@ _**Note**: The bridge UI configuration should be performed with an unprivileged 
     REACT_APP_HOME_HTTP_PARITY_URL=https://sokol.poa.network 
 ```
 
-  * Run `npm run start`
+  * Run the dApp
+```
+yarn start
+```
+
   * Make sure your web3 wallet (Nifty Wallet, AlphaWallet or MetaMask) is funded and connected to the POA Sokol Network (see step 2)
   * Specify an amount and click `Transfer` to complete a cross-chain transaction from Sokol to Kovan
 
@@ -184,19 +181,27 @@ APP_STYLES | The set of styles to render the bridge UI page. Currently only `cla
 
 To run tests
 
-`npm run test`
+```
+yarn test
+```
 
 To run linting
 
-`npm run lint`
+```
+yarn lint
+```
 
 To run tests with coverage
 
-`npm run coverage`
+```
+yarn coverage
+```
 
 To build the project
 
-`npm run build`
+```
+yarn build
+```
 
 ## Contributing
 

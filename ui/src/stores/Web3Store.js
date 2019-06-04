@@ -4,24 +4,37 @@ import { balanceLoaded } from './utils/testUtils'
 import { BRIDGE_MODES } from './utils/bridgeMode'
 
 class Web3Store {
-  @observable injectedWeb3 = {}
-  @observable defaultAccount = { address: '', homeBalance: '' }
+  @observable
+  injectedWeb3 = {}
+  @observable
+  defaultAccount = { address: '', homeBalance: '' }
 
-  @observable homeWeb3 = {}
-  @observable foreignWeb3 = {}
+  @observable
+  homeWeb3 = {}
+  @observable
+  foreignWeb3 = {}
 
-  @observable loading = true
-  @observable errors = []
+  @observable
+  loading = true
+  @observable
+  errors = []
 
-  @observable getWeb3Promise = null
-  @observable setHomeWeb3Promise = null
-  @observable metamaskNotSetted = false
+  @observable
+  getWeb3Promise = null
+  @observable
+  setHomeWeb3Promise = null
+  @observable
+  metamaskNotSetted = false
 
-  @observable homeNet = { id: '', name: '' }
-  @observable foreignNet = { id: '', name: '' }
-  @observable metamaskNet = { id: '', name: '' }
+  @observable
+  homeNet = { id: '', name: '' }
+  @observable
+  foreignNet = { id: '', name: '' }
+  @observable
+  metamaskNet = { id: '', name: '' }
 
-  @observable walletInstalled = true
+  @observable
+  walletInstalled = true
 
   HOME_HTTP_PARITY_URL = process.env.REACT_APP_HOME_HTTP_PARITY_URL
   FOREIGN_HTTP_PARITY_URL = process.env.REACT_APP_FOREIGN_HTTP_PARITY_URL

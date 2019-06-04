@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const Web3 = require('web3')
 const logger = require('./logger')('checkWorker')
-const { decodeBridgeMode } = require('./utils/bridgeMode')
+const { getBridgeMode } = require('./utils/bridgeMode')
 const getBalances = require('./getBalances')
 const getShortEventStats = require('./getShortEventStats')
 const validators = require('./validators')
@@ -11,13 +11,12 @@ const { HOME_BRIDGE_ADDRESS, HOME_RPC_URL } = process.env
 const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
-const HOME_ERC_TO_ERC_ABI = require('./abis/HomeBridgeErcToErc.abi')
+const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
 
 async function checkWorker() {
   try {
     const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
-    const bridgeModeHash = await homeBridge.methods.getBridgeMode().call()
-    const bridgeMode = decodeBridgeMode(bridgeModeHash)
+    const bridgeMode = await getBridgeMode(homeBridge)
     logger.debug('Bridge mode:', bridgeMode)
     logger.debug('calling getBalances()')
     const balances = await getBalances(bridgeMode)
@@ -40,10 +39,8 @@ async function checkWorker() {
       JSON.stringify(vBalances, null, 4)
     )
     logger.debug('Done')
-    return status
   } catch (e) {
     logger.error(e)
-    throw e
   }
 }
 checkWorker()

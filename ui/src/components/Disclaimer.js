@@ -23,8 +23,7 @@ export const Disclaimer = ({ onConfirmation }) => (
           {' '}
           support page
         </a>
-        .
-        <br />
+        .<br />
         <br />
         Use of this app and the TokenBridge is at your own risk. Users may experience unexpected
         delays, unexpected visual artifacts, unexpected loss of tokens or funds from improper app

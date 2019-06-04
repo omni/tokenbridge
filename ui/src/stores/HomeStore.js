@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../contracts/BridgeValidators.json'
-import { abi as ERC677_ABI } from '../contracts/ERC677BridgeToken.json'
-import { abi as BLOCK_REWARD_ABI } from '../contracts/IBlockReward'
+import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators.json'
+import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
+import { abi as BLOCK_REWARD_ABI } from '../../../contracts/build/contracts/IBlockReward'
 import { getBlockNumber, getBalance } from './utils/web3'
 import { fromDecimals } from './utils/decimals'
 import {
@@ -48,26 +48,65 @@ async function asyncForEach(array, callback) {
 }
 
 class HomeStore {
-  @observable state = null
-  @observable loading = true
-  @observable events = []
-  @observable errors = []
-  @observable balance = ''
-  @observable filter = false
-  @observable maxCurrentDeposit = ''
-  @observable maxPerTx = ''
-  @observable latestBlockNumber = 0
-  @observable validators = []
-  @observable validatorsCount = 0
-  @observable homeBridgeValidators = ''
-  @observable requiredSignatures = 0
-  @observable dailyLimit = 0
-  @observable totalSpentPerDay = 0
-  @observable tokenAddress = ''
-  @observable symbol = process.env.REACT_APP_HOME_NATIVE_NAME || 'NONAME'
-  @observable tokenName = ''
-  @observable userBalance = 0
-  @observable statistics = {
+  @observable
+  state = null
+
+  @observable
+  loading = true
+
+  @observable
+  events = []
+
+  @observable
+  errors = []
+
+  @observable
+  balance = ''
+
+  @observable
+  filter = false
+
+  @observable
+  maxCurrentDeposit = ''
+
+  @observable
+  maxPerTx = ''
+
+  @observable
+  latestBlockNumber = 0
+
+  @observable
+  validators = []
+
+  @observable
+  validatorsCount = 0
+
+  @observable
+  homeBridgeValidators = ''
+
+  @observable
+  requiredSignatures = 0
+
+  @observable
+  dailyLimit = 0
+
+  @observable
+  totalSpentPerDay = 0
+
+  @observable
+  tokenAddress = ''
+
+  @observable
+  symbol = process.env.REACT_APP_HOME_NATIVE_NAME || 'NONAME'
+
+  @observable
+  tokenName = ''
+
+  @observable
+  userBalance = 0
+
+  @observable
+  statistics = {
     deposits: 0,
     depositsValue: BN(0),
     withdraws: 0,
@@ -76,18 +115,23 @@ class HomeStore {
     users: new Set(),
     finished: false
   }
-  @observable depositFeeCollected = {
+
+  @observable
+  depositFeeCollected = {
     value: BN(0),
     type: '',
     shouldDisplay: false,
     finished: false
   }
-  @observable withdrawFeeCollected = {
+
+  @observable
+  withdrawFeeCollected = {
     value: BN(0),
     type: '',
     shouldDisplay: false,
     finished: false
   }
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
