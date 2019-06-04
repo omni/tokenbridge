@@ -3,6 +3,5 @@
   "erc20Url" : "http://localhost:3001",
   "erc20NativeUrl" : "http://localhost:3002",
   "homeNetworkID": "77",
-  "foreignNetworkID": "42",
-  "contractsPath": "../contracts"
+  "foreignNetworkID": "42"
 }
