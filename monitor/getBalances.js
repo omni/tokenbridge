@@ -55,7 +55,10 @@ async function main(bridgeMode) {
       balanceDiff: Number(Web3Utils.fromWei(diff)),
       lastChecked: Math.floor(Date.now() / 1000)
     }
-  } else if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC) {
+  } else if (
+    bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC ||
+    bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1
+  ) {
     logger.debug('calling web3Home.eth.getBalance')
     const foreignBridge = new web3Foreign.eth.Contract(
       FOREIGN_NATIVE_TO_ERC_ABI,

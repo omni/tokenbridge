@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const fs = require('fs')
+const { isV1Bridge } = require('./utils/serverUtils')
 
 const app = express()
 
@@ -18,6 +19,21 @@ async function readFile(path) {
     return {
       error: 'please check your worker'
     }
+  }
+}
+
+async function initV1routes(app) {
+  const exposeV1Routes = await isV1Bridge()
+  if (exposeV1Routes) {
+    app.get('/stuckTransfers', async (req, res, next) => {
+      try {
+        const results = await readFile('./responses/stuckTransfers.json')
+        results.ok = results.total.length === 0
+        res.json(results)
+      } catch (e) {
+        next(e)
+      }
+    })
   }
 }
 
@@ -82,6 +98,8 @@ app.get('/alerts', async (req, res, next) => {
     next(e)
   }
 })
+
+initV1routes(app)
 
 const port = process.env.PORT || 3003
 app.set('port', port)

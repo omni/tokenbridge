@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const Web3 = require('web3')
 const logger = require('./logger')('checkWorker')
-const { decodeBridgeMode } = require('./utils/bridgeMode')
+const { getBridgeMode } = require('./utils/bridgeMode')
 const getBalances = require('./getBalances')
 const getShortEventStats = require('./getShortEventStats')
 const validators = require('./validators')
@@ -16,8 +16,7 @@ const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcT
 async function checkWorker() {
   try {
     const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
-    const bridgeModeHash = await homeBridge.methods.getBridgeMode().call()
-    const bridgeMode = decodeBridgeMode(bridgeModeHash)
+    const bridgeMode = await getBridgeMode(homeBridge)
     logger.debug('Bridge mode:', bridgeMode)
     logger.debug('calling getBalances()')
     const balances = await getBalances(bridgeMode)
