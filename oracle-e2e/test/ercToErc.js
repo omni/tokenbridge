@@ -3,7 +3,7 @@ const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
 const { user, contractsPath } = require('../constants.json')
-const { generateNewBlock } = require('../utils/utils')
+const { generateNewBlock } = require('../../e2e-commons/utils')
 
 const abisDir = path.join(__dirname, '..', contractsPath, 'build/contracts')
 
