@@ -9,7 +9,6 @@ COPY ui/lib/web3-eth/index.js ./ui/lib/web3-eth/index.js
 COPY ui-e2e/package.json ./ui-e2e/
 COPY monitor/package.json ./monitor/
 COPY contracts/package.json ./contracts/
-COPY ui/lib/web3-eth/index.js ./ui/lib/web3-eth/index.js
 
 COPY yarn.lock .
 RUN yarn install
