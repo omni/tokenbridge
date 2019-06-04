@@ -11,7 +11,7 @@ COPY monitor/package.json ./monitor/
 COPY contracts/package.json ./contracts/
 
 COPY yarn.lock .
-RUN yarn install
+RUN yarn install --frozen-lockfile
 COPY ./contracts ./contracts
 RUN yarn install:deploy
 RUN yarn compile:contracts
