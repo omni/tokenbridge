@@ -2,14 +2,14 @@ const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, validator, nativeToErcBridge, secondUser } = require('../../e2e-commons/constants.json')
-const { contractsPath, homeRPC, foreignRPC } = require('../config.json')
+const { user, validator, nativeToErcBridge, secondUser, homeRPCURL, foreignRPCURL } = require('../../e2e-commons/constants.json')
+const { contractsPath } = require('../config.json')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
 const abisDir = path.join(__dirname, '..', contractsPath, '/build/contracts')
 
-const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC))
+const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPCURL))
+const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPCURL))
 
 const HOME_BRIDGE_ADDRESS = nativeToErcBridge.home
 const FOREIGN_BRIDGE_ADDRESS = nativeToErcBridge.foreign

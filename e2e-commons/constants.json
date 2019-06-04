@@ -26,5 +26,7 @@
     "home": "0x32198D570fffC7033641F8A9094FFDCaAEF42624",
     "foreign": "0x2B6871b9B02F73fa24F4864322CdC78604207769",
     "foreignToken": "0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B"
-  }
+  },
+  "homeRPCURL": "http://parity1:8545",
+  "foreignRPCURL": "http://parity2:8545"
 }
