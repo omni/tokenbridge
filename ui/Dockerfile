@@ -6,7 +6,7 @@ COPY contracts/package.json ./contracts/
 COPY ui/package.json ./ui/
 COPY ui/lib/web3-eth/index.js ./ui/lib/web3-eth/index.js
 COPY yarn.lock .
-RUN yarn install --production
+RUN yarn install --production --frozen-lockfile
 
 COPY ./contracts ./contracts
 RUN yarn run compile:contracts
