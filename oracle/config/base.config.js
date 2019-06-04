@@ -14,8 +14,8 @@ const foreignErc677Erc677Abi = require('../../contracts/build/contracts/ForeignB
 const homeErcNativeAbi = require('../../contracts/build/contracts/HomeBridgeErcToNative').abi
 const foreignErcNativeAbi = require('../../contracts/build/contracts/ForeignBridgeErcToNative').abi
 
-const homeAMBAbi = require('../abis/HomeAMB.abi')
-const foreignAMBAbi = require('../abis/ForeignAMB.abi')
+const homeAMBAbi = require('../../contracts/build/contracts/HomeAMB').abi
+const foreignAMBAbi = require('../../contracts/build/contracts/ForeignAMB').abi
 
 const { VALIDATOR_ADDRESS, VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
