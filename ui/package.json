@@ -39,7 +39,7 @@
     "coverage": "react-app-rewired test --env=jsdom --coverage",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "eject": "react-app-rewired eject",
-    "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src && cp lib/web3-eth/index.js ./node_modules/web3-eth/src)"
+    "postinstall": "cp lib/web3-eth/index.js ../node_modules/web3-eth/src || cp lib/web3-eth/index.js ./node_modules/web3-eth/src || :"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
