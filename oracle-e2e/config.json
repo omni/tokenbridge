@@ -1,3 +1,5 @@
 {
-    "contractsPath": "../contracts"
+    "contractsPath": "../contracts",
+    "homeRPC": "http://parity1:8545",
+    "foreignRPC": "http://parity2:8545"
 }

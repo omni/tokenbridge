@@ -3,13 +3,13 @@ const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
 const { user, validator, nativeToErcBridge, secondUser } = require('../../e2e-commons/constants.json')
-const { contractsPath } = require('../config.json')
+const { contractsPath, homeRPC, foreignRPC } = require('../config.json')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
 const abisDir = path.join(__dirname, '..', contractsPath, '/build/contracts')
 
-const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))
+const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC))
+const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC))
 
 const HOME_BRIDGE_ADDRESS = nativeToErcBridge.home
 const FOREIGN_BRIDGE_ADDRESS = nativeToErcBridge.foreign
@@ -24,7 +24,7 @@ foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(secondUser.privateKey)
 
 const tokenAbi = require(path.join(abisDir, 'ERC677BridgeToken.json')).abi
-const token = new foreignWeb3.eth.Contract(tokenAbi, '0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B')
+const token = new foreignWeb3.eth.Contract(tokenAbi, nativeToErcBridge.foreignToken)
 
 const sleep = timeout => new Promise(res => setTimeout(res, timeout))
 
