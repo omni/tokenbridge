@@ -5,7 +5,7 @@ const MainPage = require('./mainPage.js').MainPage;
 class User {
 	constructor(driver, obj) {
 		try {
-      this.driver = driver;
+			this.driver = driver;
 			this.account = obj.account;
 			this.privateKey = obj.privateKey;
 			this.networkID = obj.networkID;
