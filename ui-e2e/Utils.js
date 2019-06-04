@@ -1,9 +1,6 @@
 const webdriver = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const fs = require('fs-extra');
-const {user} = require('../e2e-commons/constants.json')
-const config = require('./config.json')
-const configFile = './config.json';
+const {user, nativeToErcBridge, ercToErcBridge, ercToNativeBridge, homeRPC, foreignRPC} = require('../e2e-commons/constants.json')
 
 class Utils {
 
@@ -11,7 +8,7 @@ class Utils {
     return {
       account: user.address,
       privateKey: user.privateKey,
-      networkID: config.homeNetworkID
+      networkID: homeRPC.homeNetworkID
     }
   }
 
@@ -19,20 +16,20 @@ class Utils {
     return {
       account: user.address,
       privateKey: user.privateKey,
-      networkID: config.foreignNetworkID
+      networkID: foreignRPC.foreignNetworkID
     }
   }
 
   static async getStartURL() {
-    return config.startUrl;
+    return nativeToErcBridge.ui;
   }
 
   static async getErc20StartURL() {
-    return config.erc20Url;
+    return ercToErcBridge.ui;
   }
 
   static async getErc20NativeStartURL() {
-    return config.erc20NativeUrl;
+    return ercToNativeBridge.ui;
   }
 
   static async startBrowserWithMetamask() {
