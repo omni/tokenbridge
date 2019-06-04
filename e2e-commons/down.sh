@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 cd $(dirname $0)
 
-ps | grep node | grep -v grep | awk '{print "kill " $1}' | sh
+if [ $CI ]; then exit $rc; fi
+
+ps | grep node | grep -v grep | awk '{print "kill " $1}' | /bin/bash
 docker-compose down
