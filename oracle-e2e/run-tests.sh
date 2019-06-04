@@ -1,4 +1,5 @@
 cd $(dirname $0)
+set -e
 
 ../e2e-commons/up.sh oracle deploy
 
