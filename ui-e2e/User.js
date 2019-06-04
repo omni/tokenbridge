@@ -6,7 +6,6 @@ class User {
 	constructor(driver, obj) {
 		try {
       this.driver = driver;
-      console.log(obj)
 			this.account = obj.account;
 			this.privateKey = obj.privateKey;
 			this.networkID = obj.networkID;

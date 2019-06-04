@@ -8,7 +8,7 @@ class Utils {
     return {
       account: user.address,
       privateKey: user.privateKey,
-      networkID: homeRPC.homeNetworkID
+      networkID: homeRPC.ID
     }
   }
 
@@ -16,7 +16,7 @@ class Utils {
     return {
       account: user.address,
       privateKey: user.privateKey,
-      networkID: foreignRPC.foreignNetworkID
+      networkID: foreignRPC.ID
     }
   }
 
