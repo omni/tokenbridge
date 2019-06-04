@@ -2,8 +2,8 @@ const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user } = require('../../e2e-commons/constants.json')
-const { contractsPath } = require('../constants.json')
+const { user, ercToErcBridge } = require('../../e2e-commons/constants.json')
+const { contractsPath } = require('../config.json')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
 const abisDir = path.join(__dirname, '..', contractsPath, 'build/contracts')
@@ -11,8 +11,8 @@ const abisDir = path.join(__dirname, '..', contractsPath, 'build/contracts')
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))
 
-const HOME_BRIDGE_ADDRESS = '0x1feB40aD9420b186F019A717c37f5546165d411E'
-const FOREIGN_BRIDGE_ADDRESS = '0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127'
+const HOME_BRIDGE_ADDRESS = ercToErcBridge.home
+const FOREIGN_BRIDGE_ADDRESS = ercToErcBridge.foreign
 
 const { toBN } = foreignWeb3.utils
 
