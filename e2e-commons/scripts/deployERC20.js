@@ -1,10 +1,10 @@
 /* eslint import/no-unresolved: 0  node/no-missing-require: 0 */
 const path = require('path')
+const {user} = require('../constants.json')
 const contractsPath = '../../contracts';
 require('dotenv').config({
   path: path.join(__dirname, contractsPath, '/deploy/.env')
 })
-const user = '0x7FC1442AB55Da569940Eb750AaD2BAA63DA4010E'
 
 const {
   deployContract,
@@ -33,7 +33,7 @@ async function deployErc20() {
     console.log('[Foreign] POA20 Test: ', poa20foreign.options.address)
 
     const mintData = await poa20foreign.methods
-      .mint(user, '500000000000000000000')
+      .mint(user.address, '500000000000000000000')
       .encodeABI({ from: DEPLOYMENT_ACCOUNT_ADDRESS })
     await sendRawTxForeign({
       data: mintData,
