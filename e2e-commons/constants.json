@@ -2,5 +2,9 @@
   "user": {
     "address": "0x7FC1442AB55Da569940Eb750AaD2BAA63DA4010E",
     "privateKey": "0x460635eb4ac4287de2d2393985e19b4a9f948ac533453a1044ab8d50330b0df9"
+  },
+  "validator": {
+    "address": "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b",
+    "privateKey": "0x8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
   }
 }
