@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 cd $(dirname $0)
+set -e # exit when any command fails
 
 ./down.sh
 docker-compose build
