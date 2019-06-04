@@ -1,14 +1,20 @@
-const webdriver = require('selenium-webdriver'),
-  chrome = require('selenium-webdriver/chrome');
+const webdriver = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs-extra');
+const {user} = require('../e2e-commons/constants.json')
+const config = require('./config.json')
 const configFile = './config.json';
 
 class Utils {
 
   static async getHomeAccount() {
     try {
-      let obj = JSON.parse(fs.readFileSync(configFile), "utf8");
-      return obj.homeAccount;
+      return {
+        account: user.address,
+        privateKey: user.privateKey,
+        networkID: config.homeNetworkID
+      }
+      return config.homeAccount;
     } catch (err) {
       return null;
     }
@@ -16,8 +22,11 @@ class Utils {
 
   static async getForeignAccount() {
     try {
-      let obj = JSON.parse(fs.readFileSync(configFile), "utf8");
-      return obj.foreignAccount;
+      return {
+        account: user.address,
+        privateKey: user.privateKey,
+        networkID: config.foreignNetworkID
+      }
     } catch (err) {
       return null;
     }
@@ -25,8 +34,7 @@ class Utils {
 
   static async getStartURL() {
     try {
-      let obj = JSON.parse(fs.readFileSync(configFile), "utf8");
-      return obj.startUrl;
+      return config.startUrl;
     } catch (err) {
       return null;
     }
@@ -34,8 +42,7 @@ class Utils {
 
   static async getErc20StartURL() {
     try {
-      let obj = JSON.parse(fs.readFileSync(configFile), "utf8");
-      return obj.erc20Url;
+      return config.erc20Url;
     } catch (err) {
       return null;
     }
@@ -43,8 +50,7 @@ class Utils {
 
   static async getErc20NativeStartURL() {
     try {
-      let obj = JSON.parse(fs.readFileSync(configFile), "utf8");
-      return obj.erc20NativeUrl;
+      return config.erc20NativeUrl;
     } catch (err) {
       return null;
     }
@@ -59,10 +65,8 @@ class Utils {
     await driver.sleep(5000);
     return driver;
   }
-
 }
 
 module.exports = {
-  Utils: Utils
+  Utils
 }
-

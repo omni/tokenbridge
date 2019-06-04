@@ -9,8 +9,8 @@ foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 
 function main() {
   setTimeout(async () => {
-    generateNewBlock(homeWeb3, user.account)
-    generateNewBlock(foreignWeb3, user.account)
+    generateNewBlock(homeWeb3, user.address)
+    generateNewBlock(foreignWeb3, user.address)
     main()
   }, 5000)
 }

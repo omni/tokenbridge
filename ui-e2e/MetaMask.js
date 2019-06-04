@@ -1,6 +1,7 @@
 const key = require('selenium-webdriver').Key;
 const Page = require('./Page.js').Page;
 const By = require('selenium-webdriver/lib/by').By;
+const {homeNetworkID, foreignNetworkID} = require('./config.json')
 const IDMetaMask = "nkbihfbeogaeaoehlefnkodbefgpgknn";
 const URL = "chrome-extension://" + IDMetaMask + "//popup.html";
 const buttonSubmit = By.className("confirm btn-green");
@@ -126,12 +127,12 @@ class MetaMask extends Page {
   async addNetwork(provider) {
     let url;
     switch (provider) {
-      case 77: {
+      case homeNetworkID: {
         url = "http://localhost:8541";
         networks.push(177);
         break;
       }
-      case 42: {
+      case foreignNetworkID: {
         url = "http://localhost:8542";
         networks.push(142);
         break;
