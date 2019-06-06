@@ -12,6 +12,7 @@
     - name: Install dependencies
       raw: docker exec oracle-server bash -c 'apt-get update && apt-get -y install sudo apt-transport-https ca-certificates'
     - raw: docker exec oracle-server bash -c 'sudo add-apt-repository ppa:adiscon/v8-stable --yes; sudo apt-get update; sudo apt-get install rsyslog -y'
+    - raw: docker exec oracle-server bash -c 'mkdir /etc/docker'
 # - name: Spin up ui host container
 #   hosts: localhost
 #   gather_facts: false

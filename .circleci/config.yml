@@ -114,7 +114,7 @@ jobs:
       - checkout
       - run: sudo apt update; sudo apt install python3-pip sshpass -y; pip install ansible
       - run: cd deployment && ansible-playbook dev.yml
-      - run: cd cd deployment && ansible-playbook -i dev-hosts.yml site.yml
+      - run: cd deployment && ansible-playbook -i dev-hosts.yml site.yml
 workflows:
   version: 2
   tokenbridge:

@@ -4,7 +4,7 @@
   become: true
   failed_when: false
 - name: Build the container
-  shell: COMPOSE_HTTP_TIMEOUT=480 docker-compose build
+  shell: COMPOSE_HTTP_TIMEOUT=480 docker-compose build --compress --force-rm
   args:
     chdir: "{{ bridge_path }}/oracle"
 - name: Down
