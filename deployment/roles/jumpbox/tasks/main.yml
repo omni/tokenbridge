@@ -1,4 +1,17 @@
-- name: Launch container
-  shell: docker-compose up -d
+# for some reason service module is not working in docker
+- name: Make sure docker service is running
+  shell: service docker start
+  become: true
+  failed_when: false
+- name: Build the container
+  shell: docker-compose build
+  args:
+    chdir: "{{ bridge_path }}/oracle"
+- name: Down
+  shell: COMPOSE_HTTP_TIMEOUT=240 docker-compose down
+  args:
+    chdir: "{{ bridge_path }}/oracle"
+- name: Run the container
+  shell: COMPOSE_HTTP_TIMEOUT=480 docker-compose up -d
   args:
     chdir: "{{ bridge_path }}/oracle"

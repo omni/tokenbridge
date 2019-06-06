@@ -1,6 +1,6 @@
 - name: Get blocks
   become_user: "{{ compose_service_user }}" 
-  shell: docker-compose run --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
+  shell: COMPOSE_HTTP_TIMEOUT=480 docker-compose run --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: BLOCKS
@@ -15,7 +15,7 @@
 
 - name: Get validator address
   become_user: "{{ compose_service_user }}" 
-  shell: docker-compose run -e VALIDATOR_ADDRESS_PRIVATE_KEY="{{ VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
+  shell: COMPOSE_HTTP_TIMEOUT=480 docker-compose run -e VALIDATOR_ADDRESS_PRIVATE_KEY="{{ VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: VADDRESS

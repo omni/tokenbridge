@@ -107,10 +107,12 @@ jobs:
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
   deployment:
-    docker:
-      - image: circleci/node:10.15
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
     steps:
       - checkout
+      - run: sudo apt update && sudo apt install python3-pip && pip3 install ansible
       - run: cd deployment && ansible-playbook dev.yml
       - run: cd cd deployment && ansible-playbook -i dev-hosts.yml site.yml
 workflows:

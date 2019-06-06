@@ -1,0 +1,18 @@
+example:
+  children:
+    oracle:
+      hosts:
+        127.0.0.1:
+          ansible_user: root
+          ansible_password: root
+          ansible_port: 3001
+          VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9" 
+          syslog_server_port: "udp://127.0.0.1:514"
+    # ui:
+    #   hosts:
+    #     127.0.0.1:
+    #       ansible_user: root
+    #       ansible_password: root
+    #       ansible_port: 3002
+    #       VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9" 
+    #       syslog_server_port: "udp://127.0.0.1:514"
