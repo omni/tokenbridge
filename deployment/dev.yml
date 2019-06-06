@@ -4,14 +4,14 @@
   become: false
   tasks:
     - name: Stop and remove if running
-      raw: docker ps -f name=oracle-server -q | xargs docker rm -f
+      raw: '(docker ps -f name=oracle-server -q | xargs docker rm -f) || :'
     - name: Remove old host authentication key
       raw: ssh-keygen -R [127.0.0.1]:3001
     - name: Spin up container
       raw: docker run --privileged -it -d -p 3001:22 --name="oracle-server" rastasheep/ubuntu-sshd:16.04
     - name: Install dependencies
       raw: docker exec oracle-server bash -c 'apt-get update && apt-get -y install sudo apt-transport-https ca-certificates'
-    - raw: docker exec oracle-server bash -c 'mkdir /etc/docker /etc/rsyslog.d /etc/logrotate.d'
+    - raw: docker exec oracle-server bash -c 'mkdir /etc/docker /etc/rsyslog.d'
     - raw: docker exec oracle-server bash -c 'touch /etc/rsyslog.conf'
 # - name: Spin up ui host container
 #   hosts: localhost
