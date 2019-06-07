@@ -13,7 +13,8 @@ const {
   privateKeyToAddress,
   syncForEach,
   waitForFunds,
-  watchdog
+  watchdog,
+  nonceError
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
 
@@ -152,10 +153,7 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
           logger.error(
             `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
           )
-        } else if (
-          e.message.includes('Transaction nonce is too low') ||
-          e.message.includes('transaction with same nonce in the queue')
-        ) {
+        } else if (nonceError(e)) {
           nonce = await readNonce(true)
         }
       }
