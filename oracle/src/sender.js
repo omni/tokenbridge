@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('../env')
 const path = require('path')
 const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis, redlock } = require('./services/redisClient')

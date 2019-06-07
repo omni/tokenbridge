@@ -1,7 +1,4 @@
-const path = require('path')
-require('dotenv').config({
-  path: path.join(__dirname, '../.env')
-})
+require('../env')
 const Web3 = require('web3')
 const ERC677BridgeTokenABI = require('../../contracts/build/contracts/ERC677BridgeToken').abi
 const { ERC_TYPES } = require('../src/utils/constants')

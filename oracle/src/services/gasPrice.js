@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('../../env')
 const fetch = require('node-fetch')
 const Web3Utils = require('web3-utils')
 const { web3Home, web3Foreign } = require('../services/web3')

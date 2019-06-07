@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('../env')
 
 const { toBN } = require('web3').utils
 const { web3Home, web3Foreign } = require('../src/services/web3')
