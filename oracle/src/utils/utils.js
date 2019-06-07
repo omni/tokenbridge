@@ -96,6 +96,14 @@ function privateKeyToAddress(privateKey) {
     : null
 }
 
+function nonceError(e) {
+  return (
+    e.message.includes('Transaction nonce is too low') ||
+    e.message.includes('nonce too low') ||
+    e.message.includes('transaction with same nonce in the queue')
+  )
+}
+
 module.exports = {
   syncForEach,
   checkHTTPS,
@@ -103,5 +111,6 @@ module.exports = {
   addExtraGas,
   setIntervalAndRun,
   watchdog,
-  privateKeyToAddress
+  privateKeyToAddress,
+  nonceError
 }
