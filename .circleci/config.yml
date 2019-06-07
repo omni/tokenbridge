@@ -115,7 +115,7 @@ jobs:
       - run: sudo apt update; sudo apt install python3-pip sshpass -y; pip install ansible
       - run: cd deployment && ansible-playbook dev.yml
       - run: 
-          command: cd deployment && ansible-playbook -vvv -i dev-hosts.yml site.yml
+          command: cd deployment && ansible-playbook -i dev-hosts.yml site.yml
           no_output_timeout: 50m
 
 workflows:
