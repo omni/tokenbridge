@@ -58,9 +58,6 @@ jobs:
   test:
     docker:
       - image: circleci/node:10.15
-    environment:
-      HOME_RPC_URL: http://example.com
-      FOREIGN_RPC_URL: http://example.com
     steps:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
