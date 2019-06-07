@@ -1,7 +1,4 @@
-const path = require('path')
-require('dotenv').config({
-  path: path.join(__dirname, '../.env')
-})
+require('../env')
 const Web3 = require('web3')
 const bridgeValidatorsABI = require('../../contracts/build/contracts/BridgeValidators').abi
 

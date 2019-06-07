@@ -1,4 +1,3 @@
-require('dotenv').config()
 const baseConfig = require('./base.config')
 const erc20Abi = require('../../contracts/build/contracts/ERC20').abi
 const { ERC_TYPES } = require('../src/utils/constants')

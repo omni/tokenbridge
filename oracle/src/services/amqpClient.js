@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('../../env')
 const connection = require('amqp-connection-manager').connect(process.env.QUEUE_URL)
 const logger = require('./logger')
 

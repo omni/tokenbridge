@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
