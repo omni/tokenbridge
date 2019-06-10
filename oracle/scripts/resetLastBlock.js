@@ -1,8 +1,5 @@
+require('../env')
 const Redis = require('ioredis')
-const path = require('path')
-require('dotenv').config({
-  path: path.join(__dirname, '../.env')
-})
 const { id } = require('../config/base.config')
 const { EXIT_CODES } = require('../src/utils/constants')
 
