@@ -25,6 +25,7 @@ Sub-repositories maintained within this monorepo are listed below.
 | [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
 | [UI-E2E](ui-e2e/README.md) | End to end tests for the UI |
+| [E2E-Commons](e2e-commons/README.md) | Common utilities and configuration used in end to end tests |
 
 Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
 

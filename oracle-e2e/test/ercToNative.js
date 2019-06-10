@@ -2,16 +2,17 @@ const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, contractsPath } = require('../constants.json')
-const { generateNewBlock } = require('../utils/utils')
+const { user, ercToNativeBridge, homeRPC, foreignRPC } = require('../../e2e-commons/constants.json')
+const { abiPath } = require('../config.json')
+const { generateNewBlock } = require('../../e2e-commons/utils')
 
-const abisDir = path.join(__dirname, '..', contractsPath, 'build/contracts')
+const abisDir = path.join(__dirname, '..', abiPath)
 
-const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))
+const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
+const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
 
-const HOME_BRIDGE_ADDRESS = '0x488Af810997eD1730cB3a3918cD83b3216E6eAda'
-const FOREIGN_BRIDGE_ADDRESS = '0x488Af810997eD1730cB3a3918cD83b3216E6eAda'
+const HOME_BRIDGE_ADDRESS = ercToNativeBridge.home
+const FOREIGN_BRIDGE_ADDRESS = ercToNativeBridge.foreign
 
 const { toBN } = foreignWeb3.utils
 
@@ -21,7 +22,7 @@ foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 const tokenAbi = require(path.join(abisDir, 'ERC677BridgeToken.json')).abi
 const erc20Token = new foreignWeb3.eth.Contract(
   tokenAbi,
-  '0x3C665A31199694Bf723fD08844AD290207B5797f'
+  ercToNativeBridge.foreignToken
 )
 
 describe('erc to native', () => {

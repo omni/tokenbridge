@@ -3,15 +3,13 @@ const MetaMask = require('./MetaMask.js').MetaMask;
 const MainPage = require('./mainPage.js').MainPage;
 
 class User {
-	constructor(driver, file) {
+	constructor(driver, obj) {
 		try {
 			this.driver = driver;
-			let obj = JSON.parse(fs.readFileSync(file, "utf8"));
 			this.account = obj.account;
 			this.privateKey = obj.privateKey;
 			this.networkID = obj.networkID;
 			this.accountOrderInMetamask = "undefined";//for MetaMaskPage usage only
-			this.name = file;
 		}
 		catch (err) {
 			console.log("instance User was not created");

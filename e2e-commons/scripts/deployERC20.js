@@ -1,20 +1,21 @@
 /* eslint import/no-unresolved: 0  node/no-missing-require: 0 */
 const path = require('path')
-const { contractsPath, user } = require('../constants.json')
+const {user} = require('../constants.json')
+const contractsPath = '../../contracts';
 require('dotenv').config({
-  path: path.join(__dirname, '..', contractsPath, '/deploy/.env')
+  path: path.join(__dirname, contractsPath, '/deploy/.env')
 })
 
 const {
   deployContract,
   sendRawTxForeign,
   privateKeyToAddress
-} = require(`../${contractsPath}/deploy/src/deploymentUtils`)
+} = require(`${contractsPath}/deploy/src/deploymentUtils`)
 const {
   web3Foreign,
   deploymentPrivateKey
-} = require(`../${contractsPath}/deploy/src/web3`)
-const POA20 = require(`../${contractsPath}/build/contracts/ERC677BridgeToken.json`)
+} = require(`${contractsPath}/deploy/src/web3`)
+const POA20 = require(`${contractsPath}/build/contracts/ERC677BridgeToken.json`)
 
 const { DEPLOYMENT_ACCOUNT_PRIVATE_KEY } = process.env
 const DEPLOYMENT_ACCOUNT_ADDRESS = privateKeyToAddress(DEPLOYMENT_ACCOUNT_PRIVATE_KEY)
@@ -32,7 +33,7 @@ async function deployErc20() {
     console.log('[Foreign] POA20 Test: ', poa20foreign.options.address)
 
     const mintData = await poa20foreign.methods
-      .mint(user.address, '1000000000000000000')
+      .mint(user.address, '500000000000000000000')
       .encodeABI({ from: DEPLOYMENT_ACCOUNT_ADDRESS })
     await sendRawTxForeign({
       data: mintData,
@@ -43,6 +44,7 @@ async function deployErc20() {
     })
   } catch (e) {
     console.log(e)
+    throw e;
   }
 }
 
