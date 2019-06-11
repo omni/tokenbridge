@@ -15,4 +15,4 @@ RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./b
 COPY ./ui ./ui
 WORKDIR /mono/ui
 CMD echo "To start a UI application run:" \
-  "?"
+  "yarn start"
