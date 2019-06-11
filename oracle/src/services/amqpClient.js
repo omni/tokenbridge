@@ -24,13 +24,17 @@ function connectWatcherToQueue({ queueName, cb }) {
 }
 
 function connectSenderToQueue({ queueName, cb }) {
+  const deadLetterExchange = `${queueName}-retry`
+
   const channelWrapper = connection.createChannel({
     json: true
   })
 
   channelWrapper.addSetup(channel => {
     return Promise.all([
+      channel.assertExchange(deadLetterExchange, 'fanout', { durable: true }),
       channel.assertQueue(queueName, { durable: true }),
+      channel.bindQueue(queueName, deadLetterExchange),
       channel.prefetch(1),
       channel.consume(queueName, msg =>
         cb({
@@ -38,7 +42,21 @@ function connectSenderToQueue({ queueName, cb }) {
           channel: channelWrapper,
           ackMsg: job => channelWrapper.ack(job),
           nackMsg: job => channelWrapper.nack(job, false, true),
-          sendToQueue: data => channelWrapper.sendToQueue(queueName, data, { persistent: true })
+          scheduleForRetry: async (data, msgRetries = 0) => {
+            const retries = msgRetries + 1
+            const delay = retries ** 2 * 1000
+            const retryQueue = `${queueName}-retry-${delay}`
+            await channel.assertQueue(retryQueue, {
+              durable: true,
+              deadLetterExchange,
+              messageTtl: delay,
+              expires: delay * 10
+            })
+            await channelWrapper.sendToQueue(retryQueue, data, {
+              persistent: true,
+              headers: { 'x-retries': retries }
+            })
+          }
         })
       )
     ])
