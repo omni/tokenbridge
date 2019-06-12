@@ -1,6 +1,7 @@
 require('../../env')
 const connection = require('amqp-connection-manager').connect(process.env.QUEUE_URL)
 const logger = require('./logger')
+const { getRetrySequence } = require('../utils/utils')
 
 connection.on('connect', () => {
   logger.info('Connected to amqp Broker')
@@ -44,7 +45,7 @@ function connectSenderToQueue({ queueName, cb }) {
           nackMsg: job => channelWrapper.nack(job, false, true),
           scheduleForRetry: async (data, msgRetries = 0) => {
             const retries = msgRetries + 1
-            const delay = retries ** 2 * 1000
+            const delay = getRetrySequence(retries) * 1000
             const retryQueue = `${queueName}-retry-${delay}`
             await channel.assertQueue(retryQueue, {
               durable: true,
