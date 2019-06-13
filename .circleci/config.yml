@@ -35,6 +35,12 @@ jobs:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/project
+  initialize-root:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - run: sudo su - -c 'export CI=true && cd /home/circleci/project && yarn initialize && yarn test'
   build:
     docker:
       - image: circleci/node:10.15
@@ -111,6 +117,7 @@ workflows:
   tokenbridge:
     jobs:
       - initialize
+      - initialize-root
       - build:
           requires:
             - initialize
