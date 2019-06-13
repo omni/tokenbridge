@@ -140,8 +140,15 @@ cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json
 ```
 
   * Run the dApp
+
+Using Yarn:
 ```
 yarn start
+```
+
+Using Docker:
+```
+docker-compose up -d
 ```
 
   * Make sure your web3 wallet (Nifty Wallet, AlphaWallet or MetaMask) is funded and connected to the POA Sokol Network (see step 2)

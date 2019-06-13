@@ -1,0 +1,14 @@
+version: '2.4'
+services:
+  ui:
+    build:
+      context: ..
+      dockerfile: ui/Dockerfile
+    ports:
+    - "${PORT}:${PORT}"
+    command: 'true'
+    env_file: ./.env
+    environment: 
+      - NODE_ENV=production
+    restart: unless-stopped
+    entrypoint: yarn start
