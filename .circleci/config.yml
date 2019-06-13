@@ -117,7 +117,10 @@ workflows:
   tokenbridge:
     jobs:
       - initialize
-      - initialize-root
+      - initialize-root:
+          filters:
+            branches:
+              only: master
       - build:
           requires:
             - initialize
