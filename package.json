@@ -31,7 +31,7 @@
     "contracts"
   ],
   "scripts": {
-    "initialize": "yarn clean && git submodule update --init && yarn install --frozen-lockfile && yarn install:deploy && yarn compile:contracts",
+    "initialize": "yarn clean && git submodule update --init && yarn install --unsafe-perm --frozen-lockfile && yarn install:deploy && yarn compile:contracts",
     "build": "yarn workspace ui run build",
     "lint": "yarn wsrun --exclude oracle-e2e --exclude ui-e2e --exclude poa-parity-bridge-contracts lint",
     "test": "yarn wsrun --exclude monitor --exclude oracle-e2e --exclude ui-e2e test",
@@ -40,7 +40,7 @@
     "ui-e2e": "./ui-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build",
     "compile:contracts": "yarn workspace poa-parity-bridge-contracts run compile",
-    "install:deploy": "cd contracts/deploy && npm install --silent",
+    "install:deploy": "cd contracts/deploy && npm install --unsafe-perm --silent",
     "postinstall": "ln -sf $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
   }
 }
