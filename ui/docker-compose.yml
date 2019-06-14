@@ -6,7 +6,6 @@ services:
       dockerfile: ui/Dockerfile
     ports:
     - "${PORT}:${PORT}"
-    command: 'true'
     env_file: ./.env
     environment: 
       - NODE_ENV=production
