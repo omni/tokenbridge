@@ -122,22 +122,35 @@ GAS_PRICE_FALLBACK=21
 LEFT_TX_THRESHOLD=100
 ```
 
-## Check balances of contracts and validators
-```
-node checkWorker.js
-```
-
-## Check unprocessed events
-```
-node checkWorker2.js
-```
-
 ## Run web interface
+
+Using Yarn:
 ```
 yarn start
 ```
 
+You can run web interface via [pm2](https://www.npmjs.com/package/pm2) or similar supervisor program.
+
+Using Docker:
+```
+docker-compose up -d
+```
+
 To enabled debug logging, set `DEBUG=1` env variable.
+
+## Check balances of contracts and validators, get unprocessed events
+
+Using Yarn:
+```
+yarn check-all
+```
+
+Using Docker:
+```
+docker-compose exec monitor yarn check-all
+```
+
+### Cron
 
 You can create cron job to run workers (see `crontab.example` for reference):
 ```bash
@@ -146,8 +159,6 @@ You can create cron job to run workers (see `crontab.example` for reference):
 */5 * * * * cd $HOME/bridge-monitor; node checkWorker2.js >>cronWorker2.out 2>>cronWorker2.err
 ```
 
-You can run web interface via [pm2](https://www.npmjs.com/package/pm2) or similar supervisor program.
-
 ## Linting
 
 Running linter:
@@ -155,7 +166,6 @@ Running linter:
 ```bash
 yarn lint
 ```
-
 
 ## Contributing
 
