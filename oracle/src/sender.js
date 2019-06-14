@@ -91,7 +91,7 @@ function updateNonce(nonce) {
   return redis.set(nonceKey, nonce)
 }
 
-async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
+async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
   try {
     if (redis.status !== 'ready') {
       nackMsg(msg)
@@ -167,7 +167,7 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
 
     if (failedTx.length) {
       logger.info(`Sending ${failedTx.length} Failed Tx to Queue`)
-      await sendToQueue(failedTx)
+      await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
     }
     ackMsg(msg)
     logger.debug(`Finished processing msg`)
