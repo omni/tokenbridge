@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "node deploy.js",
     "start": "mocha"
   },
   "author": "",
