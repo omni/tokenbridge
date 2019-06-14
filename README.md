@@ -47,26 +47,14 @@ The POA TokenBridge provides three operational modes:
 
 ## Initializing the monorepository
 
-Clone the repository with submodules:
+Clone the repository:
 ```bash
-git clone --recursive https://github.com/poanetwork/tokenbridge
-
-# or initialize submodules if already cloned without --recursive option:
-git submodule update --init
+git clone https://github.com/poanetwork/tokenbridge
 ```
 
-Install dependencies:
-
+Initialize submodules, install dependencies, compile the Smart Contracts:
 ```
-yarn install && yarn install:deploy
-```
-
-_**Note**: The installation should be performed with an unprivileged Linux account or with the following flag: `yarn install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
-
-Compile the Smart Contracts
-
-```
-yarn compile:contracts
+yarn initialize
 ```
 
 ## Linting
@@ -96,6 +84,10 @@ yarn test
 Additionaly there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [UI](ui-e2e/README.md).
 
 For details on building, running and developing please refer to respective READMEs in sub-repositories.
+
+## Building, running and deploying
+
+Please refer to the instructions in sub-directories.
 
 ## Contributing
 
