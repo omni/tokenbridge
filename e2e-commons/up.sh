@@ -26,9 +26,9 @@ while [ "$1" != "" ]; do
   if [ "$1" == "ui" ]; then
     docker-compose up -d ui ui-erc20 ui-erc20-native
 
-    docker-compose run -d -p 3000:3000 ui yarn workspace ui run start
-    docker-compose run -d -p 3001:3000 ui-erc20 yarn workspace ui run start
-    docker-compose run -d -p 3002:3000 ui-erc20-native yarn workspace ui run start
+    docker-compose run -d -p 3000:3000 ui yarn start
+    docker-compose run -d -p 3001:3000 ui-erc20 yarn start
+    docker-compose run -d -p 3002:3000 ui-erc20-native yarn start
   fi
 
   if [ "$1" == "deploy" ]; then
