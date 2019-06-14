@@ -140,9 +140,18 @@ cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json
 ```
 
   * Run the dApp
+
+Using Yarn:
 ```
 yarn start
 ```
+
+Using Docker:
+```
+docker-compose up -d
+```
+
+The application will run on `http://localhost:PORT`, where `PORT` is specified in your `.env` file.
 
   * Make sure your web3 wallet (Nifty Wallet, AlphaWallet or MetaMask) is funded and connected to the POA Sokol Network (see step 2)
   * Specify an amount and click `Transfer` to complete a cross-chain transaction from Sokol to Kovan
