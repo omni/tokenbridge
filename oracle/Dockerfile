@@ -12,7 +12,7 @@ COPY package.json .
 COPY contracts/package.json ./contracts/
 COPY oracle/package.json ./oracle/
 COPY yarn.lock .
-RUN yarn install --production
+RUN yarn install --production --frozen-lockfile
 
 COPY ./contracts ./contracts
 RUN yarn run compile:contracts
