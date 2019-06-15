@@ -1,5 +1,5 @@
 module.exports = {
-  EXTRA_GAS_PERCENTAGE: 1,
+  EXTRA_GAS_PERCENTAGE: 4,
   MAX_CONCURRENT_EVENTS: 50,
   RETRY_CONFIG: {
     retries: 20,
