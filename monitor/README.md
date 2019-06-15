@@ -124,7 +124,8 @@ Using Docker:
 docker-compose up -d
 ```
 
-To enabled debug logging, set `DEBUG=1` env variable.
+- The application will run on `http://localhost:PORT`, where `PORT` is specified in your `.env` file.
+- To enabled debug logging, set `DEBUG=1` variable in `.env`.
 
 ## Check balances of contracts and validators, get unprocessed events
 
