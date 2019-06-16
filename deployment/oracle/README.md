@@ -115,12 +115,12 @@ If the bridge does not handle an event properly (i.e. a transaction stalls due t
 Execute the `reset-lastBlock.sh` script in the bridge root directory. For example, if you've installed your bridge with this deployment script and all the default parameters, use the following set of commands:
 
 ```shell
-$ sudo service poabridge stop
 $ sudo su poadocker
 $ cd ~/bridge
-$ docker-compose exec bridge_affirmation bash ./reset-lastBlock.sh <watcher> <block num>
+$ docker-compose stop bridge_affirmation bridge_request bridge_collected
+$ docker-compose exec bridge_senderhome bash ./reset-lastBlock.sh <watcher> <block num>
 $ exit
-$ sudo service poabridge start
+$ sudo service poabridge restart
 ```
 where the _<watcher>_ could be one of the following:
 
