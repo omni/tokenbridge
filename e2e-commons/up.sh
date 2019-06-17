@@ -40,7 +40,7 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "monitor" ]; then
-    docker-compose up -d monitor
+    docker-compose up -d -p 3003:3003 monitor
   fi
 
   shift # Shift all the parameters down by one
