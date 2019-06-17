@@ -40,13 +40,29 @@ check_files_exist
 
 # Test case - Web Interface should return balances
 
-#curl
+OUTPUT=$(curl http://localhost:3003/)
+grep -q home <<< "$OUTPUT"
+grep -q foreign <<< "$OUTPUT"
+! grep -q error <<< "$OUTPUT"
 
 # Test case - Web Interface should return validators
 
+OUTPUT=$(curl http://localhost:3003/validators)
+grep -q home <<< "$OUTPUT"
+grep -q foreign <<< "$OUTPUT"
+! grep -q error <<< "$OUTPUT"
+
 # Test case - Web Interface should return eventsStats
 
+OUTPUT=$(curl http://localhost:3003/eventsStats)
+grep -q lastChecked <<< "$OUTPUT"
+! grep -q error <<< "$OUTPUT"
+
 # Test case - Web Interface should return alerts
+
+OUTPUT=$(curl http://localhost:3003/alerts)
+grep -q lastChecked <<< "$OUTPUT"
+! grep -q error <<< "$OUTPUT"
 
 
 ##### Cleanup #####
