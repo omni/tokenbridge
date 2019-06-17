@@ -11,8 +11,6 @@ On your local machine install:
 
 The playbook will automatically install `Docker`, `docker-compose`, `Python`, `Git` and it dependencies (such as `curl`, `ca-certificates`, `apt-transport-https`, etc.) to the node. Also this playbooks creates an additional non-sudo docker user to run service as.
 
-
-
 ## Running the playbook
 
 ```yaml
