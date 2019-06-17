@@ -105,13 +105,12 @@ jobs:
              - ~/.cache/yarn
       - run: yarn run ui-e2e
   monitor-e2e:
-    docker:
-      - image: circleci/node:10.15
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
     steps:
         - checkout
         - run: git submodule update --init
-        - setup_remote_docker:
-            docker_layer_caching: true
         - run: ./monitor-e2e/run-tests.sh
   cover:
     docker:
