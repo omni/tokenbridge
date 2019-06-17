@@ -22,7 +22,11 @@ The playbooks automatically install `Docker`, `docker-compose`, `Python`, `Git`a
 
 ## Configuration
 
-Please see the [Oracle](../oracle/README.md) for configuration and execution details. 
+Please refer to [Configuration](./CONFIGURATION.md).
+
+## Execution
+
+Please refer to [Execution](./EXECUTION.md).
 
 ## Bridge service commands
 
