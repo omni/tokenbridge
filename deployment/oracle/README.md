@@ -117,7 +117,8 @@ Execute the `reset-lastBlock.sh` script in the bridge root directory. For exampl
 ```shell
 $ sudo su poadocker
 $ cd ~/bridge
-$ docker-compose exec bridge_affirmation bash ./reset-lastBlock.sh <watcher> <block num>
+$ docker-compose stop bridge_affirmation bridge_request bridge_collected
+$ docker-compose exec bridge_senderhome bash ./reset-lastBlock.sh <watcher> <block num>
 $ exit
 $ sudo service poabridge restart
 ```
