@@ -108,32 +108,3 @@ Commands format:
 sudo service poabridge [start|stop|restart|status|rebuild]
 ```
 
-## Rollback the Last Processed Block in Redis
-
-If the bridge does not handle an event properly (i.e. a transaction stalls due to a low gas price), the Redis DB can be rolled back. You must identify which watcher needs to re-run. For example, if the validator signatures were collected but the transaction with signatures was not sent to the Foreign network, the `collected-signatures` watcher must look at the block where the corresponding `CollectedSignatures` event was raised.
-
-Execute the `reset-lastBlock.sh` script in the bridge root directory. For example, if you've installed your bridge with this deployment script and all the default parameters, use the following set of commands:
-
-```shell
-$ sudo su poadocker
-$ cd ~/bridge
-$ docker-compose stop bridge_affirmation bridge_request bridge_collected
-$ docker-compose exec bridge_senderhome bash ./reset-lastBlock.sh <watcher> <block num>
-$ exit
-$ sudo service poabridge restart
-```
-where the _<watcher>_ could be one of the following:
-
-- `signature-request`
-- `collected-signatures`
-- `affirmation-request`
-
-## Logs
-
-If the `syslog_server_port` option in the hosts.yml file is not set, all logs will be stored in `/var/log/docker/` folder in the set of folders with the `bridge_` prefix. 
-
-If the `syslog_server_port` is set, logs will be redirected to the specified server and cannot be accessed on the bridge machine.
-
-```yaml 
-syslog_server_port: "<protocol>://<ip>:<port>" # When this parameter is set all bridge logs will be redirected to the <ip>:<port> address.
-```
