@@ -2,13 +2,13 @@
 cd $(dirname $0)
 set -e # exit when any command fails
 
+
 ##### Helper Functions #####
 
 function cleanup {
-  echo "The tests failed, cleaning up..."
   ../e2e-commons/down.sh
 }
-trap finish EXIT
+trap cleanup EXIT
 
 FILES=(getBalances.json validators.json eventsStats.json alerts.json)
 
@@ -21,9 +21,13 @@ check_files_exist() {
   return $rc
 }
 
+
 ##### Initialization #####
 
 ../e2e-commons/up.sh oracle deploy monitor
+
+
+##### Test cases #####
 
 # Test case - CheckWorker scripts should work and create files in responses/ directory
 
@@ -43,3 +47,8 @@ check_files_exist
 # Test case - Web Interface should return eventsStats
 
 # Test case - Web Interface should return alerts
+
+
+##### Cleanup #####
+
+cleanup
