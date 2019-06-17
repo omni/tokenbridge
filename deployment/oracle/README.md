@@ -1,23 +1,3 @@
-#### Administrator Configurations
-
-1. The `group_vars/<bridge_name>.yml` file contains the public bridge parameters. This file is prepared by administrators for each bridge. The validator only needs to add the required bridge name in the hosts.yml file to tell Ansible which file to use.
-
-   `group_vars/example.yml` shows an example configuration for the POA/Sokol - POA/Sokol bridge. Parameter values should match values from the .env file for the Oracle. See [Configuration parameters](../../oracle/README.md#configuration-parameters) for details.
-
-2. You can also add the following parameters in the `group_vars` to change the default behavior of `deployment-bridge` playbooks:
-
-2.1 `compose_service_user` - specifies users to be created by playbooks. This user will be used to run Token Bridge Oracle.
-
-2.2 `bridge_repo` contains address of Token Bridge Oracle repository. The default value is  https://github.com/poanetwork/tokenbridge.
-
-2.3 `bridge_repo_branch` points to the specific branch or commit to use with the `bridge_repo`. If `bridge_repo_branch` is not specified, the default (`master`) branch is used.
-
-2.4 `bridge_path` set the path where Token Bridge Oracle would be installed. By default it point to the home folder of `compose_service_user`
-
-2.5 `docker_compose_version` - specifies a version of docker-compose to be installed.
-
-2.6 `ALLOW_HTTP` (`no` by default) can be set to `yes` to allow bridge insecure connections to the network.
-
 ## Execution
 
 The playbook can be executed once [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) is installed and all configuration variables are set. 
