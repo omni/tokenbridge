@@ -7,7 +7,7 @@ Please see the [Oracle](../oracle/README.md) for configuration and execution det
 1. Clone this repository and go to the `deployment/oracle` folder
 ```
 git clone --recursive https://github.com/poanetwork/tokenbridge
-cd tokenbridge/deployment/oracle
+cd tokenbridge/deployment
 ```
 2. Create the file `hosts.yml` from `hosts.yml.example`
 ```
