@@ -200,6 +200,8 @@ services:
     - LEFT_TX_THRESHOLD=100
     - PORT=3003
     entrypoint: yarn start
+    ports:
+    - "3003:3003"
   e2e:
     build:
       context: ..
