@@ -104,6 +104,15 @@ jobs:
            paths:
              - ~/.cache/yarn
       - run: yarn run ui-e2e
+  monitor-e2e:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+        - checkout
+        - run: git submodule update --init
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run: ./monitor-e2e/run-tests.sh
   cover:
     docker:
       - image: circleci/node:10.15
@@ -139,3 +148,4 @@ workflows:
       - ansible-lint
       - oracle-e2e
       - ui-e2e
+      - monitor-e2e
