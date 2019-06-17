@@ -5,9 +5,9 @@ Please see the [Oracle](../oracle/README.md) for additional configuration and ex
 ## Prerequisites
 
 A functional Ubuntu 16.04 server launched using a trusted hosting provider. For more information, see our tutorials on [setting up a validator node on AWS](https://github.com/poanetwork/wiki/wiki/Validator-Node-on-AWS) or [setting up on non-AWS](https://github.com/poanetwork/wiki/wiki/Validator-Node-Non-AWS).
-   * Record the IP address (required for file setup).
-   * Setup ssh access to your node via public+private keys (using passwords is less secure). 
-   * When creating the node, set a meaningful `hostname` that can identify you (e.g. `validator-0x...`).
+  * Record the IP address (required for file setup).
+  * Setup ssh access to your node via public+private keys (using passwords is less secure). 
+  * When creating the node, set a meaningful `hostname` that can identify you (e.g. `validator-0x...`).
 
 ## Initialization
 

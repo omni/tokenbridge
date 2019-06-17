@@ -5,9 +5,9 @@ Please refer to the [Configuration](./CONFIGURATION.md) first.
 ## Dependencies
 
 On your local machine install:
-    * Python 2 (v2.6-v2.7)/Python3 (v3.5+)
-    * [Ansible v2.3+](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-    * Git
+  * Python 2 (v2.6-v2.7)/Python3 (v3.5+)
+  * [Ansible v2.3+](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+  * Git
 
 The playbook can be executed once [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) is installed and all configuration variables are set.
 
