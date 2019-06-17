@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 cd $(dirname $0)
+set -e # exit when any command fails
 
-../e2e-commons/up.sh oracle deploy monitor
+##### Helper Functions #####
+
+function cleanup {
+  echo "The tests failed, cleaning up..."
+  ../e2e-commons/down.sh
+}
+trap finish EXIT
 
 FILES=(getBalances.json validators.json eventsStats.json alerts.json)
 
@@ -14,14 +21,25 @@ check_files_exist() {
   return $rc
 }
 
+##### Initialization #####
+
+../e2e-commons/up.sh oracle deploy monitor
+
+# Test case - CheckWorker scripts should work and create files in responses/ directory
+
 ! check_files_exist
-rc1=$?
 
 docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "node checkWorker.js"
 docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "node checkWorker2.js"
 
 check_files_exist
-rc2=$?
 
-../e2e-commons/down.sh
-[[ $rc1 -eq 0 && $rc2 -eq 0 ]] || exit 1
+# Test case - Web Interface should return balances
+
+#curl
+
+# Test case - Web Interface should return validators
+
+# Test case - Web Interface should return eventsStats
+
+# Test case - Web Interface should return alerts
