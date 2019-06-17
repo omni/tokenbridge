@@ -24,7 +24,7 @@ ansible-playbook -i hosts.yml site.yml
 To be used with the ansible-playbook command, for example:
 
 ```yaml
- `ansible-playbook -i hosts.yml site.yml --ask-become-pass`
+ansible-playbook -i hosts.yml site.yml --ask-become-pass
 ```
 
 * `--ask-pass` - ask for the password used to connect to the bridge VM.
