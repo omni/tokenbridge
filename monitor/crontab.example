@@ -1,2 +1,5 @@
-*/4 * * * * cd $HOME/bridge-monitor; node checkWorker.js >>cronWorker.out 2>>cronWorker.err
-*/5 * * * * cd $HOME/bridge-monitor; node checkWorker2.js >>cronWorker2.out 2>>cronWorker2.err
+# Yarn:
+*/4 * * * * cd $HOME/bridge-monitor; yarn check-all >>cronWorker.out 2>>cronWorker.err
+
+# Docker:
+*/4 * * * * cd $HOME/bridge-monitor; docker-compose exec monitor yarn check-all >>cronWorker.out 2>>cronWorker.err
