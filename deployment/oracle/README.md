@@ -99,12 +99,3 @@ To be used with the ansible-playbook command, for example:
 
 * `--user=<username>` - connect as this username
 
-## Bridge service commands
-
-The Bridge service is named `poabridge`. Use the default `SysVinit` commands to `start`, `stop`, `restart`, and `rebuild` the service and to check the `status` of the service. 
-
-Commands format:
-```bash
-sudo service poabridge [start|stop|restart|status|rebuild]
-```
-
