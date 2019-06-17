@@ -20,12 +20,6 @@ These playbooks are designed to automate the deployment process for cross-chain 
 
 The playbooks automatically install `Docker`, `docker-compose`, `Python`, `Git`and it dependencies (such as `curl`, `ca-certificates`, `apt-transport-https`, etc.).
 
-## Linting
-
-- [ansible-lint](https://github.com/ansible/ansible-lint) is required
-
-`yarn ansible-lint`
-
 ## Configuration
 
 Please see the [Oracle](../oracle/README.md) for configuration and execution details. 
@@ -68,6 +62,12 @@ If the `syslog_server_port` is set, logs will be redirected to the specified ser
 ```yaml 
 syslog_server_port: "<protocol>://<ip>:<port>" # When this parameter is set all bridge logs will be redirected to the <ip>:<port> address.
 ```
+
+## Linting
+
+- [ansible-lint](https://github.com/ansible/ansible-lint) is required
+
+`yarn ansible-lint`
 
 ## Contributing
 
