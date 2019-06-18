@@ -1,0 +1,49 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+  enabled: False
+platforms:
+  - name: oracle-host
+    groups:
+      - example
+    children:
+      - oracle
+    image: ubuntu:16.04
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+    enabled: False
+  playbooks:
+    prepare: prepare.yml
+    converge: ../../site.yml
+  inventory:
+    host_vars:
+      oracle-host:
+        VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9" 
+        syslog_server_port: "udp://127.0.0.1:514"
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
+scenario:
+  name: default
+  test_sequence:
+    - lint
+    - cleanup
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy

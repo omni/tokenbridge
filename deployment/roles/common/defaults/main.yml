@@ -1,0 +1,5 @@
+docker_compose_version: 1.23.2
+compose_service_user: poadocker
+bridge_path: "/home/{{ compose_service_user }}/bridge"
+bridge_repo: https://github.com/poanetwork/tokenbridge.git
+bridge_repo_branch: master
