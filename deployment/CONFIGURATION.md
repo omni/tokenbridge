@@ -57,7 +57,7 @@ cp hosts.yml.example hosts.yml
 
 2.1 `compose_service_user` - specifies the user created by the playbooks. This user runs the Token Bridge Oracle.
 
-2.2 `bridge_repo` contains address of Token Bridge Oracle repository. The default value is https://github.com/poanetwork/tokenbridge.
+2.2 `bridge_repo` contains the address of the Token Bridge Oracle repository. The default value is https://github.com/poanetwork/tokenbridge.
 
 2.3 `bridge_repo_branch` points to the specific branch or commit to use with the `bridge_repo`. If `bridge_repo_branch` is not specified, the default (`master`) branch is used.
 
