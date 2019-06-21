@@ -61,7 +61,7 @@ cp hosts.yml.example hosts.yml
 
 2.3 `bridge_repo_branch` points to the specific branch or commit to use with the `bridge_repo`. If `bridge_repo_branch` is not specified, the default (`master`) branch is used.
 
-2.4 `bridge_path` set the path where Token Bridge Oracle would be installed. By default it point to the home folder of `compose_service_user`
+2.4 `bridge_path` sets the path where the Token Bridge Oracle is installed. By default, it points. to the home folder of `compose_service_user`
 
 2.5 `docker_compose_version` - specifies a version of docker-compose to be installed.
 
