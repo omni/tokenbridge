@@ -11,7 +11,7 @@ A functional Ubuntu 16.04 server launched using a trusted hosting provider. For 
 
 ## Initialization
 
-1. Clone this repository and go to the `deployment/oracle` folder
+1. Clone this repository and go to the `deployment` folder
 ```
 git clone --recursive https://github.com/poanetwork/tokenbridge
 cd tokenbridge/deployment
