@@ -55,7 +55,7 @@ cp hosts.yml.example hosts.yml
 
 2. You can also add the following parameters in the `group_vars` to change the default behavior of the playbooks:
 
-2.1 `compose_service_user` - specifies users to be created by playbooks. This user will be used to run Token Bridge Oracle.
+2.1 `compose_service_user` - specifies the user created by the playbooks. This user runs the Token Bridge Oracle.
 
 2.2 `bridge_repo` contains address of Token Bridge Oracle repository. The default value is https://github.com/poanetwork/tokenbridge.
 
