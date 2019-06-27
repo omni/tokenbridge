@@ -39,5 +39,9 @@ while [ "$1" != "" ]; do
     node ./scripts/blocks.js &
   fi
 
+  if [ "$1" == "monitor" ]; then
+    docker-compose up -d monitor
+  fi
+
   shift # Shift all the parameters down by one
 done
