@@ -24,6 +24,7 @@ Sub-repositories maintained within this monorepo are listed below.
 | [Monitor](monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
 | [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
+| [Monitor-E2E](monitor-e2e/README.md) | End to end tests for the Monitor |
 | [UI-E2E](ui-e2e/README.md) | End to end tests for the UI |
 | [E2E-Commons](e2e-commons/README.md) | Common utilities and configuration used in end to end tests |
 
