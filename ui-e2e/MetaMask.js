@@ -1,6 +1,6 @@
 /* eslint-disable no-return-await */
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { key } = require('selenium-webdriver')
+const { Key } = require('selenium-webdriver')
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { By } = require('selenium-webdriver/lib/by')
 const { Page } = require('./Page.js')
@@ -45,7 +45,7 @@ class MetaMask extends Page {
       (await this.open(this.URL)) === this.URL &&
       (await this.clickWithWait(buttonAccept)) &&
       (await this.clickWithWait(agreement)) &&
-      (await this.clickKey(key.TAB, 15)) &&
+      (await this.clickKey(Key.TAB, 15)) &&
       (await this.clickWithWait(buttonAccept)) &&
       (await this.waitUntilLocated(fieldNewPass)) &&
       (await this.clickWithWait(fieldNewPass)) &&
