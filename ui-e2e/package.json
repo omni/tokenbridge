@@ -8,5 +8,8 @@
   },
   "scripts": {
     "lint": "eslint . --ignore-path ../.eslintignore"
+  },
+  "engines": {
+    "node": ">= 8.9"
   }
 }
