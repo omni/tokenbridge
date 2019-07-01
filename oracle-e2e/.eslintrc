@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "plugin:node/recommended",
+    "airbnb-base",
+    "../.eslintrc"
+  ],
+  "plugins": ["node"],
+  "rules": {
+    "node/no-unpublished-require": "off"
+  },
+  "env": {
+    "mocha": true
+  }
+}
