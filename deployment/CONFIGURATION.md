@@ -25,11 +25,13 @@ cp hosts.yml.example hosts.yml
 
 ```yaml
 <bridge_name>:
-    hosts:
+  children:
+    oracle:
+      hosts:
         <host_ip>:
-            ansible_user: <user>
-            VALIDATOR_ADDRESS_PRIVATE_KEY: "<private_key>"
-            #syslog_server_port: "<protocol>://<ip>:<port>" # When this parameter is set all bridge logs will be redirected to <ip>:<port> address.
+          ansible_user: <user>
+          VALIDATOR_ADDRESS_PRIVATE_KEY: "<private_key>"
+          #syslog_server_port: "<protocol>://<ip>:<port>" # When this parameter is set all bridge logs will be redirected to <ip>:<port> address.
 ```
 
 | Value | Description |
