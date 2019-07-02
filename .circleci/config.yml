@@ -133,7 +133,9 @@ jobs:
       - run: sudo apt-get install python3-pip python3.6-dev -y
       - run: cd deployment && virtualenv -p python3.6 venv
       - run: cd deployment && source venv/bin/activate && pip install -r requirements.txt
-      - run: cd deployment && source venv/bin/activate && molecule test
+      - run: cd deployment && source venv/bin/activate && molecule test --scenario-name example
+      - run: cd deployment && source venv/bin/activate && molecule test --scenario-name dai
+      - run: cd deployment && source venv/bin/activate && molecule test --scenario-name wetc
 workflows:
   version: 2
   tokenbridge:
