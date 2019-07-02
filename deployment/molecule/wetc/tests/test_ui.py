@@ -15,4 +15,6 @@ def test_docker_containers(host, name):
 
 
 def test_website(host):
-    assert host.run_test('curl http://host.docker.internal:3001 || curl http://localhost:3001')
+    assert host.run_test(
+        'curl http://host.docker.internal:3001 || curl http://localhost:3001'
+    )
