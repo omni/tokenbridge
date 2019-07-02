@@ -1,7 +1,3 @@
-- name: Make sure docker service is running
-  shell: service docker start
-  become: true
-  failed_when: false
 - name: Get blocks
   become_user: "{{ compose_service_user }}" 
   shell: docker-compose run --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
