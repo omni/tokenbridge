@@ -14,11 +14,9 @@ Please refer to [Configuration](./CONFIGURATION.md).
 
 Please refer to [Execution](./EXECUTION.md).
 
-## Linting
+## Testing
 
-- [ansible-lint](https://github.com/ansible/ansible-lint) is required
-
-`yarn ansible-lint`
+Please refer to [Testing](./TESTING.md).
 
 ## Contributing
 

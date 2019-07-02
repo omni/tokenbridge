@@ -43,6 +43,8 @@ hosts
 Vagrantfile
 vagrant-hosts.yml
 .vagrant
+deployment/venv
+__pycache__
 
 #monitor
 monitor/responses/*

@@ -1,0 +1,4 @@
+# pre-release because it contains "CI Fixes for ansible 2.8"
+molecule==2.22rc1
+docker
+flake8

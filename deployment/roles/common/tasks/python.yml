@@ -1,0 +1,2 @@
+- name: Install python if necessary
+  raw: "test -e {{ ansible_python_interpreter | default ('/usr/bin/python') }} || (sudo apt -y update && sudo apt install -y python-minimal)"

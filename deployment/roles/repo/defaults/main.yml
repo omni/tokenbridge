@@ -1,3 +1,0 @@
-bridge_path: "/home/{{ compose_service_user }}/bridge"
-bridge_repo: https://github.com/poanetwork/tokenbridge.git
-bridge_repo_branch: master
