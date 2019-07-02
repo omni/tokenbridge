@@ -1,11 +1,14 @@
 ---
-- name: Cleanup
-  hosts: all
+- name: Cleanup UI
+  hosts: ui
   tasks:
     - name: Remove ui containers
       shell: docker-compose down
       args:
         chdir: "/home/poadocker/bridge/ui"
+- name: Cleanup Oracle
+  hosts: oracle
+  tasks:
     - name: Remove oracle containers
       shell: docker-compose down
       args:
