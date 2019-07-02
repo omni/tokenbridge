@@ -17,6 +17,16 @@ platforms:
     network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  # - name: monitor-host
+  #   groups:
+  #     - example
+  #   children:
+  #     - monitor
+  #   image: ubuntu:16.04
+  #   privileged: true
+  #   network_mode: host
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
 provisioner:
   name: ansible
   lint:
