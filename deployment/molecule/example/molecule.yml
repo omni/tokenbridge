@@ -50,13 +50,10 @@ scenario:
   name: example
   test_sequence:
     - lint
-    - cleanup
-    - destroy
     - dependency
     - syntax
     - create
     - prepare
     - converge
     - verify
-    - cleanup
     - destroy

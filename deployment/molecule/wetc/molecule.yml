@@ -34,13 +34,10 @@ scenario:
   name: wetc
   test_sequence:
     - lint
-    - cleanup
-    - destroy
     - dependency
     - syntax
     - create
     - prepare
     - converge
     - verify
-    - cleanup
     - destroy
