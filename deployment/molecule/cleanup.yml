@@ -1,0 +1,8 @@
+---
+- name: cleanup
+  hosts: all
+  tasks:
+    - name: Kill all docker containers
+      shell: docker kill $(docker ps -q)
+    - name: Remove all docker containers
+      shell: docker rm $(docker ps -a -q)
