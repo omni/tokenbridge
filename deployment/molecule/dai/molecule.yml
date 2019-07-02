@@ -7,7 +7,7 @@ lint:
   name: yamllint
   enabled: False
 platforms:
-  - name: ui-host
+  - name: ui-dai-host
     groups:
       - dai
     children:
