@@ -33,7 +33,7 @@ provisioner:
     name: ansible-lint
     enabled: False
   playbooks:
-    prepare: prepare.yml
+    prepare: ../prepare.yml
     converge: ../../site.yml
   inventory:
     host_vars:
