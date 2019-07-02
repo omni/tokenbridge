@@ -34,6 +34,7 @@ provisioner:
     enabled: False
   playbooks:
     prepare: ../prepare.yml
+    cleanup: ../cleanup.yml
     converge: ../../site.yml
   inventory:
     host_vars:
@@ -46,7 +47,7 @@ verifier:
   lint:
     name: flake8
 scenario:
-  name: default
+  name: example
   test_sequence:
     - lint
     - cleanup
