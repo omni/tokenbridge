@@ -1,0 +1,8 @@
+---
+- name: Cleanup
+  hosts: all
+  tasks:
+    - name: Remove ui containers
+      shell: docker-compose down
+      args:
+        chdir: "/home/poadocker/bridge/ui"

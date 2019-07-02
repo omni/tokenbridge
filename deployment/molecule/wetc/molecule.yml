@@ -24,7 +24,7 @@ provisioner:
     enabled: False
   playbooks:
     prepare: ../prepare.yml
-    cleanup: ../cleanup.yml
+    cleanup: ./cleanup.yml
     converge: ../../site.yml
 verifier:
   name: testinfra
@@ -42,4 +42,5 @@ scenario:
     - prepare
     - converge
     - verify
+    - cleanup
     - destroy
