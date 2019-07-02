@@ -1,9 +1,17 @@
-const webdriver = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
-const {user, nativeToErcBridge, ercToErcBridge, ercToNativeBridge, homeRPC, foreignRPC} = require('../e2e-commons/constants.json')
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-return-await */
+const webdriver = require('selenium-webdriver')
+const chrome = require('selenium-webdriver/chrome')
+const {
+  user,
+  nativeToErcBridge,
+  ercToErcBridge,
+  ercToNativeBridge,
+  homeRPC,
+  foreignRPC
+} = require('../e2e-commons/constants.json')
 
 class Utils {
-
   static async getHomeAccount() {
     return {
       account: user.address,
@@ -21,25 +29,25 @@ class Utils {
   }
 
   static async getStartURL() {
-    return nativeToErcBridge.ui;
+    return nativeToErcBridge.ui
   }
 
   static async getErc20StartURL() {
-    return ercToErcBridge.ui;
+    return ercToErcBridge.ui
   }
 
   static async getErc20NativeStartURL() {
-    return ercToNativeBridge.ui;
+    return ercToNativeBridge.ui
   }
 
   static async startBrowserWithMetamask() {
-    let source = './MetaMask.crx';
-    let options = new chrome.Options();
-    await options.addExtensions(source);
-    await options.addArguments('disable-popup-blocking');
-    let driver = await new webdriver.Builder().withCapabilities(options.toCapabilities()).build();
-    await driver.sleep(5000);
-    return driver;
+    const source = './MetaMask.crx'
+    const options = new chrome.Options()
+    await options.addExtensions(source)
+    await options.addArguments('disable-popup-blocking')
+    const driver = await new webdriver.Builder().withCapabilities(options.toCapabilities()).build()
+    await driver.sleep(5000)
+    return driver
   }
 }
 

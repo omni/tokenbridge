@@ -2,7 +2,14 @@ const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, validator, nativeToErcBridge, secondUser, homeRPC, foreignRPC } = require('../../e2e-commons/constants.json')
+const {
+  user,
+  validator,
+  nativeToErcBridge,
+  secondUser,
+  homeRPC,
+  foreignRPC
+} = require('../../e2e-commons/constants.json')
 const { abiPath } = require('../config.json')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
