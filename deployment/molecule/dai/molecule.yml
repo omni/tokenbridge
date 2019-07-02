@@ -1,0 +1,44 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+  enabled: False
+platforms:
+  - name: ui-host
+    groups:
+      - dai
+    children:
+      - ui
+    image: ubuntu:16.04
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+    enabled: False
+  playbooks:
+    prepare: ../prepare.yml
+    converge: ../../site.yml
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
+scenario:
+  name: dai
+  test_sequence:
+    - lint
+    - cleanup
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy
