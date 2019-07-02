@@ -1,5 +1,5 @@
 ---
-- name: Cleanupx
+- name: Cleanup
   hosts: all
   tasks:
     - name: Remove ui containers
