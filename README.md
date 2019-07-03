@@ -36,10 +36,9 @@ Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridg
 | ---------- | ---------- |
 | [POA20 Bridge](https://bridge.poa.net/) | [Ocean Token Bridge](https://bridge.oceanprotocol.com/) | 
 | [xDai Bridge](https://dai-bridge.poa.network/) | [Thunder bridge](https://ui.stormdapps.com/) |
-| [WETC Bridge](https://wetc.app/) | [Volta Token Bridge](https://vt.volta.bridge.eth.events/) |
-| | [DAI bridge to Volta Chain](https://dai.volta.bridge.eth.events/) |
-| | Artis |
-| | Tenda |
+| [WETC Bridge](https://wetc.app/) | [Volta Token Bridge](https://vt.volta.bridge.eth.events/) & [DAI bridge to Volta Chain](https://dai.volta.bridge.eth.events/) |
+| | [Artis Brige](https://bridge.artis.network/) |
+| | [Tenda bridge](https://bridge-mainnet.tenda.network) & [xDai-to-Tenda bridge](https://bridge-xdai.tenda.network/) |
 
 ## Network Definitions
 
