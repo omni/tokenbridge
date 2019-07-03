@@ -32,7 +32,7 @@ Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridg
 
 ## Available deployments
 
-| **Native** | **Forked** |
+| **Launched by POA** | **Launched by 3rd parties** |
 | ---------- | ---------- |
 | [POA20 Bridge](https://bridge.poa.net/) | [Ocean Token Bridge](https://bridge.oceanprotocol.com/) | 
 | [xDai Bridge](https://dai-bridge.poa.network/) | [Thunder bridge](https://ui.stormdapps.com/) |
