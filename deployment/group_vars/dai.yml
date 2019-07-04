@@ -33,9 +33,9 @@ FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 UI_TITLE: "TokenBridge UI app - %c"
 UI_DESCRIPTION: "The TokenBridge serves as a method of transferring MakerDAO stable tokens between the Ethereum network to xDai chain in a quick and cost-efficient manner."
 UI_PORT: 3001
-UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/sokol/tx/%s
-UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/kovan/tx/%s
-UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/sokol/address/%s
-UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/kovan/address/%s
+UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/dai/tx/%s
+UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
+UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/dai/address/%s
+UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
 UI_HOME_GAS_PRICE_FALLBACK: 1000000000
 UI_FOREIGN_GAS_PRICE_FALLBACK: 10000000000
