@@ -30,6 +30,16 @@ Sub-repositories maintained within this monorepo are listed below.
 
 Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
 
+## Available deployments
+
+| **Launched by POA** | **Launched by 3rd parties** |
+| ---------- | ---------- |
+| [POA20 Bridge](https://bridge.poa.net/) | [Ocean Token Bridge](https://bridge.oceanprotocol.com/) | 
+| [xDai Bridge](https://dai-bridge.poa.network/) | [Thunder bridge](https://ui.stormdapps.com/) |
+| [WETC Bridge](https://wetc.app/) | [Volta Token Bridge](https://vt.volta.bridge.eth.events/) & [DAI bridge to Volta Chain](https://dai.volta.bridge.eth.events/) |
+| | [Artis Brige](https://bridge.artis.network/) |
+| | [Tenda bridge](https://bridge-mainnet.tenda.network) & [xDai-to-Tenda bridge](https://bridge-xdai.tenda.network/) |
+
 ## Network Definitions
 
  Bridging occurs between two networks.
