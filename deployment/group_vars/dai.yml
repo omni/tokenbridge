@@ -1,24 +1,41 @@
 ## General settings
 BRIDGE_MODE: "ERC_TO_NATIVE"
+HOME_NATIVE_NAME: "xDai"
 
 ## Home contract
 HOME_RPC_URL: "https://dai.poa.network"
+HOME_NAME: "xDai chain"
+HOME_WITHOUT_EVENTS: false
 HOME_BRIDGE_ADDRESS: "0x7301CFA0e1756B71869E93d4e4Dca5c7d0eb0AA6"
 HOME_POLLING_INTERVAL: 5000
 
 ## Foreign contract
 FOREIGN_RPC_URL: "https://mainnet.infura.io"
+FOREIGN_NAME: "Ethereum Mainnet"
+FOREIGN_WITHOUT_EVENTS: false
 FOREIGN_BRIDGE_ADDRESS: "0x4aa42145Aa6Ebf72e164C9bBC74fbD3788045016"
 ERC20_TOKEN_ADDRESS:    "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"
 FOREIGN_POLLING_INTERVAL: 5000
 
-## Gasprice
-#HOME_GAS_PRICE_ORACLE_URL: "https://localhost:8888/"
+## Home Gasprice
+# HOME_GAS_PRICE_ORACLE_URL: "https://localhost:8888/"
 HOME_GAS_PRICE_SPEED_TYPE: "standard"
 HOME_GAS_PRICE_FALLBACK: 0
 HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
 
+## Foreign Gasprice
 FOREIGN_GAS_PRICE_ORACLE_URL: "https://gasprice.poa.network/"
 FOREIGN_GAS_PRICE_SPEED_TYPE: "standard"
 FOREIGN_GAS_PRICE_FALLBACK: 10000000000
 FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
+
+## UI
+UI_TITLE: "TokenBridge UI app - %c"
+UI_DESCRIPTION: "The TokenBridge serves as a method of transferring MakerDAO stable tokens between the Ethereum network to xDai chain in a quick and cost-efficient manner."
+UI_PORT: 3001
+UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/dai/tx/%s
+UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
+UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/dai/address/%s
+UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
+UI_HOME_GAS_PRICE_FALLBACK: 1000000000
+UI_FOREIGN_GAS_PRICE_FALLBACK: 10000000000
