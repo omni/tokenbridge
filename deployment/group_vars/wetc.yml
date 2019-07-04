@@ -1,6 +1,6 @@
 ## General settings
 BRIDGE_MODE: "NATIVE_TO_ERC"
-HOME_NATIVE_NAME: "POA"
+HOME_NATIVE_NAME: "ETC"
 
 ## Home contract
 HOME_RPC_URL: "https://ethereumclassic.network"
@@ -11,7 +11,7 @@ HOME_POLLING_INTERVAL: 7000
 
 ## Foreign contract
 FOREIGN_RPC_URL: "https://mainnet.infura.io/"
-FOREIGN_NAME: "Ethereum"
+FOREIGN_NAME: "Ethereum Mainnet"
 FOREIGN_WITHOUT_EVENTS: false
 FOREIGN_BRIDGE_ADDRESS: "0x0cB781EE62F815bdD9CD4c2210aE8600d43e7040"
 ERC20_TOKEN_ADDRESS: "0x86aaBCc646f290b9Fc9Bd05CE17C3858d1511Da1"
