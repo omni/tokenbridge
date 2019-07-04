@@ -18,7 +18,7 @@ ERC20_TOKEN_ADDRESS:    "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"
 FOREIGN_POLLING_INTERVAL: 5000
 
 ## Home Gasprice
-HOME_GAS_PRICE_ORACLE_URL: "https://gasprice.poa.network/"
+# HOME_GAS_PRICE_ORACLE_URL: "https://localhost:8888/"
 HOME_GAS_PRICE_SPEED_TYPE: "standard"
 HOME_GAS_PRICE_FALLBACK: 0
 HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
@@ -37,3 +37,5 @@ UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/sokol/tx/%s
 UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/kovan/tx/%s
 UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/sokol/address/%s
 UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/kovan/address/%s
+UI_HOME_GAS_PRICE_FALLBACK: 1000000000
+UI_FOREIGN_GAS_PRICE_FALLBACK: 10000000000
