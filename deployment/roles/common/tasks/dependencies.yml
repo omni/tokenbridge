@@ -19,8 +19,7 @@
     - software-properties-common
     - docker-ce
     - git
-    - python3-pip
-    - "{{ (ansible_python_interpreter | default ('python')).split('/')[-1] }}-pip"
+    - "{{ (ansible_python_interpreter | default ('python3')).split('/')[-1] }}-pip"
 
 - name: Install Docker Compose
   get_url:
