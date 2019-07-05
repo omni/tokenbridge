@@ -10,3 +10,7 @@ sokol-kovan:
       hosts:
         127.0.0.1:
           ansible_user: ubuntu
+    monitor:
+      hosts:
+        127.0.0.1:
+          ansible_user: ubuntu
