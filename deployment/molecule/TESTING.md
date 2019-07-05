@@ -24,8 +24,8 @@ In this case `master` branch will be used as a codebase for Monitor, UI, Oracle 
 CIRCLE_BRANCH=master ./molecule.sh <scenario_name>
 ```
 
-## Exit the virtual environment
+Available scenarios:
 
-```
-deactivate
-```
+Scenario | Description
+--- | ---
+default | Deploys oracle on Ubuntu host and checks some assertions
