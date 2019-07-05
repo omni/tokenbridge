@@ -19,7 +19,8 @@
     - software-properties-common
     - docker-ce
     - git
-    - "{{ (ansible_python_interpreter | default ('python3')).split('/')[-1] }}-pip"
+    - python3
+    - python3-pip
 
 - name: Install Docker Compose
   get_url:
@@ -31,11 +32,7 @@
     mode: "0755"
     
 - name: Install python docker library
-  pip:
-    name: "{{ item }}"
-  with_items:
-    - docker
-    - docker-compose
+  shell: pip3 install docker docker-compose setuptools
 
 - name: Add user to run docker-compose
   user:
