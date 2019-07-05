@@ -28,10 +28,32 @@ cp hosts.yml.example hosts.yml
   children:
     oracle:
       hosts:
-        <host_ip>:
+        <host_ip_A>:
           ansible_user: <user>
           VALIDATOR_ADDRESS_PRIVATE_KEY: "<private_key>"
           #syslog_server_port: "<protocol>://<ip>:<port>" # When this parameter is set all bridge logs will be redirected to <ip>:<port> address.
+        <host_ip_B>:
+          # (...)
+    ui:
+      hosts:
+        <host_ip_B>:
+          ansible_user: <user>
+        <host_ip_C>:
+          ansible_user: <user>
+```
+
+The config above would install the Oracle on `<host_ip_A>`, UI on `<host_ip_C>`, and both Oracle and UI on `<host_ip_B>`.
+
+Example config for installing only UI:
+```yaml
+<bridge_name>:
+  children:
+    oracle:
+      hosts:
+    ui:
+      hosts:
+        <host_ip>:
+          ansible_user: <user>
 ```
 
 | Value | Description |
@@ -42,7 +64,7 @@ cp hosts.yml.example hosts.yml
 | VALIDATOR_ADDRESS_PRIVATE_KEY: `"<private_key>"` | The private key for the specified validator address. |
 | syslog_server_port: `"<protocol>://<ip>:<port>"` | Optional port specification for bridge logs. This value will be provided by an administrator if required.  |
 
-`hosts.yml` can contain multiple hosts and bridge configurations (groups) at once.
+`hosts.yml` can contain multiple bridge configurations at once.
 
 3. Copy the bridge name(s) to the hosts.yml file. 
    1. Go to the group_vars folder. 

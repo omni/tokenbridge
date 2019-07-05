@@ -37,13 +37,20 @@ ansible-playbook -i hosts.yml site.yml --ask-become-pass
 
 * `--user=<username>` - connect as this username
 
-## Bridge service commands
+## Service commands
 
-The Bridge service is named `poabridge`. Use the default `SysVinit` commands to `start`, `stop`, `restart`, and `rebuild` the service and to check the `status` of the service. 
+The deployed components have the following services:
+
+Component | Service Name
+--- | ---
+Oracle | poabridge
+UI | tokenbridge-ui
+
+Use the default `SysVinit` commands to `start`, `stop`, `restart`, and `rebuild` the service and to check the `status` of the service. 
 
 Commands format:
 ```bash
-sudo service poabridge [start|stop|restart|status|rebuild]
+sudo service <service_name> [start|stop|restart|status|rebuild]
 ```
 
 ## Rollback the Last Processed Block in Redis
