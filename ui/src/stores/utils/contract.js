@@ -53,8 +53,8 @@ export const getBalanceOf = async (contract, address) => {
   return fromDecimals(balance, decimals)
 }
 
-export const mintedTotally = async contract => {
-  const mintedCoins = await contract.methods.mintedTotally().call()
+export const mintedTotallyByBridge = async (contract, bridgeAddress) => {
+  const mintedCoins = await contract.methods.mintedTotallyByBridge(bridgeAddress).call()
   return new BN(mintedCoins)
 }
 

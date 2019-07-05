@@ -15,7 +15,7 @@ import {
   getDecimals,
   getTotalSupply,
   getBalanceOf,
-  mintedTotally,
+  mintedTotallyByBridge,
   totalBurntCoins,
   getName,
   getFeeManager,
@@ -253,7 +253,10 @@ class HomeStore {
           balanceLoaded()
         })
       } else if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
-        const mintedCoins = await mintedTotally(this.blockRewardContract)
+        const mintedCoins = await mintedTotallyByBridge(
+          this.blockRewardContract,
+          this.HOME_BRIDGE_ADDRESS
+        )
         const burntCoins = await totalBurntCoins(this.homeBridge)
         this.balance = fromDecimals(mintedCoins.minus(burntCoins).toString(10), this.tokenDecimals)
       } else {
