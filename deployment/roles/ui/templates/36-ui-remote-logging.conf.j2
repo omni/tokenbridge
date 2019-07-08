@@ -1,16 +1,3 @@
-template(name="RemoteForwardFormat" type="list") {
-    constant(value="<")
-    property(name="pri")
-    constant(value=">")
-    property(name="timestamp" dateFormat="rfc3339")
-    constant(value=" ")
-    property(name="hostname")
-    constant(value=" ")
-    property(name="syslogtag")
-    property(name="msg" spifno1stsp="on")
-    property(name="msg")
-}
-
 if $programname startswith 'ui_' then {
 action(
    type="omfwd"
