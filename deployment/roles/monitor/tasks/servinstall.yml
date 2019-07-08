@@ -1,4 +1,4 @@
-# This role creates a tokenbridge-monitor service which is designed to manage docker-compose ui deployment.
+# This role creates a tokenbridge-monitor service which is designed to manage docker-compose monitor deployment.
 # /etc/init.d/tokenbridge-monitor start, status, stop, restart - does what the services usually do in such cases.
 # /etc/init.d/tokenbridge-monitor rebuild - builds a new monitor deployment from scratch.
 ---
