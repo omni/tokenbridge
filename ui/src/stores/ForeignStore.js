@@ -19,7 +19,10 @@ import {
   ZERO_ADDRESS,
   getDeployedAtBlock,
   getValidatorList,
-  getTokenType
+  getTokenType,
+  getValidatorContract,
+  getRequiredSignatures,
+  getValidatorCount
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
@@ -390,16 +393,14 @@ class ForeignStore {
   @action
   async getValidators() {
     try {
-      const foreignValidatorsAddress = await this.foreignBridge.methods.validatorContract().call()
+      const foreignValidatorsAddress = await getValidatorContract(this.foreignBridge)
       this.foreignBridgeValidators = new this.foreignWeb3.eth.Contract(
         BRIDGE_VALIDATORS_ABI,
         foreignValidatorsAddress
       )
 
-      this.requiredSignatures = await this.foreignBridgeValidators.methods
-        .requiredSignatures()
-        .call()
-      this.validatorsCount = await this.foreignBridgeValidators.methods.validatorCount().call()
+      this.requiredSignatures = await getRequiredSignatures(this.foreignBridgeValidators)
+      this.validatorsCount = await getValidatorCount(this.foreignBridgeValidators)
 
       this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth)
     } catch (e) {
