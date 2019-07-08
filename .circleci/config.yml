@@ -126,14 +126,7 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
-      - run: git submodule update --init
-      - run: sudo add-apt-repository ppa:jonathonf/python-3.6 -y
-      - run: sudo apt-get update
-      - run: sudo apt-get install python3.6 -y
-      - run: sudo apt-get install python3-pip python3.6-dev -y
-      - run: cd deployment && virtualenv -p python3.6 venv
-      - run: cd deployment && source venv/bin/activate && pip install -r requirements.txt
-      - run: cd deployment && source venv/bin/activate && molecule test
+      - run: deployment/molecule/molecule.sh default
 workflows:
   version: 2
   tokenbridge:
