@@ -7,7 +7,11 @@ const logger = require('../services/logger').child({
   module: 'gasPrice'
 })
 const { setIntervalAndRun } = require('../utils/utils')
-const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../utils/constants')
+const {
+  DEFAULT_UPDATE_INTERVAL,
+  GAS_PRICE_BOUNDARIES,
+  DEFAULT_GAS_PRICE_FACTOR
+} = require('../utils/constants')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
@@ -93,7 +97,7 @@ async function start(chainId) {
     oracleUrl = HOME_GAS_PRICE_ORACLE_URL
     speedType = HOME_GAS_PRICE_SPEED_TYPE
     updateInterval = HOME_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
-    factor = Number(HOME_GAS_PRICE_FACTOR)
+    factor = Number(HOME_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
 
     cachedGasPrice = HOME_GAS_PRICE_FALLBACK
   } else if (chainId === 'foreign') {
@@ -101,7 +105,7 @@ async function start(chainId) {
     oracleUrl = FOREIGN_GAS_PRICE_ORACLE_URL
     speedType = FOREIGN_GAS_PRICE_SPEED_TYPE
     updateInterval = FOREIGN_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
-    factor = Number(FOREIGN_GAS_PRICE_FACTOR)
+    factor = Number(FOREIGN_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
 
     cachedGasPrice = FOREIGN_GAS_PRICE_FALLBACK
   } else {
