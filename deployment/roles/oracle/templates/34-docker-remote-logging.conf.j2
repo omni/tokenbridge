@@ -1,0 +1,28 @@
+template(name="RemoteForwardFormat" type="list") {
+    constant(value="<")
+    property(name="pri")
+    constant(value=">")
+    property(name="timestamp" dateFormat="rfc3339")
+    constant(value=" ")
+    property(name="hostname")
+    constant(value=" ")
+    property(name="syslogtag")
+    property(name="msg" spifno1stsp="on")
+    property(name="msg")
+}
+
+if $programname startswith 'docker' then {
+action(
+   type="omfwd"
+   protocol="{{ syslog_server_port.split(":")[0] }}"
+   target="{{ (syslog_server_port.split(":")[1])[2:] }}"
+   port="{{ syslog_server_port.split(":")[2] }}"
+   template="RemoteForwardFormat"
+   queue.SpoolDirectory="/var/spool/rsyslog"
+   queue.FileName="remote"
+   queue.MaxDiskSpace="1g"
+   queue.SaveOnShutdown="on"
+   queue.Type="LinkedList"
+   ResendLastMSGOnReconnect="on"
+   )
+}

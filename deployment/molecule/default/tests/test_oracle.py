@@ -30,7 +30,7 @@ def test_services(host, service):
 
 
 def test_remote_logging(host):
-    assert host.file('/etc/rsyslog.d/35-remote-logging.conf').exists
+    assert host.file('/etc/rsyslog.d/35-oracle-remote-logging.conf').exists
 
 
 def test_docker_config(host):
