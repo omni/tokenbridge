@@ -24,7 +24,11 @@ import {
   getFeeManagerMode,
   ZERO_ADDRESS,
   getValidatorList,
-  getDeployedAtBlock
+  getDeployedAtBlock,
+  getBlockRewardContract,
+  getValidatorContract,
+  getRequiredSignatures,
+  getValidatorCount
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
@@ -421,14 +425,14 @@ class HomeStore {
   @action
   async getValidators() {
     try {
-      const homeValidatorsAddress = await this.homeBridge.methods.validatorContract().call()
+      const homeValidatorsAddress = await getValidatorContract(this.homeBridge)
       this.homeBridgeValidators = new this.homeWeb3.eth.Contract(
         BRIDGE_VALIDATORS_ABI,
         homeValidatorsAddress
       )
 
-      this.requiredSignatures = await this.homeBridgeValidators.methods.requiredSignatures().call()
-      this.validatorsCount = await this.homeBridgeValidators.methods.validatorCount().call()
+      this.requiredSignatures = await getRequiredSignatures(this.homeBridgeValidators)
+      this.validatorsCount = await getValidatorCount(this.homeBridgeValidators)
 
       this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth)
     } catch (e) {
@@ -527,7 +531,7 @@ class HomeStore {
   }
 
   async getBlockRewardContract() {
-    const blockRewardAddress = await this.homeBridge.methods.blockRewardContract().call()
+    const blockRewardAddress = await getBlockRewardContract(this.homeBridge)
     this.blockRewardContract = new this.homeWeb3.eth.Contract(BLOCK_REWARD_ABI, blockRewardAddress)
   }
 

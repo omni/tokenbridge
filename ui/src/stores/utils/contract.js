@@ -170,3 +170,11 @@ export const getTokenType = async (contract, bridgeAddress) => {
     return ERC_TYPES.ERC20
   }
 }
+
+export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()
+
+export const getValidatorContract = contract => contract.methods.validatorContract().call()
+
+export const getRequiredSignatures = contract => contract.methods.requiredSignatures().call()
+
+export const getValidatorCount = contract => contract.methods.validatorCount().call()
