@@ -18,11 +18,13 @@ const {
   FOREIGN_GAS_PRICE_ORACLE_URL,
   FOREIGN_GAS_PRICE_SPEED_TYPE,
   FOREIGN_GAS_PRICE_UPDATE_INTERVAL,
+  FOREIGN_GAS_PRICE_FACTOR,
   HOME_BRIDGE_ADDRESS,
   HOME_GAS_PRICE_FALLBACK,
   HOME_GAS_PRICE_ORACLE_URL,
   HOME_GAS_PRICE_SPEED_TYPE,
-  HOME_GAS_PRICE_UPDATE_INTERVAL
+  HOME_GAS_PRICE_UPDATE_INTERVAL,
+  HOME_GAS_PRICE_FACTOR
 } = process.env
 
 const homeBridge = new web3Home.eth.Contract(HomeABI, HOME_BRIDGE_ADDRESS)
@@ -41,15 +43,21 @@ function gasPriceWithinLimits(gasPrice) {
   }
 }
 
-async function fetchGasPriceFromOracle(oracleUrl, speedType) {
+function normalizeGasPrice(oracleGasPrice, factor) {
+  const gasPriceGwei = oracleGasPrice * factor
+  const gasPrice = gasPriceWithinLimits(gasPriceGwei)
+  return Web3Utils.toWei(gasPrice.toString(), 'gwei')
+}
+
+async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
   const response = await fetch(oracleUrl)
   const json = await response.json()
   const oracleGasPrice = json[speedType]
   if (!oracleGasPrice) {
     throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
   }
-  const gasPrice = gasPriceWithinLimits(oracleGasPrice)
-  return Web3Utils.toWei(gasPrice.toString(), 'gwei')
+
+  return normalizeGasPrice(oracleGasPrice, factor)
 }
 
 async function fetchGasPrice({ bridgeContract, oracleFn }) {
@@ -79,11 +87,13 @@ async function start(chainId) {
   let oracleUrl = null
   let speedType = null
   let updateInterval = null
+  let factor = null
   if (chainId === 'home') {
     bridgeContract = homeBridge
     oracleUrl = HOME_GAS_PRICE_ORACLE_URL
     speedType = HOME_GAS_PRICE_SPEED_TYPE
     updateInterval = HOME_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
+    factor = Number(HOME_GAS_PRICE_FACTOR)
 
     cachedGasPrice = HOME_GAS_PRICE_FALLBACK
   } else if (chainId === 'foreign') {
@@ -91,6 +101,7 @@ async function start(chainId) {
     oracleUrl = FOREIGN_GAS_PRICE_ORACLE_URL
     speedType = FOREIGN_GAS_PRICE_SPEED_TYPE
     updateInterval = FOREIGN_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
+    factor = Number(FOREIGN_GAS_PRICE_FACTOR)
 
     cachedGasPrice = FOREIGN_GAS_PRICE_FALLBACK
   } else {
@@ -100,7 +111,7 @@ async function start(chainId) {
   fetchGasPriceInterval = setIntervalAndRun(async () => {
     const gasPrice = await fetchGasPrice({
       bridgeContract,
-      oracleFn: () => fetchGasPriceFromOracle(oracleUrl, speedType)
+      oracleFn: () => fetchGasPriceFromOracle(oracleUrl, speedType, factor)
     })
     cachedGasPrice = gasPrice || cachedGasPrice
   }, updateInterval)
@@ -114,5 +125,6 @@ module.exports = {
   start,
   fetchGasPrice,
   getPrice,
-  gasPriceWithinLimits
+  gasPriceWithinLimits,
+  normalizeGasPrice
 }
