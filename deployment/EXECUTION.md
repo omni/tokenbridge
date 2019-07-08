@@ -45,6 +45,7 @@ Component | Service Name
 --- | ---
 Oracle | poabridge
 UI | tokenbridge-ui
+Monitor | tokenbridge-monitor
 
 Use the default `SysVinit` commands to `start`, `stop`, `restart`, and `rebuild` the service and to check the `status` of the service. 
 
