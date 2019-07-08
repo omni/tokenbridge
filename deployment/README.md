@@ -16,7 +16,7 @@ Please refer to [Execution](./EXECUTION.md).
 
 ## Testing
 
-Please refer to [Testing](./TESTING.md).
+Please refer to [Testing](./molecule/TESTING.md).
 
 ## Contributing
 
