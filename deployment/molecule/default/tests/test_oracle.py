@@ -29,8 +29,13 @@ def test_services(host, service):
     assert host.service(service).is_running
 
 
-def test_remote_logging(host):
-    assert host.file('/etc/rsyslog.d/35-remote-logging.conf').exists
+@pytest.mark.parametrize("filename", [
+    ("/etc/rsyslog.d/31-oracle-docker.conf"),
+    ("/etc/rsyslog.d/36-oracle-remote-logging.conf")
+])
+def test_logging(host, filename):
+    assert host.file(filename).exists
+    assert host.file(filename).mode == 0o0644
 
 
 def test_docker_config(host):

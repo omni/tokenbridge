@@ -11,7 +11,7 @@ template(name="RemoteForwardFormat" type="list") {
     property(name="msg")
 }
 
-if $programname startswith 'oracle_bridge_' or $programname startswith 'docker' then {
+if $programname startswith 'docker' then {
 action(
    type="omfwd"
    protocol="{{ syslog_server_port.split(":")[0] }}"
