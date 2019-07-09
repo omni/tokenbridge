@@ -29,8 +29,9 @@ def test_services(host, service):
     assert host.service(service).is_running
 
 
-def test_remote_logging(host):
-    assert host.file('/etc/rsyslog.d/35-oracle-remote-logging.conf').exists
+def test_logging(host):
+    assert host.file('/etc/rsyslog.d/31-oracle-docker.conf').exists
+    assert host.file('/etc/rsyslog.d/36-oracle-remote-logging.conf').exists
 
 
 def test_docker_config(host):
