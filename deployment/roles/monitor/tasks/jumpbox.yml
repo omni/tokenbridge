@@ -2,11 +2,3 @@
   shell: docker-compose up -d
   args:
     chdir: "{{ bridge_path }}/monitor"
-- name: Initial checks 1/2
-  shell: docker-compose exec -T monitor /bin/bash -c "timeout -s 9 5m node checkWorker.js"
-  args:
-    chdir: "{{ bridge_path }}/monitor"
-- name: Initial checks 2/2
-  shell: docker-compose exec -T monitor /bin/bash -c "timeout -s 9 5m node checkWorker2.js"
-  args:
-    chdir: "{{ bridge_path }}/monitor"
