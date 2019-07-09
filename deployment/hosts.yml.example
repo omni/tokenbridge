@@ -10,6 +10,7 @@ sokol-kovan:
       hosts:
         127.0.0.1:
           ansible_user: ubuntu
+          #syslog_server_port: "udp://127.0.0.1:514"
     monitor:
       hosts:
         127.0.0.1:

@@ -2,5 +2,6 @@
   git:
     repo: "{{ bridge_repo }}"
     dest: "{{ bridge_path }}"
-    force: yes
+    force: no
+    update: no
     version: "{{ bridge_repo_branch }}"

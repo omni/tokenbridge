@@ -38,8 +38,10 @@ cp hosts.yml.example hosts.yml
       hosts:
         <host_ip_B>:
           ansible_user: <user>
+          #syslog_server_port: "<protocol>://<ip>:<port>"
         <host_ip_C>:
           ansible_user: <user>
+          #syslog_server_port: "<protocol>://<ip>:<port>"
     monitor:
       hosts:
         <host_ip_B>:
