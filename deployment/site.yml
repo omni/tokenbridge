@@ -8,3 +8,8 @@
   become: true
   roles: 
     - { role: ui }
+- name: Install Monitor
+  hosts: monitor
+  become: true
+  roles: 
+    - { role: monitor }
