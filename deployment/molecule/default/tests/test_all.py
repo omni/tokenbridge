@@ -1,4 +1,5 @@
 import os
+import pytest
 import testinfra.utils.ansible_runner
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
@@ -20,6 +21,10 @@ def test_user(host):
     assert 'docker' in host.user('poadocker').groups
 
 
-def test_logging(host):
-    assert host.file('/etc/rsyslog.d/30-docker.conf').exists
-    assert host.file('/etc/rsyslog.d/35-docker-remote-logging.conf').exists
+@pytest.mark.parametrize("filename", [
+    ("/etc/rsyslog.d/30-docker.conf"),
+    ("/etc/rsyslog.d/35-docker-remote-logging.conf")
+])
+def test_logging(host, filename):
+    assert host.file(filename).exists
+    assert host.file(filename).mode == 0o0644
