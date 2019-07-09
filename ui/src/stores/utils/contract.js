@@ -53,8 +53,8 @@ export const getBalanceOf = async (contract, address) => {
   return fromDecimals(balance, decimals)
 }
 
-export const mintedTotally = async contract => {
-  const mintedCoins = await contract.methods.mintedTotally().call()
+export const mintedTotallyByBridge = async (contract, bridgeAddress) => {
+  const mintedCoins = await contract.methods.mintedTotallyByBridge(bridgeAddress).call()
   return new BN(mintedCoins)
 }
 
@@ -170,3 +170,11 @@ export const getTokenType = async (contract, bridgeAddress) => {
     return ERC_TYPES.ERC20
   }
 }
+
+export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()
+
+export const getValidatorContract = contract => contract.methods.validatorContract().call()
+
+export const getRequiredSignatures = contract => contract.methods.requiredSignatures().call()
+
+export const getValidatorCount = contract => contract.methods.validatorCount().call()
