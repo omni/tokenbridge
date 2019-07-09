@@ -19,37 +19,20 @@
 
 - name: Set the local container logs configuration file
   template:
-    src: 31-ui-docker.conf.j2
-    dest: /etc/rsyslog.d/31-ui-docker.conf
+    src: 32-ui-docker.conf.j2
+    dest: /etc/rsyslog.d/32-ui-docker.conf
     owner: root
     group: root
     mode: 0644
-
-- name: Set the log configuration file to send docker logs to remote server
-  template:
-    src: 34-docker-remote-logging.conf.j2
-    dest: /etc/rsyslog.d/34-docker-remote-logging.conf
-    owner: root
-    group: root
-    mode: 0644
-  when: syslog_server_port is defined
 
 - name: Set the log configuration file to send container logs to remote server
   template:
-    src: 36-ui-remote-logging.conf.j2
-    dest: /etc/rsyslog.d/36-ui-remote-logging.conf
+    src: 37-ui-remote-logging.conf.j2
+    dest: /etc/rsyslog.d/37-ui-remote-logging.conf
     owner: root
     group: root
     mode: 0644
   when: syslog_server_port is defined
-
-- name: Set the logrotate config file
-  template:
-    src: docker-logs.j2
-    dest: /etc/logrotate.d/docker-logs
-    owner: root
-    group: root
-    mode: 0644
 
 - name: restart rsyslog
   service:

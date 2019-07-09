@@ -7,6 +7,5 @@ template(name="DockerLogFileName_Oracle" type="list") {
 
 if $programname startswith 'oracle_bridge_' then \
   ?DockerLogFileName_Oracle
-else
-  /var/log/docker/no_tag/docker.log
+
 $FileCreateMode 0600

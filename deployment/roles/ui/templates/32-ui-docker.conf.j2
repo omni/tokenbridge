@@ -7,6 +7,5 @@ template(name="DockerLogFileName_UI" type="list") {
 
 if $programname startswith 'ui_' then \
   ?DockerLogFileName_UI
-else
-  /var/log/docker/no_tag/docker.log
+
 $FileCreateMode 0600
