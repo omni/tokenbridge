@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-return-await */
 const test = require('selenium-webdriver/testing')
 const assert = require('assert')

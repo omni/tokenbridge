@@ -6,7 +6,8 @@
   ],
   "plugins": ["node"],
   "rules": {
-    "node/no-unpublished-require": "off"
+    "node/no-unpublished-require": "off",
+    "import/no-extraneous-dependencies": "off"
   },
   "env": {
     "mocha": true
