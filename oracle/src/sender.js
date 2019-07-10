@@ -1,7 +1,7 @@
 require('../env')
 const path = require('path')
 const { connectSenderToQueue } = require('./services/amqpClient')
-const { redis, redlock } = require('./services/redisClient')
+const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
 const logger = require('./services/logger')
 const rpcUrlsManager = require('./services/getRpcUrlsManager')
@@ -18,7 +18,7 @@ const {
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
 
-const { VALIDATOR_ADDRESS_PRIVATE_KEY, REDIS_LOCK_TTL } = process.env
+const { VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
 const VALIDATOR_ADDRESS = privateKeyToAddress(VALIDATOR_ADDRESS_PRIVATE_KEY)
 
@@ -30,7 +30,6 @@ if (process.argv.length < 3) {
 const config = require(path.join('../config/', process.argv[2]))
 
 const web3Instance = config.web3
-const nonceLock = `lock:${config.id}:nonce`
 const nonceKey = `${config.id}:nonce`
 let chainId = 0
 
@@ -102,11 +101,6 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     logger.info(`Msg received with ${txArray.length} Tx to send`)
     const gasPrice = GasPrice.getPrice()
 
-    const ttl = REDIS_LOCK_TTL * txArray.length
-
-    logger.debug('Acquiring lock')
-    const lock = await redlock.lock(nonceLock, ttl)
-
     let nonce = await readNonce()
     let insufficientFunds = false
     let minimumBalance = null
@@ -161,9 +155,6 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
 
     logger.debug('Updating nonce')
     await updateNonce(nonce)
-
-    logger.debug('Releasing lock')
-    await lock.unlock()
 
     if (failedTx.length) {
       logger.info(`Sending ${failedTx.length} Failed Tx to Queue`)

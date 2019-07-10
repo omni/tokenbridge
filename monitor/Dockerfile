@@ -14,4 +14,4 @@ RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./b
 COPY ./monitor ./monitor
 WORKDIR /mono/monitor
 CMD echo "To start the monitor run:" \
-  "yarn start"
+  "yarn check-and-start"

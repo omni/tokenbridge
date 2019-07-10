@@ -38,11 +38,17 @@ cp hosts.yml.example hosts.yml
       hosts:
         <host_ip_B>:
           ansible_user: <user>
+          #syslog_server_port: "<protocol>://<ip>:<port>"
         <host_ip_C>:
+          ansible_user: <user>
+          #syslog_server_port: "<protocol>://<ip>:<port>"
+    monitor:
+      hosts:
+        <host_ip_B>:
           ansible_user: <user>
 ```
 
-The config above would install the Oracle on `<host_ip_A>`, UI on `<host_ip_C>`, and both Oracle and UI on `<host_ip_B>`.
+The config above would install the Oracle on `<host_ip_A>`, UI on `<host_ip_C>`, and both Oracle, UI and Monitor on `<host_ip_B>`.
 
 Example config for installing only UI:
 ```yaml
