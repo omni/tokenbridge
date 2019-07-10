@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const test = require('selenium-webdriver/testing')
 const assert = require('assert')
 const { Utils } = require('./Utils.js')

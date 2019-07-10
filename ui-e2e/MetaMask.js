@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const { Key } = require('selenium-webdriver')
 const { By } = require('selenium-webdriver/lib/by')
 const { Page } = require('./Page.js')
