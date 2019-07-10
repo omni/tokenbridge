@@ -145,7 +145,6 @@ workflows:
           filters:
             branches:
               only: master
-      - ansible-lint
       - oracle-e2e
       - ui-e2e
       - monitor-e2e
