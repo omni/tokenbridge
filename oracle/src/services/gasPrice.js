@@ -50,7 +50,7 @@ function gasPriceWithinLimits(gasPrice) {
 function normalizeGasPrice(oracleGasPrice, factor) {
   const gasPriceGwei = oracleGasPrice * factor
   const gasPrice = gasPriceWithinLimits(gasPriceGwei)
-  return Web3Utils.toWei(gasPrice.toString(), 'gwei')
+  return Web3Utils.toWei(gasPrice.toFixed(2).toString(), 'gwei')
 }
 
 async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {

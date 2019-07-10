@@ -27,5 +27,5 @@ export async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
 
 export function normalizeGasPrice(oracleGasPrice, factor) {
   const gasPrice = oracleGasPrice * factor
-  return toWei(gasPrice.toString(), 'gwei')
+  return toWei(gasPrice.toFixed(2).toString(), 'gwei')
 }
