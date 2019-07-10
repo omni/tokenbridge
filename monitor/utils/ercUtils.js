@@ -1,4 +1,4 @@
-const { ERC_TYPES } = require('./bridgeMode')
+const { ERC_TYPES } = require('../../commons')
 
 const getTokenType = async (contract, bridgeAddress) => {
   try {

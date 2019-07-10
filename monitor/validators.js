@@ -2,7 +2,7 @@ require('dotenv').config()
 const Web3 = require('web3')
 const fetch = require('node-fetch')
 const logger = require('./logger')('validators')
-const { getBridgeABIs } = require('./utils/bridgeMode')
+const { getBridgeABIs, BRIDGE_VALIDATORS_ABI } = require('../commons')
 const { getValidatorList } = require('./utils/validatorUtils')
 const { getBlockNumber } = require('./utils/contract')
 
@@ -25,8 +25,6 @@ const web3Home = new Web3(homeProvider)
 
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
-
-const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi
 
 const asyncForEach = async (array, callback) => {
   for (let index = 0; index < array.length; index++) {
