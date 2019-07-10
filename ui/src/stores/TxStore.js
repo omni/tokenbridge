@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx'
 import { estimateGas } from './utils/web3'
 import { addPendingTransaction, removePendingTransaction } from './utils/testUtils'
-import { getUnit } from './utils/bridgeMode'
+import { getUnit } from '../../../commons'
 import yn from '../components/utils/yn'
 
 class TxStore {

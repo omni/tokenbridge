@@ -1,6 +1,6 @@
 import React from 'react'
 import yn from './utils/yn'
-import { BRIDGE_MODES } from '../stores/utils/bridgeMode'
+import { BRIDGE_MODES } from '../../../commons'
 import { BridgeStatistics } from './index'
 import { Redirect } from 'react-router'
 import { TransactionsStatistics } from './TransactionsStatistics'

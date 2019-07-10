@@ -1,9 +1,16 @@
 import { action, observable } from 'mobx'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators.json'
-import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
-import { abi as BLOCK_REWARD_ABI } from '../../../contracts/build/contracts/IBlockReward'
 import { getBlockNumber, getBalance } from './utils/web3'
 import { fromDecimals } from './utils/decimals'
+import {
+  BRIDGE_VALIDATORS_ABI,
+  ERC677_BRIDGE_TOKEN_ABI,
+  BLOCK_REWARD_ABI,
+  BRIDGE_MODES,
+  FEE_MANAGER_MODE,
+  getUnit,
+  decodeFeeManagerMode,
+  getBridgeABIs
+} from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
@@ -33,13 +40,6 @@ import {
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
 import BN from 'bignumber.js'
-import {
-  getBridgeABIs,
-  getUnit,
-  BRIDGE_MODES,
-  decodeFeeManagerMode,
-  FEE_MANAGER_MODE
-} from './utils/bridgeMode'
 import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import { processLargeArrayAsync } from './utils/array'
 import { getRewardableData } from './utils/rewardable'
@@ -193,7 +193,10 @@ class HomeStore {
   async getTokenInfo() {
     try {
       this.tokenAddress = await getErc677TokenAddress(this.homeBridge)
-      this.tokenContract = new this.homeWeb3.eth.Contract(ERC677_ABI, this.tokenAddress)
+      this.tokenContract = new this.homeWeb3.eth.Contract(
+        ERC677_BRIDGE_TOKEN_ABI,
+        this.tokenAddress
+      )
       this.symbol = await getSymbol(this.tokenContract)
       this.tokenName = await getName(this.tokenContract)
       const alternativeContract = new this.homeWeb3.eth.Contract(ERC20Bytes32Abi, this.tokenAddress)
