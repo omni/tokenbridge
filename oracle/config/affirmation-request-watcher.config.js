@@ -1,5 +1,5 @@
 const baseConfig = require('./base.config')
-const erc20Abi = require('../../contracts/build/contracts/ERC20').abi
+const { ERC20_ABI } = require('../../commons')
 const { ERC_TYPES } = require('../src/utils/constants')
 
 const initialChecksJson = process.argv[3]
@@ -29,7 +29,7 @@ module.exports =
         ...baseConfig.foreignConfig,
         event: 'Transfer',
         eventContractAddress: process.env.ERC20_TOKEN_ADDRESS,
-        eventAbi: erc20Abi,
+        eventAbi: ERC20_ABI,
         eventFilter: { to: process.env.FOREIGN_BRIDGE_ADDRESS },
         queue: 'home',
         name: `watcher-${id}`,

@@ -1,6 +1,6 @@
 require('../env')
 const Web3 = require('web3')
-const ERC677BridgeTokenABI = require('../../contracts/build/contracts/ERC677BridgeToken').abi
+const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
 const { ERC_TYPES } = require('../src/utils/constants')
 
 async function initialChecks() {
@@ -9,7 +9,7 @@ async function initialChecks() {
 
   if (BRIDGE_MODE === 'ERC_TO_ERC') {
     const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(FOREIGN_RPC_URL))
-    const tokenContract = new foreignWeb3.eth.Contract(ERC677BridgeTokenABI, ERC20_TOKEN_ADDRESS)
+    const tokenContract = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ERC20_TOKEN_ADDRESS)
     try {
       const bridgeContract = await tokenContract.methods.bridgeContract().call()
       if (bridgeContract === FOREIGN_BRIDGE_ADDRESS) {
