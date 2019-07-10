@@ -24,7 +24,9 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
-    enabled: False
+    enabled: True
+    options:
+      r: ["bug"]
   playbooks:
     prepare: prepare.yml
     converge: ../../site.yml
