@@ -1,3 +1,4 @@
+---
 - name: Set the local docker logs configuration file
   template:
     src: 30-docker.conf.j2

@@ -1,15 +1,16 @@
+---
 - name: Install Oracle
   hosts: oracle
   become: true
-  roles: 
+  roles:
     - { role: oracle }
 - name: Install UI
   hosts: ui
   become: true
-  roles: 
+  roles:
     - { role: ui }
 - name: Install Monitor
   hosts: monitor
   become: true
-  roles: 
+  roles:
     - { role: monitor }

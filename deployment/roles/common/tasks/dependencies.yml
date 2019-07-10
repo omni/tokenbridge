@@ -1,8 +1,9 @@
+---
 - name: Install the gpg key for docker
   apt_key:
     url: "https://download.docker.com/linux/ubuntu/gpg"
     state: present
-    
+
 - name: Install the docker repos
   apt_repository:
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
@@ -30,7 +31,7 @@
     owner: "root"
     group: "root"
     mode: "0755"
-    
+
 - name: Install python docker library
   shell: pip3 install docker docker-compose setuptools
 
@@ -49,7 +50,7 @@
 - name: Configure auditd
   blockinfile:
     path: /etc/audit/audit.rules
-    block: | 
+    block: |
      -w /usr/bin/docker -p wa
      -w /var/lib/docker -p wa
      -w /etc/docker -p wa
@@ -58,7 +59,7 @@
      -w /etc/default/docker -p wa
      -w /etc/docker/daemon.json -p wa
      -w /usr/bin/docker-containerd -p wa
-     -w /usr/bin/docker-runc -p wa 
+     -w /usr/bin/docker-runc -p wa
   notify: restart auditd
 
 - name: Configure docker engine
