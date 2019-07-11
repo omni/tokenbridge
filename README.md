@@ -26,6 +26,7 @@ Sub-repositories maintained within this monorepo are listed below.
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
 | [Monitor-E2E](monitor-e2e/README.md) | End to end tests for the Monitor |
 | [UI-E2E](ui-e2e/README.md) | End to end tests for the UI |
+| [Commons](commons/README.md) | Interfaces, constants and utilities shared between the sub-repositories |
 | [E2E-Commons](e2e-commons/README.md) | Common utilities and configuration used in end to end tests |
 
 Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
@@ -74,14 +75,6 @@ Running linter for all JS projects:
 
 ```
 yarn lint
-```
-
-Running linter for all Ansible playbooks:
-
-- [ansible-lint](https://github.com/ansible/ansible-lint) is required
-
-```
-yarn ansible-lint
 ```
 
 ## Tests
