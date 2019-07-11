@@ -28,7 +28,7 @@ provisioner:
     options:
       r: ["bug"]
   playbooks:
-    prepare: prepare.yml
+    prepare: ../prepare.yml
     converge: ../../site.yml
   inventory:
     host_vars:
