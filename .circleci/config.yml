@@ -121,6 +121,13 @@ jobs:
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh oracle
+  deployment-ui:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: deployment/molecule/molecule.sh ui
 workflows:
   version: 2
   tokenbridge:
@@ -149,3 +156,4 @@ workflows:
       - ui-e2e
       - monitor-e2e
       - deployment-oracle
+      - deployment-ui
