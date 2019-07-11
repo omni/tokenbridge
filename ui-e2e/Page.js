@@ -1,5 +1,3 @@
-/* eslint-disable no-return-await */
-// eslint-disable-next-line import/no-extraneous-dependencies
 const webdriver = require('selenium-webdriver')
 
 const Twait = 20000

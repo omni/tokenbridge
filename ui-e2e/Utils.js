@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-return-await */
 const webdriver = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
 const {
