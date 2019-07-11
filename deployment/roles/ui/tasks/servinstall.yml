@@ -8,7 +8,7 @@
     dest: "/etc/init.d/tokenbridge-ui"
     owner: root
     mode: 755
-    
+
 - name: "Start/Enable the service"
   service:
     name: "tokenbridge-ui"

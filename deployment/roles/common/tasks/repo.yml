@@ -1,3 +1,4 @@
+---
 - name: Get bridge repo
   git:
     repo: "{{ bridge_repo }}"
