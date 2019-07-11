@@ -23,6 +23,7 @@
     "mocha": "^5.2.0"
   },
   "workspaces": [
+    "commons",
     "oracle",
     "oracle-e2e",
     "ui",
