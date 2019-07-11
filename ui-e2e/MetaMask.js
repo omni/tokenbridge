@@ -1,7 +1,4 @@
-/* eslint-disable no-return-await */
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { Key } = require('selenium-webdriver')
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { By } = require('selenium-webdriver/lib/by')
 const { Page } = require('./Page.js')
 const { homeRPC, foreignRPC } = require('../e2e-commons/constants.json')

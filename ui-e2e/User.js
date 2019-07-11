@@ -1,4 +1,3 @@
-/* eslint-disable no-return-await */
 const { MetaMask } = require('./MetaMask.js')
 const { MainPage } = require('./mainPage.js')
 
