@@ -1,7 +1,7 @@
 const path = '../contracts/build/contracts/'
 
 const HOME_NATIVE_TO_ERC_ABI = require(`${path}HomeBridgeNativeToErc`).abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require(`${path}ForeignBridgeNativeTErc`).abi
+const FOREIGN_NATIVE_TO_ERC_ABI = require(`${path}ForeignBridgeNativeToErc`).abi
 const HOME_ERC_TO_ERC_ABI = require(`${path}HomeBridgeErcToErc`).abi
 const FOREIGN_ERC_TO_ERC_ABI = require(`${path}ForeignBridgeErc677ToEr677`).abi
 const HOME_ERC_TO_NATIVE_ABI = require(`${path}HomeBridgeErcToNative`).abi
