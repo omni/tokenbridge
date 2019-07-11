@@ -41,7 +41,7 @@ verifier:
   lint:
     name: flake8
 scenario:
-  name: default
+  name: oracle
   test_sequence:
     - lint
     - cleanup

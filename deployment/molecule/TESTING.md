@@ -28,4 +28,4 @@ Available scenarios:
 
 Scenario | Description
 --- | ---
-default | Deploys oracle on Ubuntu host and checks some assertions
+oracle | Deploys oracle on Ubuntu host and checks some assertions
