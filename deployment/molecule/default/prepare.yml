@@ -7,7 +7,7 @@
         name: "{{ packages }}"
       vars:
         packages:
-        - apt-transport-https
-        - rsyslog
+          - apt-transport-https
+          - rsyslog
     - shell: service rsyslog start
     - shell: groupadd docker && chgrp docker /var/run/docker.sock

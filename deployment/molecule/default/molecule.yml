@@ -5,7 +5,10 @@ driver:
   name: docker
 lint:
   name: yamllint
-  enabled: False
+  enabled: True
+  options:
+    config-data:
+      ignore: ../../hosts.yml
 platforms:
   - name: oracle-host
     groups:
@@ -21,14 +24,16 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
-    enabled: False
+    enabled: True
+    options:
+      r: ["bug"]
   playbooks:
     prepare: prepare.yml
     converge: ../../site.yml
   inventory:
     host_vars:
       oracle-host:
-        VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9" 
+        VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
         syslog_server_port: "udp://127.0.0.1:514"
         bridge_repo_branch: $CODEBASE_BRANCH
 verifier:

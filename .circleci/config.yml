@@ -55,12 +55,6 @@ jobs:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run lint
-  ansible-lint:
-    docker:
-      - image: particlekit/ansible-lint
-    steps:
-      - checkout
-      - run: ./deployment/lint.sh
   test:
     docker:
       - image: circleci/node:10.15
@@ -151,7 +145,6 @@ workflows:
           filters:
             branches:
               only: master
-      - ansible-lint
       - oracle-e2e
       - ui-e2e
       - monitor-e2e
