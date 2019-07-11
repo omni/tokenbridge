@@ -1,0 +1,10 @@
+{
+  "name": "commons",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ignore-path ../.eslintignore",
+    "test": "NODE_ENV=test mocha"
+  }
+}
