@@ -41,7 +41,14 @@ const asyncForEach = async (array, callback) => {
   }
 }
 
-async function getGasPrices(url, type, factor, fallback) {
+function getGasPrices(url, type, factor, fallback) {
+  if (!url) {
+    return Web3Utils.toBN(fallback)
+  }
+  return fetchGasPrices(url, type, factor, fallback)
+}
+
+async function fetchGasPrices(url, type, factor, fallback) {
   try {
     const response = await fetch(url)
     const json = await response.json()
@@ -130,11 +137,9 @@ async function main(bridgeMode) {
   logger.debug('calling asyncForEach foreignValidators foreignVBalances')
   await asyncForEach(foreignValidators, async v => {
     const balance = await web3Foreign.eth.getBalance(v)
-    const leftTx = foreignTxCost.isZero()
-      ? 0
-      : Web3Utils.toBN(balance)
-          .div(foreignTxCost)
-          .toString(10)
+    const leftTx = Web3Utils.toBN(balance)
+      .div(foreignTxCost)
+      .toString(10)
     foreignVBalances[v] = {
       balance: Web3Utils.fromWei(balance),
       leftTx: Number(leftTx),
@@ -149,7 +154,7 @@ async function main(bridgeMode) {
   await asyncForEach(homeValidators, async v => {
     const balance = await web3Home.eth.getBalance(v)
     const leftTx = homeTxCost.isZero()
-      ? 0
+      ? 999999
       : Web3Utils.toBN(balance)
           .div(homeTxCost)
           .toString(10)
