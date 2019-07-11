@@ -40,6 +40,8 @@ verifier:
   name: testinfra
   lint:
     name: flake8
+  additional_files_or_dirs:
+    - ../../tests/*
 scenario:
   name: oracle
   test_sequence:
