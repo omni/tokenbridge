@@ -1,3 +1,4 @@
+---
 ## General settings
 BRIDGE_MODE: "NATIVE_TO_ERC"
 HOME_NATIVE_NAME: "ETC"

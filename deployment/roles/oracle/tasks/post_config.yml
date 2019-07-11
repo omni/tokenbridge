@@ -1,5 +1,6 @@
+---
 - name: Get blocks
-  become_user: "{{ compose_service_user }}" 
+  become_user: "{{ compose_service_user }}"
   shell: docker-compose run --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
@@ -14,7 +15,7 @@
       FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
 
 - name: Get validator address
-  become_user: "{{ compose_service_user }}" 
+  become_user: "{{ compose_service_user }}"
   shell: docker-compose run -e VALIDATOR_ADDRESS_PRIVATE_KEY="{{ VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"

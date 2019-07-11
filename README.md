@@ -77,14 +77,6 @@ Running linter for all JS projects:
 yarn lint
 ```
 
-Running linter for all Ansible playbooks:
-
-- [ansible-lint](https://github.com/ansible/ansible-lint) is required
-
-```
-yarn ansible-lint
-```
-
 ## Tests
 
 Running tests for all projects:
