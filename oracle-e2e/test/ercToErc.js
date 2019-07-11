@@ -1,12 +1,9 @@
-const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
 const { user, ercToErcBridge, homeRPC, foreignRPC } = require('../../e2e-commons/constants.json')
-const { abiPath } = require('../config.json')
+const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
-
-const abisDir = path.join(__dirname, '..', abiPath)
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
@@ -19,9 +16,11 @@ const { toBN } = foreignWeb3.utils
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 
-const tokenAbi = require(path.join(abisDir, 'ERC677BridgeToken.json')).abi
-const erc20Token = new foreignWeb3.eth.Contract(tokenAbi, ercToErcBridge.foreignToken)
-const erc677Token = new homeWeb3.eth.Contract(tokenAbi, ercToErcBridge.homeToken)
+const erc20Token = new foreignWeb3.eth.Contract(
+  ERC677_BRIDGE_TOKEN_ABI,
+  ercToErcBridge.foreignToken
+)
+const erc677Token = new homeWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToErcBridge.homeToken)
 
 describe('erc to erc', () => {
   it('should convert tokens in foreign to tokens in home', async () => {
