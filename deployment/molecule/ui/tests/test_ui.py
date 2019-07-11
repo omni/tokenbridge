@@ -30,7 +30,3 @@ def test_services(host, service):
 def test_logging(host, filename):
     assert host.file(filename).exists
     assert host.file(filename).mode == 0o0644
-
-
-def test_docker_config(host):
-    assert host.file('/etc/docker/daemon.json').exists
