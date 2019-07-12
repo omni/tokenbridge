@@ -114,13 +114,20 @@ jobs:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
-  deployment:
+  deployment-oracle:
     machine:
       image: circleci/classic:latest
       docker_layer_caching: true
     steps:
       - checkout
-      - run: deployment/molecule/molecule.sh default
+      - run: deployment/molecule/molecule.sh oracle
+  deployment-ui:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: deployment/molecule/molecule.sh ui
 workflows:
   version: 2
   tokenbridge:
@@ -148,4 +155,5 @@ workflows:
       - oracle-e2e
       - ui-e2e
       - monitor-e2e
-      - deployment
+      - deployment-oracle
+      - deployment-ui

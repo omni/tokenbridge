@@ -28,4 +28,5 @@ Available scenarios:
 
 Scenario | Description
 --- | ---
-default | Deploys oracle on Ubuntu host and checks some assertions
+oracle | Deploys and checks standalone Oracle on Ubuntu host
+ui | Deploys and checks standalone UI on Ubuntu host
