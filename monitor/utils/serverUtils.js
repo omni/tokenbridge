@@ -1,6 +1,5 @@
 const Web3 = require('web3')
-const { getBridgeMode, BRIDGE_MODES } = require('./bridgeMode')
-const HOME_ERC_TO_ERC_ABI = require('../../contracts/build/contracts/HomeBridgeErcToErc').abi
+const { BRIDGE_MODES, getBridgeMode, HOME_ERC_TO_ERC_ABI } = require('../../commons')
 
 const { HOME_BRIDGE_ADDRESS, HOME_RPC_URL } = process.env
 const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
