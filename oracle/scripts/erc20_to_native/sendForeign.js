@@ -14,15 +14,14 @@ const {
 
 const NUMBER_OF_DEPOSITS_TO_SEND = process.argv[2] || process.env.NUMBER_OF_DEPOSITS_TO_SEND || 1
 
-const ERC20_ABI = require('../../../contracts/build/contracts/ERC20').abi
-const BRIDGE_ABI = require('../../../contracts/build/contracts/ForeignBridgeErcToNative').abi
+const { ERC20_ABI, FOREIGN_ERC_TO_NATIVE_ABI } = require('../../../commons')
 
 const foreignRpcUrl = rpcUrlsManager.foreignUrls[0]
 const foreignProvider = new Web3.providers.HttpProvider(foreignRpcUrl)
 const web3Foreign = new Web3(foreignProvider)
 
 async function main() {
-  const bridge = new web3Foreign.eth.Contract(BRIDGE_ABI, FOREIGN_BRIDGE_ADDRESS)
+  const bridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, FOREIGN_BRIDGE_ADDRESS)
   const ERC20_TOKEN_ADDRESS = await bridge.methods.erc20token().call()
   const poa20 = new web3Foreign.eth.Contract(ERC20_ABI, ERC20_TOKEN_ADDRESS)
 
