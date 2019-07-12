@@ -1,17 +1,15 @@
-const path = '../contracts/build/contracts/'
-
-const HOME_NATIVE_TO_ERC_ABI = require(`${path}HomeBridgeNativeToErc`).abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require(`${path}ForeignBridgeNativeToErc`).abi
-const HOME_ERC_TO_ERC_ABI = require(`${path}HomeBridgeErcToErc`).abi
-const FOREIGN_ERC_TO_ERC_ABI = require(`${path}ForeignBridgeErc677ToErc677`).abi
-const HOME_ERC_TO_NATIVE_ABI = require(`${path}HomeBridgeErcToNative`).abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require(`${path}ForeignBridgeErcToNative`).abi
-const ERC20_ABI = require(`${path}ERC20`).abi
-const ERC677_ABI = require(`${path}ERC677`).abi
-const ERC677_BRIDGE_TOKEN_ABI = require(`${path}ERC677BridgeToken`).abi
-const BLOCK_REWARD_ABI = require(`${path}IBlockReward`).abi
-const BRIDGE_VALIDATORS_ABI = require(`${path}BridgeValidators`).abi
-const REWARDABLE_VALIDATORS_ABI = require(`${path}RewardableValidators`).abi
+const HOME_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeNativeToErc').abi
+const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc').abi
+const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
+const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErc677ToErc677').abi
+const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative').abi
+const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
+const ERC677_ABI = require('../contracts/build/contracts/ERC677').abi
+const ERC677_BRIDGE_TOKEN_ABI = require('../contracts/build/contracts/ERC677BridgeToken').abi
+const BLOCK_REWARD_ABI = require('../contracts/build/contracts/IBlockReward').abi
+const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi
+const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/RewardableValidators').abi
 
 const { homeV1Abi, foreignViAbi } = require('./v1Abis')
 const { BRIDGE_MODES } = require('./constants')
