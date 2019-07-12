@@ -1,6 +1,6 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
-const bridgeValidatorsAbi = require('../../contracts/build/contracts/BridgeValidators').abi
+const { BRIDGE_VALIDATORS_ABI } = require('../../commons')
 const logger = require('../logger')('validatorsUtils')
 const { getPastEvents } = require('./contract')
 
@@ -54,7 +54,7 @@ const validatorList = async contract => {
 
 const getValidatorList = async (address, eth, fromBlock, toBlock) => {
   logger.debug('getting validatorList')
-  const validatorsContract = new eth.Contract(bridgeValidatorsAbi, address)
+  const validatorsContract = new eth.Contract(BRIDGE_VALIDATORS_ABI, address)
   const validators = await validatorList(validatorsContract)
 
   if (validators.length) {

@@ -10,6 +10,7 @@ RUN apt-get clean
 WORKDIR /mono
 COPY package.json .
 COPY contracts/package.json ./contracts/
+COPY commons/package.json ./commons/
 COPY oracle/package.json ./oracle/
 COPY yarn.lock .
 RUN yarn install --production --frozen-lockfile
@@ -17,6 +18,8 @@ RUN yarn install --production --frozen-lockfile
 COPY ./contracts ./contracts
 RUN yarn run compile:contracts
 RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./build ./contracts/
+
+COPY ./commons ./commons
 
 COPY ./oracle ./oracle
 WORKDIR /mono/oracle

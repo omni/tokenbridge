@@ -28,7 +28,7 @@ provisioner:
     options:
       r: ["bug"]
   playbooks:
-    prepare: prepare.yml
+    prepare: ../prepare.yml
     converge: ../../site.yml
   inventory:
     host_vars:
@@ -40,8 +40,10 @@ verifier:
   name: testinfra
   lint:
     name: flake8
+  additional_files_or_dirs:
+    - ../../tests/*
 scenario:
-  name: default
+  name: oracle
   test_sequence:
     - lint
     - cleanup
