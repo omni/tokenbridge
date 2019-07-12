@@ -1,7 +1,7 @@
 require('dotenv').config()
 const Web3 = require('web3')
 const logger = require('./logger')('stuckTransfers.js')
-const { foreignViAbi } = require('./utils/v1Abis')
+const { foreignViAbi } = require('../commons/abis')
 
 const { FOREIGN_RPC_URL, FOREIGN_BRIDGE_ADDRESS } = process.env
 const FOREIGN_DEPLOYMENT_BLOCK = Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0
