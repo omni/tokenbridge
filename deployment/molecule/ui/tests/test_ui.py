@@ -41,7 +41,8 @@ def test_index_page_title(host):
 
 
 def test_index_page_error(host):
-    assert host.run_expect([1], 
+    assert host.run_expect(
+        [1],
         'curl -s http://localhost:3001 | '
         'grep -i -q "error"'
     )
