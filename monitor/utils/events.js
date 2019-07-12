@@ -2,7 +2,14 @@ require('dotenv').config()
 const Web3 = require('web3')
 const { toBN } = require('web3').utils
 const logger = require('../logger')('eventsUtils')
-const { BRIDGE_MODES, getBridgeMode, getBridgeABIs, ERC_TYPES } = require('./bridgeMode')
+const {
+  BRIDGE_MODES,
+  ERC_TYPES,
+  getBridgeABIs,
+  getBridgeMode,
+  HOME_ERC_TO_ERC_ABI,
+  ERC20_ABI
+} = require('../../commons')
 const { getTokenType } = require('./ercUtils')
 
 const { HOME_RPC_URL, FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } = process.env
@@ -15,8 +22,6 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const HOME_ERC_TO_ERC_ABI = require('../../contracts/build/contracts/HomeBridgeErcToErc').abi
-const ERC20_ABI = require('../../contracts/build/contracts/ERC20').abi
 const { getPastEvents, getBlockNumber } = require('./contract')
 
 async function main(mode) {

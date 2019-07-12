@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const Web3 = require('web3')
 const logger = require('./logger')('checkWorker')
-const { getBridgeMode } = require('./utils/bridgeMode')
+const { getBridgeMode } = require('../commons')
 const getBalances = require('./getBalances')
 const getShortEventStats = require('./getShortEventStats')
 const validators = require('./validators')
@@ -11,7 +11,7 @@ const { HOME_BRIDGE_ADDRESS, HOME_RPC_URL } = process.env
 const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
-const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
+const { HOME_ERC_TO_ERC_ABI } = require('../commons')
 
 async function checkWorker() {
   try {

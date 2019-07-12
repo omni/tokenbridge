@@ -2,7 +2,7 @@ require('dotenv').config()
 const BN = require('bignumber.js')
 const Web3 = require('web3')
 const logger = require('./logger')('getBalances')
-const { BRIDGE_MODES } = require('./utils/bridgeMode')
+const { BRIDGE_MODES } = require('../commons')
 
 const Web3Utils = Web3.utils
 
@@ -14,16 +14,16 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
-const ERC677_ABI = require('../contracts/build/contracts/ERC677').abi
-const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
-const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
-const BLOCK_REWARD_ABI = require('../contracts/build/contracts/IBlockReward').abi
-const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErcToErc').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative')
-  .abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc')
-  .abi
+const {
+  ERC20_ABI,
+  ERC677_ABI,
+  BLOCK_REWARD_ABI,
+  HOME_ERC_TO_ERC_ABI,
+  HOME_ERC_TO_NATIVE_ABI,
+  FOREIGN_ERC_TO_ERC_ABI,
+  FOREIGN_ERC_TO_NATIVE_ABI,
+  FOREIGN_NATIVE_TO_ERC_ABI
+} = require('../commons')
 
 async function main(bridgeMode) {
   if (bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {
