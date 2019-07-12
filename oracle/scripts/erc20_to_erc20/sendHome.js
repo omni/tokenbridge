@@ -4,6 +4,7 @@ const Web3Utils = require('web3-utils')
 const rpcUrlsManager = require('../../src/services/getRpcUrlsManager')
 const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
 const { isValidAmount } = require('../utils/utils')
+const { HOME_ERC_TO_ERC_ABI } = require('../../../commons')
 
 const {
   USER_ADDRESS,
@@ -46,14 +47,12 @@ const BRIDGEABLE_TOKEN_ABI = [
   }
 ]
 
-const BRIDGE_ABI = require('../../../contracts/build/contracts/HomeBridgeErcToErc').abi
-
 const homeRpcUrl = rpcUrlsManager.homeUrls[0]
 const homeProvider = new Web3.providers.HttpProvider(homeRpcUrl)
 const web3Home = new Web3(homeProvider)
 
 async function main() {
-  const bridge = new web3Home.eth.Contract(BRIDGE_ABI, HOME_BRIDGE_ADDRESS)
+  const bridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
   const BRIDGEABLE_TOKEN_ADDRESS = await bridge.methods.erc677token().call()
   const erc677 = new web3Home.eth.Contract(BRIDGEABLE_TOKEN_ABI, BRIDGEABLE_TOKEN_ADDRESS)
 
