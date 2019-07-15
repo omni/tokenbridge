@@ -1,5 +1,5 @@
 ---
-- name: Launch container
-  shell: docker-compose up -d
+- name: Build the containers
+  shell: docker-compose build
   args:
     chdir: "{{ bridge_path }}/oracle"
