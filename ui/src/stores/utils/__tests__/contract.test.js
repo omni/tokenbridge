@@ -1,6 +1,6 @@
 import BN from 'bignumber.js'
 import { getTokenType, mintedTotallyByBridge } from '../contract'
-import { ERC_TYPES } from '../bridgeMode'
+import { ERC_TYPES } from '../../../../../commons'
 
 describe('getTokenType', () => {
   it('should return ERC677 if bridgeContract is equal to bridgeAddress', async () => {

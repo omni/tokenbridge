@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 import BN from 'bignumber.js'
 import HomeStore from '../HomeStore'
-import { BRIDGE_MODES } from '../utils/bridgeMode'
+import { BRIDGE_MODES } from '../../../../commons'
 import * as contract from '../utils/contract'
 import * as web3StoreUtils from '../utils/web3'
 

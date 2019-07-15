@@ -1,5 +1,5 @@
 import { getFeeToApply, validFee, getRewardableData } from '../rewardable'
-import { FEE_MANAGER_MODE } from '../bridgeMode'
+import { FEE_MANAGER_MODE } from '../../../../../commons'
 import BN from 'bignumber.js'
 
 describe('validFee', () => {

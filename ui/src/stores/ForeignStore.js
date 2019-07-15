@@ -1,6 +1,14 @@
 import { action, observable } from 'mobx'
-import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
 import { getBlockNumber } from './utils/web3'
+import {
+  BRIDGE_VALIDATORS_ABI,
+  ERC677_BRIDGE_TOKEN_ABI,
+  BRIDGE_MODES,
+  FEE_MANAGER_MODE,
+  getUnit,
+  decodeFeeManagerMode,
+  getBridgeABIs
+} from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
@@ -26,14 +34,6 @@ import {
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
-import {
-  getBridgeABIs,
-  getUnit,
-  BRIDGE_MODES,
-  decodeFeeManagerMode,
-  FEE_MANAGER_MODE
-} from './utils/bridgeMode'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators'
 import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import BN from 'bignumber.js'
 import { processLargeArrayAsync } from './utils/array'
@@ -186,7 +186,10 @@ class ForeignStore {
         this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
           ? await getErc20TokenAddress(this.foreignBridge)
           : await getErc677TokenAddress(this.foreignBridge)
-      this.tokenContract = new this.foreignWeb3.eth.Contract(ERC677_ABI, this.tokenAddress)
+      this.tokenContract = new this.foreignWeb3.eth.Contract(
+        ERC677_BRIDGE_TOKEN_ABI,
+        this.tokenAddress
+      )
       this.tokenType = await getTokenType(this.tokenContract, this.FOREIGN_BRIDGE_ADDRESS)
       const alternativeContract = new this.foreignWeb3.eth.Contract(
         ERC20Bytes32Abi,
