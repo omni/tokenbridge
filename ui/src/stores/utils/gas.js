@@ -12,7 +12,7 @@ export async function fetchGasPrice({ oracleFn }) {
   return gasPrice
 }
 
-export async function fetchGasPriceFromOracle(oracleUrl, speedType) {
+export async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
   if (!oracleUrl) {
     throw new Error(`Gas Price Oracle url not defined`)
   }
@@ -22,5 +22,10 @@ export async function fetchGasPriceFromOracle(oracleUrl, speedType) {
   if (!gasPrice) {
     throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
   }
-  return toWei(gasPrice.toString(), 'gwei')
+  return normalizeGasPrice(gasPrice, factor)
+}
+
+export function normalizeGasPrice(oracleGasPrice, factor) {
+  const gasPrice = oracleGasPrice * factor
+  return toWei(gasPrice.toFixed(2).toString(), 'gwei')
 }

@@ -1,7 +1,12 @@
 const sinon = require('sinon')
 const { expect } = require('chai')
 const proxyquire = require('proxyquire').noPreserveCache()
-const { fetchGasPrice, gasPriceWithinLimits } = require('../src/services/gasPrice')
+const Web3Utils = require('web3-utils')
+const {
+  fetchGasPrice,
+  gasPriceWithinLimits,
+  normalizeGasPrice
+} = require('../src/services/gasPrice')
 const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../src/utils/constants')
 
 describe('gasPrice', () => {
@@ -174,6 +179,65 @@ describe('gasPrice', () => {
 
       // Then
       expect(gasPrice).to.equal(GAS_PRICE_BOUNDARIES.MAX)
+    })
+  })
+  describe('normalizeGasPrice', () => {
+    it('should work with oracle gas price in gwei', () => {
+      // Given
+      const oracleGasPrice = 20
+      const factor = 1
+
+      // When
+      const result = normalizeGasPrice(oracleGasPrice, factor)
+
+      // Then
+      expect(result).to.equal('20000000000')
+    })
+    it('should work with oracle gas price not in gwei', () => {
+      // Given
+      const oracleGasPrice = 200
+      const factor = 0.1
+
+      // When
+      const result = normalizeGasPrice(oracleGasPrice, factor)
+
+      // Then
+      expect(result).to.equal('20000000000')
+    })
+    it('should increase gas price value from oracle', () => {
+      // Given
+      const oracleGasPrice = 20
+      const factor = 1.5
+
+      // When
+      const result = normalizeGasPrice(oracleGasPrice, factor)
+
+      // Then
+      expect(result).to.equal('30000000000')
+    })
+    it('should respect gas price max limit', () => {
+      // Given
+      const oracleGasPrice = 200
+      const factor = 4
+      const maxInWei = Web3Utils.toWei(GAS_PRICE_BOUNDARIES.MAX.toString(), 'gwei')
+
+      // When
+      const result = normalizeGasPrice(oracleGasPrice, factor)
+
+      // Then
+      expect(result).to.equal(maxInWei)
+    })
+    it('should respect gas price min limit', () => {
+      // Given
+      const oracleGasPrice = 1
+      const factor = 0.01
+      const minInWei = Web3Utils.toWei(GAS_PRICE_BOUNDARIES.MIN.toString(), 'gwei')
+
+      // When
+      const result = normalizeGasPrice(oracleGasPrice, factor)
+
+      // Then
+      expect(result).to.equal(minInWei)
     })
   })
 })

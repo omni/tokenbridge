@@ -8,6 +8,7 @@ module.exports = {
     randomize: true
   },
   DEFAULT_UPDATE_INTERVAL: 600000,
+  DEFAULT_GAS_PRICE_FACTOR: 1,
   EXIT_CODES: {
     GENERAL_ERROR: 1,
     INCOMPATIBILITY: 10,
