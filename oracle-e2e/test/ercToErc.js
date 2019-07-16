@@ -5,8 +5,10 @@ const { user, ercToErcBridge, homeRPC, foreignRPC } = require('../../e2e-commons
 const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
-const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
+const homeWeb3 = new Web3(new Web3.providers.HttpProvider(process.env.HOME_RPC || homeRPC.URL))
+const foreignWeb3 = new Web3(
+  new Web3.providers.HttpProvider(process.env.FOREIGN_RPC || foreignRPC.URL)
+)
 
 const HOME_BRIDGE_ADDRESS = ercToErcBridge.home
 const FOREIGN_BRIDGE_ADDRESS = ercToErcBridge.foreign
