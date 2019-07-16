@@ -38,6 +38,7 @@
     "test": "yarn wsrun --exclude monitor --exclude oracle-e2e --exclude ui-e2e test",
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
     "ui-e2e": "./ui-e2e/run-tests.sh",
+    "monitor-e2e": "./monitor-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build",
     "compile:contracts": "yarn workspace poa-parity-bridge-contracts run compile",
     "install:deploy": "cd contracts/deploy && npm install --unsafe-perm --silent",

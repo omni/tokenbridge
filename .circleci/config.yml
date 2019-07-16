@@ -106,6 +106,15 @@ jobs:
         - checkout
         - run: git submodule update --init
         - run: ./monitor-e2e/run-tests.sh
+  monitor-e2e-docker:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+        - checkout
+        - run: git submodule update --init
+        - setup_remote_docker:
+            docker_layer_caching: true
+        - run: yarn run monitor-e2e
   cover:
     docker:
       - image: circleci/node:10.15
@@ -127,6 +136,22 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
+      - run: deployment/molecule/molecule.sh ui
+  deployment-oracle-docker:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: deployment/molecule/molecule.sh oracle
+  deployment-ui-docker:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run: deployment/molecule/molecule.sh ui
 workflows:
   version: 2
@@ -153,7 +178,10 @@ workflows:
             branches:
               only: master
       - oracle-e2e
-      - ui-e2e
+      #- ui-e2e
       - monitor-e2e
+      - monitor-e2e-docker
       - deployment-oracle
+      - deployment-oracle-docker
       - deployment-ui
+      - deployment-ui-docker
