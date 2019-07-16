@@ -9,9 +9,12 @@
     owner: root
     mode: 755
 
-- name: "Start/Enable poabridge service"
+- name: "Enable the service"
   service:
     name: "poabridge"
     state: started
     enabled: yes
     use: service
+
+- name: Start the service
+  shell: service poabridge start

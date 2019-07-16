@@ -9,9 +9,12 @@
     owner: root
     mode: 755
 
-- name: "Start/Enable the service"
+- name: "Enable the service"
   service:
     name: "tokenbridge-ui"
     state: started
     enabled: yes
     use: service
+
+- name: Start the service
+  shell: service tokenbridge-ui start
