@@ -24,3 +24,4 @@ Shut down and cleans up containers, networks, services, running scripts:
 | oracle | Launches Oracle containers |
 | ui | Launches UI containers |
 | blocks | Auto mines blocks |
+| native-to-erc | Creates infrastructure for ultimate e2e testing, for native-to-erc type of bridge |

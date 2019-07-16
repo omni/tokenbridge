@@ -128,6 +128,37 @@ jobs:
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh ui
+  ultimate-native-to-erc:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run:
+          name: Install node
+          command: |
+            set +e             
+            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v10.15.3
+
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
+      - run: 
+          name: Install yarn
+          command: |
+            nvm use v10.15.3
+            curl -o- -L https://yarnpkg.com/install.sh | bash
+            echo 'export PATH=$HOME/.yarn/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+            yarn run initialize
+      - run:
+          name: Prepare the infrastructure
+          command: |
+            nvm use v10.15.3
+            e2e-commons/up.sh deploy native-to-erc
+      - run: 'echo "TODO - Run the e2e tests on top of the infrastructure created by previous step"'
 workflows:
   version: 2
   tokenbridge:
@@ -157,3 +188,4 @@ workflows:
       - monitor-e2e
       - deployment-oracle
       - deployment-ui
+      - ultimate-native-to-erc
