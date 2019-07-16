@@ -4,11 +4,11 @@ set -e # exit when any command fails
 
 ./down.sh
 docker-compose build
-docker-compose up -d parity1 parity2 redis rabbit e2e
+docker-compose up -d parity1 parity2 e2e
 
 while [ "$1" != "" ]; do
   if [ "$1" == "oracle" ]; then
-    docker-compose up -d oracle oracle-erc20 oracle-erc20-native
+    docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native
 
     docker-compose run -d oracle yarn watcher:signature-request
     docker-compose run -d oracle yarn watcher:collected-signatures
