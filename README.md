@@ -24,9 +24,22 @@ Sub-repositories maintained within this monorepo are listed below.
 | [Monitor](monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
 | [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
+| [Monitor-E2E](monitor-e2e/README.md) | End to end tests for the Monitor |
 | [UI-E2E](ui-e2e/README.md) | End to end tests for the UI |
+| [Commons](commons/README.md) | Interfaces, constants and utilities shared between the sub-repositories |
+| [E2E-Commons](e2e-commons/README.md) | Common utilities and configuration used in end to end tests |
 
 Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts) used to manage bridge validators, collect signatures, and confirm asset relay and disposal.
+
+## Available deployments
+
+| **Launched by POA** | **Launched by 3rd parties** |
+| ---------- | ---------- |
+| [POA20 Bridge](https://bridge.poa.net/) | [Ocean Token Bridge](https://bridge.oceanprotocol.com/) | 
+| [xDai Bridge](https://dai-bridge.poa.network/) | [Thunder bridge](https://ui.stormdapps.com/) |
+| [WETC Bridge](https://wetc.app/) | [Volta Token Bridge](https://vt.volta.bridge.eth.events/) & [DAI bridge to Volta Chain](https://dai.volta.bridge.eth.events/) |
+| | [Artis Brige](https://bridge.artis.network/) |
+| | [Tenda bridge](https://bridge-mainnet.tenda.network) & [xDai-to-Tenda bridge](https://bridge-xdai.tenda.network/) |
 
 ## Network Definitions
 
@@ -46,26 +59,14 @@ The POA TokenBridge provides three operational modes:
 
 ## Initializing the monorepository
 
-Clone the repository with submodules:
+Clone the repository:
 ```bash
-git clone --recursive https://github.com/poanetwork/tokenbridge
-
-# or initialize submodules if already cloned without --recursive option:
-git submodule update --init
+git clone https://github.com/poanetwork/tokenbridge
 ```
 
-Install dependencies:
-
+Initialize submodules, install dependencies, compile the Smart Contracts:
 ```
-yarn install && yarn install:deploy
-```
-
-_**Note**: The installation should be performed with an unprivileged Linux account or with the following flag: `yarn install --unsafe-perm`. [More information](https://docs.npmjs.com/misc/scripts#user)_
-
-Compile the Smart Contracts
-
-```
-yarn compile:contracts
+yarn initialize
 ```
 
 ## Linting
@@ -74,14 +75,6 @@ Running linter for all JS projects:
 
 ```
 yarn lint
-```
-
-Running linter for all Ansible playbooks:
-
-- [ansible-lint](https://github.com/ansible/ansible-lint) is required
-
-```
-yarn ansible-lint
 ```
 
 ## Tests
@@ -95,6 +88,10 @@ yarn test
 Additionaly there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [UI](ui-e2e/README.md).
 
 For details on building, running and developing please refer to respective READMEs in sub-repositories.
+
+## Building, running and deploying
+
+Please refer to the instructions in sub-directories.
 
 ## Contributing
 

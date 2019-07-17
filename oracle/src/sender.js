@@ -1,7 +1,7 @@
-require('dotenv').config()
+require('../env')
 const path = require('path')
 const { connectSenderToQueue } = require('./services/amqpClient')
-const { redis, redlock } = require('./services/redisClient')
+const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
 const logger = require('./services/logger')
 const rpcUrlsManager = require('./services/getRpcUrlsManager')
@@ -13,11 +13,12 @@ const {
   privateKeyToAddress,
   syncForEach,
   waitForFunds,
-  watchdog
+  watchdog,
+  nonceError
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
 
-const { VALIDATOR_ADDRESS_PRIVATE_KEY, REDIS_LOCK_TTL } = process.env
+const { VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
 const VALIDATOR_ADDRESS = privateKeyToAddress(VALIDATOR_ADDRESS_PRIVATE_KEY)
 
@@ -29,7 +30,6 @@ if (process.argv.length < 3) {
 const config = require(path.join('../config/', process.argv[2]))
 
 const web3Instance = config.web3
-const nonceLock = `lock:${config.id}:nonce`
 const nonceKey = `${config.id}:nonce`
 let chainId = 0
 
@@ -90,7 +90,7 @@ function updateNonce(nonce) {
   return redis.set(nonceKey, nonce)
 }
 
-async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
+async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
   try {
     if (redis.status !== 'ready') {
       nackMsg(msg)
@@ -99,11 +99,6 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
 
     const txArray = JSON.parse(msg.content)
     logger.info(`Msg received with ${txArray.length} Tx to send`)
-
-    const ttl = REDIS_LOCK_TTL * txArray.length
-
-    logger.debug('Acquiring lock')
-    const lock = await redlock.lock(nonceLock, ttl)
 
     let nonce = await readNonce()
     let insufficientFunds = false
@@ -152,10 +147,7 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
           logger.error(
             `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
           )
-        } else if (
-          e.message.includes('Transaction nonce is too low') ||
-          e.message.includes('transaction with same nonce in the queue')
-        ) {
+        } else if (nonceError(e)) {
           nonce = await readNonce(true)
         }
       }
@@ -164,12 +156,9 @@ async function main({ msg, ackMsg, nackMsg, sendToQueue, channel }) {
     logger.debug('Updating nonce')
     await updateNonce(nonce)
 
-    logger.debug('Releasing lock')
-    await lock.unlock()
-
     if (failedTx.length) {
       logger.info(`Sending ${failedTx.length} Failed Tx to Queue`)
-      await sendToQueue(failedTx)
+      await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
     }
     ackMsg(msg)
     logger.debug(`Finished processing msg`)

@@ -1,1 +1,0 @@
-This role sets the .env config (excluding starting blocks).

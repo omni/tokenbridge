@@ -1,4 +1,3 @@
-require('dotenv').config()
 const baseConfig = require('./base.config')
 
 const { web3Foreign } = require('../src/services/web3')

@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('../env')
 const path = require('path')
 const { BN, toBN } = require('web3').utils
 const { connectWatcherToQueue, connection } = require('./services/amqpClient')

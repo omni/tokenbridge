@@ -1,3 +1,4 @@
+---
 version: '2.4'
 services:
   rabbit:
@@ -34,7 +35,6 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-    command: 'true'
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
@@ -50,7 +50,6 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-    command: 'true'
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
@@ -66,7 +65,6 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-    command: 'true'
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
@@ -82,7 +80,6 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-    command: 'true'
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
@@ -98,7 +95,6 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-    command: 'true'
     env_file: ./.env
     environment: 
       - NODE_ENV=production 

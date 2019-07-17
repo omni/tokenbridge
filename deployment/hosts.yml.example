@@ -1,0 +1,18 @@
+---
+sokol-kovan:
+  children:
+    oracle:
+      hosts:
+        127.0.0.1:
+          ansible_user: ubuntu
+          VALIDATOR_ADDRESS_PRIVATE_KEY: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          #syslog_server_port: "udp://127.0.0.1:514"
+    ui:
+      hosts:
+        127.0.0.1:
+          ansible_user: ubuntu
+          #syslog_server_port: "udp://127.0.0.1:514"
+    monitor:
+      hosts:
+        127.0.0.1:
+          ansible_user: ubuntu

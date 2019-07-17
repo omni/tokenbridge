@@ -1,0 +1,13 @@
+---
+- name: prepare
+  hosts: all
+  tasks:
+    - name: install apt packages
+      apt:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - apt-transport-https
+          - rsyslog
+    - shell: service rsyslog start
+    - shell: groupadd docker && chgrp docker /var/run/docker.sock

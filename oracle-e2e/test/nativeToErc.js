@@ -1,29 +1,32 @@
-const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, validator, temp, contractsPath } = require('../constants.json')
-const { generateNewBlock } = require('../utils/utils')
+const {
+  user,
+  validator,
+  nativeToErcBridge,
+  secondUser,
+  homeRPC,
+  foreignRPC
+} = require('../../e2e-commons/constants.json')
+const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
+const { generateNewBlock } = require('../../e2e-commons/utils')
 
-const abisDir = path.join(__dirname, '..', contractsPath, '/build/contracts')
-
-const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))
-
-const HOME_BRIDGE_ADDRESS = '0x32198D570fffC7033641F8A9094FFDCaAEF42624'
-const FOREIGN_BRIDGE_ADDRESS = '0x2B6871b9B02F73fa24F4864322CdC78604207769'
-
+const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
+const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
 const { toBN } = foreignWeb3.utils
+
+const HOME_BRIDGE_ADDRESS = nativeToErcBridge.home
+const FOREIGN_BRIDGE_ADDRESS = nativeToErcBridge.foreign
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
 homeWeb3.eth.accounts.wallet.add(validator.privateKey)
-homeWeb3.eth.accounts.wallet.add(temp.privateKey)
+homeWeb3.eth.accounts.wallet.add(secondUser.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
-foreignWeb3.eth.accounts.wallet.add(temp.privateKey)
+foreignWeb3.eth.accounts.wallet.add(secondUser.privateKey)
 
-const tokenAbi = require(path.join(abisDir, 'ERC677BridgeToken.json')).abi
-const token = new foreignWeb3.eth.Contract(tokenAbi, '0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B')
+const token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, nativeToErcBridge.foreignToken)
 
 const sleep = timeout => new Promise(res => setTimeout(res, timeout))
 
@@ -105,7 +108,7 @@ describe('native to erc', () => {
     const originalBalance = toBN(await token.methods.balanceOf(user.address).call())
 
     // empty validator funds
-    await sendAllBalance(homeWeb3, validator.address, temp.address)
+    await sendAllBalance(homeWeb3, validator.address, secondUser.address)
 
     // send transaction to home chain
     const depositTx = await homeWeb3.eth.sendTransaction({
@@ -127,7 +130,7 @@ describe('native to erc', () => {
     assert(originalBalance.eq(balance), "Token balance shouldn't have changed")
 
     // send funds back to validator
-    const sendBalanceBackTx = await sendAllBalance(homeWeb3, temp.address, validator.address)
+    const sendBalanceBackTx = await sendAllBalance(homeWeb3, secondUser.address, validator.address)
 
     // expect Deposit event to be processed
     await promiseRetry(
@@ -161,7 +164,7 @@ describe('native to erc', () => {
     const originalBalance = toBN(await token.methods.balanceOf(user.address).call())
 
     // empty foreign validator funds
-    await sendAllBalance(foreignWeb3, validator.address, temp.address)
+    await sendAllBalance(foreignWeb3, validator.address, secondUser.address)
     const foreignBlockNumber = await foreignWeb3.eth.getBlockNumber()
 
     // send transaction to home chain
@@ -199,7 +202,7 @@ describe('native to erc', () => {
     assert(lastForeignBlockNumber === foreignBlockNumber, "Shouldn't have emitted a new block")
 
     // send funds back to validator
-    await sendAllBalance(foreignWeb3, temp.address, validator.address)
+    await sendAllBalance(foreignWeb3, secondUser.address, validator.address)
 
     // check that account has tokens in the foreign chain
     await promiseRetry(async retry => {

@@ -110,43 +110,38 @@ cd monitor
 cp .env.example .env
 ```
 
-#### Example:
-```bash
-HOME_RPC_URL=https://sokol.poa.network
-FOREIGN_RPC_URL=https://kovan.infura.io/mew
-HOME_BRIDGE_ADDRESS=0xABb4C1399DcC28FBa3Beb76CAE2b50Be3e087353
-FOREIGN_BRIDGE_ADDRESS=0xE405F6872cE38a7a4Ff63DcF946236D458c2ca3a
-GAS_PRICE_SPEED_TYPE=standard
-GAS_LIMIT=300000
-GAS_PRICE_FALLBACK=21
-LEFT_TX_THRESHOLD=100
-```
-
-## Check balances of contracts and validators
-```
-node checkWorker.js
-```
-
-## Check unprocessed events
-```
-node checkWorker2.js
-```
-
 ## Run web interface
+
+Using Yarn:
 ```
 yarn start
 ```
 
-To enabled debug logging, set `DEBUG=1` env variable.
+You can run web interface via [pm2](https://www.npmjs.com/package/pm2) or similar supervisor program.
 
-You can create cron job to run workers (see `crontab.example` for reference):
-```bash
-#crontab -e
-*/4 * * * * cd $HOME/bridge-monitor; node checkWorker.js >>cronWorker.out 2>>cronWorker.err
-*/5 * * * * cd $HOME/bridge-monitor; node checkWorker2.js >>cronWorker2.out 2>>cronWorker2.err
+Using Docker:
+```
+docker-compose up -d
 ```
 
-You can run web interface via [pm2](https://www.npmjs.com/package/pm2) or similar supervisor program.
+- The application will run on `http://localhost:PORT`, where `PORT` is specified in your `.env` file.
+- To enabled debug logging, set `DEBUG=1` variable in `.env`.
+
+## Check balances of contracts and validators, get unprocessed events
+
+Using Yarn:
+```
+yarn check-all
+```
+
+Using Docker:
+```
+docker-compose exec monitor yarn check-all
+```
+
+### Cron
+
+You can create cron job to run workers (see `crontab.example` for reference):
 
 ## Linting
 
@@ -155,7 +150,6 @@ Running linter:
 ```bash
 yarn lint
 ```
-
 
 ## Contributing
 

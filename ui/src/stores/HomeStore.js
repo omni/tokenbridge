@@ -1,9 +1,16 @@
 import { action, observable } from 'mobx'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators.json'
-import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
-import { abi as BLOCK_REWARD_ABI } from '../../../contracts/build/contracts/IBlockReward'
 import { getBlockNumber, getBalance } from './utils/web3'
 import { fromDecimals } from './utils/decimals'
+import {
+  BRIDGE_VALIDATORS_ABI,
+  ERC677_BRIDGE_TOKEN_ABI,
+  BLOCK_REWARD_ABI,
+  BRIDGE_MODES,
+  FEE_MANAGER_MODE,
+  getUnit,
+  decodeFeeManagerMode,
+  getBridgeABIs
+} from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
@@ -15,7 +22,7 @@ import {
   getDecimals,
   getTotalSupply,
   getBalanceOf,
-  mintedTotally,
+  mintedTotallyByBridge,
   totalBurntCoins,
   getName,
   getFeeManager,
@@ -24,18 +31,15 @@ import {
   getFeeManagerMode,
   ZERO_ADDRESS,
   getValidatorList,
-  getDeployedAtBlock
+  getDeployedAtBlock,
+  getBlockRewardContract,
+  getValidatorContract,
+  getRequiredSignatures,
+  getValidatorCount
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
 import BN from 'bignumber.js'
-import {
-  getBridgeABIs,
-  getUnit,
-  BRIDGE_MODES,
-  decodeFeeManagerMode,
-  FEE_MANAGER_MODE
-} from './utils/bridgeMode'
 import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import { processLargeArrayAsync } from './utils/array'
 import { getRewardableData } from './utils/rewardable'
@@ -189,7 +193,10 @@ class HomeStore {
   async getTokenInfo() {
     try {
       this.tokenAddress = await getErc677TokenAddress(this.homeBridge)
-      this.tokenContract = new this.homeWeb3.eth.Contract(ERC677_ABI, this.tokenAddress)
+      this.tokenContract = new this.homeWeb3.eth.Contract(
+        ERC677_BRIDGE_TOKEN_ABI,
+        this.tokenAddress
+      )
       this.symbol = await getSymbol(this.tokenContract)
       this.tokenName = await getName(this.tokenContract)
       const alternativeContract = new this.homeWeb3.eth.Contract(ERC20Bytes32Abi, this.tokenAddress)
@@ -253,7 +260,10 @@ class HomeStore {
           balanceLoaded()
         })
       } else if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
-        const mintedCoins = await mintedTotally(this.blockRewardContract)
+        const mintedCoins = await mintedTotallyByBridge(
+          this.blockRewardContract,
+          this.HOME_BRIDGE_ADDRESS
+        )
         const burntCoins = await totalBurntCoins(this.homeBridge)
         this.balance = fromDecimals(mintedCoins.minus(burntCoins).toString(10), this.tokenDecimals)
       } else {
@@ -418,14 +428,14 @@ class HomeStore {
   @action
   async getValidators() {
     try {
-      const homeValidatorsAddress = await this.homeBridge.methods.validatorContract().call()
+      const homeValidatorsAddress = await getValidatorContract(this.homeBridge)
       this.homeBridgeValidators = new this.homeWeb3.eth.Contract(
         BRIDGE_VALIDATORS_ABI,
         homeValidatorsAddress
       )
 
-      this.requiredSignatures = await this.homeBridgeValidators.methods.requiredSignatures().call()
-      this.validatorsCount = await this.homeBridgeValidators.methods.validatorCount().call()
+      this.requiredSignatures = await getRequiredSignatures(this.homeBridgeValidators)
+      this.validatorsCount = await getValidatorCount(this.homeBridgeValidators)
 
       this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth)
     } catch (e) {
@@ -524,7 +534,7 @@ class HomeStore {
   }
 
   async getBlockRewardContract() {
-    const blockRewardAddress = await this.homeBridge.methods.blockRewardContract().call()
+    const blockRewardAddress = await getBlockRewardContract(this.homeBridge)
     this.blockRewardContract = new this.homeWeb3.eth.Contract(BLOCK_REWARD_ABI, blockRewardAddress)
   }
 

@@ -35,6 +35,12 @@ jobs:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/project
+  initialize-root:
+    docker:
+      - image: circleci/node:10.15
+    steps:
+      - checkout
+      - run: sudo su - -c 'export CI=true && cd /home/circleci/project && yarn initialize && yarn test'
   build:
     docker:
       - image: circleci/node:10.15
@@ -49,18 +55,9 @@ jobs:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run lint
-  ansible-lint:
-    docker:
-      - image: particlekit/ansible-lint
-    steps:
-      - checkout
-      - run: ./deployment/lint.sh
   test:
     docker:
       - image: circleci/node:10.15
-    environment:
-      HOME_RPC_URL: http://example.com
-      FOREIGN_RPC_URL: http://example.com
     steps:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
@@ -101,6 +98,14 @@ jobs:
            paths:
              - ~/.cache/yarn
       - run: yarn run ui-e2e
+  monitor-e2e:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+        - checkout
+        - run: git submodule update --init
+        - run: ./monitor-e2e/run-tests.sh
   cover:
     docker:
       - image: circleci/node:10.15
@@ -109,11 +114,40 @@ jobs:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
+  deployment-oracle:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: deployment/molecule/molecule.sh oracle
+  deployment-ui:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: deployment/molecule/molecule.sh ui
+  ultimate-native-to-erc:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - run:
+          name: Prepare the infrastructure
+          command: e2e-commons/up.sh deploy native-to-erc
+      - run: 'echo "TODO - Run the e2e tests on top of the infrastructure created by previous step"'
 workflows:
   version: 2
   tokenbridge:
     jobs:
       - initialize
+      - initialize-root:
+          filters:
+            branches:
+              only: master
       - build:
           requires:
             - initialize
@@ -129,6 +163,9 @@ workflows:
           filters:
             branches:
               only: master
-      - ansible-lint
       - oracle-e2e
       - ui-e2e
+      - monitor-e2e
+      - deployment-oracle
+      - deployment-ui
+      - ultimate-native-to-erc

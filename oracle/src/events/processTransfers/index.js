@@ -1,7 +1,7 @@
-require('dotenv').config()
+require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
-const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
+const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
 const {
@@ -27,7 +27,7 @@ function processTransfersBuilder(config) {
       const validatorContractAddress = await homeBridge.methods.validatorContract().call()
       rootLogger.debug({ validatorContractAddress }, 'Validator contract address obtained')
 
-      validatorContract = new web3Home.eth.Contract(bridgeValidatorsABI, validatorContractAddress)
+      validatorContract = new web3Home.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
     }
 
     rootLogger.debug(`Processing ${transfers.length} Transfer events`)

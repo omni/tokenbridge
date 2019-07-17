@@ -1,0 +1,4 @@
+---
+- include_tasks: pre_config.yml
+- include_tasks: jumpbox.yml
+- include_tasks: servinstall.yml

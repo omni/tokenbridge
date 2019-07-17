@@ -1,5 +1,5 @@
 import BN from 'bignumber.js'
-import { FEE_MANAGER_MODE } from './bridgeMode'
+import { FEE_MANAGER_MODE } from '../../../../commons'
 
 export const validFee = fee => {
   const zeroBN = new BN(0)

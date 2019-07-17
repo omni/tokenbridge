@@ -1,6 +1,14 @@
 import { action, observable } from 'mobx'
-import { abi as ERC677_ABI } from '../../../contracts/build/contracts/ERC677BridgeToken.json'
 import { getBlockNumber } from './utils/web3'
+import {
+  BRIDGE_VALIDATORS_ABI,
+  ERC677_BRIDGE_TOKEN_ABI,
+  BRIDGE_MODES,
+  FEE_MANAGER_MODE,
+  getUnit,
+  decodeFeeManagerMode,
+  getBridgeABIs
+} from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
@@ -19,18 +27,13 @@ import {
   ZERO_ADDRESS,
   getDeployedAtBlock,
   getValidatorList,
-  getTokenType
+  getTokenType,
+  getValidatorContract,
+  getRequiredSignatures,
+  getValidatorCount
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
-import {
-  getBridgeABIs,
-  getUnit,
-  BRIDGE_MODES,
-  decodeFeeManagerMode,
-  FEE_MANAGER_MODE
-} from './utils/bridgeMode'
-import { abi as BRIDGE_VALIDATORS_ABI } from '../../../contracts/build/contracts/BridgeValidators'
 import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import BN from 'bignumber.js'
 import { processLargeArrayAsync } from './utils/array'
@@ -183,7 +186,10 @@ class ForeignStore {
         this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
           ? await getErc20TokenAddress(this.foreignBridge)
           : await getErc677TokenAddress(this.foreignBridge)
-      this.tokenContract = new this.foreignWeb3.eth.Contract(ERC677_ABI, this.tokenAddress)
+      this.tokenContract = new this.foreignWeb3.eth.Contract(
+        ERC677_BRIDGE_TOKEN_ABI,
+        this.tokenAddress
+      )
       this.tokenType = await getTokenType(this.tokenContract, this.FOREIGN_BRIDGE_ADDRESS)
       const alternativeContract = new this.foreignWeb3.eth.Contract(
         ERC20Bytes32Abi,
@@ -390,16 +396,14 @@ class ForeignStore {
   @action
   async getValidators() {
     try {
-      const foreignValidatorsAddress = await this.foreignBridge.methods.validatorContract().call()
+      const foreignValidatorsAddress = await getValidatorContract(this.foreignBridge)
       this.foreignBridgeValidators = new this.foreignWeb3.eth.Contract(
         BRIDGE_VALIDATORS_ABI,
         foreignValidatorsAddress
       )
 
-      this.requiredSignatures = await this.foreignBridgeValidators.methods
-        .requiredSignatures()
-        .call()
-      this.validatorsCount = await this.foreignBridgeValidators.methods.validatorCount().call()
+      this.requiredSignatures = await getRequiredSignatures(this.foreignBridgeValidators)
+      this.validatorsCount = await getValidatorCount(this.foreignBridgeValidators)
 
       this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth)
     } catch (e) {

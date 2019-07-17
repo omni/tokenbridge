@@ -1,0 +1,5 @@
+---
+- name: Build the containers
+  shell: docker-compose build
+  args:
+    chdir: "{{ bridge_path }}/ui"

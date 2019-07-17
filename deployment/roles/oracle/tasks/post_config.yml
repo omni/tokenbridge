@@ -1,0 +1,34 @@
+---
+- name: Get blocks
+  become_user: "{{ compose_service_user }}"
+  shell: docker-compose run --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
+  args:
+    chdir: "{{ bridge_path }}/oracle"
+  register: BLOCKS
+
+- name: Write blocks
+  blockinfile:
+    path: "{{ bridge_path }}/oracle/.env"
+    marker: "## {mark} Calculated by scripts/getValidatorStartBlocks.js"
+    block: |
+      HOME_START_BLOCK={{ (BLOCKS.stdout | from_json).homeStartBlock }}
+      FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
+
+- name: Get validator address
+  become_user: "{{ compose_service_user }}"
+  shell: docker-compose run -e VALIDATOR_ADDRESS_PRIVATE_KEY="{{ VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
+  args:
+    chdir: "{{ bridge_path }}/oracle"
+  register: VADDRESS
+
+- name: Set VALIDATOR_ADDRESS variable
+  set_fact:
+    VALIDATOR_ADDRESS: "{{ VADDRESS.stdout }}"
+
+- name: Install .key config
+  template:
+    src: key.j2
+    dest: "/root/.key"
+    owner: root
+    group: root
+    mode: 0600

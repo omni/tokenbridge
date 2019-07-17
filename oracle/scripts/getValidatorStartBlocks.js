@@ -1,12 +1,8 @@
-const path = require('path')
-require('dotenv').config({
-  path: path.join(__dirname, '../.env')
-})
+require('../env')
 const Web3 = require('web3')
-const bridgeValidatorsABI = require('../../contracts/build/contracts/BridgeValidators').abi
 
+const { BRIDGE_VALIDATORS_ABI } = require('../../commons')
 const rpcUrlsManager = require('../src/services/getRpcUrlsManager')
-
 const { bridgeConfig } = require('../config/base.config')
 
 const homeABI = bridgeConfig.homeBridgeAbi
@@ -22,7 +18,7 @@ async function getStartBlock(rpcUrl, bridgeAddress, bridgeAbi) {
 
     const validatorContractAddress = await bridgeContract.methods.validatorContract().call()
     const validatorContract = new web3Instance.eth.Contract(
-      bridgeValidatorsABI,
+      BRIDGE_VALIDATORS_ABI,
       validatorContractAddress
     )
 

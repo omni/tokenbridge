@@ -1,0 +1,5 @@
+---
+- name: Install .env config
+  template:
+    src: .env.j2
+    dest: "{{ bridge_path }}/ui/.env"

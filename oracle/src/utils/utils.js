@@ -4,6 +4,14 @@ const Web3 = require('web3')
 const Web3Utils = require('web3-utils')
 const { GAS_PRICE_OPTIONS } = require('./constants')
 
+const retrySequence = [1, 2, 3, 5, 8, 13, 21, 34, 55, 60]
+
+function getRetrySequence(count) {
+  return count > retrySequence.length
+    ? retrySequence[retrySequence.length - 1]
+    : retrySequence[count - 1]
+}
+
 async function syncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array)
@@ -98,6 +106,14 @@ function privateKeyToAddress(privateKey) {
     : null
 }
 
+function nonceError(e) {
+  return (
+    e.message.includes('Transaction nonce is too low') ||
+    e.message.includes('nonce too low') ||
+    e.message.includes('transaction with same nonce in the queue')
+  )
+}
+
 function generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed }) {
   let gasPriceOptions = null
   if (dataType === GAS_PRICE_OPTIONS.GAS_PRICE) {
@@ -122,5 +138,7 @@ module.exports = {
   setIntervalAndRun,
   watchdog,
   privateKeyToAddress,
+  nonceError,
+  getRetrySequence,
   generateGasPriceOptions
 }

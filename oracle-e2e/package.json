@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "node deploy.js",
-    "start": "mocha"
+    "start": "mocha",
+    "lint": "eslint . --ignore-path ../.eslintignore"
   },
   "author": "",
   "license": "ISC",

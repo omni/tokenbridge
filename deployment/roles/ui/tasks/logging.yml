@@ -1,0 +1,41 @@
+---
+- name: Slurp docker compose file
+  slurp:
+    src: "{{ bridge_path }}/ui/docker-compose.yml"
+  register: docker_compose_slurp
+
+- name: Parse docker compose file
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_slurp['content'] | b64decode | from_yaml }}"
+
+- name: Set logger to remote server
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {item: {'logging': {'driver': 'syslog','options': {'tag': '{{.Name}}/{{.ID}}'}}}}}, recursive=True) }}"
+  with_items: "{{ docker_compose_parsed.services }}"
+
+- name: Write new docker-compose file
+  copy:
+    content: "{{ docker_compose_parsed | to_yaml }}"
+    dest: "{{ bridge_path }}/ui/docker-compose.yml"
+
+- name: Set the local container logs configuration file
+  template:
+    src: 32-ui-docker.conf.j2
+    dest: /etc/rsyslog.d/32-ui-docker.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set the log configuration file to send container logs to remote server
+  template:
+    src: 37-ui-remote-logging.conf.j2
+    dest: /etc/rsyslog.d/37-ui-remote-logging.conf
+    owner: root
+    group: root
+    mode: 0644
+  when: syslog_server_port is defined
+
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted

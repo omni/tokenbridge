@@ -1,1 +1,0 @@
-This role brings up a docker container using docker-compose.

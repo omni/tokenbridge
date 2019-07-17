@@ -1,4 +1,0 @@
-- name: Launch container
-  shell: docker-compose up -d
-  args:
-    chdir: "{{ bridge_path }}/oracle"

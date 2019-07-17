@@ -1,8 +1,7 @@
 import BN from 'bignumber.js'
 import { fromDecimals } from './decimals'
 import { fromWei } from 'web3-utils'
-import { abi as rewardableValidatorsAbi } from '../../../../contracts/build/contracts/RewardableValidators'
-import { ERC_TYPES } from './bridgeMode'
+import { ERC_TYPES, REWARDABLE_VALIDATORS_ABI } from '../../../../commons'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -53,8 +52,8 @@ export const getBalanceOf = async (contract, address) => {
   return fromDecimals(balance, decimals)
 }
 
-export const mintedTotally = async contract => {
-  const mintedCoins = await contract.methods.mintedTotally().call()
+export const mintedTotallyByBridge = async (contract, bridgeAddress) => {
+  const mintedCoins = await contract.methods.mintedTotallyByBridge(bridgeAddress).call()
   return new BN(mintedCoins)
 }
 
@@ -64,7 +63,7 @@ export const totalBurntCoins = async contract => {
 }
 
 export const getValidatorList = async (address, eth) => {
-  const validatorsContract = new eth.Contract(rewardableValidatorsAbi, address)
+  const validatorsContract = new eth.Contract(REWARDABLE_VALIDATORS_ABI, address)
   const validators = await validatorList(validatorsContract)
 
   if (validators.length) {
@@ -170,3 +169,11 @@ export const getTokenType = async (contract, bridgeAddress) => {
     return ERC_TYPES.ERC20
   }
 }
+
+export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()
+
+export const getValidatorContract = contract => contract.methods.validatorContract().call()
+
+export const getRequiredSignatures = contract => contract.methods.requiredSignatures().call()
+
+export const getValidatorCount = contract => contract.methods.validatorCount().call()

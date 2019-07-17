@@ -7,6 +7,9 @@
     "selenium-webdriver": "3.6.0"
   },
   "scripts": {
-    "deploy": "node ./scripts/deploy.js"
+    "lint": "eslint . --ignore-path ../.eslintignore"
+  },
+  "engines": {
+    "node": ">= 8.9"
   }
 }

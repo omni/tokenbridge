@@ -1,12 +1,9 @@
-const path = require('path')
-require('dotenv').config({
-  path: path.join(__dirname, '../../.env')
-})
+require('../../env')
 const Web3Utils = require('web3-utils')
 const { web3Home } = require('../../src/services/web3')
 const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
 const { isValidAmount } = require('../utils/utils')
-const BRIDGE_ABI = require('../../../contracts/build/contracts/HomeBridgeErcToNative').abi
+const { HOME_ERC_TO_NATIVE_ABI } = require('../../../commons')
 
 const {
   USER_ADDRESS,
@@ -19,7 +16,7 @@ const {
 const NUMBER_OF_DEPOSITS_TO_SEND = process.argv[2] || 1
 
 async function main() {
-  const bridge = new web3Home.eth.Contract(BRIDGE_ABI, HOME_BRIDGE_ADDRESS)
+  const bridge = new web3Home.eth.Contract(HOME_ERC_TO_NATIVE_ABI, HOME_BRIDGE_ADDRESS)
 
   try {
     await isValidAmount(HOME_MIN_AMOUNT_PER_TX, bridge)

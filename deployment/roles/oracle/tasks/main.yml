@@ -1,0 +1,6 @@
+---
+- include_tasks: pre_config.yml
+- include_tasks: logging.yml
+- include_tasks: jumpbox.yml
+- include_tasks: post_config.yml
+- include_tasks: servinstall.yml

@@ -1,18 +1,17 @@
-require('dotenv').config()
+require('../env')
 
 const { toBN } = require('web3').utils
+const {
+  BRIDGE_MODES,
+  HOME_NATIVE_TO_ERC_ABI,
+  FOREIGN_NATIVE_TO_ERC_ABI,
+  HOME_ERC_TO_ERC_ABI,
+  FOREIGN_ERC_TO_ERC_ABI,
+  HOME_ERC_TO_NATIVE_ABI,
+  FOREIGN_ERC_TO_NATIVE_ABI
+} = require('../../commons')
 const { web3Home, web3Foreign } = require('../src/services/web3')
 const { privateKeyToAddress } = require('../src/utils/utils')
-
-const homeNativeErcAbi = require('../../contracts/build/contracts/HomeBridgeNativeToErc').abi
-const foreignNativeErcAbi = require('../../contracts/build/contracts/ForeignBridgeNativeToErc').abi
-
-const homeErcErcAbi = require('../../contracts/build/contracts/HomeBridgeErcToErc').abi
-const foreignErc677Erc677Abi = require('../../contracts/build/contracts/ForeignBridgeErc677ToErc677')
-  .abi
-
-const homeErcNativeAbi = require('../../contracts/build/contracts/HomeBridgeErcToNative').abi
-const foreignErcNativeAbi = require('../../contracts/build/contracts/ForeignBridgeErcToNative').abi
 
 const homeAMBAbi = require('../../contracts/build/contracts/HomeAMB').abi
 const foreignAMBAbi = require('../../contracts/build/contracts/ForeignAMB').abi
@@ -24,19 +23,19 @@ let foreignAbi
 let id
 
 switch (process.env.BRIDGE_MODE) {
-  case 'NATIVE_TO_ERC':
-    homeAbi = homeNativeErcAbi
-    foreignAbi = foreignNativeErcAbi
+  case BRIDGE_MODES.NATIVE_TO_ERC:
+    homeAbi = HOME_NATIVE_TO_ERC_ABI
+    foreignAbi = FOREIGN_NATIVE_TO_ERC_ABI
     id = 'native-erc'
     break
-  case 'ERC_TO_ERC':
-    homeAbi = homeErcErcAbi
-    foreignAbi = foreignErc677Erc677Abi
+  case BRIDGE_MODES.ERC_TO_ERC:
+    homeAbi = HOME_ERC_TO_ERC_ABI
+    foreignAbi = FOREIGN_ERC_TO_ERC_ABI
     id = 'erc-erc'
     break
-  case 'ERC_TO_NATIVE':
-    homeAbi = homeErcNativeAbi
-    foreignAbi = foreignErcNativeAbi
+  case BRIDGE_MODES.ERC_TO_NATIVE:
+    homeAbi = HOME_ERC_TO_NATIVE_ABI
+    foreignAbi = FOREIGN_ERC_TO_NATIVE_ABI
     id = 'erc-native'
     break
   case 'ARBITRARY_MESSAGE':
@@ -48,8 +47,8 @@ switch (process.env.BRIDGE_MODE) {
     if (process.env.NODE_ENV !== 'test') {
       throw new Error(`Bridge Mode: ${process.env.BRIDGE_MODE} not supported.`)
     } else {
-      homeAbi = homeErcNativeAbi
-      foreignAbi = foreignErcNativeAbi
+      homeAbi = HOME_ERC_TO_NATIVE_ABI
+      foreignAbi = FOREIGN_ERC_TO_NATIVE_ABI
       id = 'erc-native'
     }
 }

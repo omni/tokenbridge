@@ -1,0 +1,15 @@
+---
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+
+- name: restart auditd
+  service:
+    name: auditd
+    state: restarted
+
+- name: restart docker
+  service:
+    name: docker
+    state: restarted

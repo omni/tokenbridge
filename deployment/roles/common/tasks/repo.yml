@@ -1,0 +1,8 @@
+---
+- name: Get bridge repo
+  git:
+    repo: "{{ bridge_repo }}"
+    dest: "{{ bridge_path }}"
+    force: no
+    update: no
+    version: "{{ bridge_repo_branch }}"

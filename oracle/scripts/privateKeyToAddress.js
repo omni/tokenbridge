@@ -1,7 +1,4 @@
-const path = require('path')
-require('dotenv').config({
-  path: path.join(__dirname, '..', '.env')
-})
+require('../env')
 const { privateKeyToAddress } = require('../src/utils/utils')
 const { EXIT_CODES } = require('../src/utils/constants')
 

@@ -1,11 +1,9 @@
-const path = require('path')
-require('dotenv').config({
-  path: path.join(__dirname, '../../.env')
-})
+require('../../env')
 const Web3Utils = require('web3-utils')
 const { web3Foreign } = require('../../src/services/web3')
 const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
 const { isValidAmount } = require('../utils/utils')
+const { FOREIGN_NATIVE_TO_ERC_ABI } = require('../../../commons')
 
 const {
   USER_ADDRESS,
@@ -47,10 +45,9 @@ const ERC677_ABI = [
     type: 'function'
   }
 ]
-const BRIDGE_ABI = require('../../../contracts/build/contracts/ForeignBridgeNativeToErc').abi
 
 async function main() {
-  const bridge = new web3Foreign.eth.Contract(BRIDGE_ABI, FOREIGN_BRIDGE_ADDRESS)
+  const bridge = new web3Foreign.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, FOREIGN_BRIDGE_ADDRESS)
   const ERC20_TOKEN_ADDRESS = await bridge.methods.erc677token().call()
   const poa20 = new web3Foreign.eth.Contract(ERC677_ABI, ERC20_TOKEN_ADDRESS)
 
