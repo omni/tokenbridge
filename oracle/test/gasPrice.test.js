@@ -5,9 +5,9 @@ const Web3Utils = require('web3-utils')
 const {
   fetchGasPrice,
   processGasPriceOptions,
-  gasPriceWithinLimits
-,
-  normalizeGasPrice} = require('../src/services/gasPrice')
+  gasPriceWithinLimits,
+  normalizeGasPrice
+} = require('../src/services/gasPrice')
 const {
   DEFAULT_UPDATE_INTERVAL,
   GAS_PRICE_OPTIONS,
