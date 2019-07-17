@@ -37,7 +37,7 @@ switch (process.env.BRIDGE_MODE) {
     foreignAbi = FOREIGN_ERC_TO_NATIVE_ABI
     id = 'erc-native'
     break
-  case 'ARBITRARY_MESSAGE':
+  case BRIDGE_MODES.ARBITRARY_MESSAGE:
     homeAbi = HOME_AMB_ABI
     foreignAbi = FOREIGN_AMB_ABI
     id = 'amb'
