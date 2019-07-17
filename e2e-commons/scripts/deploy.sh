@@ -29,3 +29,14 @@ cp "$ENVS_PATH/erc-to-native.env" "$DEPLOY_PATH/.env"
 cd "$DEPLOY_PATH"
 node deploy.js
 cd - > /dev/null
+
+echo -e "\n\n############ Deploying amb ############\n"
+cp "$ENVS_PATH/amb.env" "$DEPLOY_PATH/.env"
+cd "$DEPLOY_PATH"
+node deploy.js
+cd - > /dev/null
+
+echo -e "\n\n############ Deploying test contract for amb ############\n"
+cd "$DEPLOY_PATH"
+node src/utils/deployTestBox.js
+cd - > /dev/null

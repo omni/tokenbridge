@@ -1,21 +1,14 @@
-const path = require('path')
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, validator, contractsPath } = require('../constants.json')
-const { generateNewBlock } = require('../utils/utils')
+const { user, validator, homeRPC, foreignRPC, amb } = require('../../e2e-commons/constants.json')
+const { generateNewBlock } = require('../../e2e-commons/utils')
+const { HOME_AMB_ABI, FOREIGN_AMB_ABI, BOX_ABI } = require('../../commons')
+
 const { toBN } = Web3.utils
 
-const abisDir = path.join(__dirname, '..', contractsPath, 'build/contracts')
-
-const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))
-
-const homeBridgeAddress = '0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0'
-const foreignBridgeAddress = '0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0'
-
-const homeBoxAddress = '0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1'
-const foreignBoxAddress = '0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1'
+const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
+const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
@@ -23,15 +16,11 @@ foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 homeWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 
-const homeAbi = require(path.join(abisDir, 'HomeAMB.json')).abi
-const foreignAbi = require(path.join(abisDir, 'ForeignAMB.json')).abi
-const boxAbi = require(path.join(abisDir, 'Box.json')).abi
+const homeAMB = new homeWeb3.eth.Contract(HOME_AMB_ABI, amb.home)
+const homeBox = new homeWeb3.eth.Contract(BOX_ABI, amb.homeBox)
 
-const homeAMB = new homeWeb3.eth.Contract(homeAbi, homeBridgeAddress)
-const homeBox = new homeWeb3.eth.Contract(boxAbi, homeBoxAddress)
-
-const foreignAMB = new foreignWeb3.eth.Contract(foreignAbi, foreignBridgeAddress)
-const foreignBox = new foreignWeb3.eth.Contract(boxAbi, foreignBoxAddress)
+const foreignAMB = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, amb.foreign)
+const foreignBox = new foreignWeb3.eth.Contract(BOX_ABI, amb.foreignBox)
 
 const oneEther = foreignWeb3.utils.toWei('1', 'ether')
 const subsidizedHash = homeWeb3.utils.toHex('AMB-subsidized-mode')
@@ -40,16 +29,16 @@ describe('arbitrary message bridging', () => {
   describe('Home to Foreign', () => {
     describe('Defrayal Mode', () => {
       it('should be able to deposit funds for home sender', async () => {
-        const initialBalance = await foreignAMB.methods.balanceOf(homeBoxAddress).call()
+        const initialBalance = await foreignAMB.methods.balanceOf(amb.homeBox).call()
         assert(toBN(initialBalance).isZero(), 'Balance should be zero')
 
-        await foreignAMB.methods.depositForContractSender(homeBoxAddress).send({
+        await foreignAMB.methods.depositForContractSender(amb.homeBox).send({
           from: user.address,
           gas: '1000000',
           value: oneEther
         })
 
-        const balance = await foreignAMB.methods.balanceOf(homeBoxAddress).call()
+        const balance = await foreignAMB.methods.balanceOf(amb.homeBox).call()
         assert(toBN(balance).eq(toBN(oneEther)), 'Balance should be one ether')
       })
       it('should bridge message and take fees', async () => {
@@ -58,16 +47,11 @@ describe('arbitrary message bridging', () => {
         const initialValue = await foreignBox.methods.value().call()
         assert(toBN(initialValue).isZero(), 'Value should be zero')
 
-        const initialBalance = await foreignAMB.methods.balanceOf(homeBoxAddress).call()
+        const initialBalance = await foreignAMB.methods.balanceOf(amb.homeBox).call()
         assert(!toBN(initialBalance).isZero(), 'Balance should not be zero')
 
         const setValueTx = await homeBox.methods
-          .setValueOnOtherNetworkGasPrice(
-            newValue,
-            homeBridgeAddress,
-            foreignBoxAddress,
-            '1000000000'
-          )
+          .setValueOnOtherNetworkGasPrice(newValue, amb.home, amb.foreignBox, '1000000000')
           .send({
             from: user.address,
             gas: '1000000'
@@ -101,14 +85,14 @@ describe('arbitrary message bridging', () => {
         // check that value changed and balance decreased
         await promiseRetry(async retry => {
           const value = await foreignBox.methods.value().call()
-          const balance = await foreignAMB.methods.balanceOf(homeBoxAddress).call()
+          const balance = await foreignAMB.methods.balanceOf(amb.homeBox).call()
           if (!toBN(value).eq(toBN(newValue)) || toBN(balance).gte(toBN(oneEther))) {
             retry()
           }
         })
       })
       it('should be able to withdraw from deposit', async () => {
-        const initialBalance = await foreignAMB.methods.balanceOf(homeBoxAddress).call()
+        const initialBalance = await foreignAMB.methods.balanceOf(amb.homeBox).call()
         assert(!toBN(initialBalance).isZero(), 'Balance should not be zero')
 
         const initialUserBalance = toBN(await foreignWeb3.eth.getBalance(user.address))
@@ -116,8 +100,8 @@ describe('arbitrary message bridging', () => {
         const tx = await homeBox.methods
           .withdrawFromDepositOnOtherNetworkGasPrice(
             user.address,
-            homeBridgeAddress,
-            foreignBridgeAddress,
+            amb.home,
+            amb.foreign,
             '1000000000'
           )
           .send({
@@ -153,7 +137,7 @@ describe('arbitrary message bridging', () => {
         // check that value changed and balance decreased
         await promiseRetry(async retry => {
           const userBalance = toBN(await foreignWeb3.eth.getBalance(user.address))
-          const boxBalance = toBN(await foreignAMB.methods.balanceOf(homeBoxAddress).call())
+          const boxBalance = toBN(await foreignAMB.methods.balanceOf(amb.homeBox).call())
           if (!boxBalance.isZero() || userBalance.lte(initialUserBalance)) {
             retry()
           }
@@ -186,12 +170,7 @@ describe('arbitrary message bridging', () => {
         )
 
         const setValueTx = await homeBox.methods
-          .setValueOnOtherNetworkGasPrice(
-            newValue,
-            homeBridgeAddress,
-            foreignBoxAddress,
-            '1000000000'
-          )
+          .setValueOnOtherNetworkGasPrice(newValue, amb.home, amb.foreignBox, '1000000000')
           .send({
             from: user.address,
             gas: '1000000'
@@ -235,16 +214,16 @@ describe('arbitrary message bridging', () => {
   describe('Foreign to Home', () => {
     describe('Defrayal Mode', () => {
       it('should be able to deposit funds for foreign sender', async () => {
-        const initialBalance = await homeAMB.methods.balanceOf(foreignBoxAddress).call()
+        const initialBalance = await homeAMB.methods.balanceOf(amb.foreignBox).call()
         assert(toBN(initialBalance).isZero(), 'Balance should be zero')
 
-        await homeAMB.methods.depositForContractSender(homeBoxAddress).send({
+        await homeAMB.methods.depositForContractSender(amb.homeBox).send({
           from: user.address,
           gas: '1000000',
           value: oneEther
         })
 
-        const balance = await homeAMB.methods.balanceOf(foreignBoxAddress).call()
+        const balance = await homeAMB.methods.balanceOf(amb.foreignBox).call()
         assert(toBN(balance).eq(toBN(oneEther)), 'Balance should be one ether')
       })
       it('should bridge message and take fees', async () => {
@@ -253,16 +232,11 @@ describe('arbitrary message bridging', () => {
         const initialValue = await homeBox.methods.value().call()
         assert(toBN(initialValue).isZero(), 'Value should be zero')
 
-        const initialBalance = await homeAMB.methods.balanceOf(foreignBoxAddress).call()
+        const initialBalance = await homeAMB.methods.balanceOf(amb.foreignBox).call()
         assert(!toBN(initialBalance).isZero(), 'Balance should not be zero')
 
         await foreignBox.methods
-          .setValueOnOtherNetworkGasPrice(
-            newValue,
-            foreignBridgeAddress,
-            homeBoxAddress,
-            '1000000000'
-          )
+          .setValueOnOtherNetworkGasPrice(newValue, amb.foreign, amb.homeBox, '1000000000')
           .send({
             from: user.address,
             gas: '1000000'
@@ -278,14 +252,14 @@ describe('arbitrary message bridging', () => {
         // check that value changed and balance decreased
         await promiseRetry(async retry => {
           const value = await homeBox.methods.value().call()
-          const balance = await homeAMB.methods.balanceOf(foreignBoxAddress).call()
+          const balance = await homeAMB.methods.balanceOf(amb.foreignBox).call()
           if (!toBN(value).eq(toBN(newValue)) || toBN(balance).gte(toBN(oneEther))) {
             retry()
           }
         })
       })
       it('should be able to withdraw from deposit', async () => {
-        const initialBalance = await homeAMB.methods.balanceOf(foreignBoxAddress).call()
+        const initialBalance = await homeAMB.methods.balanceOf(amb.foreignBox).call()
         assert(!toBN(initialBalance).isZero(), 'Balance should not be zero')
 
         const initialUserBalance = toBN(await homeWeb3.eth.getBalance(user.address))
@@ -293,8 +267,8 @@ describe('arbitrary message bridging', () => {
         await foreignBox.methods
           .withdrawFromDepositOnOtherNetworkGasPrice(
             user.address,
-            foreignBridgeAddress,
-            homeBridgeAddress,
+            amb.foreign,
+            amb.home,
             '1000000000'
           )
           .send({
@@ -312,7 +286,7 @@ describe('arbitrary message bridging', () => {
         // check that value changed and balance decreased
         await promiseRetry(async retry => {
           const userBalance = toBN(await homeWeb3.eth.getBalance(user.address))
-          const boxBalance = toBN(await homeAMB.methods.balanceOf(foreignBoxAddress).call())
+          const boxBalance = toBN(await homeAMB.methods.balanceOf(amb.foreignBox).call())
           if (!boxBalance.isZero() || userBalance.lte(initialUserBalance)) {
             retry()
           }
@@ -347,12 +321,7 @@ describe('arbitrary message bridging', () => {
         )
 
         await foreignBox.methods
-          .setValueOnOtherNetworkGasPrice(
-            newValue,
-            homeBridgeAddress,
-            foreignBoxAddress,
-            '1000000000'
-          )
+          .setValueOnOtherNetworkGasPrice(newValue, amb.home, amb.foreignBox, '1000000000')
           .send({
             from: user.address,
             gas: '1000000'

@@ -109,6 +109,34 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
+  oracle-amb:
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
+    environment:
+      - NODE_ENV=production
+      - BRIDGE_MODE=ARBITRARY_MESSAGE
+      - QUEUE_URL=amqp://rabbit
+      - REDIS_URL=redis://redis
+      - HOME_RPC_URL=http://parity1:8545
+      - FOREIGN_RPC_URL=http://parity2:8545
+      - HOME_BRIDGE_ADDRESS=0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0
+      - FOREIGN_BRIDGE_ADDRESS=0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0
+      - VALIDATOR_ADDRESS_PRIVATE_KEY=8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9
+      - HOME_GAS_PRICE_ORACLE_URL=https://gasprice.poa.network/
+      - HOME_GAS_PRICE_SPEED_TYPE=standard
+      - HOME_GAS_PRICE_FALLBACK=1000000000
+      - HOME_GAS_PRICE_UPDATE_INTERVAL=600000
+      - HOME_GAS_PRICE_FACTOR=1
+      - FOREIGN_GAS_PRICE_ORACLE_URL=https://gasprice.poa.network/
+      - FOREIGN_GAS_PRICE_SPEED_TYPE=standard
+      - FOREIGN_GAS_PRICE_FALLBACK=10000000000
+      - FOREIGN_GAS_PRICE_UPDATE_INTERVAL=600000
+      - FOREIGN_GAS_PRICE_FACTOR=1
+      - HOME_POLLING_INTERVAL=500
+      - FOREIGN_POLLING_INTERVAL=500
+      - ALLOW_HTTP=yes
+    command: "true"
   ui:
     build:
       context: ..

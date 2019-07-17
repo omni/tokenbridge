@@ -8,13 +8,12 @@ const {
   HOME_ERC_TO_ERC_ABI,
   FOREIGN_ERC_TO_ERC_ABI,
   HOME_ERC_TO_NATIVE_ABI,
-  FOREIGN_ERC_TO_NATIVE_ABI
+  FOREIGN_ERC_TO_NATIVE_ABI,
+  HOME_AMB_ABI,
+  FOREIGN_AMB_ABI
 } = require('../../commons')
 const { web3Home, web3Foreign } = require('../src/services/web3')
 const { privateKeyToAddress } = require('../src/utils/utils')
-
-const homeAMBAbi = require('../../contracts/build/contracts/HomeAMB').abi
-const foreignAMBAbi = require('../../contracts/build/contracts/ForeignAMB').abi
 
 const { VALIDATOR_ADDRESS, VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
@@ -39,8 +38,8 @@ switch (process.env.BRIDGE_MODE) {
     id = 'erc-native'
     break
   case 'ARBITRARY_MESSAGE':
-    homeAbi = homeAMBAbi
-    foreignAbi = foreignAMBAbi
+    homeAbi = HOME_AMB_ABI
+    foreignAbi = FOREIGN_AMB_ABI
     id = 'amb'
     break
   default:

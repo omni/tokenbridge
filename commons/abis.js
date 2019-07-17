@@ -13,6 +13,9 @@ const ERC677_BRIDGE_TOKEN_ABI = require('../contracts/build/contracts/ERC677Brid
 const BLOCK_REWARD_ABI = require('../contracts/build/contracts/IBlockReward').abi
 const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi
 const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/RewardableValidators').abi
+const HOME_AMB_ABI = require('../contracts/build/contracts/HomeAMB').abi
+const FOREIGN_AMB_ABI = require('../contracts/build/contracts/ForeignAMB').abi
+const BOX_ABI = require('../contracts/build/contracts/Box').abi
 
 const { homeV1Abi, foreignViAbi } = require('./v1Abis')
 const { BRIDGE_MODES } = require('./constants')
@@ -52,5 +55,8 @@ module.exports = {
   ERC677_BRIDGE_TOKEN_ABI,
   BLOCK_REWARD_ABI,
   BRIDGE_VALIDATORS_ABI,
-  REWARDABLE_VALIDATORS_ABI
+  REWARDABLE_VALIDATORS_ABI,
+  HOME_AMB_ABI,
+  FOREIGN_AMB_ABI,
+  BOX_ABI
 }
