@@ -16,7 +16,7 @@ provisioner:
   name: ansible
   playbooks:
     prepare: ../prepare.yml
-    converge: ../../site.yml
+    converge: converge.yml
   inventory:
     host_vars:
       oracle-native-to-erc-host:

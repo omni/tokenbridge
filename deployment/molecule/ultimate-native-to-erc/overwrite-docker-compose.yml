@@ -1,0 +1,58 @@
+---
+- name: Slurp docker compose file
+  slurp:
+    src: "/home/poadocker/bridge/oracle/docker-compose.yml"
+  register: docker_compose_slurp
+
+- name: Parse docker compose file
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_slurp['content'] | b64decode | from_yaml }}"
+
+- name: Network mode host
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {item: {'network_mode': 'host', 'networks': []}}}, recursive=True) }}"
+  with_items: "{{ docker_compose_parsed.services }}"
+
+- name: No networks created
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'networks': {}}, recursive=False) }}"
+
+- name: Expose rabbit ports
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {'rabbit': {'ports': ['4369:4369', '5671:5671', '5672:5672', '15672:15672', '25672:25672'] }}}, recursive=True) }}"
+
+- name: Expose redis ports
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {'redis': {'ports': ['6379:6379'] }}}, recursive=True) }}"
+
+- name: Redis network mode should be bridge otherwise port mapping does not work
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {'redis': {'network_mode': 'bridge' }}}, recursive=True) }}"
+
+- name: Rabbit network mode should be bridge otherwise port mapping does not work
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {'rabbit': {'network_mode': 'bridge'}}}, recursive=True) }}"
+
+- name: Rabbit environment should be removed otherwise for some reason the components cannot connect
+  set_fact:
+    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {'rabbit': {'environment': []}}}, recursive=True) }}"
+
+- name: Write new docker-compose file
+  copy:
+    content: "{{ docker_compose_parsed | to_yaml }}"
+    dest: "/home/poadocker/bridge/oracle/docker-compose.yml"
+
+- name: No networks in services # network_mode' and 'networks' cannot be combined
+  shell: 'sed -i "/networks: \[\]/d" ./docker-compose.yml'
+  args:
+    chdir: "/home/poadocker/bridge/oracle"
+
+- name: remove hostname
+  shell: 'sed -i "/hostname:/d" ./docker-compose.yml'
+  args:
+    chdir: "/home/poadocker/bridge/oracle"
+  
+- name: remove volumes # otherwise caching from different debugging/testing rounds is interfering
+  shell: 'sed -i "/volumes:/d" ./docker-compose.yml'
+  args:
+    chdir: "/home/poadocker/bridge/oracle"

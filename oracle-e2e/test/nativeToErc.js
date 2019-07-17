@@ -13,7 +13,9 @@ const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
+const foreignWeb3 = new Web3(
+  new Web3.providers.HttpProvider(process.env.FOREIGN_RPC || foreignRPC.URL)
+)
 const { toBN } = foreignWeb3.utils
 
 const HOME_BRIDGE_ADDRESS = nativeToErcBridge.home

@@ -1,0 +1,15 @@
+---
+- import_playbook: ../../site.yml
+- name: Overwrite the docker-compose
+  hosts: oracle
+  become: true
+  tasks:
+  - name: stop the service
+    service: 
+      name: poabridge
+      state: stopped
+
+  - import_tasks: ./overwrite-docker-compose.yml
+
+  - name: start the service
+    shell: service poabridge start
