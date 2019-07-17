@@ -139,6 +139,8 @@ jobs:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy native-to-erc
       - run: 'echo "TODO - Run the e2e tests on top of the infrastructure created by previous step"'
+      - run: 'sleep 120; echo "Sleep ended"'
+      - run: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
 workflows:
   version: 2
   tokenbridge:
