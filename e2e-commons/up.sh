@@ -13,7 +13,7 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "oracle" ]; then
-    docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native
+    docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native oracle-amb
 
     docker-compose run -d oracle yarn watcher:signature-request
     docker-compose run -d oracle yarn watcher:collected-signatures
