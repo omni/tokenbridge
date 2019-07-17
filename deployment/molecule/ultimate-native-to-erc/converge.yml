@@ -5,11 +5,7 @@
   become: true
   tasks:
   - name: stop the service
-    service: 
-      name: poabridge
-      state: stopped
-
+    shell: service poabridge stop
   - import_tasks: ./overwrite-docker-compose.yml
-
   - name: start the service
     shell: service poabridge start

@@ -3,7 +3,6 @@
   slurp:
     src: "/home/poadocker/bridge/oracle/docker-compose.yml"
   register: docker_compose_slurp
-
 - name: Parse docker compose file
   set_fact:
     docker_compose_parsed: "{{ docker_compose_slurp['content'] | b64decode | from_yaml }}"
