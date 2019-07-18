@@ -138,6 +138,7 @@ jobs:
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy native-to-erc
+          no_output_timeout: 30m
       - run:
           name: Wait for the Oracle to start
           command: 'sleep 120'
