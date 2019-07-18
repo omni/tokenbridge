@@ -17,11 +17,11 @@
 
   - name: Add the external network used to connect to Parity nodes
     set_fact:
-      docker_compose_parsed: "{{ docker_compose_parsed |combine({'networks': {'e2e-commons_ultimate': {'external': 'true'}}}, recursive=True) }}"
+      docker_compose_parsed: "{{ docker_compose_parsed |combine({'networks': {'ultimate': {'external': 'true'}}}, recursive=True) }}"
 
   - name: Add all Oracle containers to the network
     set_fact:
-      docker_compose_parsed: "{{ docker_compose_parsed | combine({'services': {item: {'networks': docker_compose_parsed.services[item].networks | union(['e2e-commons_ultimate'])}}}, recursive=True) }}"
+      docker_compose_parsed: "{{ docker_compose_parsed | combine({'services': {item: {'networks': docker_compose_parsed.services[item].networks | union(['ultimate'])}}}, recursive=True) }}"
     with_items: "{{ docker_compose_parsed.services }}"
 
   - name: Write new docker-compose file

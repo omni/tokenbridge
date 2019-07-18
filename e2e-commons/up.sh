@@ -4,6 +4,7 @@ set -e # exit when any command fails
 
 ./down.sh
 docker-compose build
+docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
 export DOCKER_LOCALHOST="localhost"
 

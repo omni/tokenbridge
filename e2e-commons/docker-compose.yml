@@ -2,7 +2,7 @@
 version: '3'
 networks:
   ultimate:
-    driver: bridge
+    external: true
 services:
   parity1:
     build: ../parity
