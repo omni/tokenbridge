@@ -1,8 +1,8 @@
-# POA Token Bridge / Deployment
+# POA TokenBridge / Deployment
 Ansible playbooks for deploying cross-chain bridges.
 
 ## Overview
-Please refer to the [POA Token Bridge](../README.md) overview first of all.
+Please refer to the [POA TokenBridge](../README.md) overview first of all.
 
 These playbooks are designed to automate the deployment process for cross-chain bridges on bridge validator nodes. This process installs the bridge as a service and sets .env configurations on a remote server.
 

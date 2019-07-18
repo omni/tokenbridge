@@ -1,12 +1,12 @@
-# POA Token Bridge / Monitor
+# POA TokenBridge / Monitor
 Tool for checking balances and unprocessed events in bridged networks.
 
 ## Overview
-Please refer to the [POA Token Bridge](../README.md) overview first of all.
+Please refer to the [POA TokenBridge](../README.md) overview first of all.
 
 - Deployed version: https://bridge-monitoring.poa.net/
 
-This tool allows you to spin up a NODE.JS server to monitor for health of the Token Bridge contracts: check for the balance difference, discover inconsistency in the validators list, catch unhandled transactions.
+This tool allows you to spin up a NODE.JS server to monitor for health of the TokenBridge contracts: check for the balance difference, discover inconsistency in the validators list, catch unhandled transactions.
 
 ## Examples
 
