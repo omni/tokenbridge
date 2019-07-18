@@ -16,9 +16,6 @@ Run the Parity nodes, deploy the bridge contracts, deploy Oracle using the deplo
 
 ```bash
 ./up.sh deploy native-to-erc
-
-# on macOS:
-./up.sh macos deploy native-to-erc
 ```
 
 ### 2. Run the E2E tests
