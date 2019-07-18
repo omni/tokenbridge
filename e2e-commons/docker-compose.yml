@@ -20,10 +20,14 @@ services:
       - ultimate
   redis:
     image: "redis:4"
+    networks:
+      - ultimate
   rabbit:
     image: "rabbitmq:3-management"
     ports:
     - "15672:15672"
+    networks:
+      - ultimate
   oracle:
     build:
       context: ..
@@ -54,6 +58,8 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
+    networks:
+      - ultimate
   oracle-erc20:
     build:
       context: ..
@@ -85,6 +91,8 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
+    networks:
+      - ultimate
   oracle-erc20-native:
     build:
       context: ..
@@ -116,6 +124,8 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
+    networks:
+      - ultimate
   ui:
     build:
       context: ..
@@ -144,6 +154,8 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_FACTOR=1
     - PORT=3000
     command: "true"
+    networks:
+      - ultimate
   ui-erc20:
     build:
       context: ..
@@ -172,6 +184,8 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_FACTOR=1
     - PORT=3000
     command: "true"
+    networks:
+      - ultimate
   ui-erc20-native:
     build:
       context: ..
@@ -200,6 +214,8 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_FACTOR=1
     - PORT=3000
     command: "true"
+    networks:
+      - ultimate
   monitor:
     build:
       context: ..
@@ -226,6 +242,8 @@ services:
     entrypoint: yarn start
     ports:
     - "3003:3003"
+    networks:
+      - ultimate
   e2e:
     build:
       context: ..
