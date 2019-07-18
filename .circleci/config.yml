@@ -140,7 +140,7 @@ jobs:
           command: e2e-commons/up.sh deploy native-to-erc
       - run:
           name: Wait for the Oracle to start
-          command: 'cd e2e-commons; while ! docker-compose logs | grep -q "Connected to amqp Broker"; do echo "Waiting for Oracle..."; sleep 10; done'
+          command: 'sleep 120'
       - run:
           name: Run the oracle-e2e tests
           command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
