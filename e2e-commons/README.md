@@ -4,7 +4,7 @@ Common scripts and configuration for the end-to-end tests.
 
 ## Usage
 
-Spin up the parity nodes and an e2e container needed for end-to-end tests:
+Spin up parity networks, redis, rabbit, e2e container needed for end-to-end tests:
 
 ```
 ./up.sh [components]

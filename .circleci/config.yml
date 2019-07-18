@@ -148,29 +148,29 @@ workflows:
   version: 2
   tokenbridge:
     jobs:
-      # - initialize
-      # - initialize-root:
-      #     filters:
-      #       branches:
-      #         only: master
-      # - build:
-      #     requires:
-      #       - initialize
-      # - lint:
-      #     requires:
-      #       - initialize
-      # - test:
-      #     requires:
-      #       - initialize
-      # - cover:
-      #     requires:
-      #       - initialize
-      #     filters:
-      #       branches:
-      #         only: master
-      # - oracle-e2e
-      # - ui-e2e
-      # - monitor-e2e
-      # - deployment-oracle
-      # - deployment-ui
+      - initialize
+      - initialize-root:
+          filters:
+            branches:
+              only: master
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
+      - cover:
+          requires:
+            - initialize
+          filters:
+            branches:
+              only: master
+      - oracle-e2e
+      - ui-e2e
+      - monitor-e2e
+      - deployment-oracle
+      - deployment-ui
       - ultimate-native-to-erc
