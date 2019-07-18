@@ -1,4 +1,4 @@
-# POA Token Bridge / Ultimate E2E
+# POA TokenBridge / Ultimate E2E
 
 Documentation regarding the Ultimate end-to-end tests.
 
