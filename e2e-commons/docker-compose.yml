@@ -1,16 +1,23 @@
 ---
 version: '3'
+networks:
+  ultimate:
+    driver: bridge
 services:
   parity1:
     build: ../parity
     ports:
     - "8541:8545"
+    networks:
+      - ultimate
   parity2:
     build:
       context: ../parity
       dockerfile: Dockerfile-foreign
     ports:
     - "8542:8545"
+    networks:
+      - ultimate
   redis:
     image: "redis:4"
   rabbit:
@@ -224,3 +231,5 @@ services:
       context: ..
       dockerfile: Dockerfile.e2e
     command: "true"
+    networks:
+      - ultimate
