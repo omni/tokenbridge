@@ -1,6 +1,6 @@
-# POA Token Bridge / Oracle-E2E
+# POA TokenBridge / Oracle-E2E
 
-End to end tests for the POA Token Bridge [Oracle](../oracle/README.md).
+End to end tests for the POA TokenBridge [Oracle](../oracle/README.md).
 
 ## Prerequisites
 
