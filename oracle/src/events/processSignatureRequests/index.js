@@ -1,4 +1,5 @@
 require('../../../env')
+const BN = require('bignumber.js')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
 const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
@@ -13,7 +14,7 @@ const {
 } = require('../../utils/errors')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 
-const { VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
+const { VALIDATOR_ADDRESS_PRIVATE_KEY ,FOREIGN_TO_HOME_DECIMAL_SHIFT } = process.env
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
@@ -41,11 +42,21 @@ function processSignatureRequestsBuilder(config) {
     rootLogger.debug(`Processing ${signatureRequests.length} SignatureRequest events`)
     const callbacks = signatureRequests.map(signatureRequest =>
       limit(async () => {
-        const { recipient, value } = signatureRequest.returnValues
+        let { recipient, value } = signatureRequest.returnValues
 
         const logger = rootLogger.child({
           eventTransactionHash: signatureRequest.transactionHash
         })
+
+
+        if(FOREIGN_TO_HOME_DECIMAL_SHIFT){
+          const foreignToHomeDecimalShift =new BN(FOREIGN_TO_HOME_DECIMAL_SHIFT)
+          if(!foreignToHomeDecimalShift.isZero()){
+            logger.debug({ value }, `value will be negated shift by ${foreignToHomeDecimalShift} `)
+            value=new BN(value).shiftedBy(foreignToHomeDecimalShift.negated().toNumber())
+            logger.debug({ value }, `new value shifted`)
+          }
+        }
 
         logger.info(
           { sender: recipient, value },

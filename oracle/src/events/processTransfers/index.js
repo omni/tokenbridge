@@ -1,4 +1,5 @@
 require('../../../env')
+const BN = require('bignumber.js')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
 const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
@@ -13,6 +14,8 @@ const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('../processAffirmationRequests/estimateGas')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
+
+const { FOREIGN_TO_HOME_DECIMAL_SHIFT } = process.env
 
 let validatorContract = null
 
@@ -33,11 +36,21 @@ function processTransfersBuilder(config) {
     rootLogger.debug(`Processing ${transfers.length} Transfer events`)
     const callbacks = transfers.map(transfer =>
       limit(async () => {
-        const { from, value } = transfer.returnValues
+        let { from, value } = transfer.returnValues
 
         const logger = rootLogger.child({
           eventTransactionHash: transfer.transactionHash
         })
+
+        if(FOREIGN_TO_HOME_DECIMAL_SHIFT){
+          const foreignToHomeDecimalShift =new BN(FOREIGN_TO_HOME_DECIMAL_SHIFT)
+          if(!foreignToHomeDecimalShift.isZero()){
+            logger.debug({ value }, `value will be shift by ${foreignToHomeDecimalShift} `)
+            value=new BN(value).shiftedBy(foreignToHomeDecimalShift.toNumber())
+            logger.debug({ value }, `new value shifted`)
+          }
+        }
+
 
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
 
