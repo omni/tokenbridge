@@ -1,4 +1,4 @@
-# POA Token Bridge / E2E-Commons
+# POA TokenBridge / E2E-Commons
 
 Common scripts and configuration for the end-to-end tests.
 

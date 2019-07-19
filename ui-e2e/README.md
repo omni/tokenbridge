@@ -1,6 +1,6 @@
-# POA Token Bridge / UI-E2E
+# POA TokenBridge / UI-E2E
 
-End to end tests for the POA Token Bridge [UI](../UI/README.md).
+End to end tests for the POA TokenBridge [UI](../UI/README.md).
 
 - Configure startURL, homeAccount, foreignAccount in ```config.json```
 

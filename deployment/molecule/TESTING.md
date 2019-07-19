@@ -1,4 +1,4 @@
-# POA Token Bridge / Deployment Testing
+# POA TokenBridge / Deployment Testing
 
 The deployment playbooks are tested using [Molecule](https://molecule.readthedocs.io).
 
