@@ -42,7 +42,8 @@ function processSignatureRequestsBuilder(config) {
     rootLogger.debug(`Processing ${signatureRequests.length} SignatureRequest events`)
     const callbacks = signatureRequests.map(signatureRequest =>
       limit(async () => {
-        let { recipient, value } = signatureRequest.returnValues
+        const { recipient } = signatureRequest.returnValues
+        let { value } = signatureRequest.returnValues
 
         const logger = rootLogger.child({
           eventTransactionHash: signatureRequest.transactionHash

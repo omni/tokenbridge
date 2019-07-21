@@ -36,7 +36,8 @@ function processTransfersBuilder(config) {
     rootLogger.debug(`Processing ${transfers.length} Transfer events`)
     const callbacks = transfers.map(transfer =>
       limit(async () => {
-        let { from, value } = transfer.returnValues
+        const { from } = transfer.returnValues
+        let { value } = transfer.returnValues
 
         const logger = rootLogger.child({
           eventTransactionHash: transfer.transactionHash
