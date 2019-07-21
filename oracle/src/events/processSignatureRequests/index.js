@@ -14,7 +14,7 @@ const {
 } = require('../../utils/errors')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 
-const { VALIDATOR_ADDRESS_PRIVATE_KEY ,FOREIGN_TO_HOME_DECIMAL_SHIFT } = process.env
+const { VALIDATOR_ADDRESS_PRIVATE_KEY, FOREIGN_TO_HOME_DECIMAL_SHIFT } = process.env
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
@@ -49,12 +49,11 @@ function processSignatureRequestsBuilder(config) {
           eventTransactionHash: signatureRequest.transactionHash
         })
 
-
-        if(FOREIGN_TO_HOME_DECIMAL_SHIFT){
-          const foreignToHomeDecimalShift =new BN(FOREIGN_TO_HOME_DECIMAL_SHIFT)
-          if(!foreignToHomeDecimalShift.isZero()){
+        if (FOREIGN_TO_HOME_DECIMAL_SHIFT) {
+          const foreignToHomeDecimalShift = new BN(FOREIGN_TO_HOME_DECIMAL_SHIFT)
+          if (!foreignToHomeDecimalShift.isZero()) {
             logger.debug({ value }, `value will be negated shift by ${foreignToHomeDecimalShift} `)
-            value=new BN(value).shiftedBy(foreignToHomeDecimalShift.negated().toNumber())
+            value = new BN(value).shiftedBy(foreignToHomeDecimalShift.negated().toNumber())
             logger.debug({ value }, `new value shifted`)
           }
         }

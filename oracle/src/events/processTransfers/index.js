@@ -43,15 +43,14 @@ function processTransfersBuilder(config) {
           eventTransactionHash: transfer.transactionHash
         })
 
-        if(FOREIGN_TO_HOME_DECIMAL_SHIFT){
-          const foreignToHomeDecimalShift =new BN(FOREIGN_TO_HOME_DECIMAL_SHIFT)
-          if(!foreignToHomeDecimalShift.isZero()){
+        if (FOREIGN_TO_HOME_DECIMAL_SHIFT) {
+          const foreignToHomeDecimalShift = new BN(FOREIGN_TO_HOME_DECIMAL_SHIFT)
+          if (!foreignToHomeDecimalShift.isZero()) {
             logger.debug({ value }, `value will be shift by ${foreignToHomeDecimalShift} `)
-            value=new BN(value).shiftedBy(foreignToHomeDecimalShift.toNumber())
+            value = new BN(value).shiftedBy(foreignToHomeDecimalShift.toNumber())
             logger.debug({ value }, `new value shifted`)
           }
         }
-
 
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
 
