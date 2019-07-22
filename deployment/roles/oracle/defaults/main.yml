@@ -3,5 +3,4 @@ bridge_path: "/home/{{ compose_service_user }}/bridge"
 ALLOW_HTTP: no
 QUEUE_URL: amqp://rabbit
 REDIS_URL: redis://redis
-syslog_server_port: udp://127.0.0.1:514
 keyfile_path: "/root/.key"
