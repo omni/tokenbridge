@@ -1,7 +1,7 @@
 {
   "name": "tokenbridge",
   "version": "0.0.1",
-  "description": "Monorepository for token bridge",
+  "description": "Monorepository for TokenBridge",
   "repository": "https://github.com/poanetwork/tokenbridge.git",
   "author": "rzadp <przemek@ethworks.io>",
   "license": "MIT",

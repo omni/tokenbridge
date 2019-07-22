@@ -1,8 +1,8 @@
-# POA Token Bridge / Oracle
+# POA TokenBridge / Oracle
 Oracle responsible for listening to bridge related events and authorizing asset transfers.
 
 ## Overview
-Please refer to the [POA Token Bridge](../README.md) overview first of all.
+Please refer to the [POA TokenBridge](../README.md) overview first of all.
 
 The Oracle is deployed on specified validator nodes (only nodes whose private keys correspond to addresses specified in the smart contracts) in the network. It connects to two chains via a Remote Procedure Call (RPC) and is responsible for:
 - listening to events related to bridge contracts

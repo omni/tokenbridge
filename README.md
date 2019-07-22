@@ -3,15 +3,15 @@
 [![License: LGPL v3.0](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 # Tokenbridge
-Welcome to the **POA Token Bridge** monorepository!
+Welcome to the **POA TokenBridge** monorepository!
 
 Please note that this repository as a **work in progress**.
 
 ## Overview
 
-The POA Token Bridge allows users to transfer assets between two chains in the Ethereum ecosystem. It is composed of several elements which are contained within this monorepository.
+The POA TokenBridge allows users to transfer assets between two chains in the Ethereum ecosystem. It is composed of several elements which are contained within this monorepository.
 
-For a complete picture of the POA Token Bridge functionality, it is useful to explore each subrepository.
+For a complete picture of the POA TokenBridge functionality, it is useful to explore each subrepository.
 
 ## Structure
 
@@ -35,9 +35,9 @@ Additionally there are [Smart Contracts](https://github.com/poanetwork/poa-bridg
 
 | **Launched by POA** | **Launched by 3rd parties** |
 | ---------- | ---------- |
-| [POA20 Bridge](https://bridge.poa.net/) | [Ocean Token Bridge](https://bridge.oceanprotocol.com/) | 
+| [POA20 Bridge](https://bridge.poa.net/) | [Ocean TokenBridge](https://bridge.oceanprotocol.com/) | 
 | [xDai Bridge](https://dai-bridge.poa.network/) | [Thunder bridge](https://ui.stormdapps.com/) |
-| [WETC Bridge](https://wetc.app/) | [Volta Token Bridge](https://vt.volta.bridge.eth.events/) & [DAI bridge to Volta Chain](https://dai.volta.bridge.eth.events/) |
+| [WETC Bridge](https://wetc.app/) | [Volta TokenBridge](https://vt.volta.bridge.eth.events/) & [DAI bridge to Volta Chain](https://dai.volta.bridge.eth.events/) |
 | | [Artis Brige](https://bridge.artis.network/) |
 | | [Tenda bridge](https://bridge-mainnet.tenda.network) & [xDai-to-Tenda bridge](https://bridge-xdai.tenda.network/) |
 

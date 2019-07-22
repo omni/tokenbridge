@@ -1,10 +1,10 @@
 [![Coverage Status](https://coveralls.io/repos/github/poanetwork/tokenbridge/badge.svg?branch=master)](https://coveralls.io/github/poanetwork/tokenbridge?branch=master)
 
-# POA Token Bridge / UI
+# POA TokenBridge / UI
 DApp interface to transfer tokens and coins between chains.
 
 ## Overview
-Please refer to the [POA Token Bridge](../README.md) overview first of all.
+Please refer to the [POA TokenBridge](../README.md) overview first of all.
 
 The UI provides an intuitive interface for assets transfer between networks running the Bridge smart contracts. Users can connect to a web3 wallet such as [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/) and complete the transfer through a web browser.
 
@@ -88,7 +88,7 @@ The following is an example setup using the POA Sokol testnet as the Home networ
       * `FOREIGN_RPC_URL`=https://kovan.infura.io/mew
     * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `poa-bridge-contracts/deploy` directory and includes the bridge contract addresses.  
 
-5. Install and run the Token Bridge Oracle.
+5. Install and run the TokenBridge Oracle.
   * Go to the `sokol-kovan-bridge` folder
   * [Initialize](../README.md#initializing-the-monorepository) the monorepository
   * Go to `oracle` sub-repository

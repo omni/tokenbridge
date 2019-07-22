@@ -1,6 +1,6 @@
-# POA Token Bridge / Monitor-E2E
+# POA TokenBridge / Monitor-E2E
 
-End to end tests for the POA Token Bridge [Monitor](../monitor/README.md).
+End to end tests for the POA TokenBridge [Monitor](../monitor/README.md).
 
 ## Running
 

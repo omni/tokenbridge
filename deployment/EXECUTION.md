@@ -1,4 +1,4 @@
-# POA Token Bridge / Deployment Execution
+# POA TokenBridge / Deployment Execution
 
 Please refer to the [Configuration](./CONFIGURATION.md) first.
 
