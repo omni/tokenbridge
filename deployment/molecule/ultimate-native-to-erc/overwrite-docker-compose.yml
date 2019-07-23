@@ -23,6 +23,10 @@
     set_fact:
       docker_compose_parsed: "{{ docker_compose_parsed | combine({'services': {item: {'networks': docker_compose_parsed.services[item].networks | union(['ultimate'])}}}, recursive=True) }}"
     with_items: "{{ docker_compose_parsed.services }}"
+  
+  - name: Expose Redis port to allow connecting from redis-cli
+    set_fact:
+      docker_compose_parsed: "{{ docker_compose_parsed | combine({'services': {'redis': {'ports': ['6379:6379']}}}, recursive=True) }}"
 
   - name: Write new docker-compose file
     copy:
