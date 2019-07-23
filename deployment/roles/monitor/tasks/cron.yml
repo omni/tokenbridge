@@ -6,7 +6,7 @@
     day: "{{ MONITOR_CRON_SCHEDULE.split(' ')[2] }}"
     month: "{{ MONITOR_CRON_SCHEDULE.split(' ')[3] }}"
     weekday: "{{ MONITOR_CRON_SCHEDULE.split(' ')[4] }}"
-    job: "/bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./checkDocker.sh >>cronWorker.out 2>>cronWorker.err'"
+    job: "/bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./checkDocker.sh >cronWorker.out 2>cronWorker.err'"
   ignore_errors: True
   register: set_fact_result
 - name: Add cron entry
