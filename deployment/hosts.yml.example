@@ -16,3 +16,4 @@ sokol-kovan:
       hosts:
         127.0.0.1:
           ansible_user: ubuntu
+          #MONITOR_CRON_SCHEDULE: "*/4 * * * *"
