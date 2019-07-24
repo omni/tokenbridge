@@ -14,7 +14,7 @@ const BLOCK_REWARD_ABI = require('../contracts/build/contracts/IBlockReward').ab
 const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi
 const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/RewardableValidators').abi
 
-const { homeV1Abi, foreignViAbi } = require('./v1Abis')
+const { HOME_V1_ABI, FOREIGN_V1_ABI } = require('./v1Abis')
 const { BRIDGE_MODES } = require('./constants')
 
 function getBridgeABIs(bridgeMode) {
@@ -30,8 +30,8 @@ function getBridgeABIs(bridgeMode) {
     HOME_ABI = HOME_ERC_TO_NATIVE_ABI
     FOREIGN_ABI = FOREIGN_ERC_TO_NATIVE_ABI
   } else if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1) {
-    HOME_ABI = homeV1Abi
-    FOREIGN_ABI = foreignViAbi
+    HOME_ABI = HOME_V1_ABI
+    FOREIGN_ABI = FOREIGN_V1_ABI
   } else {
     throw new Error(`Unrecognized bridge mode: ${bridgeMode}`)
   }
@@ -52,5 +52,7 @@ module.exports = {
   ERC677_BRIDGE_TOKEN_ABI,
   BLOCK_REWARD_ABI,
   BRIDGE_VALIDATORS_ABI,
-  REWARDABLE_VALIDATORS_ABI
+  REWARDABLE_VALIDATORS_ABI,
+  HOME_V1_ABI,
+  FOREIGN_V1_ABI
 }
