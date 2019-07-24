@@ -7,7 +7,8 @@ import {
   FEE_MANAGER_MODE,
   getUnit,
   decodeFeeManagerMode,
-  getBridgeABIs
+  getBridgeABIs,
+  ERC20_BYTES32_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -34,7 +35,6 @@ import {
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
-import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import BN from 'bignumber.js'
 import { processLargeArrayAsync } from './utils/array'
 import { fromDecimals } from './utils/decimals'
@@ -192,7 +192,7 @@ class ForeignStore {
       )
       this.tokenType = await getTokenType(this.tokenContract, this.FOREIGN_BRIDGE_ADDRESS)
       const alternativeContract = new this.foreignWeb3.eth.Contract(
-        ERC20Bytes32Abi,
+        ERC20_BYTES32_ABI,
         this.tokenAddress
       )
       try {

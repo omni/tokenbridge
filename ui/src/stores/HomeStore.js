@@ -10,7 +10,8 @@ import {
   getUnit,
   decodeFeeManagerMode,
   getBridgeABIs,
-  HOME_V1_ABI
+  HOME_V1_ABI,
+  ERC20_BYTES32_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -41,7 +42,6 @@ import {
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
 import BN from 'bignumber.js'
-import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import { processLargeArrayAsync } from './utils/array'
 import { getRewardableData } from './utils/rewardable'
 
@@ -199,7 +199,10 @@ class HomeStore {
       )
       this.symbol = await getSymbol(this.tokenContract)
       this.tokenName = await getName(this.tokenContract)
-      const alternativeContract = new this.homeWeb3.eth.Contract(ERC20Bytes32Abi, this.tokenAddress)
+      const alternativeContract = new this.homeWeb3.eth.Contract(
+        ERC20_BYTES32_ABI,
+        this.tokenAddress
+      )
       try {
         this.symbol = await getSymbol(this.tokenContract)
       } catch (e) {

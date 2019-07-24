@@ -17,6 +17,37 @@ const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/Rewardab
 const { HOME_V1_ABI, FOREIGN_V1_ABI } = require('./v1Abis')
 const { BRIDGE_MODES } = require('./constants')
 
+const ERC20_BYTES32_ABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'name',
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'symbol',
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  }
+]
+
 function getBridgeABIs(bridgeMode) {
   let HOME_ABI = null
   let FOREIGN_ABI = null
@@ -54,5 +85,6 @@ module.exports = {
   BRIDGE_VALIDATORS_ABI,
   REWARDABLE_VALIDATORS_ABI,
   HOME_V1_ABI,
-  FOREIGN_V1_ABI
+  FOREIGN_V1_ABI,
+  ERC20_BYTES32_ABI
 }
