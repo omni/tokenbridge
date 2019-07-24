@@ -1,6 +1,5 @@
 const baseConfig = require('./base.config')
-const { ERC20_ABI } = require('../../commons')
-const { ERC_TYPES } = require('../src/utils/constants')
+const { ERC20_ABI, ERC_TYPES } = require('../../commons')
 
 const initialChecksJson = process.argv[3]
 

@@ -1,7 +1,6 @@
 require('../env')
 const Web3 = require('web3')
-const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
-const { ERC_TYPES } = require('../src/utils/constants')
+const { ERC677_BRIDGE_TOKEN_ABI, ERC_TYPES } = require('../../commons')
 
 async function initialChecks() {
   const { ERC20_TOKEN_ADDRESS, BRIDGE_MODE, FOREIGN_RPC_URL, FOREIGN_BRIDGE_ADDRESS } = process.env
