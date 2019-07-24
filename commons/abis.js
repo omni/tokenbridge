@@ -35,6 +35,9 @@ function getBridgeABIs(bridgeMode) {
   } else if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1) {
     HOME_ABI = homeV1Abi
     FOREIGN_ABI = foreignViAbi
+  } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    HOME_ABI = HOME_AMB_ABI
+    FOREIGN_ABI = FOREIGN_AMB_ABI
   } else {
     throw new Error(`Unrecognized bridge mode: ${bridgeMode}`)
   }

@@ -30,13 +30,17 @@ async function main(mode) {
   const { HOME_ABI, FOREIGN_ABI } = getBridgeABIs(bridgeMode)
   const homeBridge = new web3Home.eth.Contract(HOME_ABI, HOME_BRIDGE_ADDRESS)
   const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ABI, FOREIGN_BRIDGE_ADDRESS)
-  const tokenType = await getTokenType(foreignBridge, FOREIGN_BRIDGE_ADDRESS)
-  const isExternalErc20 = tokenType === ERC_TYPES.ERC20
   const v1Bridge = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1
-  const erc20MethodName =
-    bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
-  const erc20Address = await foreignBridge.methods[erc20MethodName]().call()
-  const erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
+  let isExternalErc20
+  let erc20Contract
+  if (bridgeMode !== BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    const tokenType = await getTokenType(foreignBridge, FOREIGN_BRIDGE_ADDRESS)
+    isExternalErc20 = tokenType === ERC_TYPES.ERC20
+    const erc20MethodName =
+      bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
+    const erc20Address = await foreignBridge.methods[erc20MethodName]().call()
+    erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
+  }
 
   logger.debug('getting last block numbers')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
