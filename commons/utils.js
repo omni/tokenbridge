@@ -1,4 +1,5 @@
-const { BRIDGE_MODES, FEE_MANAGER_MODE } = require('./constants')
+const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
+const { ERC677_BRIDGE_TOKEN_ABI } = require('./abis')
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
@@ -33,6 +34,17 @@ async function getBridgeMode(contract) {
   }
 }
 
+const getTokenType = async (web3, tokenAddress, bridgeAddress) => {
+  const tokenContract = new web3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, tokenAddress)
+  const resultBridgeAddress = await tokenContract.methods.bridgeContract().call()
+
+  if (resultBridgeAddress === bridgeAddress) {
+    return ERC_TYPES.ERC677
+  } else {
+    return ERC_TYPES.ERC20
+  }
+}
+
 const getUnit = bridgeMode => {
   let unitHome = null
   let unitForeign = null
@@ -56,5 +68,6 @@ module.exports = {
   decodeBridgeMode,
   decodeFeeManagerMode,
   getBridgeMode,
+  getTokenType,
   getUnit
 }
