@@ -7,7 +7,8 @@ import {
   FEE_MANAGER_MODE,
   getUnit,
   decodeFeeManagerMode,
-  getBridgeABIs
+  getBridgeABIs,
+  getTokenType
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -27,7 +28,6 @@ import {
   ZERO_ADDRESS,
   getDeployedAtBlock,
   getValidatorList,
-  getTokenType,
   getValidatorContract,
   getRequiredSignatures,
   getValidatorCount

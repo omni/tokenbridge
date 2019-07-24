@@ -34,13 +34,15 @@ async function getBridgeMode(contract) {
   }
 }
 
-const getTokenType = async (web3, tokenAddress, bridgeAddress) => {
-  const tokenContract = new web3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, tokenAddress)
-  const resultBridgeAddress = await tokenContract.methods.bridgeContract().call()
-
-  if (resultBridgeAddress === bridgeAddress) {
-    return ERC_TYPES.ERC677
-  } else {
+const getTokenType = async (bridgeTokenContract, bridgeAddress) => {
+  try {
+    const resultBridgeAddress = await bridgeTokenContract.methods.bridgeContract().call()
+    if (resultBridgeAddress === bridgeAddress) {
+      return ERC_TYPES.ERC677
+    } else {
+      return ERC_TYPES.ERC20
+    }
+  } catch (e) {
     return ERC_TYPES.ERC20
   }
 }
