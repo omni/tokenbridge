@@ -1,5 +1,4 @@
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
-const { ERC677_BRIDGE_TOKEN_ABI } = require('./abis')
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
