@@ -6,7 +6,7 @@ const { web3Home } = require('../../services/web3')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
-const { addTxHashToData, parseAMBMessage } = require('../../utils/message')
+const { addTxHashToData, parseAMBMessage } = require('../../../../commons')
 const { generateGasPriceOptions } = require('../../utils/utils')
 const {
   AlreadyProcessedError,

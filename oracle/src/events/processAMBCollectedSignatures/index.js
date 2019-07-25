@@ -4,7 +4,8 @@ const { HttpListProviderError } = require('http-list-provider')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
-const { signatureToVRS, parseAMBMessage } = require('../../utils/message')
+const { signatureToVRS } = require('../../utils/message')
+const { parseAMBMessage } = require('../../../../commons')
 const { generateGasPriceOptions } = require('../../utils/utils')
 const estimateGas = require('./estimateGas')
 const {

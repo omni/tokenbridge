@@ -21,16 +21,5 @@ module.exports = {
   ERC_TYPES: {
     ERC20: 'ERC20',
     ERC677: 'ERC677'
-  },
-  GAS_PRICE_OPTIONS: {
-    UNDEFINED: '00',
-    GAS_PRICE: '01',
-    SPEED: '02'
-  },
-  ORACLE_GAS_PRICE_SPEEDS: {
-    SLOW: 'slow',
-    STANDARD: 'standard',
-    FAST: 'fast',
-    INSTANT: 'instant'
   }
 }

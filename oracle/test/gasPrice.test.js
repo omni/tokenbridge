@@ -8,12 +8,8 @@ const {
   gasPriceWithinLimits,
   normalizeGasPrice
 } = require('../src/services/gasPrice')
-const {
-  DEFAULT_UPDATE_INTERVAL,
-  GAS_PRICE_OPTIONS,
-  ORACLE_GAS_PRICE_SPEEDS,
-  GAS_PRICE_BOUNDARIES
-} = require('../src/utils/constants')
+const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../src/utils/constants')
+const { GAS_PRICE_OPTIONS, ORACLE_GAS_PRICE_SPEEDS } = require('../../commons')
 
 describe('gasPrice', () => {
   describe('fetchGasPrice', () => {

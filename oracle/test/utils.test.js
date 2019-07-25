@@ -5,7 +5,7 @@ const BigNumber = require('bignumber.js')
 const proxyquire = require('proxyquire')
 const Web3Utils = require('web3-utils')
 const { addExtraGas, syncForEach, generateGasPriceOptions } = require('../src/utils/utils')
-const { GAS_PRICE_OPTIONS, ORACLE_GAS_PRICE_SPEEDS } = require('../src/utils/constants')
+const { GAS_PRICE_OPTIONS, ORACLE_GAS_PRICE_SPEEDS } = require('../../commons')
 
 chai.use(chaiAsPromised)
 const { expect } = chai

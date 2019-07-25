@@ -10,9 +10,9 @@ const { setIntervalAndRun } = require('../utils/utils')
 const {
   DEFAULT_UPDATE_INTERVAL,
   GAS_PRICE_BOUNDARIES,
-  DEFAULT_GAS_PRICE_FACTOR,
-  GAS_PRICE_OPTIONS
+  DEFAULT_GAS_PRICE_FACTOR
 } = require('../utils/constants')
+const { GAS_PRICE_OPTIONS } = require('../../../commons')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi

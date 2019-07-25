@@ -4,7 +4,7 @@ const { HttpListProviderError } = require('http-list-provider')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
-const { addTxHashToData, parseAMBMessage } = require('../../utils/message')
+const { addTxHashToData, parseAMBMessage } = require('../../../../commons')
 const estimateGas = require('../processSignatureRequests/estimateGas')
 const {
   AlreadyProcessedError,

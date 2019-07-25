@@ -1,5 +1,5 @@
 const web3Utils = require('web3').utils
-const { addTxHashToData, parseAMBMessage } = require('../../oracle/src/utils/message')
+const { addTxHashToData, parseAMBMessage } = require('../../commons')
 
 function deliveredMsgNotProcessed(processedList) {
   return deliveredMsg => {

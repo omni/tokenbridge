@@ -2,7 +2,7 @@ const BigNumber = require('bignumber.js')
 const promiseRetry = require('promise-retry')
 const Web3 = require('web3')
 const Web3Utils = require('web3-utils')
-const { GAS_PRICE_OPTIONS } = require('./constants')
+const { GAS_PRICE_OPTIONS } = require('../../../commons')
 
 const retrySequence = [1, 2, 3, 5, 8, 13, 21, 34, 55, 60]
 
