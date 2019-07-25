@@ -11,9 +11,7 @@ function deliveredMsgNotProcessed(processedList) {
     )
     return (
       processedList.filter(processedMsg => {
-        processedMsg.returnValues.txHash =
-          processedMsg.returnValues.transactionHash || processedMsg.returnValues.txHash
-        return messagesEquals(msg, processedMsg.returnValues)
+        return messageEqualsEvent(msg, processedMsg.returnValues)
       }).length === 0
     )
   }
@@ -21,8 +19,6 @@ function deliveredMsgNotProcessed(processedList) {
 
 function processedMsgNotDelivered(deliveredList) {
   return processedMsg => {
-    processedMsg.returnValues.txHash =
-      processedMsg.returnValues.transactionHash || processedMsg.returnValues.txHash
     return (
       deliveredList.filter(deliveredMsg => {
         const msg = parseAMBMessage(
@@ -31,17 +27,17 @@ function processedMsgNotDelivered(deliveredList) {
             transactionHash: deliveredMsg.transactionHash
           })
         )
-        return messagesEquals(msg, processedMsg.returnValues)
+        return messageEqualsEvent(msg, processedMsg.returnValues)
       }).length === 0
     )
   }
 }
 
-function messagesEquals(a, b) {
+function messageEqualsEvent(parsedMsg, event) {
   return (
-    web3Utils.toChecksumAddress(a.sender) === b.sender &&
-    web3Utils.toChecksumAddress(a.executor) === b.executor &&
-    a.txHash === b.txHash
+    web3Utils.toChecksumAddress(parsedMsg.sender) === event.sender &&
+    web3Utils.toChecksumAddress(parsedMsg.executor) === event.executor &&
+    parsedMsg.txHash === event.transactionHash
   )
 }
 
