@@ -1,14 +1,12 @@
 ---
 - name: Parse cron schedule
   set_fact:
-    minute: "{{ MONITOR_CRON_SCHEDULE.split(' ')[0] }}"
-    hour: "{{ MONITOR_CRON_SCHEDULE.split(' ')[1] }}"
-    day: "{{ MONITOR_CRON_SCHEDULE.split(' ')[2] }}"
-    month: "{{ MONITOR_CRON_SCHEDULE.split(' ')[3] }}"
-    weekday: "{{ MONITOR_CRON_SCHEDULE.split(' ')[4] }}"
+    minute: "{{ monitor_cron_schedule.split(' ')[0] }}"
+    hour: "{{ monitor_cron_schedule.split(' ')[1] }}"
+    day: "{{ monitor_cron_schedule.split(' ')[2] }}"
+    month: "{{ monitor_cron_schedule.split(' ')[3] }}"
+    weekday: "{{ monitor_cron_schedule.split(' ')[4] }}"
     job: "/bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./checkDocker.sh >cronWorker.out 2>cronWorker.err'"
-  ignore_errors: True
-  register: set_fact_result
 - name: Add cron entry
   cron:
     name: "RUN_MONITOR_CHECKS"
@@ -18,4 +16,3 @@
     month: "{{ month }}"
     weekday: "{{ weekday }}"
     job: "{{ job }}"
-  when: not set_fact_result.failed
