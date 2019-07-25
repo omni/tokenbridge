@@ -96,7 +96,8 @@ async function main(mode) {
     foreignDeposits,
     homeWithdrawals,
     foreignWithdrawals,
-    isExternalErc20
+    isExternalErc20,
+    bridgeMode
   }
 }
 
