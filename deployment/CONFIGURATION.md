@@ -46,6 +46,7 @@ cp hosts.yml.example hosts.yml
       hosts:
         <host_ip_B>:
           ansible_user: <user>
+          #syslog_server_port: "<protocol>://<ip>:<port>"
           #monitor_cron_schedule: "*/4 * * * *" # When this parameter is set, it will overwrite default schedule for performing checks
 ```
 
