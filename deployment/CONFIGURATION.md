@@ -47,6 +47,7 @@ cp hosts.yml.example hosts.yml
         <host_ip_B>:
           ansible_user: <user>
           #syslog_server_port: "<protocol>://<ip>:<port>"
+          #monitor_cron_schedule: "*/4 * * * *" # When this parameter is set, it will overwrite default schedule for performing checks
 ```
 
 The config above would install the Oracle on `<host_ip_A>`, UI on `<host_ip_C>`, and both Oracle, UI and Monitor on `<host_ip_B>`.
