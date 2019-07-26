@@ -4,14 +4,10 @@ set -e # exit when any command fails
 
 ./down.sh
 docker-compose build
+docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
-export DOCKER_LOCALHOST="localhost"
 
 while [ "$1" != "" ]; do
-  if [ "$1" == "macos" ]; then
-    export DOCKER_LOCALHOST="host.docker.internal"
-  fi
-
   if [ "$1" == "oracle" ]; then
     docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native
 
