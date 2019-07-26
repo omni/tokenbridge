@@ -1,0 +1,11 @@
+$FileCreateMode 0644
+template(name="DockerLogFileName_Monitor" type="list") {
+   constant(value="/var/log/docker/")
+   property(name="syslogtag" securepath="replace" regex.type="ERE" regex.submatch="1" regex.expression="monitor_(.*)\\/[a-zA-Z0-9]+\\[")
+   constant(value="/docker.log")
+}
+
+if $programname startswith 'monitor_' then \
+  ?DockerLogFileName_Monitor
+
+$FileCreateMode 0600

@@ -158,6 +158,6 @@ const foreignViAbi = [
 ]
 
 module.exports = {
-  homeV1Abi,
-  foreignViAbi
+  HOME_V1_ABI: homeV1Abi,
+  FOREIGN_V1_ABI: foreignViAbi
 }

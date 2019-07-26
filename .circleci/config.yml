@@ -134,11 +134,32 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
+      - run:
+          name: Install redis tools
+          command: sudo apt-get install -y redis-tools
       - run: git submodule update --init
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy native-to-erc
-      - run: 'echo "TODO - Run the e2e tests on top of the infrastructure created by previous step"'
+          no_output_timeout: 30m
+      - run:
+          name: Wait for the Oracle to start
+          command: |
+            set +e
+            i=0
+            while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]]; do
+              ((i++))
+              if [ "$i" -gt 30 ]
+              then
+                exit -1
+              fi
+
+              echo "Sleeping..."
+              sleep 3
+            done
+      - run:
+          name: Run the oracle-e2e tests
+          command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
 workflows:
   version: 2
   tokenbridge:
