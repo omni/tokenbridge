@@ -6,3 +6,7 @@
     force: no
     update: no
     version: "{{ bridge_repo_branch }}"
+- name: Initialize submodules
+  shell: git submodule update --init
+  args:
+    chdir: "{{ bridge_path }}"
