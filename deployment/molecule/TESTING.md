@@ -30,3 +30,7 @@ Scenario | Description
 --- | ---
 oracle | Deploys and checks standalone Oracle on Ubuntu host
 ui | Deploys and checks standalone UI on Ubuntu host
+
+## Ultimate E2E tests
+
+For information on the Ultimate tests, please refer to [Ultimate](../../e2e-commons/ULTIMATE.md).
