@@ -9,7 +9,9 @@ import {
   FEE_MANAGER_MODE,
   getUnit,
   decodeFeeManagerMode,
-  getBridgeABIs
+  getBridgeABIs,
+  HOME_V1_ABI,
+  ERC20_BYTES32_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -40,10 +42,8 @@ import {
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
 import BN from 'bignumber.js'
-import ERC20Bytes32Abi from './utils/ERC20Bytes32.abi'
 import { processLargeArrayAsync } from './utils/array'
 import { getRewardableData } from './utils/rewardable'
-import HomeBridgeV1Abi from './utils/HomeBridgeV1.abi'
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
@@ -199,7 +199,10 @@ class HomeStore {
       )
       this.symbol = await getSymbol(this.tokenContract)
       this.tokenName = await getName(this.tokenContract)
-      const alternativeContract = new this.homeWeb3.eth.Contract(ERC20Bytes32Abi, this.tokenAddress)
+      const alternativeContract = new this.homeWeb3.eth.Contract(
+        ERC20_BYTES32_ABI,
+        this.tokenAddress
+      )
       try {
         this.symbol = await getSymbol(this.tokenContract)
       } catch (e) {
@@ -447,7 +450,7 @@ class HomeStore {
     try {
       const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
       const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
-      const abi = [...HomeBridgeV1Abi, ...HOME_ABI]
+      const abi = [...HOME_V1_ABI, ...HOME_ABI]
       const contract = new this.homeWeb3.eth.Contract(abi, this.HOME_BRIDGE_ADDRESS)
       const events = await getPastEvents(contract, deployedAtBlock, 'latest')
       processLargeArrayAsync(events, this.processEvent, () => {
