@@ -8,6 +8,7 @@ import {
   getUnit,
   decodeFeeManagerMode,
   getBridgeABIs,
+  getTokenType,
   ERC20_BYTES32_ABI
 } from '../../../commons'
 import {
@@ -28,7 +29,6 @@ import {
   ZERO_ADDRESS,
   getDeployedAtBlock,
   getValidatorList,
-  getTokenType,
   getValidatorContract,
   getRequiredSignatures,
   getValidatorCount
