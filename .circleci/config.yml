@@ -219,7 +219,7 @@ jobs:
           command: |
             nvm use default;
             node ./e2e-commons/scripts/blocks.js &
-            ui-e2e; npx mocha -g "NATIVE TO ERC" -b ./test.js
+            cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
 workflows:
   version: 2
   tokenbridge:
