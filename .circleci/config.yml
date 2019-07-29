@@ -83,7 +83,7 @@ jobs:
       - run: nvm install 11.4.0 && nvm alias default 11.4.0
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-      - run: sleep 5; sudo apt-get update && sudo apt-get install yarn
+      - run: sleep 5; sudo apt-get update; sleep 10; sudo apt-get install yarn
       - run: wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
       - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
       - run: git submodule update --init
