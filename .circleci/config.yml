@@ -166,10 +166,10 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
+      - run: git submodule update --init
       - run:
           name: Install redis tools
           command: sudo apt-get install -y redis-tools
-      - run: git submodule update --init
       - run:
           name: Install node
           command: |      
@@ -178,8 +178,7 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm install v10.15.3
             nvm alias default v10.15.3
-            
-            # Each step uses the same `$BASH_ENV`, so need to modify it
+
             echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
             echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
       - run:
@@ -217,30 +216,30 @@ workflows:
   version: 2
   tokenbridge:
     jobs:
-      # - initialize
-      # - initialize-root:
-      #     filters:
-      #       branches:
-      #         only: master
-      # - build:
-      #     requires:
-      #       - initialize
-      # - lint:
-      #     requires:
-      #       - initialize
-      # - test:
-      #     requires:
-      #       - initialize
-      # - cover:
-      #     requires:
-      #       - initialize
-      #     filters:
-      #       branches:
-      #         only: master
-      # - oracle-e2e
-      # - ui-e2e
-      # - monitor-e2e
-      # - deployment-oracle
-      # - deployment-ui
-      # - ultimate-native-to-erc-oracle
+      - initialize
+      - initialize-root:
+          filters:
+            branches:
+              only: master
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
+      - cover:
+          requires:
+            - initialize
+          filters:
+            branches:
+              only: master
+      - oracle-e2e
+      - ui-e2e
+      - monitor-e2e
+      - deployment-oracle
+      - deployment-ui
+      - ultimate-native-to-erc-oracle
       - ultimate-native-to-erc-ui
