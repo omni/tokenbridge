@@ -196,7 +196,7 @@ jobs:
       - run:
           name: Run the ui-e2e tests
           command: |
-            cd ui-e2e; npm install
+            cd ui-e2e; npx mocha -g "NATIVE TO ERC" -b ./test.js
 workflows:
   version: 2
   tokenbridge:
