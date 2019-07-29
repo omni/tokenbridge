@@ -37,7 +37,7 @@ FOREIGN_GAS_PRICE_FACTOR: 1
 ## UI
 UI_TITLE: "TokenBridge UI app - %c"
 UI_DESCRIPTION: "The POA cross-chain bridge serves as a method of transferring POA native tokens from the POA Network to the Ethereum network in a quick and cost-efficient manner."
-UI_PORT: 3001
+UI_PORT: 3000
 UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/sokol/tx/%s
 UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/kovan/tx/%s
 UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/sokol/address/%s
@@ -46,7 +46,7 @@ UI_HOME_GAS_PRICE_FALLBACK: 1000000000
 UI_FOREIGN_GAS_PRICE_FALLBACK: 1000000000
 
 ## Monitor
-MONITOR_PORT: 3000
+MONITOR_PORT: 3003
 MONITOR_HOME_DEPLOYMENT_BLOCK: 0
 MONITOR_FOREIGN_DEPLOYMENT_BLOCK: 0
 MONITOR_HOME_GAS_LIMIT: 300000
