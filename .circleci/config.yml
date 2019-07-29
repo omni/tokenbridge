@@ -183,17 +183,8 @@ jobs:
             echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
             echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
       - run:
-          name: check version
-          command: |
-            nvm --version
-            node --version
-            nvm use default
-            node --version
-            exit -1
-      - run:
           name: Install npm packages in ui-e2e
-          command: |
-            cd ui-e2e; npm install
+          command: nvm use default; cd ui-e2e; npm install
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy native-to-erc
@@ -216,7 +207,7 @@ jobs:
       - run:
           name: Run the ui-e2e tests
           command: |
-            cd ui-e2e; npx mocha -g "NATIVE TO ERC" -b ./test.js
+            nvm use default; cd ui-e2e; npx mocha -g "NATIVE TO ERC" -b ./test.js
 workflows:
   version: 2
   tokenbridge:
