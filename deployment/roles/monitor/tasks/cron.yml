@@ -1,0 +1,18 @@
+---
+- name: Parse cron schedule
+  set_fact:
+    minute: "{{ monitor_cron_schedule.split(' ')[0] }}"
+    hour: "{{ monitor_cron_schedule.split(' ')[1] }}"
+    day: "{{ monitor_cron_schedule.split(' ')[2] }}"
+    month: "{{ monitor_cron_schedule.split(' ')[3] }}"
+    weekday: "{{ monitor_cron_schedule.split(' ')[4] }}"
+    job: "/bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./checkDocker.sh >cronWorker.out 2>cronWorker.err'"
+- name: Add cron entry
+  cron:
+    name: "RUN_MONITOR_CHECKS"
+    minute: "{{ minute }}"
+    hour: "{{ hour }}"
+    day: "{{ day }}"
+    month: "{{ month }}"
+    weekday: "{{ weekday }}"
+    job: "{{ job }}"

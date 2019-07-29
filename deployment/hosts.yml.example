@@ -17,3 +17,4 @@ sokol-kovan:
         127.0.0.1:
           ansible_user: ubuntu
           #syslog_server_port: "<protocol>://<ip>:<port>"
+          #monitor_cron_schedule: "*/4 * * * *"

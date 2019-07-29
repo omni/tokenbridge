@@ -1,4 +1,4 @@
-const { BRIDGE_MODES, FEE_MANAGER_MODE } = require('./constants')
+const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
@@ -33,6 +33,19 @@ async function getBridgeMode(contract) {
   }
 }
 
+const getTokenType = async (bridgeTokenContract, bridgeAddress) => {
+  try {
+    const resultBridgeAddress = await bridgeTokenContract.methods.bridgeContract().call()
+    if (resultBridgeAddress === bridgeAddress) {
+      return ERC_TYPES.ERC677
+    } else {
+      return ERC_TYPES.ERC20
+    }
+  } catch (e) {
+    return ERC_TYPES.ERC20
+  }
+}
+
 const getUnit = bridgeMode => {
   let unitHome = null
   let unitForeign = null
@@ -56,5 +69,6 @@ module.exports = {
   decodeBridgeMode,
   decodeFeeManagerMode,
   getBridgeMode,
+  getTokenType,
   getUnit
 }

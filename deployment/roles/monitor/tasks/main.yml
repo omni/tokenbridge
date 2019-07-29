@@ -3,3 +3,4 @@
 - include_tasks: logging.yml
 - include_tasks: jumpbox.yml
 - include_tasks: servinstall.yml
+- include_tasks: cron.yml
