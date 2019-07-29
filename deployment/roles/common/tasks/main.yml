@@ -1,4 +1,4 @@
 ---
 - include_tasks: dependencies.yml
 - include_tasks: repo.yml
-# - include_tasks: logging.yml
+- include_tasks: logging.yml
