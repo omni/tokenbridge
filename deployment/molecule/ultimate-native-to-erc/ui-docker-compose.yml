@@ -20,7 +20,7 @@
 
   - name: Add all UI containers to the network
     set_fact:
-      docker_compose_parsed: "{{ docker_compose_parsed | combine({'services': {item: {'networks': docker_compose_parsed.services[item].networks | union(['ultimate'])}}}, recursive=True) }}"
+      docker_compose_parsed: "{{ docker_compose_parsed | combine({'services': {item: {'networks': ['ultimate']}}}, recursive=True) }}"
     with_items: "{{ docker_compose_parsed.services }}"
   
   - name: Write new docker-compose file
