@@ -128,7 +128,7 @@ jobs:
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh ui
-  ultimate-native-to-erc:
+  ultimate-native-to-erc-oracle:
     machine:
       image: circleci/classic:latest
       docker_layer_caching: true
@@ -160,33 +160,71 @@ jobs:
       - run:
           name: Run the oracle-e2e tests
           command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
+  ultimate-native-to-erc-ui:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run:
+          name: Install redis tools
+          command: sudo apt-get install -y redis-tools
+      - run: git submodule update --init
+      - run:
+          name: Install npm packages in ui-e2e
+          command: |
+            cd ui-e2e; npm install
+      - run:
+          name: Prepare the infrastructure
+          command: e2e-commons/up.sh deploy native-to-erc
+          no_output_timeout: 30m
+      - run:
+          name: Wait for the Oracle to start
+          command: |
+            set +e
+            i=0
+            while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]]; do
+              ((i++))
+              if [ "$i" -gt 30 ]
+              then
+                exit -1
+              fi
+
+              echo "Sleeping..."
+              sleep 3
+            done
+      - run:
+          name: Run the ui-e2e tests
+          command: |
+            cd ui-e2e; npm install
 workflows:
   version: 2
   tokenbridge:
     jobs:
-      - initialize
-      - initialize-root:
-          filters:
-            branches:
-              only: master
-      - build:
-          requires:
-            - initialize
-      - lint:
-          requires:
-            - initialize
-      - test:
-          requires:
-            - initialize
-      - cover:
-          requires:
-            - initialize
-          filters:
-            branches:
-              only: master
-      - oracle-e2e
-      - ui-e2e
-      - monitor-e2e
-      - deployment-oracle
-      - deployment-ui
-      - ultimate-native-to-erc
+      # - initialize
+      # - initialize-root:
+      #     filters:
+      #       branches:
+      #         only: master
+      # - build:
+      #     requires:
+      #       - initialize
+      # - lint:
+      #     requires:
+      #       - initialize
+      # - test:
+      #     requires:
+      #       - initialize
+      # - cover:
+      #     requires:
+      #       - initialize
+      #     filters:
+      #       branches:
+      #         only: master
+      # - oracle-e2e
+      # - ui-e2e
+      # - monitor-e2e
+      # - deployment-oracle
+      # - deployment-ui
+      # - ultimate-native-to-erc-oracle
+      - ultimate-native-to-erc-ui
