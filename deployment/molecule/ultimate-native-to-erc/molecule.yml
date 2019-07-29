@@ -49,6 +49,7 @@ provisioner:
         FOREIGN_RPC_URL: "http://localhost:8542"
         ALLOW_HTTP: yes
         LOG_LEVEL: debug
+        UI_PORT: 3000
 verifier:
   name: testinfra
   lint:
