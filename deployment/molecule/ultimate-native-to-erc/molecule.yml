@@ -4,7 +4,7 @@ driver:
 platforms:
   - name: oracle-native-to-erc-host
     groups:
-      - example
+      - native-to-erc
     children:
       - oracle
     image: ubuntu:16.04
@@ -14,7 +14,7 @@ platforms:
       - /var/run/docker.sock:/var/run/docker.sock
   - name: ui-native-to-erc-host
     groups:
-      - example
+      - native-to-erc
     children:
       - ui
     image: ubuntu:16.04
@@ -28,24 +28,17 @@ provisioner:
     prepare: ../prepare.yml
     converge: converge.yml
   inventory:
-    group_vars:
-      example:
-        bridge_repo_branch: $CODEBASE_BRANCH
-        HOME_BRIDGE_ADDRESS: "0x32198D570fffC7033641F8A9094FFDCaAEF42624"
-        FOREIGN_BRIDGE_ADDRESS: "0x2B6871b9B02F73fa24F4864322CdC78604207769"
-        ERC20_TOKEN_ADDRESS: "0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B"
-        ALLOW_HTTP: yes
-        LOG_LEVEL: debug
     host_vars:
       oracle-native-to-erc-host:
+        bridge_repo_branch: $CODEBASE_BRANCH
         HOME_RPC_URL: "http://parity1:8545"
         FOREIGN_RPC_URL: "http://parity2:8545"
         VALIDATOR_ADDRESS: "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b"
         VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
       ui-native-to-erc-host:
+        bridge_repo_branch: $CODEBASE_BRANCH
         HOME_RPC_URL: "http://localhost:8541"
         FOREIGN_RPC_URL: "http://localhost:8542"
-        UI_PORT: 3000
 verifier:
   name: testinfra
   lint:
