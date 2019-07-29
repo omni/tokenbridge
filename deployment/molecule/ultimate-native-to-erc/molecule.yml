@@ -36,12 +36,13 @@ provisioner:
         ERC20_TOKEN_ADDRESS: "0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B"
         ALLOW_HTTP: yes
         LOG_LEVEL: debug
-      oracle:
+    host_vars:
+      oracle-native-to-erc-host:
         HOME_RPC_URL: "http://parity1:8545"
         FOREIGN_RPC_URL: "http://parity2:8545"
         VALIDATOR_ADDRESS: "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b"
         VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
-      ui:
+      ui-native-to-erc-host:
         HOME_RPC_URL: "http://localhost:8541"
         FOREIGN_RPC_URL: "http://localhost:8542"
         UI_PORT: 3000
