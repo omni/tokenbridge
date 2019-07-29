@@ -192,7 +192,7 @@ jobs:
           command: nvm use default; cd ui-e2e; npm install
       - run:
           name: Prepare the infrastructure
-          command: e2e-commons/up.sh deploy native-to-erc
+          command: e2e-commons/up.sh deploy blocks native-to-erc
           no_output_timeout: 30m
       - run:
           name: Wait for the Oracle to start
