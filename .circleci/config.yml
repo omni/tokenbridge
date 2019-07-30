@@ -220,34 +220,98 @@ jobs:
             nvm use default;
             node ./e2e-commons/scripts/blocks.js &
             cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
+  ultimate-native-to-erc-oracle-ui:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - run:
+          name: Install redis tools
+          command: sudo apt-get install -y redis-tools
+      - run:
+          name: Install node
+          command: |      
+            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v10.15.3
+            nvm alias default v10.15.3
+
+            echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+            echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
+      - run:
+          name: Install Chrome
+          command: |
+            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo dpkg -i google-chrome-stable_current_amd64.deb
+      - run:
+          name: Install yarn
+          command: |
+            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+            sudo apt-get update && sudo apt-get install yarn
+      - run:
+          name: Install npm packages
+          command: nvm use default; yarn install --frozen-lockfile
+      - run:
+          name: Prepare the infrastructure
+          command: e2e-commons/up.sh deploy native-to-erc
+          no_output_timeout: 30m
+      - run:
+          name: Wait for the Oracle to start
+          command: |
+            set +e
+            i=0
+            while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]]; do
+              ((i++))
+              if [ "$i" -gt 30 ]
+              then
+                exit -1
+              fi
+
+              echo "Sleeping..."
+              sleep 3
+            done
+      - run:
+          name: Run the oracle-e2e tests
+          command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
+      - run:
+          name: Run the ui-e2e tests
+          command: |
+            nvm use default;
+            node ./e2e-commons/scripts/blocks.js &
+            cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
 workflows:
   version: 2
   tokenbridge:
     jobs:
-      - initialize
-      - initialize-root:
-          filters:
-            branches:
-              only: master
-      - build:
-          requires:
-            - initialize
-      - lint:
-          requires:
-            - initialize
-      - test:
-          requires:
-            - initialize
-      - cover:
-          requires:
-            - initialize
-          filters:
-            branches:
-              only: master
-      - oracle-e2e
-      - ui-e2e
-      - monitor-e2e
-      - deployment-oracle
-      - deployment-ui
-      - ultimate-native-to-erc-oracle
-      - ultimate-native-to-erc-ui
+      # - initialize
+      # - initialize-root:
+      #     filters:
+      #       branches:
+      #         only: master
+      # - build:
+      #     requires:
+      #       - initialize
+      # - lint:
+      #     requires:
+      #       - initialize
+      # - test:
+      #     requires:
+      #       - initialize
+      # - cover:
+      #     requires:
+      #       - initialize
+      #     filters:
+      #       branches:
+      #         only: master
+      # - oracle-e2e
+      # - ui-e2e
+      # - monitor-e2e
+      # - deployment-oracle
+      # - deployment-ui
+      # - ultimate-native-to-erc-oracle
+      # - ultimate-native-to-erc-ui
+      - ultimate-native-to-erc-oracle-ui
