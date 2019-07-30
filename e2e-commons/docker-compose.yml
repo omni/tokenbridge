@@ -241,7 +241,7 @@ services:
     - PORT=3010
     entrypoint: yarn check-and-start
     ports:
-    - "3010:3010"
+      - "3010:3010"
     networks:
       - ultimate
   monitor-erc20:
@@ -269,7 +269,9 @@ services:
     - PORT=3011
     entrypoint: yarn check-and-start
     ports:
-    - "3011:3011"
+      - "3011:3011"
+    networks:
+      - ultimate
   monitor-erc20-native:
     build:
       context: ..
@@ -295,7 +297,7 @@ services:
     - PORT=3012
     entrypoint: yarn check-and-start
     ports:
-    - "3012:3012"
+      - "3012:3012"
     networks:
       - ultimate
   e2e:
