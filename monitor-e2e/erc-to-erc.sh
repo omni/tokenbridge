@@ -2,8 +2,8 @@
 cd $(dirname $0)
 set -e # exit when any command fails
 
-echo "MONITOR E2E - NATIVE TO ERC"
-local URL=localhost:3010
+echo "MONITOR E2E - ERC TO ERC"
+local URL=localhost:3011
 
 echo "Test case - Web Interface should return balances"
 OUTPUT=$(curl -s http://$URL/)

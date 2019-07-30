@@ -29,14 +29,12 @@ check_files_exist() {
 
 ##### Test cases #####
 
-echo "Test case - CheckWorker scripts should work and create files in responses/ directory"
-(! check_files_exist)
-docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "node checkWorker.js"
-docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "node checkWorker2.js"
-check_files_exist
-
-
 source ./native-to-erc.sh
+
+source ./erc-to-erc.sh
+
+source ./erc-to-native.sh
+
 
 ##### Cleanup #####
 
