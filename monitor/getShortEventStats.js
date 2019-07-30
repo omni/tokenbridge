@@ -16,8 +16,8 @@ async function main(bridgeMode) {
         processed: homeWithdrawals.length
       },
       foreign: {
-        delivered: foreignDeposits.length,
-        processed: foreignWithdrawals.length
+        delivered: foreignWithdrawals.length,
+        processed: foreignDeposits.length
       }
     }
   } else {
