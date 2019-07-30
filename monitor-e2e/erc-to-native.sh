@@ -1,7 +1,3 @@
-#!/usr/bin/env bash
-cd $(dirname $0)
-set -e # exit when any command fails
-
 echo "MONITOR E2E - ERC TO NATIVE"
 export URL=localhost:3012
 
