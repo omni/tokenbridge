@@ -249,5 +249,5 @@ workflows:
       - monitor-e2e
       - deployment-oracle
       - deployment-ui
-      # - ultimate-native-to-erc-oracle
-      # - ultimate-native-to-erc-ui
+      - ultimate-native-to-erc-oracle
+      - ultimate-native-to-erc-ui
