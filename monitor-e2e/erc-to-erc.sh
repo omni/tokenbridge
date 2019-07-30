@@ -1,3 +1,5 @@
+set -e # exit when any command fails
+
 echo "MONITOR E2E - ERC TO ERC"
 export URL=localhost:3011
 

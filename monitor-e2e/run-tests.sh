@@ -39,11 +39,11 @@ check_files_exist
 
 ##### Test cases #####
 
-source ./native-to-erc.sh
+./native-to-erc.sh
 
-source ./erc-to-erc.sh
+./erc-to-erc.sh
 
-source ./erc-to-native.sh
+./erc-to-native.sh
 
 
 ##### Cleanup #####
