@@ -24,7 +24,7 @@ check_files_exist() {
 
 ##### Initialization #####
 
-../e2e-commons/up.sh oracle deploy monitor
+../e2e-commons/up.sh deploy oracle monitor
 
 
 ##### Test cases #####
