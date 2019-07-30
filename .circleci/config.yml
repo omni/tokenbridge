@@ -83,7 +83,7 @@ jobs:
       - run: nvm install 11.4.0 && nvm alias default 11.4.0
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-      - run: sudo apt-get update; sudo apt-get install yarn
+      - run: sudo apt-get update && sudo apt-get install yarn
       - run: wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
       - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
       - run: git submodule update --init
@@ -191,7 +191,7 @@ jobs:
           command: |
             curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
             echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-            sudo apt-get update; sudo apt-get install yarn
+            sudo apt-get update && sudo apt-get install yarn
       - run:
           name: Install npm packages
           command: nvm use default; yarn install --frozen-lockfile
@@ -224,30 +224,30 @@ workflows:
   version: 2
   tokenbridge:
     jobs:
-      # - initialize
-      # - initialize-root:
-      #     filters:
-      #       branches:
-      #         only: master
-      # - build:
-      #     requires:
-      #       - initialize
-      # - lint:
-      #     requires:
-      #       - initialize
-      # - test:
-      #     requires:
-      #       - initialize
-      # - cover:
-      #     requires:
-      #       - initialize
-      #     filters:
-      #       branches:
-      #         only: master
-      # - oracle-e2e
+      - initialize
+      - initialize-root:
+          filters:
+            branches:
+              only: master
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
+      - cover:
+          requires:
+            - initialize
+          filters:
+            branches:
+              only: master
+      - oracle-e2e
       - ui-e2e
-      # - monitor-e2e
-      # - deployment-oracle
-      # - deployment-ui
-      # - ultimate-native-to-erc-oracle
+      - monitor-e2e
+      - deployment-oracle
+      - deployment-ui
+      - ultimate-native-to-erc-oracle
       - ultimate-native-to-erc-ui
