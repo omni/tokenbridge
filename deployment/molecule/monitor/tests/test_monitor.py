@@ -14,7 +14,6 @@ def test_docker_containers(host, name):
     assert container.is_running
 
 
-
 @pytest.mark.parametrize("service", [
     ("tokenbridge-monitor"),
     ("rsyslog")
