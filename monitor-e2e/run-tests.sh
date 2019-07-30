@@ -29,7 +29,7 @@ check_files_exist() {
 ../e2e-commons/up.sh deploy oracle monitor
 
 
-# Initial checks
+##### Initial checks #####
 
 docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "yarn check-all"
 docker-compose -f ../e2e-commons/docker-compose.yml exec monitor-erc20 /bin/bash -c "yarn check-all"
