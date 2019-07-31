@@ -84,8 +84,8 @@ jobs:
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - run: sudo apt-get update && sudo apt-get install yarn
-      - run: wget https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
-      - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
+      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i chrome.deb
       - run: git submodule update --init
       - restore_cache:
            name: Restore Machine Yarn Package Cache
