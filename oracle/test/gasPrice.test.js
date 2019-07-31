@@ -2,11 +2,8 @@ const sinon = require('sinon')
 const { expect } = require('chai')
 const proxyquire = require('proxyquire').noPreserveCache()
 const Web3Utils = require('web3-utils')
-const {
-  fetchGasPrice,
-  gasPriceWithinLimits,
-  normalizeGasPrice
-} = require('../src/services/gasPrice')
+const { fetchGasPrice, normalizeGasPrice } = require('../src/services/gasPrice')
+const { gasPriceWithinLimits } = require('../../commons')
 const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../src/utils/constants')
 
 describe('gasPrice', () => {

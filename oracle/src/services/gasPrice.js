@@ -111,6 +111,5 @@ module.exports = {
   start,
   fetchGasPrice,
   getPrice,
-  gasPriceWithinLimits,
   normalizeGasPrice
 }

@@ -1,4 +1,4 @@
-import { normalizeGasPrice } from '../gas'
+import { normalizeGasPrice } from '../../../../../commons'
 
 describe('normalizeGasPrice', () => {
   it('should work with oracle gas price in gwei', () => {
@@ -7,7 +7,7 @@ describe('normalizeGasPrice', () => {
     const factor = 1
 
     // When
-    const result = normalizeGasPrice(oracleGasPrice, factor)
+    const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
     // Then
     expect(result).toEqual('30000000000')
@@ -18,7 +18,7 @@ describe('normalizeGasPrice', () => {
     const factor = 0.1
 
     // When
-    const result = normalizeGasPrice(oracleGasPrice, factor)
+    const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
     // Then
     expect(result).toEqual('30000000000')
@@ -29,7 +29,7 @@ describe('normalizeGasPrice', () => {
     const factor = 1.5
 
     // When
-    const result = normalizeGasPrice(oracleGasPrice, factor)
+    const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
     // Then
     expect(result).toEqual('30000000000')
