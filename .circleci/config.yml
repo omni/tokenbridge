@@ -188,9 +188,6 @@ jobs:
             nvm use default;
             node ./e2e-commons/scripts/blocks.js &
             cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
-      - run:
-          name: Run the oracle-e2e tests
-          command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
 workflows:
   version: 2
   tokenbridge:
