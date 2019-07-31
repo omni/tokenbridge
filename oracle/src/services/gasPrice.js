@@ -9,7 +9,8 @@ const { setIntervalAndRun } = require('../utils/utils')
 const {
   DEFAULT_UPDATE_INTERVAL,
   GAS_PRICE_BOUNDARIES,
-  DEFAULT_GAS_PRICE_FACTOR
+  DEFAULT_GAS_PRICE_FACTOR,
+  gasPriceFromOracle
 } = require('../utils/constants')
 const { normalizeGasPrice } = require('../../../commons')
 
@@ -37,15 +38,12 @@ const foreignBridge = new web3Foreign.eth.Contract(ForeignABI, FOREIGN_BRIDGE_AD
 
 let cachedGasPrice = null
 
-async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
-  const response = await fetch(oracleUrl)
-  const json = await response.json()
-  const oracleGasPrice = json[speedType]
-  if (!oracleGasPrice) {
-    throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
+const fetchGasPriceFromOracle = async (oracleUrl, speedType, factor) => {
+  if (!oracleUrl) {
+    throw new Error(`Gas Price Oracle url not defined`)
   }
-
-  return normalizeGasPrice(oracleGasPrice, factor, GAS_PRICE_BOUNDARIES)
+  const fetchFn = () => fetch(oracleUrl)
+  return gasPriceFromOracle(fetchFn, speedType, factor, GAS_PRICE_BOUNDARIES)
 }
 
 async function fetchGasPrice({ bridgeContract, oracleFn }) {

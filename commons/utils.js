@@ -1,4 +1,4 @@
-const { toWei } = require('web3-utils')
+const { toWei, toBN } = require('web3-utils')
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
 
 function decodeBridgeMode(bridgeModeHash) {
@@ -75,7 +75,18 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
     gasPrice = limits.MAX
   }
 
-  return toWei(gasPrice.toFixed(2).toString(), 'gwei')
+  return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
+}
+
+const gasPriceFromOracle = async (fetchFn, speedType, factor, limits = null) => {
+  const response = await fetchFn()
+  const json = await response.json()
+  const oracleGasPrice = json[speedType]
+  if (!oracleGasPrice) {
+    throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
+  }
+
+  return normalizeGasPrice(oracleGasPrice, factor, limits)
 }
 
 module.exports = {
@@ -84,5 +95,6 @@ module.exports = {
   getBridgeMode,
   getTokenType,
   getUnit,
-  normalizeGasPrice
+  normalizeGasPrice,
+  gasPriceFromOracle
 }
