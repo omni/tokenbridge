@@ -1,6 +1,5 @@
 require('../../env')
 const fetch = require('node-fetch')
-const Web3Utils = require('web3-utils')
 const { web3Home, web3Foreign } = require('../services/web3')
 const { bridgeConfig } = require('../../config/base.config')
 const logger = require('../services/logger').child({
@@ -12,7 +11,7 @@ const {
   GAS_PRICE_BOUNDARIES,
   DEFAULT_GAS_PRICE_FACTOR
 } = require('../utils/constants')
-const { normalizeGasPriceWithinLimits } = require('../../../commons')
+const { normalizeGasPrice } = require('../../../commons')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
@@ -46,7 +45,7 @@ async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
     throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
   }
 
-  return normalizeGasPriceWithinLimits(oracleGasPrice, factor, GAS_PRICE_BOUNDARIES)
+  return normalizeGasPrice(oracleGasPrice, factor, GAS_PRICE_BOUNDARIES)
 }
 
 async function fetchGasPrice({ bridgeContract, oracleFn }) {
