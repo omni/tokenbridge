@@ -84,8 +84,8 @@ jobs:
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - run: sudo apt-get update && sudo apt-get install yarn
-      - run: wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-      - run: sudo dpkg -i google-chrome-stable_current_amd64.deb
+      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i chrome.deb
       - run: git submodule update --init
       - restore_cache:
            name: Restore Machine Yarn Package Cache
@@ -128,39 +128,7 @@ jobs:
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh ui
-  ultimate-native-to-erc-oracle:
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - run:
-          name: Install redis tools
-          command: sudo apt-get install -y redis-tools
-      - run: git submodule update --init
-      - run:
-          name: Prepare the infrastructure
-          command: e2e-commons/up.sh deploy native-to-erc
-          no_output_timeout: 30m
-      - run:
-          name: Wait for the Oracle to start
-          command: |
-            set +e
-            i=0
-            while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]]; do
-              ((i++))
-              if [ "$i" -gt 30 ]
-              then
-                exit -1
-              fi
-
-              echo "Sleeping..."
-              sleep 3
-            done
-      - run:
-          name: Run the oracle-e2e tests
-          command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
-  ultimate-native-to-erc-ui:
+  ultimate-native-to-erc:
     machine:
       image: circleci/classic:latest
       docker_layer_caching: true
@@ -184,8 +152,8 @@ jobs:
       - run:
           name: Install Chrome
           command: |
-            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-            sudo dpkg -i google-chrome-stable_current_amd64.deb
+            wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+            sudo dpkg -i chrome.deb
       - run:
           name: Install yarn
           command: |
@@ -220,6 +188,9 @@ jobs:
             nvm use default;
             node ./e2e-commons/scripts/blocks.js &
             cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
+      - run:
+          name: Run the oracle-e2e tests
+          command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
 workflows:
   version: 2
   tokenbridge:
@@ -249,5 +220,4 @@ workflows:
       - monitor-e2e
       - deployment-oracle
       - deployment-ui
-      - ultimate-native-to-erc-oracle
-      - ultimate-native-to-erc-ui
+      - ultimate-native-to-erc
