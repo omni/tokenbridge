@@ -185,7 +185,11 @@ workflows:
             branches:
               only: master
       - oracle-e2e
-      - ui-e2e
+      - ui-e2e:
+          filters:
+            branches:
+              ignore:
+                - master
       - monitor-e2e
       - deployment-oracle
       - deployment-ui
