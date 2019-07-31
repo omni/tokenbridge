@@ -185,7 +185,7 @@ describe('gasPrice', () => {
       const factor = 1
 
       // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
+      const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
       // Then
       expect(result).to.equal('20000000000')
@@ -196,7 +196,7 @@ describe('gasPrice', () => {
       const factor = 0.1
 
       // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
+      const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
       // Then
       expect(result).to.equal('20000000000')
@@ -207,7 +207,7 @@ describe('gasPrice', () => {
       const factor = 1.5
 
       // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
+      const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
       // Then
       expect(result).to.equal('30000000000')
@@ -219,7 +219,7 @@ describe('gasPrice', () => {
       const maxInWei = Web3Utils.toWei(GAS_PRICE_BOUNDARIES.MAX.toString(), 'gwei')
 
       // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
+      const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
       // Then
       expect(result).to.equal(maxInWei)
