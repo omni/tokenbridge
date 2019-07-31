@@ -1,3 +1,4 @@
+const { toWei } = require('web3-utils')
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
 
 function decodeBridgeMode(bridgeModeHash) {
@@ -65,10 +66,29 @@ const getUnit = bridgeMode => {
   return { unitHome, unitForeign }
 }
 
+const normalizeGasPrice = (oracleGasPrice, factor) => {
+  const gasPrice = oracleGasPrice * factor
+  return toWei(gasPrice.toFixed(2).toString(), 'gwei')
+}
+
+const normalizeGasPriceWithinLimits = (oracleGasPrice, factor, limits) => {
+  let gasPrice = oracleGasPrice * factor
+
+  if (gasPrice < limits.MIN) {
+    gasPrice = limits.MIN
+  } else if (gasPrice > limits.MAX) {
+    gasPrice = limits.MAX
+  }
+
+  return toWei(gasPrice.toFixed(2).toString(), 'gwei')
+}
+
 module.exports = {
   decodeBridgeMode,
   decodeFeeManagerMode,
   getBridgeMode,
   getTokenType,
-  getUnit
+  getUnit,
+  normalizeGasPrice,
+  normalizeGasPriceWithinLimits
 }

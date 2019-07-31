@@ -12,6 +12,7 @@ const {
   GAS_PRICE_BOUNDARIES,
   DEFAULT_GAS_PRICE_FACTOR
 } = require('../utils/constants')
+const { normalizeGasPriceWithinLimits } = require('../../../commons')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
@@ -37,22 +38,6 @@ const foreignBridge = new web3Foreign.eth.Contract(ForeignABI, FOREIGN_BRIDGE_AD
 
 let cachedGasPrice = null
 
-function gasPriceWithinLimits(gasPrice) {
-  if (gasPrice < GAS_PRICE_BOUNDARIES.MIN) {
-    return GAS_PRICE_BOUNDARIES.MIN
-  } else if (gasPrice > GAS_PRICE_BOUNDARIES.MAX) {
-    return GAS_PRICE_BOUNDARIES.MAX
-  } else {
-    return gasPrice
-  }
-}
-
-function normalizeGasPrice(oracleGasPrice, factor) {
-  const gasPriceGwei = oracleGasPrice * factor
-  const gasPrice = gasPriceWithinLimits(gasPriceGwei)
-  return Web3Utils.toWei(gasPrice.toFixed(2).toString(), 'gwei')
-}
-
 async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
   const response = await fetch(oracleUrl)
   const json = await response.json()
@@ -61,7 +46,7 @@ async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
     throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
   }
 
-  return normalizeGasPrice(oracleGasPrice, factor)
+  return normalizeGasPriceWithinLimits(oracleGasPrice, factor, GAS_PRICE_BOUNDARIES)
 }
 
 async function fetchGasPrice({ bridgeContract, oracleFn }) {

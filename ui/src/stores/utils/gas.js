@@ -1,4 +1,5 @@
 const { toWei } = require('web3-utils')
+const { normalizeGasPrice } = require('../../../../commons')
 
 export async function fetchGasPrice({ oracleFn }) {
   let gasPrice = null
@@ -23,9 +24,4 @@ export async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
     throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
   }
   return normalizeGasPrice(gasPrice, factor)
-}
-
-export function normalizeGasPrice(oracleGasPrice, factor) {
-  const gasPrice = oracleGasPrice * factor
-  return toWei(gasPrice.toFixed(2).toString(), 'gwei')
 }

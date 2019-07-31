@@ -2,7 +2,7 @@ require('dotenv').config()
 const Web3 = require('web3')
 const fetch = require('node-fetch')
 const logger = require('./logger')('validators')
-const { getBridgeABIs, BRIDGE_VALIDATORS_ABI } = require('../commons')
+const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, normalizeGasPrice } = require('../commons')
 const { getValidatorList } = require('./utils/validatorUtils')
 const { getBlockNumber } = require('./utils/contract')
 
@@ -60,11 +60,6 @@ async function fetchGasPrices(url, type, factor, fallback) {
     logger.error('Gas Price API is not available', e)
     return Web3Utils.toBN(fallback)
   }
-}
-
-function normalizeGasPrice(oracleGasPrice, factor) {
-  const gasPrice = oracleGasPrice * factor
-  return Web3Utils.toBN(Web3Utils.toWei(gasPrice.toFixed(2).toString(), 'gwei'))
 }
 
 async function main(bridgeMode) {
