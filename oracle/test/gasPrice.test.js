@@ -140,7 +140,7 @@ describe('gasPrice', () => {
       expect(utils.setIntervalAndRun.args[0][1]).to.equal(DEFAULT_UPDATE_INTERVAL)
     })
   })
-  describe('gasPriceWithinLimits', () => {
+  describe.skip('gasPriceWithinLimits', () => {
     it('should return gas price if gas price is between boundaries', () => {
       // given
       const minGasPrice = 1
