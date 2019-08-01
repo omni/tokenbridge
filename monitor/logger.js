@@ -3,12 +3,7 @@ module.exports = function logger(name) {
 
   function log(...args) {
     const now = new Date()
-    console.log(
-      now.toISOString(),
-      `(+${lastlog ? now.getTime() - lastlog : 0}ms)`,
-      `[${name}]`,
-      ...args
-    )
+    console.log(now.toISOString(), `(+${lastlog ? now.getTime() - lastlog : 0}ms)`, `[${name}]`, ...args)
     lastlog = now.getTime()
   }
 

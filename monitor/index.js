@@ -91,8 +91,7 @@ app.get('/eventsStats', async (req, res, next) => {
 app.get('/alerts', async (req, res, next) => {
   try {
     const results = await readFile('./responses/alerts.json')
-    results.ok =
-      !results.executeAffirmations.mostRecentTxHash && !results.executeSignatures.mostRecentTxHash
+    results.ok = !results.executeAffirmations.mostRecentTxHash && !results.executeSignatures.mostRecentTxHash
     res.json(results)
   } catch (e) {
     next(e)

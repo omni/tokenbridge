@@ -23,10 +23,7 @@ class RootStore {
   @action
   async setBridgeMode() {
     const homeWeb3 = getWeb3Instance(process.env.REACT_APP_HOME_HTTP_PARITY_URL)
-    const homeBridge = new homeWeb3.eth.Contract(
-      HOME_ERC_TO_ERC_ABI,
-      process.env.REACT_APP_HOME_BRIDGE_ADDRESS
-    )
+    const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_ERC_ABI, process.env.REACT_APP_HOME_BRIDGE_ADDRESS)
     const bridgeModeHash = await homeBridge.methods.getBridgeMode().call()
     this.bridgeMode = decodeBridgeMode(bridgeModeHash)
     this.bridgeModeInitialized = true

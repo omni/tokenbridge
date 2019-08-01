@@ -193,29 +193,19 @@ class HomeStore {
   async getTokenInfo() {
     try {
       this.tokenAddress = await getErc677TokenAddress(this.homeBridge)
-      this.tokenContract = new this.homeWeb3.eth.Contract(
-        ERC677_BRIDGE_TOKEN_ABI,
-        this.tokenAddress
-      )
+      this.tokenContract = new this.homeWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, this.tokenAddress)
       this.symbol = await getSymbol(this.tokenContract)
       this.tokenName = await getName(this.tokenContract)
-      const alternativeContract = new this.homeWeb3.eth.Contract(
-        ERC20_BYTES32_ABI,
-        this.tokenAddress
-      )
+      const alternativeContract = new this.homeWeb3.eth.Contract(ERC20_BYTES32_ABI, this.tokenAddress)
       try {
         this.symbol = await getSymbol(this.tokenContract)
       } catch (e) {
-        this.symbol = this.homeWeb3.utils
-          .hexToAscii(await getSymbol(alternativeContract))
-          .replace(/\u0000*$/, '')
+        this.symbol = this.homeWeb3.utils.hexToAscii(await getSymbol(alternativeContract)).replace(/\u0000*$/, '')
       }
       try {
         this.tokenName = await getName(this.tokenContract)
       } catch (e) {
-        this.tokenName = this.homeWeb3.utils
-          .hexToAscii(await getName(alternativeContract))
-          .replace(/\u0000*$/, '')
+        this.tokenName = this.homeWeb3.utils.hexToAscii(await getName(alternativeContract)).replace(/\u0000*$/, '')
       }
       this.tokenDecimals = await getDecimals(this.tokenContract)
     } catch (e) {
@@ -256,17 +246,11 @@ class HomeStore {
       if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {
         this.balance = await getTotalSupply(this.tokenContract)
         this.web3Store.getWeb3Promise.then(async () => {
-          this.userBalance = await getBalanceOf(
-            this.tokenContract,
-            this.web3Store.defaultAccount.address
-          )
+          this.userBalance = await getBalanceOf(this.tokenContract, this.web3Store.defaultAccount.address)
           balanceLoaded()
         })
       } else if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
-        const mintedCoins = await mintedTotallyByBridge(
-          this.blockRewardContract,
-          this.HOME_BRIDGE_ADDRESS
-        )
+        const mintedCoins = await mintedTotallyByBridge(this.blockRewardContract, this.HOME_BRIDGE_ADDRESS)
         const burntCoins = await totalBurntCoins(this.homeBridge)
         this.balance = fromDecimals(mintedCoins.minus(burntCoins).toString(10), this.tokenDecimals)
       } else {
@@ -388,14 +372,8 @@ class HomeStore {
   async filterByTxHash(transactionHash) {
     const events = await this.getEvents(1, 'latest')
     this.events = events.filter(event => event.transactionHash === transactionHash)
-    if (
-      this.events.length > 0 &&
-      this.events[0].returnValues &&
-      this.events[0].returnValues.transactionHash
-    ) {
-      await this.rootStore.foreignStore.filterByTxHashInReturnValues(
-        this.events[0].returnValues.transactionHash
-      )
+    if (this.events.length > 0 && this.events[0].returnValues && this.events[0].returnValues.transactionHash) {
+      await this.rootStore.foreignStore.filterByTxHashInReturnValues(this.events[0].returnValues.transactionHash)
     }
   }
 
@@ -432,10 +410,7 @@ class HomeStore {
   async getValidators() {
     try {
       const homeValidatorsAddress = await getValidatorContract(this.homeBridge)
-      this.homeBridgeValidators = new this.homeWeb3.eth.Contract(
-        BRIDGE_VALIDATORS_ABI,
-        homeValidatorsAddress
-      )
+      this.homeBridgeValidators = new this.homeWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorsAddress)
 
       this.requiredSignatures = await getRequiredSignatures(this.homeBridgeValidators)
       this.validatorsCount = await getValidatorCount(this.homeBridgeValidators)
@@ -455,9 +430,7 @@ class HomeStore {
       const events = await getPastEvents(contract, deployedAtBlock, 'latest')
       processLargeArrayAsync(events, this.processEvent, () => {
         this.statistics.finished = true
-        this.statistics.totalBridged = this.statistics.depositsValue.plus(
-          this.statistics.withdrawsValue
-        )
+        this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawsValue)
       })
     } catch (e) {
       console.error(e)
@@ -505,10 +478,8 @@ class HomeStore {
 
     const data = getRewardableData(this.feeManager, this.rootStore.foreignStore.feeManager)
 
-    this.depositFeeCollected.type =
-      data.depositSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
-    this.withdrawFeeCollected.type =
-      data.withdrawSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
+    this.depositFeeCollected.type = data.depositSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
+    this.withdrawFeeCollected.type = data.withdrawSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
     this.depositFeeCollected.shouldDisplay = data.displayDeposit
     this.withdrawFeeCollected.shouldDisplay = data.displayWithdraw
 

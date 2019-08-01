@@ -112,10 +112,7 @@ class Web3Store {
         await this.rootStore.homeStore.getBalance()
         this.alertStore.setLoading(false)
       }
-      if (
-        this.rootStore.bridgeModeInitialized &&
-        this.rootStore.bridgeMode !== BRIDGE_MODES.ERC_TO_ERC
-      ) {
+      if (this.rootStore.bridgeModeInitialized && this.rootStore.bridgeMode !== BRIDGE_MODES.ERC_TO_ERC) {
         balanceLoaded()
       }
     } catch (e) {
@@ -132,10 +129,7 @@ class Web3Store {
         }, 1000)
         return
       }
-      if (
-        this.metamaskNet.name !== this.homeNet.name &&
-        this.metamaskNet.name !== this.foreignNet.name
-      ) {
+      if (this.metamaskNet.name !== this.homeNet.name && this.metamaskNet.name !== this.foreignNet.name) {
         this.metamaskNotSetted = true
         this.alertStore.pushError(
           `You are on an unknown network on your wallet. Please select ${this.homeNet.name} or ${

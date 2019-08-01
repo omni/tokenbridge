@@ -23,10 +23,7 @@ describe('FeeStatistics', () => {
 
     // When
     const { queryByTestId } = render(
-      <FeeStatistics
-        depositFeeCollected={depositFeeCollected}
-        withdrawFeeCollected={withdrawFeeCollected}
-      />
+      <FeeStatistics depositFeeCollected={depositFeeCollected} withdrawFeeCollected={withdrawFeeCollected} />
     )
 
     // Then
@@ -61,10 +58,7 @@ describe('FeeStatistics', () => {
 
     // When
     const { queryByTestId } = render(
-      <FeeStatistics
-        depositFeeCollected={depositFeeCollected}
-        withdrawFeeCollected={withdrawFeeCollected}
-      />
+      <FeeStatistics depositFeeCollected={depositFeeCollected} withdrawFeeCollected={withdrawFeeCollected} />
     )
 
     // Then
@@ -96,10 +90,7 @@ describe('FeeStatistics', () => {
 
     // When
     const { queryByTestId } = render(
-      <FeeStatistics
-        depositFeeCollected={depositFeeCollected}
-        withdrawFeeCollected={withdrawFeeCollected}
-      />
+      <FeeStatistics depositFeeCollected={depositFeeCollected} withdrawFeeCollected={withdrawFeeCollected} />
     )
 
     // Then
@@ -131,10 +122,7 @@ describe('FeeStatistics', () => {
 
     // When
     const { queryByTestId } = render(
-      <FeeStatistics
-        depositFeeCollected={depositFeeCollected}
-        withdrawFeeCollected={withdrawFeeCollected}
-      />
+      <FeeStatistics depositFeeCollected={depositFeeCollected} withdrawFeeCollected={withdrawFeeCollected} />
     )
 
     // Then
