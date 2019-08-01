@@ -21,8 +21,7 @@ if (baseConfig.id === 'erc-erc' && initialChecks.foreignERC === ERC_TYPES.ERC677
 const id = `${baseConfig.id}-affirmation-request`
 
 module.exports =
-  (baseConfig.id === 'erc-erc' && initialChecks.foreignERC === ERC_TYPES.ERC20) ||
-  baseConfig.id === 'erc-native'
+  (baseConfig.id === 'erc-erc' && initialChecks.foreignERC === ERC_TYPES.ERC20) || baseConfig.id === 'erc-native'
     ? {
         ...baseConfig.bridgeConfig,
         ...baseConfig.foreignConfig,

@@ -12,9 +12,7 @@ export class Wallet extends React.Component {
     const explorerAddressUrl = isHome
       ? homeStore.getExplorerAddressUrl(address)
       : foreignStore.getExplorerAddressUrl(address)
-    const completed = isHome
-      ? homeStore.getDailyQuotaCompleted()
-      : foreignStore.getDailyQuotaCompleted()
+    const completed = isHome ? homeStore.getDailyQuotaCompleted() : foreignStore.getDailyQuotaCompleted()
     const width = `${completed}%`
 
     const wallet =

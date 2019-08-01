@@ -2,19 +2,9 @@ import React from 'react'
 import numeral from 'numeral'
 import { DataBlock } from './DataBlock'
 
-export const Configuration = ({
-  requiredSignatures,
-  authorities,
-  symbol,
-  maxSingleDeposit,
-  maxTotalBalance
-}) => (
+export const Configuration = ({ requiredSignatures, authorities, symbol, maxSingleDeposit, maxTotalBalance }) => (
   <div className="status-configuration-data">
-    <DataBlock
-      description="Required Signatures"
-      value={numeral(requiredSignatures).format('0')}
-      type=""
-    />
+    <DataBlock description="Required Signatures" value={numeral(requiredSignatures).format('0')} type="" />
     <div className="separator" />
     <DataBlock description="Authorities" value={numeral(authorities).format('0')} type="" />
     {maxSingleDeposit &&

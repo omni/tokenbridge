@@ -4,16 +4,7 @@ import numeral from 'numeral'
 import { CopyIcon } from '../icons/CopyIcon'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-export const Event = ({
-  color,
-  eventName,
-  transactionHash,
-  recipient,
-  value,
-  blockNumber,
-  txUrl,
-  accountUrl
-}) => (
+export const Event = ({ color, eventName, transactionHash, recipient, value, blockNumber, txUrl, accountUrl }) => (
   <div>
     <div className="event">
       <div className="event-tx-container txhash-column">

@@ -12,22 +12,18 @@ export const Disclaimer = ({ onConfirmation }) => (
         <br /> TokenBridge UI App Beta+
       </span>
       <p className="disclaimer-description">
-        We’re launching our TokenBridge and our UI App on a beta-testing basis. While we’ve worked
-        long and hard to develop the core features of the software, we expect that our users may
-        detect bugs and other issues. Help us improve by posting any difficulties to our
-        <a
-          href="https://forum.poa.network/c/support/tokenbridge-support"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        We’re launching our TokenBridge and our UI App on a beta-testing basis. While we’ve worked long and hard to
+        develop the core features of the software, we expect that our users may detect bugs and other issues. Help us
+        improve by posting any difficulties to our
+        <a href="https://forum.poa.network/c/support/tokenbridge-support" target="_blank" rel="noopener noreferrer">
           {' '}
           support page
         </a>
         .<br />
         <br />
-        Use of this app and the TokenBridge is at your own risk. Users may experience unexpected
-        delays, unexpected visual artifacts, unexpected loss of tokens or funds from improper app
-        configuration, or other negative outcomes.
+        Use of this app and the TokenBridge is at your own risk. Users may experience unexpected delays, unexpected
+        visual artifacts, unexpected loss of tokens or funds from improper app configuration, or other negative
+        outcomes.
         <br />
         <br />
         By hitting the "continue" button, you are representing that you’ve read our
