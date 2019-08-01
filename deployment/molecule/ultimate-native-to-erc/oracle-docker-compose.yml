@@ -1,6 +1,5 @@
 ---
-# The Oracle's docker-compose file has to be modified, in order to join the docker containers over network with the parity containers
-- name: Overwrite the docker-compose
+- name: Overwrite Oracle the docker-compose
   hosts: oracle
   become: true
   tasks:
