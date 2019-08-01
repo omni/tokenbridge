@@ -10,7 +10,8 @@ const {
   DEFAULT_UPDATE_INTERVAL,
   GAS_PRICE_BOUNDARIES,
   DEFAULT_GAS_PRICE_FACTOR,
-  gasPriceFromOracle
+  gasPriceFromOracle,
+  gasPriceFromContract
 } = require('../utils/constants')
 const { normalizeGasPrice } = require('../../../commons')
 
@@ -37,32 +38,6 @@ const homeBridge = new web3Home.eth.Contract(HomeABI, HOME_BRIDGE_ADDRESS)
 const foreignBridge = new web3Foreign.eth.Contract(ForeignABI, FOREIGN_BRIDGE_ADDRESS)
 
 let cachedGasPrice = null
-
-const fetchGasPriceFromOracle = async (oracleUrl, speedType, factor) => {
-  if (!oracleUrl) {
-    throw new Error(`Gas Price Oracle url not defined`)
-  }
-  const fetchFn = () => fetch(oracleUrl)
-  return gasPriceFromOracle(fetchFn, speedType, factor, GAS_PRICE_BOUNDARIES)
-}
-
-async function fetchGasPrice({ bridgeContract, oracleFn }) {
-  let gasPrice = null
-  try {
-    gasPrice = await oracleFn()
-    logger.debug({ gasPrice }, 'Gas price updated using the oracle')
-  } catch (e) {
-    logger.error(`Gas Price API is not available. ${e.message}`)
-
-    try {
-      gasPrice = await bridgeContract.methods.gasPrice().call()
-      logger.debug({ gasPrice }, 'Gas price updated using the contracts')
-    } catch (e) {
-      logger.error(`There was a problem getting the gas price from the contract. ${e.message}`)
-    }
-  }
-  return gasPrice
-}
 
 let fetchGasPriceInterval = null
 
@@ -95,11 +70,10 @@ async function start(chainId) {
   }
 
   fetchGasPriceInterval = setIntervalAndRun(async () => {
-    const gasPrice = await fetchGasPrice({
-      bridgeContract,
-      oracleFn: () => fetchGasPriceFromOracle(oracleUrl, speedType, factor)
-    })
-    cachedGasPrice = gasPrice || cachedGasPrice
+    cachedGasPrice =
+      (await gasPriceFromContract(bridgeContract, logger)) ||
+      (await gasPriceFromOracle(() => fetch(oracleUrl), speedType, factor, GAS_PRICE_BOUNDARIES)) ||
+      cachedGasPrice
   }, updateInterval)
 }
 
@@ -109,7 +83,6 @@ function getPrice() {
 
 module.exports = {
   start,
-  fetchGasPrice,
   getPrice,
   normalizeGasPrice
 }

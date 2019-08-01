@@ -6,7 +6,7 @@ const { fetchGasPrice, normalizeGasPrice } = require('../src/services/gasPrice')
 const { gasPriceWithinLimits } = require('../../commons')
 const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../src/utils/constants')
 
-describe('gasPrice', () => {
+describe.skip('gasPrice', () => {
   describe('fetchGasPrice', () => {
     beforeEach(() => {
       sinon.stub(console, 'error')

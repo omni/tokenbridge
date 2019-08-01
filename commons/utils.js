@@ -89,6 +89,21 @@ const gasPriceFromOracle = async (fetchFn, speedType, factor, limits = null) => 
   return normalizeGasPrice(oracleGasPrice, factor, limits)
 }
 
+const gasPriceFromContract = async (bridgeContract, logger = undefined) => {
+  try {
+    const gasPrice = await bridgeContract.methods.gasPrice().call()
+    if (logger && logger.debug) {
+      logger.debug({ gasPrice }, 'Gas price updated using the contracts')
+    }
+    return gasPrice
+  } catch (e) {
+    if (logger && logger.error) {
+      logger.error(`There was a problem getting the gas price from the contract. ${e.message}`)
+    }
+  }
+  return null
+}
+
 module.exports = {
   decodeBridgeMode,
   decodeFeeManagerMode,
@@ -96,5 +111,6 @@ module.exports = {
   getTokenType,
   getUnit,
   normalizeGasPrice,
-  gasPriceFromOracle
+  gasPriceFromOracle,
+  gasPriceFromContract
 }
