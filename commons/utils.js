@@ -96,7 +96,16 @@ const gasPriceFromOracle = async (fetchFn, options = {}) => {
       return null
     }
 
-    return normalizeGasPrice(oracleGasPrice, options.factor, options.limits)
+    const normalizedGasPrice = normalizeGasPrice(oracleGasPrice, options.factor, options.limits)
+
+    options.logger &&
+      options.logger.debug &&
+      options.logger.debug(
+        { oracleGasPrice, normalizedGasPrice },
+        'Gas price updated using the API'
+      )
+
+    return normalizedGasPrice
   } catch (e) {
     options.logger &&
       options.logger.error &&
