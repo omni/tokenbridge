@@ -33,6 +33,18 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
+const homeGasOracleOpts = {
+  speedType: HOME_GAS_PRICE_SPEED_TYPE,
+  factor: HOME_GAS_PRICE_FACTOR,
+  logger
+}
+
+const foreignGasOracleOpts = {
+  speedType: FOREIGN_GAS_PRICE_SPEED_TYPE,
+  factor: FOREIGN_GAS_PRICE_FACTOR,
+  logger
+}
+
 const asyncForEach = async (array, callback) => {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array)
@@ -82,18 +94,6 @@ async function main(bridgeMode) {
   })
   const foreignVBalances = {}
   const homeVBalances = {}
-
-  const homeGasOracleOpts = {
-    speedType: HOME_GAS_PRICE_SPEED_TYPE,
-    factor: HOME_GAS_PRICE_FACTOR,
-    logger
-  }
-
-  const foreignGasOracleOpts = {
-    speedType: FOREIGN_GAS_PRICE_SPEED_TYPE,
-    factor: FOREIGN_GAS_PRICE_FACTOR,
-    logger
-  }
 
   logger.debug('calling home getGasPrices')
   const homeGasPrice =
