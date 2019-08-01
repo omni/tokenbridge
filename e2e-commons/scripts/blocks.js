@@ -3,16 +3,16 @@ const { generateNewBlock } = require('../utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8541'))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8542'))
-const {user} = require('../constants.json');
-homeWeb3.eth.accounts.wallet.add(user.privateKey)
-foreignWeb3.eth.accounts.wallet.add(user.privateKey)
+const {secondUser} = require('../constants.json');
+homeWeb3.eth.accounts.wallet.add(secondUser.privateKey)
+foreignWeb3.eth.accounts.wallet.add(secondUser.privateKey)
 
 function main() {
   setTimeout(async () => {
-    generateNewBlock(homeWeb3, user.address)
-    generateNewBlock(foreignWeb3, user.address)
+    generateNewBlock(homeWeb3, secondUser.address)
+    generateNewBlock(foreignWeb3, secondUser.address)
     main()
-  }, 5000)
+  }, 1000)
 }
 
 main()
