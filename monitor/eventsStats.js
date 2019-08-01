@@ -57,18 +57,10 @@ function compareTransferForeign(home) {
 }
 
 async function main() {
-  const {
-    foreignDeposits,
-    homeDeposits,
-    homeWithdrawals,
-    foreignWithdrawals,
-    isExternalErc20
-  } = await eventsInfo()
+  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals, isExternalErc20 } = await eventsInfo()
 
   const onlyInHomeDeposits = homeDeposits.filter(compareDepositsHome(foreignDeposits))
-  const onlyInForeignDeposits = foreignDeposits
-    .concat([])
-    .filter(compareDepositsForeign(homeDeposits))
+  const onlyInForeignDeposits = foreignDeposits.concat([]).filter(compareDepositsForeign(homeDeposits))
 
   const onlyInHomeWithdrawals = isExternalErc20
     ? homeWithdrawals.filter(compareTransferHome(foreignWithdrawals))

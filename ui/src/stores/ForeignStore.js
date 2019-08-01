@@ -186,28 +186,18 @@ class ForeignStore {
         this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
           ? await getErc20TokenAddress(this.foreignBridge)
           : await getErc677TokenAddress(this.foreignBridge)
-      this.tokenContract = new this.foreignWeb3.eth.Contract(
-        ERC677_BRIDGE_TOKEN_ABI,
-        this.tokenAddress
-      )
+      this.tokenContract = new this.foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, this.tokenAddress)
       this.tokenType = await getTokenType(this.tokenContract, this.FOREIGN_BRIDGE_ADDRESS)
-      const alternativeContract = new this.foreignWeb3.eth.Contract(
-        ERC20_BYTES32_ABI,
-        this.tokenAddress
-      )
+      const alternativeContract = new this.foreignWeb3.eth.Contract(ERC20_BYTES32_ABI, this.tokenAddress)
       try {
         this.symbol = await getSymbol(this.tokenContract)
       } catch (e) {
-        this.symbol = this.foreignWeb3.utils
-          .hexToAscii(await getSymbol(alternativeContract))
-          .replace(/\u0000*$/, '')
+        this.symbol = this.foreignWeb3.utils.hexToAscii(await getSymbol(alternativeContract)).replace(/\u0000*$/, '')
       }
       try {
         this.tokenName = await getName(this.tokenContract)
       } catch (e) {
-        this.tokenName = this.foreignWeb3.utils
-          .hexToAscii(await getName(alternativeContract))
-          .replace(/\u0000*$/, '')
+        this.tokenName = this.foreignWeb3.utils.hexToAscii(await getName(alternativeContract)).replace(/\u0000*$/, '')
       }
 
       this.tokenDecimals = await getDecimals(this.tokenContract)
@@ -269,17 +259,11 @@ class ForeignStore {
       if (this.waitingForConfirmation.size) {
         const confirmationEvents = foreignEvents.filter(
           event =>
-            event.event === 'RelayedMessage' &&
-            this.waitingForConfirmation.has(event.returnValues.transactionHash)
+            event.event === 'RelayedMessage' && this.waitingForConfirmation.has(event.returnValues.transactionHash)
         )
         confirmationEvents.forEach(async event => {
           const TxReceipt = await this.getTxReceipt(event.transactionHash)
-          if (
-            TxReceipt &&
-            TxReceipt.logs &&
-            TxReceipt.logs.length > 1 &&
-            this.waitingForConfirmation.size
-          ) {
+          if (TxReceipt && TxReceipt.logs && TxReceipt.logs.length > 1 && this.waitingForConfirmation.size) {
             this.alertStore.setLoadingStepIndex(3)
             const urlExplorer = this.getExplorerTxUrl(event.transactionHash)
             const unitReceived = getUnit(this.rootStore.bridgeMode).unitForeign
@@ -397,10 +381,7 @@ class ForeignStore {
   async getValidators() {
     try {
       const foreignValidatorsAddress = await getValidatorContract(this.foreignBridge)
-      this.foreignBridgeValidators = new this.foreignWeb3.eth.Contract(
-        BRIDGE_VALIDATORS_ABI,
-        foreignValidatorsAddress
-      )
+      this.foreignBridgeValidators = new this.foreignWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
 
       this.requiredSignatures = await getRequiredSignatures(this.foreignBridgeValidators)
       this.validatorsCount = await getValidatorCount(this.foreignBridgeValidators)

@@ -59,14 +59,7 @@ function connectSenderToQueue({ queueName, cb }) {
   })
 }
 
-async function generateRetry({
-  data,
-  msgRetries,
-  channelWrapper,
-  channel,
-  queueName,
-  deadLetterExchange
-}) {
+async function generateRetry({ data, msgRetries, channelWrapper, channel, queueName, deadLetterExchange }) {
   const retries = msgRetries + 1
   const delay = getRetrySequence(retries) * 1000
   const retryQueue = `${queueName}-retry-${delay}`

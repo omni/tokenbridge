@@ -15,12 +15,8 @@ export class StatisticsPage extends React.Component {
     const isNativeToErc = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC
     const leftTitle = isNativeToErc ? 'Deposits' : 'Withdraws'
     const rightTitle = isNativeToErc ? 'Withdraws' : 'Deposits'
-    const {
-      REACT_APP_HOME_WITHOUT_EVENTS: HOME,
-      REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN
-    } = process.env
-    const withoutEvents =
-      web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
+    const { REACT_APP_HOME_WITHOUT_EVENTS: HOME, REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
+    const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
 
     return withoutEvents ? (
       <Redirect to="/" />
@@ -32,9 +28,7 @@ export class StatisticsPage extends React.Component {
             <span className="statistics-bridge-title statistics-title">Bridge Statistics</span>
             <BridgeStatistics
               users={homeStore.statistics.finished ? homeStore.statistics.users.size : ''}
-              totalBridged={
-                homeStore.statistics.finished ? homeStore.statistics.totalBridged.toString() : ''
-              }
+              totalBridged={homeStore.statistics.finished ? homeStore.statistics.totalBridged.toString() : ''}
               homeBalance={homeStore.balance}
               homeSymbol={homeStore.symbol}
               homeNativeSupplyTitle={isNativeToErc}
@@ -44,8 +38,7 @@ export class StatisticsPage extends React.Component {
           </div>
           {homeStore.depositFeeCollected.finished &&
             homeStore.withdrawFeeCollected.finished &&
-            (homeStore.depositFeeCollected.shouldDisplay ||
-              homeStore.withdrawFeeCollected.shouldDisplay) && (
+            (homeStore.depositFeeCollected.shouldDisplay || homeStore.withdrawFeeCollected.shouldDisplay) && (
               <FeeStatistics
                 depositFeeCollected={homeStore.depositFeeCollected}
                 withdrawFeeCollected={homeStore.withdrawFeeCollected}
@@ -61,9 +54,7 @@ export class StatisticsPage extends React.Component {
               />
             </div>
             <div className="statistics-withdraw-container">
-              <span className="statistics-withdraw-title statistics-title">
-                Tokens {rightTitle}
-              </span>
+              <span className="statistics-withdraw-title statistics-title">Tokens {rightTitle}</span>
               <TransactionsStatistics
                 txNumber={homeStore.statistics.finished ? homeStore.statistics.withdraws : ''}
                 type={foreignStore.symbol}

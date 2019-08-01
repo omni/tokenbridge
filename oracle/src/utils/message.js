@@ -6,13 +6,7 @@ function strip0x(input) {
   return input.replace(/^0x/, '')
 }
 
-function createMessage({
-  recipient,
-  value,
-  transactionHash,
-  bridgeAddress,
-  expectedMessageLength
-}) {
+function createMessage({ recipient, value, transactionHash, bridgeAddress, expectedMessageLength }) {
   recipient = strip0x(recipient)
   assert.strictEqual(recipient.length, 20 * 2)
 
@@ -50,10 +44,7 @@ function parseMessage(message) {
 
   const contractAddressStart = txHashStart + txHashLength
   const contractAddressLength = 32 * 2
-  const contractAddress = `0x${message.slice(
-    contractAddressStart,
-    contractAddressStart + contractAddressLength
-  )}`
+  const contractAddress = `0x${message.slice(contractAddressStart, contractAddressStart + contractAddressLength)}`
 
   return {
     recipient,

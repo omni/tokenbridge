@@ -16,18 +16,12 @@ export class Header extends React.Component {
       onMenuToggle,
       RootStore: { alertStore, web3Store }
     } = this.props
-    const {
-      REACT_APP_HOME_WITHOUT_EVENTS: HOME,
-      REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN
-    } = process.env
-    const withoutEvents =
-      web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
+    const { REACT_APP_HOME_WITHOUT_EVENTS: HOME, REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
+    const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
 
     return (
       <header className="header">
-        {showMobileMenu ? (
-          <MobileMenu withoutEvents={withoutEvents} onMenuToggle={onMenuToggle} />
-        ) : null}
+        {showMobileMenu ? <MobileMenu withoutEvents={withoutEvents} onMenuToggle={onMenuToggle} /> : null}
         <div className="container">
           <Link to="/" onClick={showMobileMenu ? onMenuToggle : null} className="header-logo" />
           <HeaderMenu withoutEvents={withoutEvents} onMenuToggle={onMenuToggle} />

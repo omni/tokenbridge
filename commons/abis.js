@@ -1,12 +1,9 @@
 const HOME_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeNativeToErc').abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc')
-  .abi
+const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc').abi
 const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
-const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErc677ToErc677')
-  .abi
+const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErc677ToErc677').abi
 const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative')
-  .abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative').abi
 const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
 const ERC677_ABI = require('../contracts/build/contracts/ERC677').abi
 const ERC677_BRIDGE_TOKEN_ABI = require('../contracts/build/contracts/ERC677BridgeToken').abi

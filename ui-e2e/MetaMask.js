@@ -74,9 +74,7 @@ class MetaMask extends Page {
       await this.setNetwork(user.networkID)
       await super.clickWithWait(popupAccount)
       await this.driver.executeScript(
-        "document.getElementsByClassName('dropdown-menu-item')[" +
-          user.accountOrderInMetamask +
-          '].click();'
+        "document.getElementsByClassName('dropdown-menu-item')[" + user.accountOrderInMetamask + '].click();'
       )
       await this.switchToNextPage()
       return true
@@ -89,9 +87,7 @@ class MetaMask extends Page {
     try {
       await super.clickWithWait(popupAccount)
       await this.driver.executeScript(
-        "document.getElementsByClassName('dropdown-menu-item')[" +
-          (accountOrderNumber + 1) +
-          '].click();'
+        "document.getElementsByClassName('dropdown-menu-item')[" + (accountOrderNumber + 1) + '].click();'
       )
       accountOrderNumber++
       return true
@@ -121,8 +117,7 @@ class MetaMask extends Page {
     try {
       await super.clickWithWait(popupNetwork)
       const orderNumber = networks.indexOf(provider)
-      const script =
-        "document.getElementsByClassName('dropdown-menu-item')[" + orderNumber + '].click();'
+      const script = "document.getElementsByClassName('dropdown-menu-item')[" + orderNumber + '].click();'
       if (orderNumber < 0) await this.addNetwork(provider)
       else await this.driver.executeScript(script)
       return true

@@ -24,22 +24,16 @@ describe('HomeStore', () => {
 
     // Other mocks
     contract.totalBurntCoins = jest.fn(() => Promise.resolve(new BN(0)))
-    contract.getBlockRewardContract = jest.fn(() =>
-      Promise.resolve('0xCecBE80Ed3548dE11D7d2D922a36576eA40C4c26')
-    )
+    contract.getBlockRewardContract = jest.fn(() => Promise.resolve('0xCecBE80Ed3548dE11D7d2D922a36576eA40C4c26'))
     contract.getPastEvents = jest.fn(() => Promise.resolve([]))
     web3StoreUtils.getBlockNumber = jest.fn(() => Promise.resolve(10))
     contract.getMinPerTxLimit = jest.fn(() => Promise.resolve(100000000))
     contract.getMaxPerTxLimit = jest.fn(() => Promise.resolve(10000000000))
     contract.getCurrentLimit = jest.fn(() => Promise.resolve({}))
-    contract.getValidatorContract = jest.fn(() =>
-      Promise.resolve('0xcDF12C376F43A70a07d7Ad2fD3449634717C9235')
-    )
+    contract.getValidatorContract = jest.fn(() => Promise.resolve('0xcDF12C376F43A70a07d7Ad2fD3449634717C9235'))
     contract.getRequiredSignatures = jest.fn(() => Promise.resolve(1))
     contract.getValidatorCount = jest.fn(() => Promise.resolve(1))
-    contract.getValidatorList = jest.fn(() =>
-      Promise.resolve(['0x52576e0cCaA0C9157142Fbf1d1c6DbfAc5e4E33e'])
-    )
+    contract.getValidatorList = jest.fn(() => Promise.resolve(['0x52576e0cCaA0C9157142Fbf1d1c6DbfAc5e4E33e']))
 
     // When
     new HomeStore(rootStore)

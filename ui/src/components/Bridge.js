@@ -87,9 +87,9 @@ export class Bridge extends React.Component {
     }
     if (isGreaterThan(amount, homeStore.maxCurrentDeposit)) {
       alertStore.pushError(
-        `The amount is above current daily limit.\nThe max deposit today: ${
-          homeStore.maxCurrentDeposit
-        } ${homeStore.symbol}`
+        `The amount is above current daily limit.\nThe max deposit today: ${homeStore.maxCurrentDeposit} ${
+          homeStore.symbol
+        }`
       )
       return
     }
@@ -140,24 +140,22 @@ export class Bridge extends React.Component {
     }
     if (!isExternalErc20 && isGreaterThan(amount, foreignStore.maxPerTx)) {
       alertStore.pushError(
-        `The amount is above maximum amount per transaction.\nThe max per transaction is: ${
-          foreignStore.maxPerTx
-        } ${foreignStore.symbol}`
+        `The amount is above maximum amount per transaction.\nThe max per transaction is: ${foreignStore.maxPerTx} ${
+          foreignStore.symbol
+        }`
       )
       return
     }
     if (!isExternalErc20 && isGreaterThan(amount, foreignStore.maxCurrentDeposit)) {
       alertStore.pushError(
-        `The amount is above current daily limit.\nThe max withdrawal today: ${
-          foreignStore.maxCurrentDeposit
-        } ${foreignStore.symbol}`
+        `The amount is above current daily limit.\nThe max withdrawal today: ${foreignStore.maxCurrentDeposit} ${
+          foreignStore.symbol
+        }`
       )
       return
     }
     if (isGreaterThan(amount, foreignStore.balance)) {
-      alertStore.pushError(
-        `Insufficient token balance. Your balance is ${foreignStore.balance} ${foreignStore.symbol}`
-      )
+      alertStore.pushError(`Insufficient token balance. Your balance is ${foreignStore.balance} ${foreignStore.symbol}`)
     } else {
       try {
         alertStore.setLoading(true)
@@ -262,8 +260,7 @@ export class Bridge extends React.Component {
   loadHomeDetails = () => {
     const { web3Store, homeStore, bridgeMode } = this.props.RootStore
     const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC
-    const isExternalErc20 =
-      bridgeMode === BRIDGE_MODES.ERC_TO_ERC || bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
+    const isExternalErc20 = bridgeMode === BRIDGE_MODES.ERC_TO_ERC || bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
 
     const modalData = {
       isHome: true,

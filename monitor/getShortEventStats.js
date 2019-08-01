@@ -2,9 +2,7 @@ require('dotenv').config()
 const eventsInfo = require('./utils/events')
 
 async function main(bridgeMode) {
-  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals } = await eventsInfo(
-    bridgeMode
-  )
+  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals } = await eventsInfo(bridgeMode)
 
   return {
     depositsDiff: homeDeposits.length - foreignDeposits.length,

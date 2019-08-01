@@ -34,12 +34,11 @@ export class NoWallet extends Component {
           <div className="noWallet-alert-container">
             <h2 className="noWallet-title">Wallet not found</h2>
             <p className="noWallet-description">
-              A wallet is not installed. Before continue, please install one (AlphaWallet, Metamask
-              or Nifty Wallet) and return to this page to continue using the application.
+              A wallet is not installed. Before continue, please install one (AlphaWallet, Metamask or Nifty Wallet) and
+              return to this page to continue using the application.
             </p>
             <p className="noWallet-description">
-              For further information on how to install any of both wallets, please click the
-              buttons below.
+              For further information on how to install any of both wallets, please click the buttons below.
             </p>
             <div className="noWallet-buttons">
               <a
