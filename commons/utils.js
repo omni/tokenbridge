@@ -78,6 +78,9 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
   return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
 }
 
+// fetchFn has to be supplied (instead of just url to oracle),
+// because this utility function is shared between Browser and Node,
+// we use built-in 'fetch' on browser side, and `node-fetch` package in Node.
 const gasPriceFromOracle = async (fetchFn, options = {}) => {
   try {
     const response = await fetchFn()
