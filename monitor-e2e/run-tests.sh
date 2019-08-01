@@ -17,6 +17,8 @@ check_files_exist() {
   for f in "${FILES[@]}"; do
     command="test -f responses/$f"
     (docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "$command") || rc=1
+    (docker-compose -f ../e2e-commons/docker-compose.yml exec monitor-erc20 /bin/bash -c "$command") || rc=1
+    (docker-compose -f ../e2e-commons/docker-compose.yml exec monitor-erc20-native /bin/bash -c "$command") || rc=1
   done
   return $rc
 }
@@ -24,38 +26,24 @@ check_files_exist() {
 
 ##### Initialization #####
 
-../e2e-commons/up.sh oracle deploy monitor
+../e2e-commons/up.sh deploy oracle monitor
+
+
+##### Initial checks #####
+
+docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "yarn check-all"
+docker-compose -f ../e2e-commons/docker-compose.yml exec monitor-erc20 /bin/bash -c "yarn check-all"
+docker-compose -f ../e2e-commons/docker-compose.yml exec monitor-erc20-native /bin/bash -c "yarn check-all"
+check_files_exist
 
 
 ##### Test cases #####
 
-echo "Test case - CheckWorker scripts should work and create files in responses/ directory"
-(! check_files_exist)
-docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "node checkWorker.js"
-docker-compose -f ../e2e-commons/docker-compose.yml exec monitor /bin/bash -c "node checkWorker2.js"
-check_files_exist
+./native-to-erc.sh
 
-echo "Test case - Web Interface should return balances"
-OUTPUT=$(curl -s http://localhost:3003/)
-grep -q home <<< "$OUTPUT"
-grep -q foreign <<< "$OUTPUT"
-(! grep -q error <<< "$OUTPUT")
+./erc-to-erc.sh
 
-echo "Test case - Web Interface should return validators"
-OUTPUT=$(curl -s http://localhost:3003/validators)
-grep -q home <<< "$OUTPUT"
-grep -q foreign <<< "$OUTPUT"
-(! grep -q error <<< "$OUTPUT")
-
-echo "Test case - Web Interface should return eventsStats"
-OUTPUT=$(curl -s http://localhost:3003/eventsStats)
-grep -q lastChecked <<< "$OUTPUT"
-(! grep -q error <<< "$OUTPUT")
-
-echo "Test case - Web Interface should return alerts"
-OUTPUT=$(curl -s http://localhost:3003/alerts)
-grep -q lastChecked <<< "$OUTPUT"
-(! grep -q error <<< "$OUTPUT")
+./erc-to-native.sh
 
 
 ##### Cleanup #####
