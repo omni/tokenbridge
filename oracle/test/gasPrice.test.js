@@ -219,7 +219,7 @@ describe('gasPrice', () => {
       const maxInWei = Web3Utils.toWei(GAS_PRICE_BOUNDARIES.MAX.toString(), 'gwei')
 
       // When
-      const result = normalizeGasPrice(oracleGasPrice, factor).toString()
+      const result = normalizeGasPrice(oracleGasPrice, factor, GAS_PRICE_BOUNDARIES).toString()
 
       // Then
       expect(result).to.equal(maxInWei)
@@ -231,7 +231,7 @@ describe('gasPrice', () => {
       const minInWei = Web3Utils.toWei(GAS_PRICE_BOUNDARIES.MIN.toString(), 'gwei')
 
       // When
-      const result = normalizeGasPrice(oracleGasPrice, factor).toString()
+      const result = normalizeGasPrice(oracleGasPrice, factor, GAS_PRICE_BOUNDARIES).toString()
 
       // Then
       expect(result).to.equal(minInWei)
