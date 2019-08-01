@@ -47,10 +47,7 @@ async function getRequiredBlockConfirmations(contract) {
     const contractAddress = contract.options.address
     logger.debug({ contractAddress }, 'Getting required block confirmations')
     const requiredBlockConfirmations = await contract.methods.requiredBlockConfirmations().call()
-    logger.debug(
-      { contractAddress, requiredBlockConfirmations },
-      'Required block confirmations obtained'
-    )
+    logger.debug({ contractAddress, requiredBlockConfirmations }, 'Required block confirmations obtained')
     return requiredBlockConfirmations
   } catch (e) {
     throw new Error(`Required block confirmations cannot be obtained`)

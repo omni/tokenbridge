@@ -6,11 +6,7 @@ const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
 const { createMessage } = require('../../utils/message')
 const estimateGas = require('./estimateGas')
-const {
-  AlreadyProcessedError,
-  AlreadySignedError,
-  InvalidValidatorError
-} = require('../../utils/errors')
+const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 
 const { VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
@@ -47,10 +43,7 @@ function processSignatureRequestsBuilder(config) {
           eventTransactionHash: signatureRequest.transactionHash
         })
 
-        logger.info(
-          { sender: recipient, value },
-          `Processing signatureRequest ${signatureRequest.transactionHash}`
-        )
+        logger.info({ sender: recipient, value }, `Processing signatureRequest ${signatureRequest.transactionHash}`)
 
         const message = createMessage({
           recipient,
@@ -76,9 +69,7 @@ function processSignatureRequestsBuilder(config) {
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {
           if (e instanceof HttpListProviderError) {
-            throw new Error(
-              'RPC Connection Error: submitSignature Gas Estimate cannot be obtained.'
-            )
+            throw new Error('RPC Connection Error: submitSignature Gas Estimate cannot be obtained.')
           } else if (e instanceof InvalidValidatorError) {
             logger.fatal({ address: config.validatorAddress }, 'Invalid validator')
             process.exit(EXIT_CODES.INCOMPATIBILITY)
@@ -87,9 +78,7 @@ function processSignatureRequestsBuilder(config) {
             return
           } else if (e instanceof AlreadyProcessedError) {
             logger.info(
-              `signatureRequest ${
-                signatureRequest.transactionHash
-              } was already processed by other validators`
+              `signatureRequest ${signatureRequest.transactionHash} was already processed by other validators`
             )
             return
           } else {

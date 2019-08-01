@@ -61,10 +61,7 @@ async function main() {
   console.log('Signature Requests')
   console.log(signatureRequestsStats)
 
-  const collectedSignaturesStats = computeCollectedSignaturesStats(
-    collectedSignatures,
-    senderForeign
-  )
+  const collectedSignaturesStats = computeCollectedSignaturesStats(collectedSignatures, senderForeign)
   console.log('Collected Signatures')
   console.log(collectedSignaturesStats)
 }
