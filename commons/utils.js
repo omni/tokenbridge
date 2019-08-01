@@ -90,13 +90,17 @@ const gasPriceFromOracle = async (fetchFn, options = {}) => {
     if (!oracleGasPrice) {
       options.logger &&
         options.logger.error &&
-        options.logger.error(`Response from Oracle didn't include gas price for ${options.speedType} type.`)
+        options.logger.error(
+          `Response from Oracle didn't include gas price for ${options.speedType} type.`
+        )
       return null
     }
 
     return normalizeGasPrice(oracleGasPrice, options.factor, options.limits)
   } catch (e) {
-    options.logger && options.logger.error && options.logger.error(`Gas Price API is not available. ${e.message}`)
+    options.logger &&
+      options.logger.error &&
+      options.logger.error(`Gas Price API is not available. ${e.message}`)
   }
   return null
 }
@@ -111,7 +115,9 @@ const gasPriceFromContract = async (bridgeContract, options = {}) => {
   } catch (e) {
     options.logger &&
       options.logger.error &&
-      options.logger.error(`There was a problem getting the gas price from the contract. ${e.message}`)
+      options.logger.error(
+        `There was a problem getting the gas price from the contract. ${e.message}`
+      )
   }
   return null
 }
