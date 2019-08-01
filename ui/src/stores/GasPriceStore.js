@@ -1,6 +1,6 @@
 import { observable, computed } from 'mobx'
 import { toHex } from 'web3-utils'
-import { fetchGasPrice, fetchGasPriceFromOracle } from './utils/gas'
+import { gasPriceFromOracle } from '../../../commons'
 
 const HOME_GAS_PRICE_FALLBACK = process.env.REACT_APP_HOME_GAS_PRICE_FALLBACK
 const HOME_GAS_PRICE_ORACLE_URL = process.env.REACT_APP_HOME_GAS_PRICE_ORACLE_URL
@@ -50,11 +50,9 @@ class GasPriceStore {
       this.factor = Number(FOREIGN_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
     }
 
-    const newGasPrice = await fetchGasPrice({
-      oracleFn: () => fetchGasPriceFromOracle(this.oracleUrl, this.speedType, this.factor)
-    })
+    const oracleOptions = { speedType: this.speedType, factor: this.factor, logger: console }
+    this.gasPrice = (await gasPriceFromOracle(() => fetch(this.oracleUrl), oracleOptions)) || this.gasPrice
 
-    this.gasPrice = newGasPrice || this.gasPrice
     setTimeout(() => this.updateGasPrice(), this.updateInterval)
   }
 
