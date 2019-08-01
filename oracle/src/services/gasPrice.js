@@ -70,9 +70,11 @@ async function start(chainId) {
   }
 
   fetchGasPriceInterval = setIntervalAndRun(async () => {
+    const contractOptions = { logger }
+    const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
     cachedGasPrice =
-      (await gasPriceFromContract(bridgeContract, logger)) ||
-      (await gasPriceFromOracle(() => fetch(oracleUrl), speedType, factor, GAS_PRICE_BOUNDARIES)) ||
+      (await gasPriceFromContract(bridgeContract, contractOptions)) ||
+      (await gasPriceFromOracle(() => fetch(oracleUrl), oracleOptions)) ||
       cachedGasPrice
   }, updateInterval)
 }

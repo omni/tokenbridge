@@ -78,28 +78,37 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
   return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
 }
 
-const gasPriceFromOracle = async (fetchFn, speedType, factor, limits = null) => {
-  const response = await fetchFn()
-  const json = await response.json()
-  const oracleGasPrice = json[speedType]
-  if (!oracleGasPrice) {
-    throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
-  }
+const gasPriceFromOracle = async (fetchFn, options = {}) => {
+  try {
+    const response = await fetchFn()
+    const json = await response.json()
+    const oracleGasPrice = json[options.speedType]
 
-  return normalizeGasPrice(oracleGasPrice, factor, limits)
+    if (!oracleGasPrice) {
+      options.logger &&
+        options.logger.error &&
+        options.logger.error(`Response from Oracle didn't include gas price for ${options.speedType} type.`)
+      return null
+    }
+
+    return normalizeGasPrice(oracleGasPrice, options.factor, options.limits)
+  } catch (e) {
+    options.logger && options.logger.error && options.logger.error(`Gas Price API is not available. ${e.message}`)
+  }
+  return null
 }
 
-const gasPriceFromContract = async (bridgeContract, logger = undefined) => {
+const gasPriceFromContract = async (bridgeContract, options = {}) => {
   try {
     const gasPrice = await bridgeContract.methods.gasPrice().call()
-    if (logger && logger.debug) {
-      logger.debug({ gasPrice }, 'Gas price updated using the contracts')
-    }
+    options.logger &&
+      options.logger.debug &&
+      options.logger.debug({ gasPrice }, 'Gas price updated using the contracts')
     return gasPrice
   } catch (e) {
-    if (logger && logger.error) {
-      logger.error(`There was a problem getting the gas price from the contract. ${e.message}`)
-    }
+    options.logger &&
+      options.logger.error &&
+      options.logger.error(`There was a problem getting the gas price from the contract. ${e.message}`)
   }
   return null
 }
