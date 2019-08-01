@@ -56,20 +56,14 @@ async function main(bridgeMode) {
   const homeBridge = new web3Home.eth.Contract(HOME_ABI, HOME_BRIDGE_ADDRESS)
   const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ABI, FOREIGN_BRIDGE_ADDRESS)
   const homeValidatorsAddress = await homeBridge.methods.validatorContract().call()
-  const homeBridgeValidators = new web3Home.eth.Contract(
-    BRIDGE_VALIDATORS_ABI,
-    homeValidatorsAddress
-  )
+  const homeBridgeValidators = new web3Home.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorsAddress)
 
   logger.debug('getting last block numbers')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
   logger.debug('calling foreignBridge.methods.validatorContract().call()')
   const foreignValidatorsAddress = await foreignBridge.methods.validatorContract().call()
-  const foreignBridgeValidators = new web3Foreign.eth.Contract(
-    BRIDGE_VALIDATORS_ABI,
-    foreignValidatorsAddress
-  )
+  const foreignBridgeValidators = new web3Foreign.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
 
   logger.debug('calling foreignBridgeValidators getValidatorList()')
   const foreignValidators = await getValidatorList(

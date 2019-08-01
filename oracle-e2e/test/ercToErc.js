@@ -16,10 +16,7 @@ const { toBN } = foreignWeb3.utils
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 
-const erc20Token = new foreignWeb3.eth.Contract(
-  ERC677_BRIDGE_TOKEN_ABI,
-  ercToErcBridge.foreignToken
-)
+const erc20Token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToErcBridge.foreignToken)
 const erc677Token = new homeWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToErcBridge.homeToken)
 
 describe('erc to erc', () => {

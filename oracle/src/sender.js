@@ -63,9 +63,7 @@ async function initialize() {
 }
 
 function resume(newBalance) {
-  logger.info(
-    `Validator balance changed. New balance is ${newBalance}. Resume messages processing.`
-  )
+  logger.info(`Validator balance changed. New balance is ${newBalance}. Resume messages processing.`)
   initialize()
 }
 
@@ -164,9 +162,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     logger.debug(`Finished processing msg`)
 
     if (insufficientFunds) {
-      logger.warn(
-        'Insufficient funds. Stop sending transactions until the account has the minimum balance'
-      )
+      logger.warn('Insufficient funds. Stop sending transactions until the account has the minimum balance')
       channel.close()
       waitForFunds(web3Instance, VALIDATOR_ADDRESS, minimumBalance, resume, logger)
     }

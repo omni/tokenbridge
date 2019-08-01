@@ -7,11 +7,7 @@ const { web3Home } = require('../../services/web3')
 const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
-const {
-  AlreadyProcessedError,
-  AlreadySignedError,
-  InvalidValidatorError
-} = require('../../utils/errors')
+const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
@@ -40,10 +36,7 @@ function processAffirmationRequestsBuilder(config) {
           eventTransactionHash: affirmationRequest.transactionHash
         })
 
-        logger.info(
-          { sender: recipient, value },
-          `Processing affirmationRequest ${affirmationRequest.transactionHash}`
-        )
+        logger.info({ sender: recipient, value }, `Processing affirmationRequest ${affirmationRequest.transactionHash}`)
 
         let gasEstimate
         try {
@@ -60,9 +53,7 @@ function processAffirmationRequestsBuilder(config) {
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {
           if (e instanceof HttpListProviderError) {
-            throw new Error(
-              'RPC Connection Error: submitSignature Gas Estimate cannot be obtained.'
-            )
+            throw new Error('RPC Connection Error: submitSignature Gas Estimate cannot be obtained.')
           } else if (e instanceof InvalidValidatorError) {
             logger.fatal({ address: config.validatorAddress }, 'Invalid validator')
             process.exit(EXIT_CODES.INCOMPATIBILITY)
@@ -71,9 +62,7 @@ function processAffirmationRequestsBuilder(config) {
             return
           } else if (e instanceof AlreadyProcessedError) {
             logger.info(
-              `affirmationRequest ${
-                affirmationRequest.transactionHash
-              } was already processed by other validators`
+              `affirmationRequest ${affirmationRequest.transactionHash} was already processed by other validators`
             )
             return
           } else {

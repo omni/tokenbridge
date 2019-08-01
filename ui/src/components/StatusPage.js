@@ -10,20 +10,14 @@ export class StatusPage extends React.Component {
   render() {
     const { homeStore, foreignStore, web3Store } = this.props.RootStore
     const isHome = web3Store.metamaskNet.id.toString() === web3Store.homeNet.id.toString()
-    const requiredSignatures = isHome
-      ? homeStore.requiredSignatures
-      : foreignStore.requiredSignatures
+    const requiredSignatures = isHome ? homeStore.requiredSignatures : foreignStore.requiredSignatures
     const authorities = isHome ? homeStore.validatorsCount : foreignStore.validatorsCount
     const symbol = isHome ? homeStore.symbol : foreignStore.symbol
     const maxSingleDeposit = isHome ? homeStore.maxPerTx : foreignStore.maxPerTx
     const maxTotalBalance = isHome ? homeStore.maxCurrentDeposit : foreignStore.maxCurrentDeposit
     const validatorsList = isHome ? homeStore.validators : foreignStore.validators
-    const {
-      REACT_APP_HOME_WITHOUT_EVENTS: HOME,
-      REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN
-    } = process.env
-    const withoutEvents =
-      web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
+    const { REACT_APP_HOME_WITHOUT_EVENTS: HOME, REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
+    const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
 
     return (
       <div className="status-page">

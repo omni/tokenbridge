@@ -8,10 +8,7 @@ async function initialChecks() {
 
   if (BRIDGE_MODE === 'ERC_TO_ERC') {
     const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(FOREIGN_RPC_URL))
-    const bridgeTokenContract = new foreignWeb3.eth.Contract(
-      ERC677_BRIDGE_TOKEN_ABI,
-      ERC20_TOKEN_ADDRESS
-    )
+    const bridgeTokenContract = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ERC20_TOKEN_ADDRESS)
 
     result.foreignERC = await getTokenType(bridgeTokenContract, FOREIGN_BRIDGE_ADDRESS)
   }
