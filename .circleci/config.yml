@@ -1,4 +1,35 @@
 version: 2.1
+
+orbs:
+  tokenbridge-orb:
+    jobs:
+      my_inline_job:
+        parameters:
+          greeting_name:
+            description: # a helpful description
+            type: string
+            default: olleh
+        executor: my_inline_executor
+        steps:
+          - my_inline_command:
+              greeting_name: <<parameters.greeting_name>>
+    commands:
+      install-chrome:
+        parameters:
+          greeting_name:
+            type: string
+        steps:
+          - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+          - run: sudo dpkg -i chrome.deb
+    executors:
+      my_inline_executor:
+        parameters:
+          version:
+            type: string
+            default: "2.4"
+        docker:
+          - image: circleci/ruby:<<parameters.version>>
+
 jobs:
   initialize:
     docker:
@@ -84,8 +115,9 @@ jobs:
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - run: sudo apt-get update && sudo apt-get install yarn
-      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
-      - run: sudo dpkg -i chrome.deb
+      - run: tokenbridge-orb/install-chrome
+      # - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      # - run: sudo dpkg -i chrome.deb
       - run: git submodule update --init
       - restore_cache:
            name: Restore Machine Yarn Package Cache
@@ -156,11 +188,12 @@ jobs:
 
             echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
             echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
-      - run:
-          name: Install Chrome
-          command: |
-            wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
-            sudo dpkg -i chrome.deb
+      - run: tokenbridge-orb/install-chrome
+      # - run:
+      #     name: Install Chrome
+      #     command: |
+      #       wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      #       sudo dpkg -i chrome.deb
       - run:
           name: Install yarn
           command: |
@@ -198,30 +231,30 @@ jobs:
 workflows:
   tokenbridge:
     jobs:
-      - initialize
-      - initialize-root:
-          filters:
-            branches:
-              only: master
-      - build:
-          requires:
-            - initialize
-      - lint:
-          requires:
-            - initialize
-      - test:
-          requires:
-            - initialize
-      - cover:
-          requires:
-            - initialize
-          filters:
-            branches:
-              only: master
-      - oracle-e2e
+      # - initialize
+      # - initialize-root:
+      #     filters:
+      #       branches:
+      #         only: master
+      # - build:
+      #     requires:
+      #       - initialize
+      # - lint:
+      #     requires:
+      #       - initialize
+      # - test:
+      #     requires:
+      #       - initialize
+      # - cover:
+      #     requires:
+      #       - initialize
+      #     filters:
+      #       branches:
+      #         only: master
+      # - oracle-e2e
       - ui-e2e
-      - monitor-e2e
-      - deployment-oracle
-      - deployment-ui
-      - deployment-monitor
+      # - monitor-e2e
+      # - deployment-oracle
+      # - deployment-ui
+      # - deployment-monitor
       - ultimate-native-to-erc
