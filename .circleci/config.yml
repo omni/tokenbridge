@@ -37,6 +37,20 @@ orbs:
                 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
                 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
                 sudo apt-get update && sudo apt-get -y install yarn
+      yarn-install-cached-on-machine:
+        steps:
+          - restore_cache:
+              name: Restore Machine Yarn Package Cache
+              keys:
+                - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+          - run:
+              name: Install npm dependencies using Yarn
+              command: nvm use default; yarn install --frozen-lockfile
+          - save_cache:
+              name: Save Machine Yarn Package Cache
+              key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+              paths:
+                - ~/.cache/yarn
       wait-for-oracle:
         steps:
           - run:
@@ -61,7 +75,7 @@ orbs:
       docker-node:
         docker:
           - image: circleci/node:10.15
-      machine-with-caching:
+      machine-with-docker-caching:
         machine:
           image: circleci/classic:latest
           docker_layer_caching: true
@@ -133,26 +147,17 @@ jobs:
             docker_layer_caching: true
         - run: yarn run oracle-e2e
   ui-e2e:
-    executor: tokenbridge-orb/machine-with-caching
+    executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - tokenbridge-orb/install-node
       - tokenbridge-orb/install-yarn
       - tokenbridge-orb/install-chrome
       - run: git submodule update --init
-      - restore_cache:
-           name: Restore Machine Yarn Package Cache
-           keys:
-             - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-      - run: yarn install --frozen-lockfile
-      - save_cache:
-           name: Save Machine Yarn Package Cache
-           key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-           paths:
-             - ~/.cache/yarn
+      - tokenbridge-orb/yarn-install-cached-on-machine
       - run: yarn run ui-e2e
   monitor-e2e:
-    executor: tokenbridge-orb/machine-with-caching
+    executor: tokenbridge-orb/machine-with-docker-caching
     steps:
         - checkout
         - run: git submodule update --init
@@ -165,34 +170,29 @@ jobs:
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
   deployment-oracle:
-    executor: tokenbridge-orb/machine-with-caching
+    executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh oracle
   deployment-ui:
-    executor: tokenbridge-orb/machine-with-caching
+    executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh ui
   deployment-monitor:
-    executor: tokenbridge-orb/machine-with-caching
+    executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh monitor
   ultimate-native-to-erc:
-    executor: tokenbridge-orb/machine-with-caching
+    executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: git submodule update --init
-      - run:
-          name: Install redis tools
-          command: sudo apt-get install -y redis-tools
       - tokenbridge-orb/install-node
       - tokenbridge-orb/install-chrome
       - tokenbridge-orb/install-yarn
-      - run:
-          name: Install npm packages
-          command: nvm use default; yarn install --frozen-lockfile
+      - tokenbridge-orb/yarn-install-cached-on-machine
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy native-to-erc
