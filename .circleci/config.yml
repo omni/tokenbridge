@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   initialize:
     docker:
@@ -196,7 +196,6 @@ jobs:
             node ./e2e-commons/scripts/blocks.js &
             cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
 workflows:
-  version: 2
   tokenbridge:
     jobs:
       - initialize
