@@ -2,17 +2,6 @@ version: 2.1
 
 orbs:
   tokenbridge-orb:
-    jobs:
-      my_inline_job:
-        parameters:
-          greeting_name:
-            description: # a helpful description
-            type: string
-            default: olleh
-        executor: my_inline_executor
-        steps:
-          - my_inline_command:
-              greeting_name: <<parameters.greeting_name>>
     commands:
       install-chrome:
         steps:
@@ -211,30 +200,30 @@ jobs:
 workflows:
   tokenbridge:
     jobs:
-      # - initialize
-      # - initialize-root:
-      #     filters:
-      #       branches:
-      #         only: master
-      # - build:
-      #     requires:
-      #       - initialize
-      # - lint:
-      #     requires:
-      #       - initialize
-      # - test:
-      #     requires:
-      #       - initialize
-      # - cover:
-      #     requires:
-      #       - initialize
-      #     filters:
-      #       branches:
-      #         only: master
-      # - oracle-e2e
+      - initialize
+      - initialize-root:
+          filters:
+            branches:
+              only: master
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
+      - cover:
+          requires:
+            - initialize
+          filters:
+            branches:
+              only: master
+      - oracle-e2e
       - ui-e2e
-      # - monitor-e2e
-      # - deployment-oracle
-      # - deployment-ui
-      # - deployment-monitor
+      - monitor-e2e
+      - deployment-oracle
+      - deployment-ui
+      - deployment-monitor
       - ultimate-native-to-erc
