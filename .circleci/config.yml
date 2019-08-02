@@ -15,9 +15,6 @@ orbs:
               greeting_name: <<parameters.greeting_name>>
     commands:
       install-chrome:
-        parameters:
-          greeting_name:
-            type: string
         steps:
           - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
           - run: sudo dpkg -i chrome.deb
@@ -115,7 +112,7 @@ jobs:
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - run: sudo apt-get update && sudo apt-get install yarn
-      - run: tokenbridge-orb/install-chrome
+      - tokenbridge-orb/install-chrome
       # - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
       # - run: sudo dpkg -i chrome.deb
       - run: git submodule update --init
@@ -188,7 +185,7 @@ jobs:
 
             echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
             echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
-      - run: tokenbridge-orb/install-chrome
+      - tokenbridge-orb/install-chrome
       # - run:
       #     name: Install Chrome
       #     command: |
