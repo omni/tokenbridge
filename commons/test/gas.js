@@ -18,7 +18,7 @@ describe('gas', () => {
       const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
       // Then
-      expect(result).toEqual('30000000000')
+      expect(result).to.equal('30000000000')
     })
     it('should work with oracle gas price not in gwei', () => {
       // Given
@@ -29,7 +29,7 @@ describe('gas', () => {
       const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
       // Then
-      expect(result).toEqual('30000000000')
+      expect(result).to.equal('30000000000')
     })
     it('should increase gas price value from oracle', () => {
       // Given
@@ -40,7 +40,7 @@ describe('gas', () => {
       const result = normalizeGasPrice(oracleGasPrice, factor).toString()
 
       // Then
-      expect(result).toEqual('30000000000')
+      expect(result).to.equal('30000000000')
     })
   })
 
