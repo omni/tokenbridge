@@ -371,6 +371,13 @@ jobs:
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh ui
+  deployment-monitor:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: deployment/molecule/molecule.sh monitor
   ultimate-native-to-erc:
     machine:
       image: circleci/classic:latest
@@ -487,4 +494,5 @@ workflows:
       - monitor-e2e
       - deployment-oracle
       - deployment-ui
+      - deployment-monitor
       - ultimate-native-to-erc
