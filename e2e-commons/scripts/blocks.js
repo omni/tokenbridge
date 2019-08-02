@@ -10,12 +10,12 @@ foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 homeWeb3.eth.accounts.wallet.add(blockGenerator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(blockGenerator.privateKey)
 
-async function main() {
+function main() {
   setTimeout(async () => {
     generateNewBlock(homeWeb3, blockGenerator.address)
     generateNewBlock(foreignWeb3, blockGenerator.address)
     main()
-  }, 5000)
+  }, 1000)
 }
 
 homeWeb3.eth.sendTransaction({
