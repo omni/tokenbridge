@@ -66,15 +66,22 @@ const getUnit = bridgeMode => {
   return { unitHome, unitForeign }
 }
 
+const gasPriceWithinLimits = (gasPrice, limits) => {
+  if (!limits) {
+    return gasPrice
+  }
+  if (gasPrice < limits.MIN) {
+    return limits.MIN
+  } else if (gasPrice > limits.MAX) {
+    return limits.MAX
+  } else {
+    return gasPrice
+  }
+}
+
 const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
   let gasPrice = oracleGasPrice * factor
-
-  if (limits !== null && gasPrice < limits.MIN) {
-    gasPrice = limits.MIN
-  } else if (limits !== null && gasPrice > limits.MAX) {
-    gasPrice = limits.MAX
-  }
-
+  gasPrice = gasPriceWithinLimits(gasPrice, limits)
   return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
 }
 
@@ -130,5 +137,6 @@ module.exports = {
   getUnit,
   normalizeGasPrice,
   gasPriceFromOracle,
-  gasPriceFromContract
+  gasPriceFromContract,
+  gasPriceWithinLimits
 }

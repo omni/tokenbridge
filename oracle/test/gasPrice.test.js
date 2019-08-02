@@ -6,7 +6,7 @@ const { fetchGasPrice, normalizeGasPrice } = require('../src/services/gasPrice')
 const { gasPriceWithinLimits } = require('../../commons')
 const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../src/utils/constants')
 
-describe.skip('gasPrice', () => {
+describe('gasPrice', () => {
   describe('fetchGasPrice', () => {
     beforeEach(() => {
       sinon.stub(console, 'error')
@@ -132,44 +132,7 @@ describe.skip('gasPrice', () => {
       expect(utils.setIntervalAndRun.args[0][1]).to.equal(DEFAULT_UPDATE_INTERVAL)
     })
   })
-  describe.skip('gasPriceWithinLimits', () => {
-    it('should return gas price if gas price is between boundaries', () => {
-      // given
-      const minGasPrice = 1
-      const middleGasPrice = 10
-      const maxGasPrice = 250
-
-      // when
-      const minGasPriceWithinLimits = gasPriceWithinLimits(minGasPrice)
-      const middleGasPriceWithinLimits = gasPriceWithinLimits(middleGasPrice)
-      const maxGasPriceWithinLimits = gasPriceWithinLimits(maxGasPrice)
-
-      // then
-      expect(minGasPriceWithinLimits).to.equal(minGasPrice)
-      expect(middleGasPriceWithinLimits).to.equal(middleGasPrice)
-      expect(maxGasPriceWithinLimits).to.equal(maxGasPrice)
-    })
-    it('should return min limit if gas price is below min boundary', () => {
-      // Given
-      const initialGasPrice = 0.5
-
-      // When
-      const gasPrice = gasPriceWithinLimits(initialGasPrice)
-
-      // Then
-      expect(gasPrice).to.equal(GAS_PRICE_BOUNDARIES.MIN)
-    })
-    it('should return max limit if gas price is above max boundary', () => {
-      // Given
-      const initialGasPrice = 260
-
-      // When
-      const gasPrice = gasPriceWithinLimits(initialGasPrice)
-
-      // Then
-      expect(gasPrice).to.equal(GAS_PRICE_BOUNDARIES.MAX)
-    })
-  })
+  
   describe('normalizeGasPrice', () => {
     it('should work with oracle gas price in gwei', () => {
       // Given
