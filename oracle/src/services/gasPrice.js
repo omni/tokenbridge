@@ -35,6 +35,16 @@ let cachedGasPrice = null
 
 let fetchGasPriceInterval = null
 
+const fetchGasPrice = async (speedType, factor, bridgeContract, oracleFetchFn) => {
+  const contractOptions = { logger }
+  const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
+  cachedGasPrice =
+    (await gasPriceFromContract(bridgeContract, contractOptions)) ||
+    (await gasPriceFromOracle(oracleFetchFn, oracleOptions)) ||
+    cachedGasPrice
+  return cachedGasPrice
+}
+
 async function start(chainId) {
   clearInterval(fetchGasPriceInterval)
 
@@ -63,14 +73,10 @@ async function start(chainId) {
     throw new Error(`Unrecognized chainId '${chainId}'`)
   }
 
-  fetchGasPriceInterval = setIntervalAndRun(async () => {
-    const contractOptions = { logger }
-    const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
-    cachedGasPrice =
-      (await gasPriceFromContract(bridgeContract, contractOptions)) ||
-      (await gasPriceFromOracle(() => fetch(oracleUrl), oracleOptions)) ||
-      cachedGasPrice
-  }, updateInterval)
+  fetchGasPriceInterval = setIntervalAndRun(
+    () => fetchGasPrice(speedType, factor, bridgeContract, () => fetch(oracleUrl)),
+    updateInterval
+  )
 }
 
 function getPrice() {
@@ -80,5 +86,5 @@ function getPrice() {
 module.exports = {
   start,
   getPrice,
-  normalizeGasPrice
+  fetchGasPrice
 }

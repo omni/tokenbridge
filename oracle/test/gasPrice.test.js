@@ -1,80 +1,9 @@
 const sinon = require('sinon')
 const { expect } = require('chai')
 const proxyquire = require('proxyquire').noPreserveCache()
-const { fetchGasPrice, normalizeGasPrice } = require('../src/services/gasPrice')
-const { gasPriceWithinLimits } = require('../../commons')
-const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../src/utils/constants')
+const { DEFAULT_UPDATE_INTERVAL } = require('../src/utils/constants')
 
 describe('gasPrice', () => {
-  describe('fetchGasPrice', () => {
-    beforeEach(() => {
-      sinon.stub(console, 'error')
-    })
-    afterEach(() => {
-      console.error.restore()
-    })
-
-    it('should fetch the gas price from the oracle by default', async () => {
-      // given
-      const oracleFnMock = () => Promise.resolve('1')
-      const bridgeContractMock = {
-        methods: {
-          gasPrice: {
-            call: sinon.stub().returns(Promise.resolve('2'))
-          }
-        }
-      }
-
-      // when
-      const gasPrice = await fetchGasPrice({
-        bridgeContract: bridgeContractMock,
-        oracleFn: oracleFnMock
-      })
-
-      // then
-      expect(gasPrice).to.equal('1')
-    })
-    it('should fetch the gas price from the contract if the oracle fails', async () => {
-      // given
-      const oracleFnMock = () => Promise.reject(new Error('oracle failed'))
-      const bridgeContractMock = {
-        methods: {
-          gasPrice: sinon.stub().returns({
-            call: sinon.stub().returns(Promise.resolve('2'))
-          })
-        }
-      }
-
-      // when
-      const gasPrice = await fetchGasPrice({
-        bridgeContract: bridgeContractMock,
-        oracleFn: oracleFnMock
-      })
-
-      // then
-      expect(gasPrice).to.equal('2')
-    })
-    it('should return null if both the oracle and the contract fail', async () => {
-      // given
-      const oracleFnMock = () => Promise.reject(new Error('oracle failed'))
-      const bridgeContractMock = {
-        methods: {
-          gasPrice: sinon.stub().returns({
-            call: sinon.stub().returns(Promise.reject(new Error('contract failed')))
-          })
-        }
-      }
-
-      // when
-      const gasPrice = await fetchGasPrice({
-        bridgeContract: bridgeContractMock,
-        oracleFn: oracleFnMock
-      })
-
-      // then
-      expect(gasPrice).to.equal(null)
-    })
-  })
   describe('start', () => {
     const utils = { setIntervalAndRun: sinon.spy() }
     beforeEach(() => {
@@ -131,6 +60,104 @@ describe('gasPrice', () => {
       expect(utils.setIntervalAndRun.args[0][1]).to.equal(DEFAULT_UPDATE_INTERVAL)
     })
   })
-  
-  
+
+  describe('fetching gas price', () => {
+    const utils = { setIntervalAndRun: () => {} }
+
+    it('should fall back to default if contract and oracle/supplier are not working', async () => {
+      // given
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, null, null)
+
+      // then
+      expect(gasPrice.getPrice()).to.equal('101000000000')
+    })
+
+    it('should fetch gas from oracle/supplier', async () => {
+      // given
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
+
+      const oracleFetchFn = () => ({
+        json: () => ({
+          standard: '103'
+        })
+      })
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, null, oracleFetchFn)
+
+      // then
+      expect(gasPrice.getPrice().toString()).to.equal('103000000000')
+    })
+
+    it('should fetch gas from contract', async () => {
+      // given
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
+
+      const bridgeContractMock = {
+        methods: {
+          gasPrice: sinon.stub().returns({
+            call: sinon.stub().returns(Promise.resolve('102000000000'))
+          })
+        }
+      }
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, null)
+
+      // then
+      expect(gasPrice.getPrice().toString()).to.equal('102000000000')
+    })
+
+    it('should fetch the gas price from the contract first', async () => {
+      // given
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
+
+      const bridgeContractMock = {
+        methods: {
+          gasPrice: sinon.stub().returns({
+            call: sinon.stub().returns(Promise.resolve('102000000000'))
+          })
+        }
+      }
+
+      const oracleFetchFn = () => ({
+        json: () => ({
+          standard: '103'
+        })
+      })
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, oracleFetchFn)
+
+      // then
+      expect(gasPrice.getPrice().toString()).to.equal('102000000000')
+    })
+
+    it('log errors using the logger', async () => {
+      // given
+      const fakeLogger = { error: sinon.spy() }
+      const gasPrice = proxyquire('../src/services/gasPrice', {
+        '../utils/utils': utils,
+        '../services/logger': { child: () => fakeLogger }
+      })
+      await gasPrice.start('home')
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, null, null)
+
+      // then
+      expect(fakeLogger.error.calledTwice).to.equal(true) // two errors
+    })
+  })
 })
