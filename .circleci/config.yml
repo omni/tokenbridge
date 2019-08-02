@@ -22,18 +22,13 @@ orbs:
                 wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
                 sudo dpkg -i chrome.deb
     executors:
-      my_inline_executor:
-        parameters:
-          version:
-            type: string
-            default: "2.4"
+      docker-node:
         docker:
-          - image: circleci/ruby:<<parameters.version>>
+          - image: circleci/node:10.15
 
 jobs:
   initialize:
-    docker:
-      - image: circleci/node:10.15
+    executor: tokenbridge-orb/docker-node
     steps:
       - checkout
       - run: git submodule update --init
@@ -67,35 +62,30 @@ jobs:
           paths:
             - ~/project
   initialize-root:
-    docker:
-      - image: circleci/node:10.15
+    executor: tokenbridge-orb/docker-node
     steps:
       - checkout
       - run: sudo su - -c 'export CI=true && cd /home/circleci/project && yarn initialize && yarn test'
   build:
-    docker:
-      - image: circleci/node:10.15
+    executor: tokenbridge-orb/docker-node
     steps:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run build
   lint:
-    docker:
-      - image: circleci/node:10.15
+    executor: tokenbridge-orb/docker-node
     steps:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run lint
   test:
-    docker:
-      - image: circleci/node:10.15
+    executor: tokenbridge-orb/docker-node
     steps:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run test
   oracle-e2e:
-    docker:
-      - image: circleci/node:10.15
+    executor: tokenbridge-orb/docker-node
     steps:
         - checkout
         - run: git submodule update --init
@@ -139,8 +129,7 @@ jobs:
         - run: git submodule update --init
         - run: ./monitor-e2e/run-tests.sh
   cover:
-    docker:
-      - image: circleci/node:10.15
+    executor: tokenbridge-orb/docker-node
     steps:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
