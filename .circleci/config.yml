@@ -16,8 +16,11 @@ orbs:
     commands:
       install-chrome:
         steps:
-          - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
-          - run: sudo dpkg -i chrome.deb
+          - run: 
+              name: Install Chrome
+              command: |
+                wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+                sudo dpkg -i chrome.deb
     executors:
       my_inline_executor:
         parameters:
