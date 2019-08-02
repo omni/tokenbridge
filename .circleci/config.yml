@@ -25,6 +25,10 @@ orbs:
       docker-node:
         docker:
           - image: circleci/node:10.15
+      machine-with-caching:
+        machine:
+          image: circleci/classic:latest
+          docker_layer_caching: true
 
 jobs:
   initialize:
@@ -93,9 +97,7 @@ jobs:
             docker_layer_caching: true
         - run: yarn run oracle-e2e
   ui-e2e:
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
+    executor: tokenbridge-orb/machine-with-caching
     steps:
       - checkout
       - run: |
@@ -121,9 +123,7 @@ jobs:
              - ~/.cache/yarn
       - run: yarn run ui-e2e
   monitor-e2e:
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
+    executor: tokenbridge-orb/machine-with-caching
     steps:
         - checkout
         - run: git submodule update --init
@@ -136,30 +136,22 @@ jobs:
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
   deployment-oracle:
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
+    executor: tokenbridge-orb/machine-with-caching
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh oracle
   deployment-ui:
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
+    executor: tokenbridge-orb/machine-with-caching
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh ui
   deployment-monitor:
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
+    executor: tokenbridge-orb/machine-with-caching
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh monitor
   ultimate-native-to-erc:
-    machine:
-      image: circleci/classic:latest
-      docker_layer_caching: true
+    executor: tokenbridge-orb/machine-with-caching
     steps:
       - checkout
       - run: git submodule update --init
