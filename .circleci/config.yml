@@ -206,6 +206,141 @@ jobs:
            paths:
              - ~/.cache/yarn
       - run: yarn run ui-e2e
+  ui-e2e6:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+          echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run: nvm install 11.4.0 && nvm alias default 11.4.0
+      - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      - run: sudo apt-get update && sudo apt-get install yarn
+      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i chrome.deb
+      - run: git submodule update --init
+      - restore_cache:
+           name: Restore Machine Yarn Package Cache
+           keys:
+             - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: yarn install --frozen-lockfile
+      - save_cache:
+           name: Save Machine Yarn Package Cache
+           key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
+      - run: yarn run ui-e2e
+  ui-e2e7:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+          echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run: nvm install 11.4.0 && nvm alias default 11.4.0
+      - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      - run: sudo apt-get update && sudo apt-get install yarn
+      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i chrome.deb
+      - run: git submodule update --init
+      - restore_cache:
+           name: Restore Machine Yarn Package Cache
+           keys:
+             - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: yarn install --frozen-lockfile
+      - save_cache:
+           name: Save Machine Yarn Package Cache
+           key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
+      - run: yarn run ui-e2e
+  ui-e2e8:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+          echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run: nvm install 11.4.0 && nvm alias default 11.4.0
+      - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      - run: sudo apt-get update && sudo apt-get install yarn
+      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i chrome.deb
+      - run: git submodule update --init
+      - restore_cache:
+           name: Restore Machine Yarn Package Cache
+           keys:
+             - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: yarn install --frozen-lockfile
+      - save_cache:
+           name: Save Machine Yarn Package Cache
+           key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
+      - run: yarn run ui-e2e
+  ui-e2e9:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+          echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run: nvm install 11.4.0 && nvm alias default 11.4.0
+      - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      - run: sudo apt-get update && sudo apt-get install yarn
+      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i chrome.deb
+      - run: git submodule update --init
+      - restore_cache:
+           name: Restore Machine Yarn Package Cache
+           keys:
+             - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: yarn install --frozen-lockfile
+      - save_cache:
+           name: Save Machine Yarn Package Cache
+           key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
+      - run: yarn run ui-e2e
+  ui-e2e10:
+    machine:
+      image: circleci/classic:latest
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run: |
+          echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
+          echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run: nvm install 11.4.0 && nvm alias default 11.4.0
+      - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      - run: sudo apt-get update && sudo apt-get install yarn
+      - run: wget -O chrome.deb https://www.slimjet.com/chrome/download-chrome.php?file=files%2F75.0.3770.80%2Fgoogle-chrome-stable_current_amd64.deb
+      - run: sudo dpkg -i chrome.deb
+      - run: git submodule update --init
+      - restore_cache:
+           name: Restore Machine Yarn Package Cache
+           keys:
+             - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: yarn install --frozen-lockfile
+      - save_cache:
+           name: Save Machine Yarn Package Cache
+           key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+           paths:
+             - ~/.cache/yarn
+      - run: yarn run ui-e2e
   monitor-e2e:
     machine:
       image: circleci/classic:latest
@@ -322,10 +457,33 @@ workflows:
       #         only: master
       # - oracle-e2e
       - ui-e2e
-      - ui-e2e2
-      - ui-e2e3
-      - ui-e2e4
-      - ui-e2e5
+      - ui-e2e2:
+          requires:
+            -  ui-e2e
+      - ui-e2e3:
+          requires:
+            -  ui-e2e2
+      - ui-e2e4:
+          requires:
+            -  ui-e2e3
+      - ui-e2e5:
+          requires:
+            -  ui-e2e4
+      - ui-e2e6:
+          requires:
+            -  ui-e2e5
+      - ui-e2e7:
+          requires:
+            -  ui-e2e6
+      - ui-e2e8:
+          requires:
+            -  ui-e2e7
+      - ui-e2e9:
+          requires:
+            -  ui-e2e8
+      - ui-e2e10:
+          requires:
+            -  ui-e2e9
       # - monitor-e2e
       # - deployment-oracle
       # - deployment-ui
