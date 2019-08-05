@@ -2,8 +2,7 @@ require('dotenv').config()
 const Web3 = require('web3')
 const fetch = require('node-fetch')
 const logger = require('./logger')('validators')
-const { getBridgeABIs, BRIDGE_VALIDATORS_ABI } = require('../commons')
-const { getValidatorList } = require('./utils/validatorUtils')
+const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, getValidatorList } = require('../commons')
 const { getBlockNumber } = require('./utils/contract')
 
 const {
@@ -82,20 +81,18 @@ async function main(bridgeMode) {
   const foreignBridgeValidators = new web3Foreign.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
 
   logger.debug('calling foreignBridgeValidators getValidatorList()')
-  const foreignValidators = await getValidatorList(
-    foreignValidatorsAddress,
-    web3Foreign.eth,
-    FOREIGN_DEPLOYMENT_BLOCK,
-    foreignBlockNumber
-  )
+  const foreignValidators = await getValidatorList(foreignValidatorsAddress, web3Foreign.eth, {
+    from: FOREIGN_DEPLOYMENT_BLOCK,
+    to: foreignBlockNumber,
+    logger
+  })
 
   logger.debug('calling homeBridgeValidators getValidatorList()')
-  const homeValidators = await getValidatorList(
-    homeValidatorsAddress,
-    web3Home.eth,
-    HOME_DEPLOYMENT_BLOCK,
-    homeBlockNumber
-  )
+  const homeValidators = await getValidatorList(homeValidatorsAddress, web3Home.eth, {
+    from: HOME_DEPLOYMENT_BLOCK,
+    to: homeBlockNumber,
+    logger
+  })
 
   const homeBalances = {}
   logger.debug('calling asyncForEach homeValidators homeBalances')
