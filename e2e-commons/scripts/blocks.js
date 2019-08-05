@@ -18,21 +18,6 @@ function main() {
   }, 1000)
 }
 
-homeWeb3.eth.sendTransaction({
-  from: user.address,
-  to: blockGenerator.address,
-  gasPrice: '1',
-  gas: '21000',
-  value: '2100000000'
-})
-foreignWeb3.eth.sendTransaction({
-  from: user.address,
-  to: blockGenerator.address,
-  gasPrice: '1',
-  gas: '21000',
-  value: '2100000000'
-})
-
 main()
 
 process.on('SIGTERM', function () {
