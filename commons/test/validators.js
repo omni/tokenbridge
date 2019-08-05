@@ -1,4 +1,5 @@
-import { processValidatorsEvents, parseValidatorEvent } from '../contract'
+import { expect } from 'chai'
+import { processValidatorsEvents, parseValidatorEvent } from '..'
 
 describe('parseValidatorEvent', () => {
   it('should parse ValidatorAdded event from v1', () => {

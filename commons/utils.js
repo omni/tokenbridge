@@ -1,6 +1,6 @@
+const { toBN } = require('web3').utils
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
-const { toBN } = require('web3').utils
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
@@ -115,23 +115,9 @@ const tryCall = async (method, fallbackValue) => {
   }
 }
 
-const validatorList = async contract => {
-  try {
-    return await contract.methods.validatorList().call()
-  } catch (e) {
-    return []
-  }
-}
+const getDeployedAtBlock = async contract => tryCall(contract.methods.deployedAtBlock(), 0)
 
-const getDeployedAtBlock = async contract => {
-  try {
-    return await contract.methods.deployedAtBlock().call()
-  } catch (e) {
-    return 0
-  }
-}
-
-async function getPastEvents({ contract, event, fromBlock, toBlock, options }) {
+const getPastEvents = async ({ contract, event, fromBlock, toBlock, options }) => {
   let events
   try {
     events = await contract.getPastEvents(event, {
@@ -201,6 +187,7 @@ module.exports = {
   getUnit,
   parseValidatorEvent,
   processValidatorsEvents,
-  validatorList,
-  getValidatorListX
+  getValidatorListX,
+  getPastEvents,
+  getDeployedAtBlock
 }
