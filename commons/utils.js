@@ -117,29 +117,27 @@ const tryCall = async (method, fallbackValue) => {
 
 const getDeployedAtBlock = async contract => tryCall(contract.methods.deployedAtBlock(), 0)
 
-const getPastEvents = async ({ contract, event, fromBlock, toBlock, options }) => {
+const getPastEvents = async (contract, { event, fromBlock, toBlock, options }) => {
   let events
   try {
-    events = await contract.getPastEvents(event, {
-      ...options,
+    events = await contract.getPastEvents(event || 'allEvents', {
+      options: options || {},
       fromBlock,
-      toBlock
+      toBlock: toBlock || 'latest'
     })
   } catch (e) {
-    if (e.message.includes('query returned more than 1000 results')) {
+    if (e.message.includes('query returned more than 1000 results') && Number.isInteger(toBlock)) {
       const middle = fromBlock.add(toBlock).divRound(toBN(2))
       const middlePlusOne = middle.add(toBN(1))
 
-      const firstHalfEvents = await getPastEvents({
-        contract,
-        event,
+      const firstHalfEvents = await getPastEvents(contract, {
+        event: event || 'allEvents',
         fromBlock,
         toBlock: middle,
         options
       })
-      const secondHalfEvents = await getPastEvents({
-        contract,
-        event,
+      const secondHalfEvents = await getPastEvents(contract, {
+        event: event || 'allEvents',
         fromBlock: middlePlusOne,
         toBlock,
         options

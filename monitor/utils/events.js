@@ -46,36 +46,29 @@ async function main(mode) {
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
-  const homeDeposits = await getPastEvents({
-    contract: homeBridge,
+  const homeDeposits = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
     fromBlock: HOME_DEPLOYMENT_BLOCK,
-    toBlock: homeBlockNumber,
-    options: {}
+    toBlock: homeBlockNumber
   })
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
-  const foreignDeposits = await getPastEvents({
-    contract: foreignBridge,
+  const foreignDeposits = await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Deposit' : 'RelayedMessage',
     fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
-    toBlock: foreignBlockNumber,
-    options: {}
+    toBlock: foreignBlockNumber
   })
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
-  const homeWithdrawals = await getPastEvents({
-    contract: homeBridge,
+  const homeWithdrawals = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Withdraw' : 'AffirmationCompleted',
     fromBlock: HOME_DEPLOYMENT_BLOCK,
-    toBlock: homeBlockNumber,
-    options: {}
+    toBlock: homeBlockNumber
   })
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
   const foreignWithdrawals = isExternalErc20
-    ? await getPastEvents({
-        contract: erc20Contract,
+    ? await getPastEvents(erc20Contract, {
         event: 'Transfer',
         fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
         toBlock: foreignBlockNumber,
@@ -83,12 +76,10 @@ async function main(mode) {
           filter: { to: FOREIGN_BRIDGE_ADDRESS }
         }
       })
-    : await getPastEvents({
-        contract: foreignBridge,
+    : await getPastEvents(foreignBridge, {
         event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
         fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
-        toBlock: foreignBlockNumber,
-        options: {}
+        toBlock: foreignBlockNumber
       })
   logger.debug('Done')
   return {
