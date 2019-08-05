@@ -1,16 +1,8 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
-const { BRIDGE_VALIDATORS_ABI, processValidatorsEvents } = require('../../commons')
+const { BRIDGE_VALIDATORS_ABI, processValidatorsEvents, validatorList } = require('../../commons')
 const logger = require('../logger')('validatorsUtils')
 const { getPastEvents } = require('./contract')
-
-const validatorList = async contract => {
-  try {
-    return await contract.methods.validatorList().call()
-  } catch (e) {
-    return []
-  }
-}
 
 const getValidatorList = async (address, eth, fromBlock, toBlock) => {
   logger.debug('getting validatorList')

@@ -1,7 +1,7 @@
 import BN from 'bignumber.js'
 import { fromDecimals } from './decimals'
 import { fromWei } from 'web3-utils'
-import { processValidatorsEvents, REWARDABLE_VALIDATORS_ABI } from '../../../../commons'
+import { processValidatorsEvents, REWARDABLE_VALIDATORS_ABI, validatorList } from '../../../../commons'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -77,14 +77,6 @@ export const getValidatorList = async (address, eth) => {
   })
 
   return processValidatorsEvents(validatorsEvents)
-}
-
-export const validatorList = async contract => {
-  try {
-    return await contract.methods.validatorList().call()
-  } catch (e) {
-    return []
-  }
 }
 
 export const getName = contract => contract.methods.name().call()

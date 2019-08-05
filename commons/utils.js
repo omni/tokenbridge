@@ -105,6 +105,14 @@ const processValidatorsEvents = events => {
   return Array.from(validatorList)
 }
 
+const validatorList = async contract => {
+  try {
+    return await contract.methods.validatorList().call()
+  } catch (e) {
+    return []
+  }
+}
+
 module.exports = {
   decodeBridgeMode,
   decodeFeeManagerMode,
@@ -112,5 +120,6 @@ module.exports = {
   getTokenType,
   getUnit,
   parseValidatorEvent,
-  processValidatorsEvents
+  processValidatorsEvents,
+  validatorList
 }
