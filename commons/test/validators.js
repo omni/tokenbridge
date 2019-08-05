@@ -1,5 +1,5 @@
-import { expect } from 'chai'
-import { processValidatorsEvents, parseValidatorEvent } from '..'
+const { expect } = require('chai')
+const { processValidatorsEvents, parseValidatorEvent } = require('..')
 
 describe('parseValidatorEvent', () => {
   it('should parse ValidatorAdded event from v1', () => {

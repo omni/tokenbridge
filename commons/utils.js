@@ -152,7 +152,7 @@ const getPastEvents = async ({ contract, event, fromBlock, toBlock, options }) =
   return events
 }
 
-const getValidatorListX = async (address, eth, options) => {
+const getValidatorList = async (address, eth, options) => {
   options.logger && options.logger.debug && options.logger.debug('getting validatorList')
 
   const validatorsContract = new eth.Contract(REWARDABLE_VALIDATORS_ABI, address) // in monitor, BRIDGE_VALIDATORS_ABI was used
@@ -187,7 +187,7 @@ module.exports = {
   getUnit,
   parseValidatorEvent,
   processValidatorsEvents,
-  getValidatorListX,
+  getValidatorList,
   getPastEvents,
   getDeployedAtBlock
 }
