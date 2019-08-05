@@ -1,80 +1,9 @@
 const sinon = require('sinon')
 const { expect } = require('chai')
 const proxyquire = require('proxyquire').noPreserveCache()
-const Web3Utils = require('web3-utils')
-const { fetchGasPrice, gasPriceWithinLimits, normalizeGasPrice } = require('../src/services/gasPrice')
-const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES } = require('../src/utils/constants')
+const { DEFAULT_UPDATE_INTERVAL } = require('../src/utils/constants')
 
 describe('gasPrice', () => {
-  describe('fetchGasPrice', () => {
-    beforeEach(() => {
-      sinon.stub(console, 'error')
-    })
-    afterEach(() => {
-      console.error.restore()
-    })
-
-    it('should fetch the gas price from the oracle by default', async () => {
-      // given
-      const oracleFnMock = () => Promise.resolve('1')
-      const bridgeContractMock = {
-        methods: {
-          gasPrice: {
-            call: sinon.stub().returns(Promise.resolve('2'))
-          }
-        }
-      }
-
-      // when
-      const gasPrice = await fetchGasPrice({
-        bridgeContract: bridgeContractMock,
-        oracleFn: oracleFnMock
-      })
-
-      // then
-      expect(gasPrice).to.equal('1')
-    })
-    it('should fetch the gas price from the contract if the oracle fails', async () => {
-      // given
-      const oracleFnMock = () => Promise.reject(new Error('oracle failed'))
-      const bridgeContractMock = {
-        methods: {
-          gasPrice: sinon.stub().returns({
-            call: sinon.stub().returns(Promise.resolve('2'))
-          })
-        }
-      }
-
-      // when
-      const gasPrice = await fetchGasPrice({
-        bridgeContract: bridgeContractMock,
-        oracleFn: oracleFnMock
-      })
-
-      // then
-      expect(gasPrice).to.equal('2')
-    })
-    it('should return null if both the oracle and the contract fail', async () => {
-      // given
-      const oracleFnMock = () => Promise.reject(new Error('oracle failed'))
-      const bridgeContractMock = {
-        methods: {
-          gasPrice: sinon.stub().returns({
-            call: sinon.stub().returns(Promise.reject(new Error('contract failed')))
-          })
-        }
-      }
-
-      // when
-      const gasPrice = await fetchGasPrice({
-        bridgeContract: bridgeContractMock,
-        oracleFn: oracleFnMock
-      })
-
-      // then
-      expect(gasPrice).to.equal(null)
-    })
-  })
   describe('start', () => {
     const utils = { setIntervalAndRun: sinon.spy() }
     beforeEach(() => {
@@ -131,101 +60,104 @@ describe('gasPrice', () => {
       expect(utils.setIntervalAndRun.args[0][1]).to.equal(DEFAULT_UPDATE_INTERVAL)
     })
   })
-  describe('gasPriceWithinLimits', () => {
-    it('should return gas price if gas price is between boundaries', () => {
+
+  describe('fetching gas price', () => {
+    const utils = { setIntervalAndRun: () => {} }
+
+    it('should fall back to default if contract and oracle/supplier are not working', async () => {
       // given
-      const minGasPrice = 1
-      const middleGasPrice = 10
-      const maxGasPrice = 250
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
 
       // when
-      const minGasPriceWithinLimits = gasPriceWithinLimits(minGasPrice)
-      const middleGasPriceWithinLimits = gasPriceWithinLimits(middleGasPrice)
-      const maxGasPriceWithinLimits = gasPriceWithinLimits(maxGasPrice)
+      await gasPrice.fetchGasPrice('standard', 1, null, null)
 
       // then
-      expect(minGasPriceWithinLimits).to.equal(minGasPrice)
-      expect(middleGasPriceWithinLimits).to.equal(middleGasPrice)
-      expect(maxGasPriceWithinLimits).to.equal(maxGasPrice)
+      expect(gasPrice.getPrice()).to.equal('101000000000')
     })
-    it('should return min limit if gas price is below min boundary', () => {
-      // Given
-      const initialGasPrice = 0.5
 
-      // When
-      const gasPrice = gasPriceWithinLimits(initialGasPrice)
+    it('should fetch gas from oracle/supplier', async () => {
+      // given
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
 
-      // Then
-      expect(gasPrice).to.equal(GAS_PRICE_BOUNDARIES.MIN)
+      const oracleFetchFn = () => ({
+        json: () => ({
+          standard: '103'
+        })
+      })
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, null, oracleFetchFn)
+
+      // then
+      expect(gasPrice.getPrice().toString()).to.equal('103000000000')
     })
-    it('should return max limit if gas price is above max boundary', () => {
-      // Given
-      const initialGasPrice = 260
 
-      // When
-      const gasPrice = gasPriceWithinLimits(initialGasPrice)
+    it('should fetch gas from contract', async () => {
+      // given
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
 
-      // Then
-      expect(gasPrice).to.equal(GAS_PRICE_BOUNDARIES.MAX)
+      const bridgeContractMock = {
+        methods: {
+          gasPrice: sinon.stub().returns({
+            call: sinon.stub().returns(Promise.resolve('102000000000'))
+          })
+        }
+      }
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, null)
+
+      // then
+      expect(gasPrice.getPrice().toString()).to.equal('102000000000')
     })
-  })
-  describe('normalizeGasPrice', () => {
-    it('should work with oracle gas price in gwei', () => {
-      // Given
-      const oracleGasPrice = 20
-      const factor = 1
 
-      // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
+    it('should fetch the gas price from the oracle first', async () => {
+      // given
+      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
+      await gasPrice.start('home')
 
-      // Then
-      expect(result).to.equal('20000000000')
+      const bridgeContractMock = {
+        methods: {
+          gasPrice: sinon.stub().returns({
+            call: sinon.stub().returns(Promise.resolve('102000000000'))
+          })
+        }
+      }
+
+      const oracleFetchFn = () => ({
+        json: () => ({
+          standard: '103'
+        })
+      })
+
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, oracleFetchFn)
+
+      // then
+      expect(gasPrice.getPrice().toString()).to.equal('103000000000')
     })
-    it('should work with oracle gas price not in gwei', () => {
-      // Given
-      const oracleGasPrice = 200
-      const factor = 0.1
 
-      // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
+    it('log errors using the logger', async () => {
+      // given
+      const fakeLogger = { error: sinon.spy() }
+      const gasPrice = proxyquire('../src/services/gasPrice', {
+        '../utils/utils': utils,
+        '../services/logger': { child: () => fakeLogger }
+      })
+      await gasPrice.start('home')
 
-      // Then
-      expect(result).to.equal('20000000000')
-    })
-    it('should increase gas price value from oracle', () => {
-      // Given
-      const oracleGasPrice = 20
-      const factor = 1.5
+      // when
+      await gasPrice.fetchGasPrice('standard', 1, null, null)
 
-      // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
-
-      // Then
-      expect(result).to.equal('30000000000')
-    })
-    it('should respect gas price max limit', () => {
-      // Given
-      const oracleGasPrice = 200
-      const factor = 4
-      const maxInWei = Web3Utils.toWei(GAS_PRICE_BOUNDARIES.MAX.toString(), 'gwei')
-
-      // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
-
-      // Then
-      expect(result).to.equal(maxInWei)
-    })
-    it('should respect gas price min limit', () => {
-      // Given
-      const oracleGasPrice = 1
-      const factor = 0.01
-      const minInWei = Web3Utils.toWei(GAS_PRICE_BOUNDARIES.MIN.toString(), 'gwei')
-
-      // When
-      const result = normalizeGasPrice(oracleGasPrice, factor)
-
-      // Then
-      expect(result).to.equal(minInWei)
+      // then
+      expect(fakeLogger.error.calledTwice).to.equal(true) // two errors
     })
   })
 })
