@@ -1,7 +1,7 @@
 import BN from 'bignumber.js'
 import { fromDecimals } from './decimals'
 import { fromWei } from 'web3-utils'
-import { ERC_TYPES, REWARDABLE_VALIDATORS_ABI } from '../../../../commons'
+import { parseValidatorEvent, REWARDABLE_VALIDATORS_ABI } from '../../../../commons'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -100,31 +100,6 @@ export const processValidatorsEvents = events => {
   })
 
   return Array.from(validatorList)
-}
-
-export const parseValidatorEvent = event => {
-  if (
-    event.event === undefined &&
-    event.raw &&
-    event.raw.topics &&
-    (event.raw.topics[0] === '0xe366c1c0452ed8eec96861e9e54141ebff23c9ec89fe27b996b45f5ec3884987' ||
-      event.raw.topics[0] === '0x8064a302796c89446a96d63470b5b036212da26bd2debe5bec73e0170a9a5e83')
-  ) {
-    const rawAddress = event.raw.topics.length > 1 ? event.raw.topics[1] : event.raw.data
-    const address = '0x' + rawAddress.slice(26)
-    event.event = 'ValidatorAdded'
-    event.returnValues.validator = address
-  } else if (
-    event.event === undefined &&
-    event.raw &&
-    event.raw.topics &&
-    event.raw.topics[0] === '0xe1434e25d6611e0db941968fdc97811c982ac1602e951637d206f5fdda9dd8f1'
-  ) {
-    const rawAddress = event.raw.data === '0x' ? event.raw.topics[1] : event.raw.data
-    const address = '0x' + rawAddress.slice(26)
-    event.event = 'ValidatorRemoved'
-    event.returnValues.validator = address
-  }
 }
 
 export const getName = contract => contract.methods.name().call()
