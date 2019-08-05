@@ -39,8 +39,8 @@ const fetchGasPrice = async (speedType, factor, bridgeContract, oracleFetchFn) =
   const contractOptions = { logger }
   const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
   cachedGasPrice =
-    (await gasPriceFromContract(bridgeContract, contractOptions)) ||
     (await gasPriceFromOracle(oracleFetchFn, oracleOptions)) ||
+    (await gasPriceFromContract(bridgeContract, contractOptions)) ||
     cachedGasPrice
   return cachedGasPrice
 }

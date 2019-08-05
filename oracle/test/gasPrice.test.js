@@ -117,7 +117,7 @@ describe('gasPrice', () => {
       expect(gasPrice.getPrice().toString()).to.equal('102000000000')
     })
 
-    it('should fetch the gas price from the contract first', async () => {
+    it('should fetch the gas price from the oracle first', async () => {
       // given
       process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
@@ -141,7 +141,7 @@ describe('gasPrice', () => {
       await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, oracleFetchFn)
 
       // then
-      expect(gasPrice.getPrice().toString()).to.equal('102000000000')
+      expect(gasPrice.getPrice().toString()).to.equal('103000000000')
     })
 
     it('log errors using the logger', async () => {
