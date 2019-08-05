@@ -1,3 +1,4 @@
+const { toWei, toBN } = require('web3-utils')
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
 
 function decodeBridgeMode(bridgeModeHash) {
@@ -65,10 +66,77 @@ const getUnit = bridgeMode => {
   return { unitHome, unitForeign }
 }
 
+const gasPriceWithinLimits = (gasPrice, limits) => {
+  if (!limits) {
+    return gasPrice
+  }
+  if (gasPrice < limits.MIN) {
+    return limits.MIN
+  } else if (gasPrice > limits.MAX) {
+    return limits.MAX
+  } else {
+    return gasPrice
+  }
+}
+
+const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
+  let gasPrice = oracleGasPrice * factor
+  gasPrice = gasPriceWithinLimits(gasPrice, limits)
+  return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
+}
+
+// fetchFn has to be supplied (instead of just url to oracle),
+// because this utility function is shared between Browser and Node,
+// we use built-in 'fetch' on browser side, and `node-fetch` package in Node.
+const gasPriceFromOracle = async (fetchFn, options = {}) => {
+  try {
+    const response = await fetchFn()
+    const json = await response.json()
+    const oracleGasPrice = json[options.speedType]
+
+    if (!oracleGasPrice) {
+      options.logger &&
+        options.logger.error &&
+        options.logger.error(`Response from Oracle didn't include gas price for ${options.speedType} type.`)
+      return null
+    }
+
+    const normalizedGasPrice = normalizeGasPrice(oracleGasPrice, options.factor, options.limits)
+
+    options.logger &&
+      options.logger.debug &&
+      options.logger.debug({ oracleGasPrice, normalizedGasPrice }, 'Gas price updated using the API')
+
+    return normalizedGasPrice
+  } catch (e) {
+    options.logger && options.logger.error && options.logger.error(`Gas Price API is not available. ${e.message}`)
+  }
+  return null
+}
+
+const gasPriceFromContract = async (bridgeContract, options = {}) => {
+  try {
+    const gasPrice = await bridgeContract.methods.gasPrice().call()
+    options.logger &&
+      options.logger.debug &&
+      options.logger.debug({ gasPrice }, 'Gas price updated using the contracts')
+    return gasPrice
+  } catch (e) {
+    options.logger &&
+      options.logger.error &&
+      options.logger.error(`There was a problem getting the gas price from the contract. ${e.message}`)
+  }
+  return null
+}
+
 module.exports = {
   decodeBridgeMode,
   decodeFeeManagerMode,
   getBridgeMode,
   getTokenType,
-  getUnit
+  getUnit,
+  normalizeGasPrice,
+  gasPriceFromOracle,
+  gasPriceFromContract,
+  gasPriceWithinLimits
 }
