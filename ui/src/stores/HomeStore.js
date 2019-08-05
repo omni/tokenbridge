@@ -11,13 +11,13 @@ import {
   decodeFeeManagerMode,
   getBridgeABIs,
   HOME_V1_ABI,
-  ERC20_BYTES32_ABI
+  ERC20_BYTES32_ABI,
+  getPastEvents
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
   getCurrentLimit,
-  getPastEvents,
   getMessage,
   getErc677TokenAddress,
   getSymbol,

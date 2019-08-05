@@ -1,4 +1,6 @@
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
+const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
+const { toBN } = require('web3').utils
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
@@ -105,12 +107,90 @@ const processValidatorsEvents = events => {
   return Array.from(validatorList)
 }
 
+const tryCall = async (method, fallbackValue) => {
+  try {
+    return await method.call()
+  } catch (e) {
+    return fallbackValue
+  }
+}
+
 const validatorList = async contract => {
   try {
     return await contract.methods.validatorList().call()
   } catch (e) {
     return []
   }
+}
+
+const getDeployedAtBlock = async contract => {
+  try {
+    return await contract.methods.deployedAtBlock().call()
+  } catch (e) {
+    return 0
+  }
+}
+
+async function getPastEvents({ contract, event, fromBlock, toBlock, options }) {
+  let events
+  try {
+    events = await contract.getPastEvents(event, {
+      ...options,
+      fromBlock,
+      toBlock
+    })
+  } catch (e) {
+    if (e.message.includes('query returned more than 1000 results')) {
+      const middle = fromBlock.add(toBlock).divRound(toBN(2))
+      const middlePlusOne = middle.add(toBN(1))
+
+      const firstHalfEvents = await getPastEvents({
+        contract,
+        event,
+        fromBlock,
+        toBlock: middle,
+        options
+      })
+      const secondHalfEvents = await getPastEvents({
+        contract,
+        event,
+        fromBlock: middlePlusOne,
+        toBlock,
+        options
+      })
+      events = [...firstHalfEvents, ...secondHalfEvents]
+    } else {
+      throw new Error(e)
+    }
+  }
+  return events
+}
+
+const getValidatorListX = async (address, eth, options) => {
+  options.logger && options.logger.debug && options.logger.debug('getting validatorList')
+
+  const validatorsContract = new eth.Contract(REWARDABLE_VALIDATORS_ABI, address) // in monitor, BRIDGE_VALIDATORS_ABI was used
+  const validators = await tryCall(validatorsContract.methods.validatorList(), [])
+
+  if (validators.length) {
+    return validators
+  }
+
+  options.logger && options.logger.debug && options.logger.debug('getting validatorsEvents')
+
+  const deployedAtBlock = await tryCall(validatorsContract.methods.deployedAtBlock(), 0)
+  const fromBlock = options.fromBlock || Number(deployedAtBlock) || 0
+  const toBlock = options.toBlock || 'latest'
+
+  const validatorsEvents = await getPastEvents({
+    contract: new eth.Contract([], address),
+    event: 'allEvents',
+    fromBlock,
+    toBlock,
+    options: {}
+  })
+
+  return processValidatorsEvents(validatorsEvents)
 }
 
 module.exports = {
@@ -121,5 +201,6 @@ module.exports = {
   getUnit,
   parseValidatorEvent,
   processValidatorsEvents,
-  validatorList
+  validatorList,
+  getValidatorListX
 }

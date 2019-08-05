@@ -1,7 +1,7 @@
 import BN from 'bignumber.js'
 import { fromDecimals } from './decimals'
 import { fromWei } from 'web3-utils'
-import { processValidatorsEvents, REWARDABLE_VALIDATORS_ABI, validatorList } from '../../../../commons'
+import { getValidatorListX } from '../../../../commons'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -26,9 +26,6 @@ export const getCurrentLimit = async (contract, decimals) => {
     totalSpentPerDay: fromDecimals(totalSpentPerDay, decimals)
   }
 }
-
-export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents') =>
-  contract.getPastEvents(event, { fromBlock, toBlock })
 
 export const getErc677TokenAddress = contract => contract.methods.erc677token().call()
 
@@ -63,20 +60,11 @@ export const totalBurntCoins = async contract => {
 }
 
 export const getValidatorList = async (address, eth) => {
-  const validatorsContract = new eth.Contract(REWARDABLE_VALIDATORS_ABI, address)
-  const validators = await validatorList(validatorsContract)
-
-  if (validators.length) {
-    return validators
+  const options = {
+    logger: console
   }
 
-  const deployedAtBlock = await getDeployedAtBlock(validatorsContract)
-  const contract = new eth.Contract([], address)
-  const validatorsEvents = await contract.getPastEvents('allEvents', {
-    fromBlock: Number(deployedAtBlock)
-  })
-
-  return processValidatorsEvents(validatorsEvents)
+  return await getValidatorListX(address, eth, options)
 }
 
 export const getName = contract => contract.methods.name().call()
@@ -99,14 +87,6 @@ export const getHomeFee = async contract => {
 export const getForeignFee = async contract => {
   const feeInWei = await contract.methods.getForeignFee().call()
   return new BN(fromWei(feeInWei.toString()))
-}
-
-export const getDeployedAtBlock = async contract => {
-  try {
-    return await contract.methods.deployedAtBlock().call()
-  } catch (e) {
-    return 0
-  }
 }
 
 export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()

@@ -10,7 +10,8 @@ const {
   HOME_ERC_TO_ERC_ABI,
   ERC20_ABI,
   ERC677_BRIDGE_TOKEN_ABI,
-  getTokenType
+  getTokenType,
+  getPastEvents
 } = require('../../commons')
 
 const { HOME_RPC_URL, FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } = process.env
@@ -23,7 +24,7 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const { getPastEvents, getBlockNumber } = require('./contract')
+const { getBlockNumber } = require('./contract')
 
 async function main(mode) {
   const homeErcBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)

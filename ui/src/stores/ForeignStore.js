@@ -9,13 +9,13 @@ import {
   decodeFeeManagerMode,
   getBridgeABIs,
   getTokenType,
-  ERC20_BYTES32_ABI
+  ERC20_BYTES32_ABI,
+  getPastEvents
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
   getCurrentLimit,
-  getPastEvents,
   getTotalSupply,
   getBalanceOf,
   getErc677TokenAddress,
