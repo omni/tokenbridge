@@ -90,11 +90,27 @@ const parseValidatorEvent = event => {
   }
 }
 
+const processValidatorsEvents = events => {
+  const validatorList = new Set()
+  events.forEach(event => {
+    parseValidatorEvent(event)
+
+    if (event.event === 'ValidatorAdded') {
+      validatorList.add(event.returnValues.validator)
+    } else if (event.event === 'ValidatorRemoved') {
+      validatorList.delete(event.returnValues.validator)
+    }
+  })
+
+  return Array.from(validatorList)
+}
+
 module.exports = {
   decodeBridgeMode,
   decodeFeeManagerMode,
   getBridgeMode,
   getTokenType,
   getUnit,
-  parseValidatorEvent
+  parseValidatorEvent,
+  processValidatorsEvents
 }

@@ -1,23 +1,8 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
-const { BRIDGE_VALIDATORS_ABI, parseValidatorEvent } = require('../../commons')
+const { BRIDGE_VALIDATORS_ABI, processValidatorsEvents } = require('../../commons')
 const logger = require('../logger')('validatorsUtils')
 const { getPastEvents } = require('./contract')
-
-const processValidatorsEvents = events => {
-  const validatorList = new Set()
-  events.forEach(event => {
-    parseValidatorEvent(event)
-
-    if (event.event === 'ValidatorAdded') {
-      validatorList.add(event.returnValues.validator)
-    } else if (event.event === 'ValidatorRemoved') {
-      validatorList.delete(event.returnValues.validator)
-    }
-  })
-
-  return Array.from(validatorList)
-}
 
 const validatorList = async contract => {
   try {
