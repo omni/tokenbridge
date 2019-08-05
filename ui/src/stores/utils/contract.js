@@ -59,14 +59,6 @@ export const totalBurntCoins = async contract => {
   return new BN(burntCoins)
 }
 
-export const getValidatorList = async (address, eth) => {
-  const options = {
-    logger: console
-  }
-
-  return await getValidatorListX(address, eth, options)
-}
-
 export const getName = contract => contract.methods.name().call()
 
 export const getFeeManager = async contract => {

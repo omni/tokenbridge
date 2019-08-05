@@ -11,7 +11,8 @@ import {
   getTokenType,
   ERC20_BYTES32_ABI,
   getPastEvents,
-  getDeployedAtBlock
+  getDeployedAtBlock,
+  getValidatorList
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -28,7 +29,6 @@ import {
   getHomeFee,
   getFeeManagerMode,
   ZERO_ADDRESS,
-  getValidatorList,
   getValidatorContract,
   getRequiredSignatures,
   getValidatorCount
@@ -386,7 +386,7 @@ class ForeignStore {
       this.requiredSignatures = await getRequiredSignatures(this.foreignBridgeValidators)
       this.validatorsCount = await getValidatorCount(this.foreignBridgeValidators)
 
-      this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth)
+      this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth, { logger: console })
     } catch (e) {
       console.error(e)
     }

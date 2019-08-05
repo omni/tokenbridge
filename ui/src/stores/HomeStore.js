@@ -13,7 +13,8 @@ import {
   HOME_V1_ABI,
   ERC20_BYTES32_ABI,
   getPastEvents,
-  getDeployedAtBlock
+  getDeployedAtBlock,
+  getValidatorList
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -33,7 +34,6 @@ import {
   getForeignFee,
   getFeeManagerMode,
   ZERO_ADDRESS,
-  getValidatorList,
   getBlockRewardContract,
   getValidatorContract,
   getRequiredSignatures,
@@ -415,7 +415,7 @@ class HomeStore {
       this.requiredSignatures = await getRequiredSignatures(this.homeBridgeValidators)
       this.validatorsCount = await getValidatorCount(this.homeBridgeValidators)
 
-      this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth)
+      this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth, { logger: console })
     } catch (e) {
       console.error(e)
     }
