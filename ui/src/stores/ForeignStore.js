@@ -247,7 +247,7 @@ class ForeignStore {
         fromBlock = 0
       }
 
-      let foreignEvents = await getPastEvents(this.foreignBridge, fromBlock, toBlock).catch(e => {
+      let foreignEvents = await getPastEvents({contract: this.foreignBridge, fromBlock, toBlock, event: 'allEvents'}).catch(e => {
         console.error("Couldn't get events", e)
         return []
       })
@@ -395,7 +395,12 @@ class ForeignStore {
   async getFeeEvents() {
     try {
       const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
-      const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
+      const events = await getPastEvents({
+        contract: this.foreignBridge,
+        fromBlock: deployedAtBlock,
+        toBlock: 'latest',
+        event: 'allEvents'
+      })
 
       processLargeArrayAsync(events, this.processEvent, () => {
         this.feeEventsFinished = true

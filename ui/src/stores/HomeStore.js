@@ -293,10 +293,12 @@ class HomeStore {
         fromBlock = 0
       }
 
-      let events = await getPastEvents(this.homeBridge, fromBlock, toBlock).catch(e => {
-        console.error("Couldn't get events", e)
-        return []
-      })
+      let events = await getPastEvents({ contract: this.homeBridge, fromBlock, toBlock, event: 'allEvents' }).catch(
+        e => {
+          console.error("Couldn't get events", e)
+          return []
+        }
+      )
 
       let homeEvents = []
       await asyncForEach(events, async event => {
@@ -427,7 +429,12 @@ class HomeStore {
       const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
       const abi = [...HOME_V1_ABI, ...HOME_ABI]
       const contract = new this.homeWeb3.eth.Contract(abi, this.HOME_BRIDGE_ADDRESS)
-      const events = await getPastEvents(contract, deployedAtBlock, 'latest')
+      const events = await getPastEvents({
+        contract,
+        fromBlock: deployedAtBlock,
+        toBlock: 'latest',
+        event: 'allEvents'
+      })
       processLargeArrayAsync(events, this.processEvent, () => {
         this.statistics.finished = true
         this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawsValue)
