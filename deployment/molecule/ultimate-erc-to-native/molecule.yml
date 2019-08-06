@@ -2,10 +2,10 @@
 driver:
   name: docker
 platforms:
-  - name: oracle-native-to-erc-host
+  - name: oracle-erc-to-native-host
     groups:
       - ultimate
-      - native-to-erc
+      - erc-to-native
     children:
       - oracle
     image: ubuntu:16.04
@@ -13,11 +13,11 @@ platforms:
     network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  - name: ui-native-to-erc-host
+  - name: ui-erc-to-native-host
     groups:
-      - ultimate
-      - native-to-erc
+      - erc-to-native
     children:
+      - ultimate
       - ui
     image: ubuntu:16.04
     privileged: true
@@ -31,13 +31,13 @@ provisioner:
     converge: ../ultimate-commons/converge.yml
   inventory:
     host_vars:
-      oracle-native-to-erc-host:
+      oracle-erc-to-native-host:
         bridge_repo_branch: $CODEBASE_BRANCH
         HOME_RPC_URL: "http://parity1:8545"
         FOREIGN_RPC_URL: "http://parity2:8545"
         VALIDATOR_ADDRESS: "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b"
         VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
-      ui-native-to-erc-host:
+      ui-erc-to-native-host:
         bridge_repo_branch: $CODEBASE_BRANCH
         HOME_RPC_URL: "http://localhost:8541"
         FOREIGN_RPC_URL: "http://localhost:8542"
@@ -46,7 +46,7 @@ verifier:
   lint:
     name: flake8
 scenario:
-  name: ultimate-native-to-erc
+  name: ultimate-erc-to-native
   test_sequence:
     - cleanup
     - destroy

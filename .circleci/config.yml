@@ -73,6 +73,8 @@ orbs:
           image: circleci/classic:latest
           docker_layer_caching: true
 
+# TODO - common job in orb for ultimate
+
 jobs:
   initialize:
     executor: tokenbridge-orb/docker-node
@@ -197,33 +199,55 @@ jobs:
             nvm use default;
             node ./e2e-commons/scripts/blocks.js &
             cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
+  ultimate-erc-to-native:
+    executor: tokenbridge-orb/machine-with-docker-caching
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - tokenbridge-orb/install-node
+      - tokenbridge-orb/install-chrome
+      - tokenbridge-orb/install-yarn
+      - tokenbridge-orb/yarn-install-cached-on-machine
+      - run:
+          name: Prepare the infrastructure
+          command: e2e-commons/up.sh deploy erc-to-native
+          no_output_timeout: 30m
+      - tokenbridge-orb/wait-for-oracle
+      - run:
+          name: Run the ui-e2e tests
+          command: |
+            nvm use default;
+            node ./e2e-commons/scripts/blocks.js &
+            cd ui-e2e; yarn mocha -g "ERC TO NATIVE" -b ./test.js
 workflows:
   tokenbridge:
     jobs:
-      - initialize
-      - initialize-root:
-          filters:
-            branches:
-              only: master
-      - build:
-          requires:
-            - initialize
-      - lint:
-          requires:
-            - initialize
-      - test:
-          requires:
-            - initialize
-      - cover:
-          requires:
-            - initialize
-          filters:
-            branches:
-              only: master
-      - oracle-e2e
-      - ui-e2e
-      - monitor-e2e
-      - deployment-oracle
-      - deployment-ui
-      - deployment-monitor
+      # - initialize
+      # - initialize-root:
+      #     filters:
+      #       branches:
+      #         only: master
+      # - build:
+      #     requires:
+      #       - initialize
+      # - lint:
+      #     requires:
+      #       - initialize
+      # - test:
+      #     requires:
+      #       - initialize
+      # - cover:
+      #     requires:
+      #       - initialize
+      #     filters:
+      #       branches:
+      #         only: master
+      # - oracle-e2e
+      # - ui-e2e
+      # - monitor-e2e
+      # - deployment-oracle
+      # - deployment-ui
+      # - deployment-monitor
       - ultimate-native-to-erc
+      - ultimate-erc-to-native
+# requires ui-e2e ?
