@@ -15,9 +15,9 @@ platforms:
       - /var/run/docker.sock:/var/run/docker.sock
   - name: ui-erc-to-native-host
     groups:
+      - ultimate
       - erc-to-native
     children:
-      - ultimate
       - ui
     image: ubuntu:16.04
     privileged: true
