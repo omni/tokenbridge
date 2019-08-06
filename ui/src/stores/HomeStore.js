@@ -12,14 +12,13 @@ import {
   getBridgeABIs,
   HOME_V1_ABI,
   ERC20_BYTES32_ABI,
-  getPastEvents,
-  getDeployedAtBlock,
-  getValidatorList
+  getDeployedAtBlock
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
   getCurrentLimit,
+  getPastEvents,
   getMessage,
   getErc677TokenAddress,
   getSymbol,
@@ -34,6 +33,7 @@ import {
   getForeignFee,
   getFeeManagerMode,
   ZERO_ADDRESS,
+  getValidatorList,
   getBlockRewardContract,
   getValidatorContract,
   getRequiredSignatures,
@@ -293,7 +293,7 @@ class HomeStore {
         fromBlock = 0
       }
 
-      let events = await getPastEvents(this.homeBridge, { fromBlock, toBlock }).catch(e => {
+      let events = await getPastEvents(this.homeBridge, fromBlock, toBlock).catch(e => {
         console.error("Couldn't get events", e)
         return []
       })
@@ -415,7 +415,7 @@ class HomeStore {
       this.requiredSignatures = await getRequiredSignatures(this.homeBridgeValidators)
       this.validatorsCount = await getValidatorCount(this.homeBridgeValidators)
 
-      this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth, { logger: console })
+      this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth)
     } catch (e) {
       console.error(e)
     }
@@ -427,9 +427,7 @@ class HomeStore {
       const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
       const abi = [...HOME_V1_ABI, ...HOME_ABI]
       const contract = new this.homeWeb3.eth.Contract(abi, this.HOME_BRIDGE_ADDRESS)
-      const events = await getPastEvents(contract, {
-        fromBlock: deployedAtBlock
-      })
+      const events = await getPastEvents(contract, deployedAtBlock, 'latest')
       processLargeArrayAsync(events, this.processEvent, () => {
         this.statistics.finished = true
         this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawsValue)

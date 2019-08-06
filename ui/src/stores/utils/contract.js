@@ -1,6 +1,7 @@
 import BN from 'bignumber.js'
 import { fromDecimals } from './decimals'
 import { fromWei } from 'web3-utils'
+import { getValidatorList as commonGetValidatorList, getPastEvents as commonGetPastEvents } from '../../../../commons'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -25,6 +26,9 @@ export const getCurrentLimit = async (contract, decimals) => {
     totalSpentPerDay: fromDecimals(totalSpentPerDay, decimals)
   }
 }
+
+export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents') =>
+  commonGetPastEvents(contract, { fromBlock, toBlock, event })
 
 export const getErc677TokenAddress = contract => contract.methods.erc677token().call()
 
@@ -57,6 +61,8 @@ export const totalBurntCoins = async contract => {
   const burntCoins = await contract.methods.totalBurntCoins().call()
   return new BN(burntCoins)
 }
+
+export const getValidatorList = async (address, eth) => commonGetValidatorList(address, eth, { logger: console })
 
 export const getName = contract => contract.methods.name().call()
 

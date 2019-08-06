@@ -10,14 +10,13 @@ import {
   getBridgeABIs,
   getTokenType,
   ERC20_BYTES32_ABI,
-  getPastEvents,
-  getDeployedAtBlock,
-  getValidatorList
+  getDeployedAtBlock
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
   getCurrentLimit,
+  getPastEvents,
   getTotalSupply,
   getBalanceOf,
   getErc677TokenAddress,
@@ -29,6 +28,7 @@ import {
   getHomeFee,
   getFeeManagerMode,
   ZERO_ADDRESS,
+  getValidatorList,
   getValidatorContract,
   getRequiredSignatures,
   getValidatorCount
@@ -247,7 +247,7 @@ class ForeignStore {
         fromBlock = 0
       }
 
-      let foreignEvents = await getPastEvents(this.foreignBridge, { fromBlock, toBlock }).catch(e => {
+      let foreignEvents = await getPastEvents(this.foreignBridge, fromBlock, toBlock).catch(e => {
         console.error("Couldn't get events", e)
         return []
       })
@@ -386,7 +386,7 @@ class ForeignStore {
       this.requiredSignatures = await getRequiredSignatures(this.foreignBridgeValidators)
       this.validatorsCount = await getValidatorCount(this.foreignBridgeValidators)
 
-      this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth, { logger: console })
+      this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth)
     } catch (e) {
       console.error(e)
     }
@@ -395,9 +395,7 @@ class ForeignStore {
   async getFeeEvents() {
     try {
       const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
-      const events = await getPastEvents(this.foreignBridge, {
-        fromBlock: deployedAtBlock
-      })
+      const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
 
       processLargeArrayAsync(events, this.processEvent, () => {
         this.feeEventsFinished = true
