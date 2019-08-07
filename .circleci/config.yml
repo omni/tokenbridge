@@ -284,6 +284,7 @@ workflows:
       - ultimate-native-to-erc
       - ultimate-erc-to-native
       - ultimate:
+          name: ULT
           scenario-name: native-to-erc
           redis-key: native-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: NATIVE TO ERC
