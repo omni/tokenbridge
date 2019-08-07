@@ -75,6 +75,7 @@ orbs:
         machine:
           image: circleci/classic:latest
           docker_layer_caching: true
+
 jobs:
   initialize:
     executor: tokenbridge-orb/docker-node
