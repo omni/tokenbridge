@@ -54,7 +54,7 @@ orbs:
               command: |
                 set +e
                 i=0
-                while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]]; do
+                while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]] && [[ $(redis-cli GET erc-native-collected-signatures:lastProcessedBlock) = "" ]]; do
                   ((i++))
                   if [ "$i" -gt 30 ]
                   then
