@@ -180,48 +180,6 @@ jobs:
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh monitor
-  ultimate-native-to-erc:
-    executor: tokenbridge-orb/machine-with-docker-caching
-    steps:
-      - checkout
-      - run: git submodule update --init
-      - tokenbridge-orb/install-node
-      - tokenbridge-orb/install-chrome
-      - tokenbridge-orb/install-yarn
-      - tokenbridge-orb/yarn-install-cached-on-machine
-      - run:
-          name: Prepare the infrastructure
-          command: e2e-commons/up.sh deploy native-to-erc
-          no_output_timeout: 30m
-      - tokenbridge-orb/wait-for-oracle:
-          redis-key: native-erc-collected-signatures:lastProcessedBlock
-      - run:
-          name: Run the ui-e2e tests
-          command: |
-            nvm use default;
-            node ./e2e-commons/scripts/blocks.js &
-            cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
-  ultimate-erc-to-native:
-    executor: tokenbridge-orb/machine-with-docker-caching
-    steps:
-      - checkout
-      - run: git submodule update --init
-      - tokenbridge-orb/install-node
-      - tokenbridge-orb/install-chrome
-      - tokenbridge-orb/install-yarn
-      - tokenbridge-orb/yarn-install-cached-on-machine
-      - run:
-          name: Prepare the infrastructure
-          command: e2e-commons/up.sh deploy erc-to-native
-          no_output_timeout: 30m
-      - tokenbridge-orb/wait-for-oracle:
-          redis-key: erc-native-collected-signatures:lastProcessedBlock
-      - run:
-          name: Run the ui-e2e tests
-          command: |
-            nvm use default;
-            node ./e2e-commons/scripts/blocks.js &
-            cd ui-e2e; yarn mocha -g "ERC TO NATIVE" -b ./test.js
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
@@ -253,34 +211,32 @@ jobs:
 workflows:
   tokenbridge:
     jobs:
-      # - initialize
-      # - initialize-root:
-      #     filters:
-      #       branches:
-      #         only: master
-      # - build:
-      #     requires:
-      #       - initialize
-      # - lint:
-      #     requires:
-      #       - initialize
-      # - test:
-      #     requires:
-      #       - initialize
-      # - cover:
-      #     requires:
-      #       - initialize
-      #     filters:
-      #       branches:
-      #         only: master
-      # - oracle-e2e
-      # - ui-e2e
-      # - monitor-e2e
-      # - deployment-oracle
-      # - deployment-ui
-      # - deployment-monitor
-      - ultimate-native-to-erc
-      - ultimate-erc-to-native
+      - initialize
+      - initialize-root:
+          filters:
+            branches:
+              only: master
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
+      - cover:
+          requires:
+            - initialize
+          filters:
+            branches:
+              only: master
+      - oracle-e2e
+      - ui-e2e
+      - monitor-e2e
+      - deployment-oracle
+      - deployment-ui
+      - deployment-monitor
       - ultimate:
           name: "ultimate: native to erc" 
           scenario-name: native-to-erc
