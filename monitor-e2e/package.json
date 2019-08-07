@@ -1,0 +1,17 @@
+{
+  "name": "monitor-e2e",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "mocha",
+    "lint": "eslint . --ignore-path ../.eslintignore"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "engines": {
+    "node": ">= 8.9"
+  },
+  "devDependencies": {}
+}
