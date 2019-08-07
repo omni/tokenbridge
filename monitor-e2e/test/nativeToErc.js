@@ -1,26 +1,17 @@
 const assert = require('assert')
 const axios = require('axios')
 
-describe('NATIVE TO ERC', () => {
-  describe('balances', async () => {
-    let output
+const types = [{ description: 'NATIVE TO ERC', baseUrl: 'http://monitor:3010' }]
 
-    beforeEach(async () => {
-      output = await axios.get('http://localhost:3010')
+types.forEach(type => {
+  describe(type.description, () => {
+    let data
+
+    before(async () => {
+      ;({ data } = await axios.get(`${type.baseUrl}`))
     })
 
-    it('should be ok', () => {
-      assert(output === 'lala')
-    })
-  })
-
-  describe('validators', async () => {})
-
-  describe('eventsStats', async () => {})
-
-  describe('alerts', async () => {})
-
-  it('should work', async () => {
-    assert(true)
+    it('balance', () => assert(parseInt(data.home.balance, 10) >= 0))
+    it('should contain totalSupply', () => assert(data.foreign.totalSupply === '0'))
   })
 })
