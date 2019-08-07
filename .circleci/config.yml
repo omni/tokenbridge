@@ -45,6 +45,9 @@ orbs:
               paths:
                 - ~/.cache/yarn
       wait-for-oracle:
+        parameters:
+          redis-key:
+            type: string
         steps:
           - run:
               name: Install redis tools
@@ -54,7 +57,7 @@ orbs:
               command: |
                 set +e
                 i=0
-                while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]] && [[ $(redis-cli GET erc-native-collected-signatures:lastProcessedBlock) = "" ]]; do
+                while [[ $(redis-cli GET << parameters.redis-key >> ); do
                   ((i++))
                   if [ "$i" -gt 30 ]
                   then
@@ -192,7 +195,8 @@ jobs:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy native-to-erc
           no_output_timeout: 30m
-      - tokenbridge-orb/wait-for-oracle
+      - tokenbridge-orb/wait-for-oracle:
+          redis-key: native-erc-collected-signatures:lastProcessedBlock
       - run:
           name: Run the ui-e2e tests
           command: |
@@ -212,7 +216,8 @@ jobs:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy erc-to-native
           no_output_timeout: 30m
-      - tokenbridge-orb/wait-for-oracle
+      - tokenbridge-orb/wait-for-oracle:
+          redis-key: erc-native-collected-signatures:lastProcessedBlock
       - run:
           name: Run the ui-e2e tests
           command: |
