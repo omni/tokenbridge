@@ -166,8 +166,7 @@ const getValidatorList = async (address, eth, options) => {
   const fromBlock = options.fromBlock || Number(deployedAtBlock) || 0
   const toBlock = options.toBlock || 'latest'
 
-  const validatorsEvents = await getPastEvents({
-    contract: new eth.Contract([], address),
+  const validatorsEvents = await getPastEvents(new eth.Contract([], address), {
     event: 'allEvents',
     fromBlock,
     toBlock,
