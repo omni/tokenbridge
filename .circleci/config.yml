@@ -250,3 +250,8 @@ workflows:
           scenario-name: erc-to-native
           redis-key: erc-native-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO NATIVE"
+      - ultimate:
+          name: "ultimate: erc to erc" 
+          scenario-name: erc-to-erc
+          redis-key: erc-erc-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "ERC TO ERC"

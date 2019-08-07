@@ -52,5 +52,9 @@ while [ "$1" != "" ]; do
     ../deployment/molecule/molecule.sh ultimate-erc-to-native
   fi
 
+  if [ "$1" == "erc-to-erc" ]; then
+    ../deployment/molecule/molecule.sh ultimate-erc-to-erc
+  fi
+
   shift # Shift all the parameters down by one
 done
