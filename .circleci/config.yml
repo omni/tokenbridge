@@ -2,6 +2,14 @@ version: 2.1
 
 orbs:
   tokenbridge-orb:
+    executors:
+      docker-node:
+        docker:
+          - image: circleci/node:10.15
+      machine-with-docker-caching:
+        machine:
+          image: circleci/classic:latest
+          docker_layer_caching: true
     commands:
       install-chrome:
         steps:
@@ -57,7 +65,7 @@ orbs:
               command: |
                 set +e
                 i=0
-                while [[ $(redis-cli GET << parameters.redis-key >> ); do
+                while [[ $(redis-cli GET << parameters.redis-key >> ) ]]; do
                   ((i++))
                   if [ "$i" -gt 30 ]
                   then
@@ -67,14 +75,6 @@ orbs:
                   echo "Sleeping..."
                   sleep 3
                 done
-    executors:
-      docker-node:
-        docker:
-          - image: circleci/node:10.15
-      machine-with-docker-caching:
-        machine:
-          image: circleci/classic:latest
-          docker_layer_caching: true
 
 # TODO - common job in orb for ultimate
 
@@ -224,6 +224,34 @@ jobs:
             nvm use default;
             node ./e2e-commons/scripts/blocks.js &
             cd ui-e2e; yarn mocha -g "ERC TO NATIVE" -b ./test.js
+  ultimate:
+    executor: tokenbridge-orb/machine-with-docker-caching
+    parameters:
+      scenario-name:
+        type: string
+      redis-key:
+        type: string
+      ui-e2e-grep:
+        type: string
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - tokenbridge-orb/install-node
+      - tokenbridge-orb/install-chrome
+      - tokenbridge-orb/install-yarn
+      - tokenbridge-orb/yarn-install-cached-on-machine
+      - run:
+          name: Prepare the infrastructure
+          command: e2e-commons/up.sh deploy << scenario-name >>
+          no_output_timeout: 30m
+      - tokenbridge-orb/wait-for-oracle:
+          redis-key: << redis-key >>
+      - run:
+          name: Run the ui-e2e tests
+          command: |
+            nvm use default;
+            node ./e2e-commons/scripts/blocks.js &
+            cd ui-e2e; yarn mocha -g "<< ui-e2e-grep >>" -b ./test.js
 workflows:
   tokenbridge:
     jobs:
@@ -255,4 +283,7 @@ workflows:
       # - deployment-monitor
       - ultimate-native-to-erc
       - ultimate-erc-to-native
-# requires ui-e2e ?
+      - ultimate:
+          scenario-name: native-to-erc
+          redis-key: native-erc-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: NATIVE TO ERC
