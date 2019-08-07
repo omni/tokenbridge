@@ -76,8 +76,6 @@ orbs:
                   sleep 3
                 done
 
-# TODO - common job in orb for ultimate
-
 jobs:
   initialize:
     executor: tokenbridge-orb/docker-node
@@ -284,12 +282,12 @@ workflows:
       - ultimate-native-to-erc
       - ultimate-erc-to-native
       - ultimate:
-          name: "Ultimate: native to erc" 
+          name: "ultimate: native to erc" 
           scenario-name: native-to-erc
           redis-key: native-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "NATIVE TO ERC"
       - ultimate:
-          name: "Ultimate: erc to native" 
+          name: "ultimate: erc to native" 
           scenario-name: erc-to-native
           redis-key: erc-native-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO NATIVE"
