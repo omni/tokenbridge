@@ -13,5 +13,7 @@
   "engines": {
     "node": ">= 8.9"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "axios": "^0.19.0"
+  }
 }
