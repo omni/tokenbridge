@@ -184,10 +184,13 @@ jobs:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
       scenario-name:
+        description: "Molecule scenario name used to create the infrastructure"
         type: string
       redis-key:
+        description: "Redis key checked for non-emptiness to assert if Oracle is running"
         type: string
       ui-e2e-grep:
+        description: "Mocha grep string used to run ui-e2e tests specific to given type of bridge"
         type: string
     steps:
       - checkout
