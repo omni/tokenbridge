@@ -45,6 +45,9 @@ orbs:
               paths:
                 - ~/.cache/yarn
       wait-for-oracle:
+        parameters:
+          redis-key:
+            type: string
         steps:
           - run:
               name: Install redis tools
@@ -54,7 +57,7 @@ orbs:
               command: |
                 set +e
                 i=0
-                while [[ $(redis-cli GET native-erc-collected-signatures:lastProcessedBlock) = "" ]]; do
+                while [[ $(redis-cli GET << parameters.redis-key >> ) ]]; do
                   ((i++))
                   if [ "$i" -gt 30 ]
                   then
@@ -177,8 +180,18 @@ jobs:
     steps:
       - checkout
       - run: deployment/molecule/molecule.sh monitor
-  ultimate-native-to-erc:
+  ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
+    parameters:
+      scenario-name:
+        description: "Molecule scenario name used to create the infrastructure"
+        type: string
+      redis-key:
+        description: "Redis key checked for non-emptiness to assert if Oracle is running"
+        type: string
+      ui-e2e-grep:
+        description: "Mocha grep string used to run ui-e2e tests specific to given type of bridge"
+        type: string
     steps:
       - checkout
       - run: git submodule update --init
@@ -188,15 +201,16 @@ jobs:
       - tokenbridge-orb/yarn-install-cached-on-machine
       - run:
           name: Prepare the infrastructure
-          command: e2e-commons/up.sh deploy native-to-erc
+          command: e2e-commons/up.sh deploy << parameters.scenario-name >>
           no_output_timeout: 30m
-      - tokenbridge-orb/wait-for-oracle
+      - tokenbridge-orb/wait-for-oracle:
+          redis-key: << parameters.redis-key >>
       - run:
           name: Run the ui-e2e tests
           command: |
             nvm use default;
             node ./e2e-commons/scripts/blocks.js &
-            cd ui-e2e; yarn mocha -g "NATIVE TO ERC" -b ./test.js
+            cd ui-e2e; yarn mocha -g "<< parameters.ui-e2e-grep >>" -b ./test.js
 workflows:
   tokenbridge:
     jobs:
@@ -226,4 +240,13 @@ workflows:
       - deployment-oracle
       - deployment-ui
       - deployment-monitor
-      - ultimate-native-to-erc
+      - ultimate:
+          name: "ultimate: native to erc" 
+          scenario-name: native-to-erc
+          redis-key: native-erc-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "NATIVE TO ERC"
+      - ultimate:
+          name: "ultimate: erc to native" 
+          scenario-name: erc-to-native
+          redis-key: erc-native-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "ERC TO NATIVE"
