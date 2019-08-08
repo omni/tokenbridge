@@ -126,7 +126,7 @@ const getPastEvents = async (contract, { event, fromBlock, toBlock, options = {}
       toBlock: toBlock || 'latest'
     })
   } catch (e) {
-    if (e.message.includes('query returned more than 1000 results') && Number.isInteger(toBlock)) {
+    if (e.message.includes('query returned more than') && Number.isInteger(toBlock)) {
       const middle = fromBlock.add(toBlock).divRound(toBN(2))
       const middlePlusOne = middle.add(toBN(1))
 
