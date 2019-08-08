@@ -1,5 +1,6 @@
 const { toWei, toBN } = require('web3-utils')
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
+const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
@@ -64,6 +65,120 @@ const getUnit = bridgeMode => {
   }
 
   return { unitHome, unitForeign }
+}
+
+const parseValidatorEvent = event => {
+  if (
+    event.event === undefined &&
+    event.raw &&
+    event.raw.topics &&
+    (event.raw.topics[0] === '0xe366c1c0452ed8eec96861e9e54141ebff23c9ec89fe27b996b45f5ec3884987' ||
+      event.raw.topics[0] === '0x8064a302796c89446a96d63470b5b036212da26bd2debe5bec73e0170a9a5e83')
+  ) {
+    const rawAddress = event.raw.topics.length > 1 ? event.raw.topics[1] : event.raw.data
+    const address = '0x' + rawAddress.slice(26)
+    event.event = 'ValidatorAdded'
+    event.returnValues.validator = address
+  } else if (
+    event.event === undefined &&
+    event.raw &&
+    event.raw.topics &&
+    event.raw.topics[0] === '0xe1434e25d6611e0db941968fdc97811c982ac1602e951637d206f5fdda9dd8f1'
+  ) {
+    const rawAddress = event.raw.data === '0x' ? event.raw.topics[1] : event.raw.data
+    const address = '0x' + rawAddress.slice(26)
+    event.event = 'ValidatorRemoved'
+    event.returnValues.validator = address
+  }
+}
+
+const processValidatorsEvents = events => {
+  const validatorList = new Set()
+  events.forEach(event => {
+    parseValidatorEvent(event)
+
+    if (event.event === 'ValidatorAdded') {
+      validatorList.add(event.returnValues.validator)
+    } else if (event.event === 'ValidatorRemoved') {
+      validatorList.delete(event.returnValues.validator)
+    }
+  })
+
+  return Array.from(validatorList)
+}
+
+const tryCall = async (method, fallbackValue) => {
+  try {
+    return await method.call()
+  } catch (e) {
+    return fallbackValue
+  }
+}
+
+const getDeployedAtBlock = async contract => tryCall(contract.methods.deployedAtBlock(), 0)
+
+const getPastEvents = async (
+  contract,
+  { event = 'allEvents', fromBlock = toBN(0), toBlock = 'latest', options = {} }
+) => {
+  let events
+  try {
+    events = await contract.getPastEvents(event, {
+      ...options,
+      fromBlock,
+      toBlock
+    })
+  } catch (e) {
+    if (e.message.includes('query returned more than') && toBlock !== 'latest') {
+      const middle = toBN(fromBlock)
+        .add(toBlock)
+        .divRound(toBN(2))
+      const middlePlusOne = middle.add(toBN(1))
+
+      const firstHalfEvents = await getPastEvents(contract, {
+        ...options,
+        event,
+        fromBlock,
+        toBlock: middle
+      })
+      const secondHalfEvents = await getPastEvents(contract, {
+        ...options,
+        event,
+        fromBlock: middlePlusOne,
+        toBlock
+      })
+      events = [...firstHalfEvents, ...secondHalfEvents]
+    } else {
+      throw new Error(e)
+    }
+  }
+  return events
+}
+
+const getValidatorList = async (address, eth, options) => {
+  options.logger && options.logger.debug && options.logger.debug('getting validatorList')
+
+  const validatorsContract = new eth.Contract(REWARDABLE_VALIDATORS_ABI, address) // in monitor, BRIDGE_VALIDATORS_ABI was used
+  const validators = await tryCall(validatorsContract.methods.validatorList(), [])
+
+  if (validators.length) {
+    return validators
+  }
+
+  options.logger && options.logger.debug && options.logger.debug('getting validatorsEvents')
+
+  const deployedAtBlock = await tryCall(validatorsContract.methods.deployedAtBlock(), 0)
+  const fromBlock = options.fromBlock || Number(deployedAtBlock) || 0
+  const toBlock = options.toBlock || 'latest'
+
+  const validatorsEvents = await getPastEvents(new eth.Contract([], address), {
+    event: 'allEvents',
+    fromBlock,
+    toBlock,
+    options: {}
+  })
+
+  return processValidatorsEvents(validatorsEvents)
 }
 
 const gasPriceWithinLimits = (gasPrice, limits) => {
@@ -135,6 +250,11 @@ module.exports = {
   getBridgeMode,
   getTokenType,
   getUnit,
+  parseValidatorEvent,
+  processValidatorsEvents,
+  getValidatorList,
+  getPastEvents,
+  getDeployedAtBlock,
   normalizeGasPrice,
   gasPriceFromOracle,
   gasPriceFromContract,
