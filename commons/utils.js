@@ -117,11 +117,11 @@ const tryCall = async (method, fallbackValue) => {
 
 const getDeployedAtBlock = async contract => tryCall(contract.methods.deployedAtBlock(), 0)
 
-const getPastEvents = async (contract, { event, fromBlock, toBlock, options }) => {
+const getPastEvents = async (contract, { event, fromBlock, toBlock, options = {} }) => {
   let events
   try {
     events = await contract.getPastEvents(event || 'allEvents', {
-      options: options || {},
+      ...options,
       fromBlock,
       toBlock: toBlock || 'latest'
     })
