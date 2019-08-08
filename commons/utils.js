@@ -117,13 +117,16 @@ const tryCall = async (method, fallbackValue) => {
 
 const getDeployedAtBlock = async contract => tryCall(contract.methods.deployedAtBlock(), 0)
 
-const getPastEvents = async (contract, { event, fromBlock, toBlock, options = {} }) => {
+const getPastEvents = async (
+  contract,
+  { event = 'allEvents', fromBlock = toBN(0), toBlock = 'latest', options = {} }
+) => {
   let events
   try {
-    events = await contract.getPastEvents(event || 'allEvents', {
+    events = await contract.getPastEvents(event, {
       ...options,
       fromBlock,
-      toBlock: toBlock || 'latest'
+      toBlock
     })
   } catch (e) {
     if (e.message.includes('query returned more than') && toBlock !== 'latest') {
@@ -133,16 +136,16 @@ const getPastEvents = async (contract, { event, fromBlock, toBlock, options = {}
       const middlePlusOne = middle.add(toBN(1))
 
       const firstHalfEvents = await getPastEvents(contract, {
-        event: event || 'allEvents',
+        ...options,
+        event,
         fromBlock,
-        toBlock: middle,
-        options
+        toBlock: middle
       })
       const secondHalfEvents = await getPastEvents(contract, {
-        event: event || 'allEvents',
+        ...options,
+        event,
         fromBlock: middlePlusOne,
-        toBlock,
-        options
+        toBlock
       })
       events = [...firstHalfEvents, ...secondHalfEvents]
     } else {
