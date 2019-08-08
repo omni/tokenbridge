@@ -9,7 +9,8 @@ import {
   decodeFeeManagerMode,
   getBridgeABIs,
   getTokenType,
-  ERC20_BYTES32_ABI
+  ERC20_BYTES32_ABI,
+  getDeployedAtBlock
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -27,7 +28,6 @@ import {
   getHomeFee,
   getFeeManagerMode,
   ZERO_ADDRESS,
-  getDeployedAtBlock,
   getValidatorList,
   getValidatorContract,
   getRequiredSignatures,
