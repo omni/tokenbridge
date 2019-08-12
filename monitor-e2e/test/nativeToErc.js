@@ -1,6 +1,7 @@
 const assert = require('assert')
 const axios = require('axios')
 
+// TODO: Move to e2e-commons constants!
 const baseUrl = 'http://monitor:3010'
 
 describe('NATIVE TO ERC', () => {
