@@ -1,11 +1,11 @@
 const assert = require('assert')
 const axios = require('axios')
+const { nativeToErcBridge, ercToErcBridge, ercToNativeBridge } = require('../../e2e-commons/constants.json')
 
-// TODO: Move to e2e-commons constants!
 const types = [
-  { description: 'NATIVE TO ERC', baseUrl: 'http://monitor:3010' },
-  { description: 'ERC TO ERC', baseUrl: 'http://monitor-erc20:3011' },
-  { description: 'ERC TO NATIVE', baseUrl: 'http://monitor-erc20-native:3012' }
+  { description: 'NATIVE TO ERC', baseUrl: nativeToErcBridge.monitor },
+  { description: 'ERC TO ERC', baseUrl: ercToErcBridge.monitor },
+  { description: 'ERC TO NATIVE', baseUrl: ercToNativeBridge.monitor }
 ]
 
 types.forEach(type => {
