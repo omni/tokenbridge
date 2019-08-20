@@ -1,6 +1,6 @@
 const shell = require('shelljs')
 const Web3 = require('web3')
-const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
+const { ERC677_BRIDGE_TOKEN_ABI } = require('../commons')
 
 const checkAll = () => {
   // the different prefixes come from macOS/linux docker differences and/or different docker-compose versions
