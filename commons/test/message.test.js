@@ -26,7 +26,7 @@ describe('strip0x', () => {
   })
 })
 describe('addTxHashToData', () => {
-  it('should add txHash to encoded data at position 82', () => {
+  it('should add txHash to encoded data at position 2', () => {
     // Given
     const msgSender = '0x003667154bb32e42bb9e1e6532f19d187fa0082e'
     const msgExecutor = '0xf4bef13f9f4f2b203faf0c3cbbaabe1afe056955'
@@ -38,8 +38,8 @@ describe('addTxHashToData', () => {
     )}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
 
     const transactionHash = '0xbdceda9d8c94838aca10c687da1411a07b1390e88239c0638cb9cc264219cc10'
-    const message = `0x${strip0x(msgSender)}${strip0x(msgExecutor)}${strip0x(
-      transactionHash
+    const message = `0x${strip0x(transactionHash)}${strip0x(msgSender)}${strip0x(
+      msgExecutor
     )}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
 
     // When
@@ -57,8 +57,8 @@ describe('parseAMBMessage', () => {
     const msgGasLimit = '000000000000000000000000000000000000000000000000000000005b877705'
     const msgDataType = '00'
     const msgData = '0xb1591967aed668a4b27645ff40c444892d91bf5951b382995d4d4f6ee3a2ce03'
-    const message = `0x${strip0x(msgSender)}${strip0x(msgExecutor)}${strip0x(
-      msgTxHash
+    const message = `0x${strip0x(msgTxHash)}${strip0x(msgSender)}${strip0x(
+      msgExecutor
     )}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
 
     // when
@@ -91,8 +91,8 @@ describe('parseAMBMessage', () => {
     const msgDataType = '01'
     const msgGasPrice = '0000000000000000000000000000000000000000000000000000000165a0bc00'
     const msgData = '0xb1591967aed668a4b27645ff40c444892d91bf5951b382995d4d4f6ee3a2ce03'
-    const message = `0x${strip0x(msgSender)}${strip0x(msgExecutor)}${strip0x(
-      msgTxHash
+    const message = `0x${strip0x(msgTxHash)}${strip0x(msgSender)}${strip0x(
+      msgExecutor
     )}${msgGasLimit}${msgDataType}${msgGasPrice}${strip0x(msgData)}`
 
     // when
@@ -125,8 +125,8 @@ describe('parseAMBMessage', () => {
     const msgDataType = '02'
     const msgGasPriceSpeed = '0x03'
     const msgData = '0xb1591967aed668a4b27645ff40c444892d91bf5951b382995d4d4f6ee3a2ce03'
-    const message = `0x${strip0x(msgSender)}${strip0x(msgExecutor)}${strip0x(
-      msgTxHash
+    const message = `0x${strip0x(msgTxHash)}${strip0x(msgSender)}${strip0x(
+      msgExecutor
     )}${msgGasLimit}${msgDataType}${strip0x(msgGasPriceSpeed)}${strip0x(msgData)}`
 
     // when
