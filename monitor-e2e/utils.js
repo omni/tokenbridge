@@ -2,9 +2,11 @@ const shell = require('shelljs')
 const Web3 = require('web3')
 
 const checkAll = () => {
-  // the different container names comes from macOS/linux docker differences and/or different docker-compose versions
-  ;['e2e-commons_monitor_1', 'e2e_commons_monitor_1', 'e2ecommons_monitor_1'].forEach(container =>
-    shell.exec(`docker exec ${container} yarn check-all`)
+  // the different prefixes come from macOS/linux docker differences and/or different docker-compose versions
+  ;['e2e-commons_', 'e2e_commons_', 'e2ecommons_'].forEach(prefix =>
+    ['monitor_1', 'monitor-erc20_1', 'monitor-erc20-native_1'].forEach(container =>
+      shell.exec(`docker exec ${prefix}${container} yarn check-all`)
+    )
   )
 }
 
