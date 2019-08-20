@@ -48,7 +48,7 @@ describe.only('NATIVE TO ERC with changing state of contracts', () => {
     assert(data.balanceDiff === 0)
 
     console.log('starting check all')
-    shell.exec('docker exec e2e-commons_monitor_1 yarn check-all')
+    shell.exec('docker exec e2e-commons_monitor_1 yarn check-all || docker exec e2e_commons_monitor_1 yarn check-all || docker exec e2ecommons_monitor_1 yarn check-all') // The difference between macOS and linux docker
     console.log('check all completed')
 
     ;({ data } = await axios.get(`${baseUrl}`))
