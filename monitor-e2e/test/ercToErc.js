@@ -16,7 +16,7 @@ describe('ERC TO ERC', () => {
   it('should contain totalSupply', () => assert(data.home.totalSupply === '0'))
 })
 
-describe('ERC TO ERC with changing state of contracts', () => {
+describe.skip('ERC TO ERC with changing state of contracts', () => {
   let data
 
   before(async () => {
