@@ -1,8 +1,8 @@
 const assert = require('assert')
 const axios = require('axios')
-const { ercToErcBridge } = require('../../e2e-commons/constants.json')
+const { ercToNativeBridge } = require('../../e2e-commons/constants.json')
 
-const baseUrl = ercToErcBridge.monitor
+const baseUrl = ercToNativeBridge.monitor
 
 describe('ERC TO NATIVE', () => {
   let data
