@@ -22,7 +22,7 @@ describe('ERC TO NATIVE', () => {
   it('should contain totalSupply', () => assert(data.home.totalSupply === '0'))
 })
 
-describe.only('ERC TO NATIVE with changing state of contracts', () => {
+describe('ERC TO NATIVE with changing state of contracts', () => {
   let data
 
   before(async () => {
@@ -30,7 +30,7 @@ describe.only('ERC TO NATIVE with changing state of contracts', () => {
     assert(data.balanceDiff === 0)
   })
 
-  it.only('should change balanceDiff', async () => {
+  it('should change balanceDiff', async () => {
     await erc20Token.methods.transfer(FOREIGN_BRIDGE_ADDRESS, foreignWeb3.utils.toWei('0.01')).send({
       from: user.address,
       gas: '1000000'
