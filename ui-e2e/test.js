@@ -131,6 +131,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
 
   test.describe('ERC TO ERC', async () => {
     test.it('User is able to open main page of bridge-ui ', async () => {
+      await foreignAccount.setMetaMaskNetwork()
       startURL = await Utils.getErc20StartURL()
       const result = await mainPage.open(startURL)
       console.log('Test URL:  ' + startURL)
