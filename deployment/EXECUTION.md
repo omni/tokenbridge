@@ -88,7 +88,7 @@ In case some tx from your bridge validator account were done outside the bridge,
     ```
 1. Connect to the redis container:
     ```
-    $ docker-container exec redis /bin/bash
+    $ docker-compose exec redis /bin/bash
     ```
     you should get a shell prompt from inside the docker container, similar to this:
     ```
