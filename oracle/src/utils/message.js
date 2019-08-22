@@ -2,13 +2,7 @@ const assert = require('assert')
 const Web3Utils = require('web3-utils')
 const { strip0x } = require('../../../commons')
 
-function createMessage({
-  recipient,
-  value,
-  transactionHash,
-  bridgeAddress,
-  expectedMessageLength
-}) {
+function createMessage({ recipient, value, transactionHash, bridgeAddress, expectedMessageLength }) {
   recipient = strip0x(recipient)
   assert.strictEqual(recipient.length, 20 * 2)
 
@@ -46,10 +40,7 @@ function parseMessage(message) {
 
   const contractAddressStart = txHashStart + txHashLength
   const contractAddressLength = 32 * 2
-  const contractAddress = `0x${message.slice(
-    contractAddressStart,
-    contractAddressStart + contractAddressLength
-  )}`
+  const contractAddress = `0x${message.slice(contractAddressStart, contractAddressStart + contractAddressLength)}`
 
   return {
     recipient,

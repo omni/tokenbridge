@@ -4,14 +4,10 @@ set -e # exit when any command fails
 
 ./down.sh
 docker-compose build
+docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
-export DOCKER_LOCALHOST="localhost"
 
 while [ "$1" != "" ]; do
-  if [ "$1" == "macos" ]; then
-    export DOCKER_LOCALHOST="host.docker.internal"
-  fi
-
   if [ "$1" == "oracle" ]; then
     docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native oracle-amb
 
@@ -48,11 +44,19 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "monitor" ]; then
-    docker-compose up -d monitor
+    docker-compose up -d monitor monitor-erc20 monitor-erc20-native
   fi
 
   if [ "$1" == "native-to-erc" ]; then
     ../deployment/molecule/molecule.sh ultimate-native-to-erc
+  fi
+
+  if [ "$1" == "erc-to-native" ]; then
+    ../deployment/molecule/molecule.sh ultimate-erc-to-native
+  fi
+
+  if [ "$1" == "erc-to-erc" ]; then
+    ../deployment/molecule/molecule.sh ultimate-erc-to-erc
   fi
 
   shift # Shift all the parameters down by one

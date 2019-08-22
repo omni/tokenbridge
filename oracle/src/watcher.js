@@ -75,10 +75,7 @@ async function runMain({ sendToQueue }) {
 
 async function getLastProcessedBlock() {
   const result = await redis.get(lastBlockRedisKey)
-  logger.debug(
-    { fromRedis: result, fromConfig: lastProcessedBlock.toString() },
-    'Last Processed block obtained'
-  )
+  logger.debug({ fromRedis: result, fromConfig: lastProcessedBlock.toString() }, 'Last Processed block obtained')
   lastProcessedBlock = result ? toBN(result) : lastProcessedBlock
 }
 
@@ -155,10 +152,7 @@ async function main({ sendToQueue }) {
       }
     }
 
-    logger.debug(
-      { lastProcessedBlock: lastBlockToProcess.toString() },
-      'Updating last processed block'
-    )
+    logger.debug({ lastProcessedBlock: lastBlockToProcess.toString() }, 'Updating last processed block')
     await updateLastProcessedBlock(lastBlockToProcess)
   } catch (e) {
     logger.error(e)

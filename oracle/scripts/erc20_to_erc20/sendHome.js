@@ -14,8 +14,7 @@ const {
   HOME_TEST_TX_GAS_PRICE
 } = process.env
 
-const NUMBER_OF_WITHDRAWALS_TO_SEND =
-  process.argv[2] || process.env.NUMBER_OF_WITHDRAWALS_TO_SEND || 1
+const NUMBER_OF_WITHDRAWALS_TO_SEND = process.argv[2] || process.env.NUMBER_OF_WITHDRAWALS_TO_SEND || 1
 
 const BRIDGEABLE_TOKEN_ABI = [
   {

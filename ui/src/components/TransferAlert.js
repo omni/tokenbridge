@@ -42,9 +42,8 @@ export const TransferAlert = ({
         <p className="transfer-description" data-testid="transfer-description">
           <strong>{fee && `Fee: ${fee.toString()}%`}</strong>
           <br />
-          Please confirm that you would like to send <strong>{formattedFromAmount}</strong>{' '}
-          {fromCurrency} from {from} to receive <strong>{formattedToAmount}</strong> {toCurrency} on{' '}
-          {to}.
+          Please confirm that you would like to send <strong>{formattedFromAmount}</strong> {fromCurrency} from {from}{' '}
+          to receive <strong>{formattedToAmount}</strong> {toCurrency} on {to}.
         </p>
         <div className="transfer-buttons">
           <button className="transfer-confirm" onClick={onConfirmation}>

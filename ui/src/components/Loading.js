@@ -13,10 +13,7 @@ export class Loading extends React.Component {
     const progress = loadingStepIndex === 3 ? 100 : loadingStepIndex * 25 + blockConfirmations * 4
 
     return (
-      <div
-        className={`loading-container ${loadingStepIndex > 0 ? 'mobile-container' : ''}`}
-        style={style}
-      >
+      <div className={`loading-container ${loadingStepIndex > 0 ? 'mobile-container' : ''}`} style={style}>
         {loadingStepIndex > 0 && (
           <ProgressRing
             confirmationNumber={blockConfirmations}
@@ -28,9 +25,7 @@ export class Loading extends React.Component {
         )}
         {loadingStepIndex === 0 && <div className="loading-logo" />}
         {loadingStepIndex === 0 && <div className="loading-i" />}
-        {loadingStepIndex > 0 && (
-          <div className="loading-text">{loadingSteps[loadingStepIndex]}</div>
-        )}
+        {loadingStepIndex > 0 && <div className="loading-text">{loadingSteps[loadingStepIndex]}</div>}
         {alertStore.showLoading && <PreventExit />}
       </div>
     )

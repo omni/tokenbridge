@@ -26,18 +26,12 @@ async function checkWorker() {
     const foreign = Object.assign({}, balances.foreign, events.foreign)
     const status = Object.assign({}, balances, events, { home }, { foreign })
     if (!status) throw new Error('status is empty: ' + JSON.stringify(status))
-    fs.writeFileSync(
-      path.join(__dirname, '/responses/getBalances.json'),
-      JSON.stringify(status, null, 4)
-    )
+    fs.writeFileSync(path.join(__dirname, '/responses/getBalances.json'), JSON.stringify(status, null, 4))
 
     logger.debug('calling validators()')
     const vBalances = await validators(bridgeMode)
     if (!vBalances) throw new Error('vBalances is empty: ' + JSON.stringify(vBalances))
-    fs.writeFileSync(
-      path.join(__dirname, '/responses/validators.json'),
-      JSON.stringify(vBalances, null, 4)
-    )
+    fs.writeFileSync(path.join(__dirname, '/responses/validators.json'), JSON.stringify(vBalances, null, 4))
     logger.debug('Done')
   } catch (e) {
     logger.error(e)

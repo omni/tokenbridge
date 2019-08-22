@@ -1,22 +1,33 @@
 ---
 version: '3'
+networks:
+  ultimate:
+    external: true
 services:
   parity1:
     build: ../parity
     ports:
     - "8541:8545"
+    networks:
+      - ultimate
   parity2:
     build:
       context: ../parity
       dockerfile: Dockerfile-foreign
     ports:
     - "8542:8545"
+    networks:
+      - ultimate
   redis:
     image: "redis:4"
+    networks:
+      - ultimate
   rabbit:
     image: "rabbitmq:3-management"
     ports:
     - "15672:15672"
+    networks:
+      - ultimate
   oracle:
     build:
       context: ..
@@ -47,6 +58,8 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
+    networks:
+      - ultimate
   oracle-erc20:
     build:
       context: ..
@@ -78,6 +91,8 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
+    networks:
+      - ultimate
   oracle-erc20-native:
     build:
       context: ..
@@ -109,6 +124,8 @@ services:
     - FOREIGN_POLLING_INTERVAL=500
     - ALLOW_HTTP=yes
     command: "true"
+    networks:
+      - ultimate
   oracle-amb:
     build:
       context: ..
@@ -137,6 +154,8 @@ services:
       - FOREIGN_POLLING_INTERVAL=500
       - ALLOW_HTTP=yes
     command: "true"
+    networks:
+      - ultimate
   ui:
     build:
       context: ..
@@ -165,6 +184,8 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_FACTOR=1
     - PORT=3000
     command: "true"
+    networks:
+      - ultimate
   ui-erc20:
     build:
       context: ..
@@ -193,6 +214,8 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_FACTOR=1
     - PORT=3000
     command: "true"
+    networks:
+      - ultimate
   ui-erc20-native:
     build:
       context: ..
@@ -221,6 +244,8 @@ services:
     - REACT_APP_FOREIGN_GAS_PRICE_FACTOR=1
     - PORT=3000
     command: "true"
+    networks:
+      - ultimate
   monitor:
     build:
       context: ..
@@ -243,12 +268,72 @@ services:
     - FOREIGN_GAS_PRICE_FALLBACK=1000000000
     - FOREIGN_GAS_PRICE_FACTOR=1
     - LEFT_TX_THRESHOLD=100
-    - PORT=3003
+    - PORT=3010
     entrypoint: yarn start
     ports:
-    - "3003:3003"
+      - "3010:3010"
+    networks:
+      - ultimate
+  monitor-erc20:
+    build:
+      context: ..
+      dockerfile: monitor/Dockerfile
+    environment:
+    - HOME_RPC_URL=http://parity1:8545
+    - FOREIGN_RPC_URL=http://parity2:8545
+    - HOME_BRIDGE_ADDRESS=0x1feB40aD9420b186F019A717c37f5546165d411E
+    - FOREIGN_BRIDGE_ADDRESS=0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127
+    - HOME_DEPLOYMENT_BLOCK=0
+    - FOREIGN_DEPLOYMENT_BLOCK=0
+    - HOME_GAS_LIMIT=300000
+    - HOME_GAS_PRICE_ORACLE_URL=https://gasprice.poa.network/
+    - HOME_GAS_PRICE_SPEED_TYPE=standard
+    - HOME_GAS_PRICE_FALLBACK=1000000000
+    - HOME_GAS_PRICE_FACTOR=1
+    - FOREIGN_GAS_LIMIT=300000
+    - FOREIGN_GAS_PRICE_ORACLE_URL=https://gasprice.poa.network/
+    - FOREIGN_GAS_PRICE_SPEED_TYPE=standard
+    - FOREIGN_GAS_PRICE_FALLBACK=1000000000
+    - FOREIGN_GAS_PRICE_FACTOR=1
+    - LEFT_TX_THRESHOLD=100
+    - PORT=3011
+    entrypoint: yarn start
+    ports:
+      - "3011:3011"
+    networks:
+      - ultimate
+  monitor-erc20-native:
+    build:
+      context: ..
+      dockerfile: monitor/Dockerfile
+    environment:
+    - HOME_RPC_URL=http://parity1:8545
+    - FOREIGN_RPC_URL=http://parity2:8545
+    - HOME_BRIDGE_ADDRESS=0x488Af810997eD1730cB3a3918cD83b3216E6eAda
+    - FOREIGN_BRIDGE_ADDRESS=0x488Af810997eD1730cB3a3918cD83b3216E6eAda
+    - HOME_DEPLOYMENT_BLOCK=0
+    - FOREIGN_DEPLOYMENT_BLOCK=0
+    - HOME_GAS_LIMIT=300000
+    - HOME_GAS_PRICE_ORACLE_URL=https://gasprice.poa.network/
+    - HOME_GAS_PRICE_SPEED_TYPE=standard
+    - HOME_GAS_PRICE_FALLBACK=1000000000
+    - HOME_GAS_PRICE_FACTOR=1
+    - FOREIGN_GAS_LIMIT=300000
+    - FOREIGN_GAS_PRICE_ORACLE_URL=https://gasprice.poa.network/
+    - FOREIGN_GAS_PRICE_SPEED_TYPE=standard
+    - FOREIGN_GAS_PRICE_FALLBACK=1000000000
+    - FOREIGN_GAS_PRICE_FACTOR=1
+    - LEFT_TX_THRESHOLD=100
+    - PORT=3012
+    entrypoint: yarn start
+    ports:
+      - "3012:3012"
+    networks:
+      - ultimate
   e2e:
     build:
       context: ..
       dockerfile: Dockerfile.e2e
     command: "true"
+    networks:
+      - ultimate

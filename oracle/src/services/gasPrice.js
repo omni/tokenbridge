@@ -1,18 +1,13 @@
 require('../../env')
 const fetch = require('node-fetch')
-const Web3Utils = require('web3-utils')
 const { web3Home, web3Foreign } = require('../services/web3')
 const { bridgeConfig } = require('../../config/base.config')
 const logger = require('../services/logger').child({
   module: 'gasPrice'
 })
 const { setIntervalAndRun } = require('../utils/utils')
-const {
-  DEFAULT_UPDATE_INTERVAL,
-  GAS_PRICE_BOUNDARIES,
-  DEFAULT_GAS_PRICE_FACTOR
-} = require('../utils/constants')
-const { GAS_PRICE_OPTIONS } = require('../../../commons')
+const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES, DEFAULT_GAS_PRICE_FACTOR } = require('../utils/constants')
+const { gasPriceFromOracle, gasPriceFromContract, GAS_PRICE_OPTIONS } = require('../../../commons')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
@@ -39,61 +34,19 @@ const foreignBridge = new web3Foreign.eth.Contract(ForeignABI, FOREIGN_BRIDGE_AD
 let cachedGasPrice = null
 let cachedGasPriceOracleSpeeds = null
 
-function gasPriceWithinLimits(gasPrice) {
-  if (gasPrice < GAS_PRICE_BOUNDARIES.MIN) {
-    return GAS_PRICE_BOUNDARIES.MIN
-  } else if (gasPrice > GAS_PRICE_BOUNDARIES.MAX) {
-    return GAS_PRICE_BOUNDARIES.MAX
-  } else {
-    return gasPrice
-  }
-}
-
-function normalizeGasPrice(oracleGasPrice, factor) {
-  const gasPriceGwei = oracleGasPrice * factor
-  const gasPrice = gasPriceWithinLimits(gasPriceGwei)
-  return Web3Utils.toWei(gasPrice.toFixed(2).toString(), 'gwei')
-}
-
-async function fetchGasPriceFromOracle(oracleUrl, speedType, factor) {
-  const response = await fetch(oracleUrl)
-  const json = await response.json()
-  const oracleGasPrice = json[speedType]
-  if (!oracleGasPrice) {
-    throw new Error(`Response from Oracle didn't include gas price for ${speedType} type.`)
-  }
-
-  return {
-    oracleGasPrice: normalizeGasPrice(oracleGasPrice, factor),
-    oracleResponse: json
-  }
-}
-
-async function fetchGasPrice({ bridgeContract, oracleFn }) {
-  let gasPrice = null
-  let oracleGasPriceSpeeds = null
-  try {
-    const { oracleGasPrice, oracleResponse } = await oracleFn()
-    gasPrice = oracleGasPrice
-    oracleGasPriceSpeeds = oracleResponse
-    logger.debug({ gasPrice }, 'Gas price updated using the oracle')
-  } catch (e) {
-    logger.error(`Gas Price API is not available. ${e.message}`)
-
-    try {
-      gasPrice = await bridgeContract.methods.gasPrice().call()
-      logger.debug({ gasPrice }, 'Gas price updated using the contracts')
-    } catch (e) {
-      logger.error(`There was a problem getting the gas price from the contract. ${e.message}`)
-    }
-  }
-  return {
-    gasPrice,
-    oracleGasPriceSpeeds
-  }
-}
-
 let fetchGasPriceInterval = null
+
+const fetchGasPrice = async (speedType, factor, bridgeContract, oracleFetchFn) => {
+  const contractOptions = { logger }
+  const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger, returnAllSpeeds: true }
+  const { gasPrice, oracleGasPriceSpeeds } = await gasPriceFromOracle(oracleFetchFn, oracleOptions)
+  cachedGasPrice =
+    gasPrice ||
+    (await gasPriceFromContract(bridgeContract, contractOptions)) ||
+    cachedGasPrice
+  cachedGasPriceOracleSpeeds = oracleGasPriceSpeeds || cachedGasPriceOracleSpeeds
+  return cachedGasPrice
+}
 
 async function start(chainId) {
   clearInterval(fetchGasPriceInterval)
@@ -123,14 +76,10 @@ async function start(chainId) {
     throw new Error(`Unrecognized chainId '${chainId}'`)
   }
 
-  fetchGasPriceInterval = setIntervalAndRun(async () => {
-    const { gasPrice, oracleGasPriceSpeeds } = await fetchGasPrice({
-      bridgeContract,
-      oracleFn: () => fetchGasPriceFromOracle(oracleUrl, speedType, factor)
-    })
-    cachedGasPrice = gasPrice || cachedGasPrice
-    cachedGasPriceOracleSpeeds = oracleGasPriceSpeeds || cachedGasPriceOracleSpeeds
-  }, updateInterval)
+  fetchGasPriceInterval = setIntervalAndRun(
+    () => fetchGasPrice(speedType, factor, bridgeContract, () => fetch(oracleUrl)),
+    updateInterval
+  )
 }
 
 function getPrice(options) {
@@ -152,9 +101,7 @@ function processGasPriceOptions({ options, cachedGasPrice, cachedGasPriceOracleS
 
 module.exports = {
   start,
-  fetchGasPrice,
   getPrice,
   processGasPriceOptions,
-  gasPriceWithinLimits,
-  normalizeGasPrice
+  fetchGasPrice
 }

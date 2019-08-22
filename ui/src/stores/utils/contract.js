@@ -1,7 +1,7 @@
 import BN from 'bignumber.js'
 import { fromDecimals } from './decimals'
 import { fromWei } from 'web3-utils'
-import { ERC_TYPES, REWARDABLE_VALIDATORS_ABI } from '../../../../commons'
+import { getValidatorList as commonGetValidatorList, getPastEvents as commonGetPastEvents } from '../../../../commons'
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -28,7 +28,7 @@ export const getCurrentLimit = async (contract, decimals) => {
 }
 
 export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents') =>
-  contract.getPastEvents(event, { fromBlock, toBlock })
+  commonGetPastEvents(contract, { fromBlock, toBlock, event })
 
 export const getErc677TokenAddress = contract => contract.methods.erc677token().call()
 
@@ -62,70 +62,7 @@ export const totalBurntCoins = async contract => {
   return new BN(burntCoins)
 }
 
-export const getValidatorList = async (address, eth) => {
-  const validatorsContract = new eth.Contract(REWARDABLE_VALIDATORS_ABI, address)
-  const validators = await validatorList(validatorsContract)
-
-  if (validators.length) {
-    return validators
-  }
-
-  const deployedAtBlock = await getDeployedAtBlock(validatorsContract)
-  const contract = new eth.Contract([], address)
-  const validatorsEvents = await contract.getPastEvents('allEvents', {
-    fromBlock: Number(deployedAtBlock)
-  })
-
-  return processValidatorsEvents(validatorsEvents)
-}
-
-export const validatorList = async contract => {
-  try {
-    return await contract.methods.validatorList().call()
-  } catch (e) {
-    return []
-  }
-}
-
-export const processValidatorsEvents = events => {
-  const validatorList = new Set()
-  events.forEach(event => {
-    parseValidatorEvent(event)
-
-    if (event.event === 'ValidatorAdded') {
-      validatorList.add(event.returnValues.validator)
-    } else if (event.event === 'ValidatorRemoved') {
-      validatorList.delete(event.returnValues.validator)
-    }
-  })
-
-  return Array.from(validatorList)
-}
-
-export const parseValidatorEvent = event => {
-  if (
-    event.event === undefined &&
-    event.raw &&
-    event.raw.topics &&
-    (event.raw.topics[0] === '0xe366c1c0452ed8eec96861e9e54141ebff23c9ec89fe27b996b45f5ec3884987' ||
-      event.raw.topics[0] === '0x8064a302796c89446a96d63470b5b036212da26bd2debe5bec73e0170a9a5e83')
-  ) {
-    const rawAddress = event.raw.topics.length > 1 ? event.raw.topics[1] : event.raw.data
-    const address = '0x' + rawAddress.slice(26)
-    event.event = 'ValidatorAdded'
-    event.returnValues.validator = address
-  } else if (
-    event.event === undefined &&
-    event.raw &&
-    event.raw.topics &&
-    event.raw.topics[0] === '0xe1434e25d6611e0db941968fdc97811c982ac1602e951637d206f5fdda9dd8f1'
-  ) {
-    const rawAddress = event.raw.data === '0x' ? event.raw.topics[1] : event.raw.data
-    const address = '0x' + rawAddress.slice(26)
-    event.event = 'ValidatorRemoved'
-    event.returnValues.validator = address
-  }
-}
+export const getValidatorList = async (address, eth) => commonGetValidatorList(address, eth, { logger: console })
 
 export const getName = contract => contract.methods.name().call()
 
@@ -147,27 +84,6 @@ export const getHomeFee = async contract => {
 export const getForeignFee = async contract => {
   const feeInWei = await contract.methods.getForeignFee().call()
   return new BN(fromWei(feeInWei.toString()))
-}
-
-export const getDeployedAtBlock = async contract => {
-  try {
-    return await contract.methods.deployedAtBlock().call()
-  } catch (e) {
-    return 0
-  }
-}
-
-export const getTokenType = async (contract, bridgeAddress) => {
-  try {
-    const bridgeContract = await contract.methods.bridgeContract().call()
-    if (bridgeContract === bridgeAddress) {
-      return ERC_TYPES.ERC677
-    } else {
-      return ERC_TYPES.ERC20
-    }
-  } catch (e) {
-    return ERC_TYPES.ERC20
-  }
 }
 
 export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()

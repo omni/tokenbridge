@@ -1,4 +1,4 @@
-# POA Token Bridge / E2E-Commons
+# POA TokenBridge / E2E-Commons
 
 Common scripts and configuration for the end-to-end tests.
 
@@ -25,3 +25,7 @@ Shut down and cleans up containers, networks, services, running scripts:
 | ui | Launches UI containers |
 | blocks | Auto mines blocks |
 | native-to-erc | Creates infrastructure for ultimate e2e testing, for native-to-erc type of bridge |
+
+#### Ultimate e2e testing
+
+For more information on the Ultimate e2e testing, please refer to [Ultimate](./ULTIMATE.md).

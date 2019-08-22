@@ -3,9 +3,7 @@ const eventsInfo = require('./utils/events')
 const { BRIDGE_MODES } = require('../commons')
 
 async function main(bridgeMode) {
-  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals } = await eventsInfo(
-    bridgeMode
-  )
+  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals } = await eventsInfo(bridgeMode)
 
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {

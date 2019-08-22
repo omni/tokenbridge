@@ -4,7 +4,9 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "selenium-webdriver": "3.6.0"
+    "selenium-webdriver": "3.6.0",
+    "mocha": "^5.2.0",
+    "chromedriver": "76.0.0"
   },
   "scripts": {
     "lint": "eslint . --ignore-path ../.eslintignore"

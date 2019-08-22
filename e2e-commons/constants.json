@@ -11,6 +11,10 @@
     "address": "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b",
     "privateKey": "0x8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
   },
+  "blockGenerator": {
+    "address": "0xB4579fd5AfEaB60B03Db3F408AAdD315035943f7",
+    "privateKey": "0xd6143d390d8b28c33601bb0fe29392fb1c35c24ccfe8722c09c2bdd6ada2699f"
+  },
   "nativeToErcBridge": {
     "home": "0x32198D570fffC7033641F8A9094FFDCaAEF42624",
     "foreign": "0x2B6871b9B02F73fa24F4864322CdC78604207769",

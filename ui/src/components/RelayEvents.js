@@ -107,31 +107,27 @@ export class RelayEvents extends React.Component {
   }
 
   getHomeEvents = homeStore => {
-    return homeStore.events
-      .slice()
-      .map(({ event, transactionHash, blockNumber, returnValues }) => ({
+    return homeStore.events.slice().map(({ event, transactionHash, blockNumber, returnValues }) => ({
+      color: this.colors[event],
+      eventName: event,
+      transactionHash,
+      recipient: returnValues.recipient,
+      value: returnValues.value,
+      blockNumber
+    }))
+  }
+
+  getForeignEvents = foreignStore => {
+    return foreignStore.events.slice().map(({ event, transactionHash, signedTxHash, blockNumber, returnValues }) => {
+      return {
         color: this.colors[event],
         eventName: event,
         transactionHash,
         recipient: returnValues.recipient,
         value: returnValues.value,
         blockNumber
-      }))
-  }
-
-  getForeignEvents = foreignStore => {
-    return foreignStore.events
-      .slice()
-      .map(({ event, transactionHash, signedTxHash, blockNumber, returnValues }) => {
-        return {
-          color: this.colors[event],
-          eventName: event,
-          transactionHash,
-          recipient: returnValues.recipient,
-          value: returnValues.value,
-          blockNumber
-        }
-      })
+      }
+    })
   }
 
   onChangeList = e => {
@@ -143,12 +139,8 @@ export class RelayEvents extends React.Component {
     const { selectedList } = this.state
     const home = this.getHomeEvents(homeStore, foreignStore)
     const foreign = this.getForeignEvents(foreignStore, homeStore)
-    const {
-      REACT_APP_HOME_WITHOUT_EVENTS: HOME,
-      REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN
-    } = process.env
-    const withoutEvents =
-      web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
+    const { REACT_APP_HOME_WITHOUT_EVENTS: HOME, REACT_APP_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
+    const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
 
     return withoutEvents ? (
       <Redirect to="/" />
@@ -156,12 +148,8 @@ export class RelayEvents extends React.Component {
       <div className="events-page">
         <div className="events-container">
           <EventsListHeader
-            handleChange={
-              selectedList === this.homeValue ? this.handleChangeHome : this.handleChangeForeign
-            }
-            handleKeyDown={
-              selectedList === this.homeValue ? this.handleKeyDownHome : this.handleKeyDownForeign
-            }
+            handleChange={selectedList === this.homeValue ? this.handleChangeHome : this.handleChangeForeign}
+            handleKeyDown={selectedList === this.homeValue ? this.handleKeyDownHome : this.handleKeyDownForeign}
             onChangeList={this.onChangeList}
             selected={selectedList}
             homeName={homeStore.networkName}

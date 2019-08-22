@@ -1,4 +1,4 @@
-# POA Token Bridge / Deployment Execution
+# POA TokenBridge / Deployment Execution
 
 Please refer to the [Configuration](./CONFIGURATION.md) first.
 
@@ -73,6 +73,49 @@ where the _<watcher>_ could be one of the following:
 - `signature-request`
 - `collected-signatures`
 - `affirmation-request`
+
+## Reset nonce counters
+In case some tx from your bridge validator account were done outside the bridge, you might need to update nonce counters.
+
+1. ssh to your bridge node and run:
+    ```
+    $ sudo su poadocker
+    $ cd ~/bridge
+    ```
+1. stop running docker containers using the nonce by running:
+    ```
+    $ docker-compose stop bridge_senderhome bridge_senderforeign
+    ```
+1. Connect to the redis container:
+    ```
+    $ docker-compose exec redis /bin/bash
+    ```
+    you should get a shell prompt from inside the docker container, similar to this:
+    ```
+    root@redis:/data#
+    ```
+1. connect to redis database by running `redis-cli`, prompt should change once again to
+    ```
+    127.0.0.1:6379>
+    ```
+1. list existing keys by running `keys *`, output should look like this:
+    ```
+    127.0.0.1:6379> keys *
+    1) "erc-native-affirmation-request:lastProcessedBlock"
+    2) "erc-native-collected-signatures:lastProcessedBlock"
+    3) "erc-native-signature-request:lastProcessedBlock"
+    4) "home:nonce"
+    5) "foreign:nonce"
+    ```
+1. delete keys containing last used nonces on both networks
+    ```
+    127.0.0.1:6379> del "home:nonce" "foreign:nonce"
+    ```
+1. exit from redis container by running `exit` twice
+1. start the rest of bridge containers:
+    ```
+    $ docker-compose start bridge_senderhome bridge_senderforeign
+    ```
 
 ## Logs
 

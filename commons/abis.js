@@ -1,12 +1,9 @@
 const HOME_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeNativeToErc').abi
-const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc')
-  .abi
+const FOREIGN_NATIVE_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeNativeToErc').abi
 const HOME_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeBridgeErcToErc').abi
-const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErc677ToErc677')
-  .abi
+const FOREIGN_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignBridgeErc677ToErc677').abi
 const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative')
-  .abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative').abi
 const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
 const ERC677_ABI = require('../contracts/build/contracts/ERC677').abi
 const ERC677_BRIDGE_TOKEN_ABI = require('../contracts/build/contracts/ERC677BridgeToken').abi
@@ -17,8 +14,39 @@ const HOME_AMB_ABI = require('../contracts/build/contracts/HomeAMB').abi
 const FOREIGN_AMB_ABI = require('../contracts/build/contracts/ForeignAMB').abi
 const BOX_ABI = require('../contracts/build/contracts/Box').abi
 
-const { homeV1Abi, foreignViAbi } = require('./v1Abis')
+const { HOME_V1_ABI, FOREIGN_V1_ABI } = require('./v1Abis')
 const { BRIDGE_MODES } = require('./constants')
+
+const ERC20_BYTES32_ABI = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'name',
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'symbol',
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  }
+]
 
 function getBridgeABIs(bridgeMode) {
   let HOME_ABI = null
@@ -33,8 +61,8 @@ function getBridgeABIs(bridgeMode) {
     HOME_ABI = HOME_ERC_TO_NATIVE_ABI
     FOREIGN_ABI = FOREIGN_ERC_TO_NATIVE_ABI
   } else if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1) {
-    HOME_ABI = homeV1Abi
-    FOREIGN_ABI = foreignViAbi
+    HOME_ABI = HOME_V1_ABI
+    FOREIGN_ABI = FOREIGN_V1_ABI
   } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     HOME_ABI = HOME_AMB_ABI
     FOREIGN_ABI = FOREIGN_AMB_ABI
@@ -59,6 +87,9 @@ module.exports = {
   BLOCK_REWARD_ABI,
   BRIDGE_VALIDATORS_ABI,
   REWARDABLE_VALIDATORS_ABI,
+  HOME_V1_ABI,
+  FOREIGN_V1_ABI,
+  ERC20_BYTES32_ABI,
   HOME_AMB_ABI,
   FOREIGN_AMB_ABI,
   BOX_ABI

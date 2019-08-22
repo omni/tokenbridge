@@ -1,4 +1,4 @@
-# POA Token Bridge / Deployment Configuration
+# POA TokenBridge / Deployment Configuration
 
 Please see the [Oracle](../oracle/README.md) for additional configuration and execution details.
 
@@ -46,6 +46,8 @@ cp hosts.yml.example hosts.yml
       hosts:
         <host_ip_B>:
           ansible_user: <user>
+          #syslog_server_port: "<protocol>://<ip>:<port>"
+          #monitor_cron_schedule: "*/4 * * * *" # When this parameter is set, it will overwrite default schedule for performing checks
 ```
 
 The config above would install the Oracle on `<host_ip_A>`, UI on `<host_ip_C>`, and both Oracle, UI and Monitor on `<host_ip_B>`.
@@ -85,13 +87,13 @@ Example config for installing only UI:
 
 2. You can also add the following parameters in the `group_vars` to change the default behavior of the playbooks:
 
-2.1 `compose_service_user` - specifies the user created by the playbooks. This user runs the Token Bridge Oracle.
+2.1 `compose_service_user` - specifies the user created by the playbooks. This user runs the TokenBridge Oracle.
 
-2.2 `bridge_repo` contains the address of the Token Bridge Oracle repository. The default value is https://github.com/poanetwork/tokenbridge.
+2.2 `bridge_repo` contains the address of the TokenBridge Oracle repository. The default value is https://github.com/poanetwork/tokenbridge.
 
 2.3 `bridge_repo_branch` points to the specific branch or commit to use with the `bridge_repo`. If `bridge_repo_branch` is not specified, the default (`master`) branch is used.
 
-2.4 `bridge_path` sets the path where the Token Bridge Oracle is installed. By default, it points. to the home folder of `compose_service_user`
+2.4 `bridge_path` sets the path where the TokenBridge Oracle is installed. By default, it points. to the home folder of `compose_service_user`
 
 2.5 `docker_compose_version` - specifies a version of docker-compose to be installed.
 

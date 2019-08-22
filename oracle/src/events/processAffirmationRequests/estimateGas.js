@@ -1,28 +1,14 @@
 const { HttpListProviderError } = require('http-list-provider')
-const {
-  AlreadyProcessedError,
-  AlreadySignedError,
-  InvalidValidatorError
-} = require('../../utils/errors')
+const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 const logger = require('../../services/logger').child({
   module: 'processAffirmationRequests:estimateGas'
 })
 
-async function estimateGas({
-  web3,
-  homeBridge,
-  validatorContract,
-  recipient,
-  value,
-  txHash,
-  address
-}) {
+async function estimateGas({ web3, homeBridge, validatorContract, recipient, value, txHash, address }) {
   try {
-    const gasEstimate = await homeBridge.methods
-      .executeAffirmation(recipient, value, txHash)
-      .estimateGas({
-        from: address
-      })
+    const gasEstimate = await homeBridge.methods.executeAffirmation(recipient, value, txHash).estimateGas({
+      from: address
+    })
 
     return gasEstimate
   } catch (e) {
@@ -36,9 +22,7 @@ async function estimateGas({
     // Check if minimum number of validations was already reached
     logger.debug('Check if minimum number of validations was already reached')
     const numAffirmationsSigned = await homeBridge.methods.numAffirmationsSigned(messageHash).call()
-    const alreadyProcessed = await homeBridge.methods
-      .isAlreadyProcessed(numAffirmationsSigned)
-      .call()
+    const alreadyProcessed = await homeBridge.methods.isAlreadyProcessed(numAffirmationsSigned).call()
 
     if (alreadyProcessed) {
       throw new AlreadyProcessedError(e.message)

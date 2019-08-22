@@ -148,8 +148,7 @@ describe('message utils', () => {
       const transactionHash = '0x4a298455c1ccb17de77718fc045a876e1b4e063afaad361dcdef142a8ee48d5a'
 
       // when
-      const messageThunk = () =>
-        createMessage({ recipient, value, transactionHash, expectedMessageLength })
+      const messageThunk = () => createMessage({ recipient, value, transactionHash, expectedMessageLength })
 
       // then
       expect(messageThunk).to.throw()
@@ -162,8 +161,7 @@ describe('message utils', () => {
       const transactionHash = '0x4a298455c1ccb17de77718fc045a876e1b4e063afaad361dcdef142a8ee48d5a'
 
       // when
-      const messageThunk = () =>
-        createMessage({ recipient, value, transactionHash, expectedMessageLength })
+      const messageThunk = () => createMessage({ recipient, value, transactionHash, expectedMessageLength })
 
       // then
       expect(messageThunk).to.throw()
@@ -176,8 +174,7 @@ describe('message utils', () => {
       const transactionHash = '0x4a298455c1ccb17de77718fc045a876e1b4e063afaad361dcdef142a8ee48d5'
 
       // when
-      const messageThunk = () =>
-        createMessage({ recipient, value, transactionHash, expectedMessageLength })
+      const messageThunk = () => createMessage({ recipient, value, transactionHash, expectedMessageLength })
 
       // then
       expect(messageThunk).to.throw()
@@ -190,8 +187,7 @@ describe('message utils', () => {
       const transactionHash = '0x4a298455c1ccb17de77718fc045a876e1b4e063afaad361dcdef142a8ee48d5aa'
 
       // when
-      const messageThunk = () =>
-        createMessage({ recipient, value, transactionHash, expectedMessageLength })
+      const messageThunk = () => createMessage({ recipient, value, transactionHash, expectedMessageLength })
 
       // then
       expect(messageThunk).to.throw()
@@ -232,8 +228,7 @@ describe('message utils', () => {
       // given
       const originalRecipient = '0xe3D952Ad4B96A756D65790393128FA359a7CD888'
       const originalValue = '0x2a'
-      const originalTransactionHash =
-        '0x4a298455c1ccb17de77718fc045a876e1b4e063afaad361dcdef142a8ee48d5a'
+      const originalTransactionHash = '0x4a298455c1ccb17de77718fc045a876e1b4e063afaad361dcdef142a8ee48d5a'
       const originalBridgeAddress = '0xfA79875FB0828c1FBD438583ED23fF5a956D80a1'
 
       // when

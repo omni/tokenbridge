@@ -16,10 +16,7 @@ export const toDecimals = (number, decimals) => {
 }
 
 const isBigNumber = object => {
-  return (
-    object &&
-    (object instanceof BN || (object.constructor && object.constructor.name === 'BigNumber'))
-  )
+  return object && (object instanceof BN || (object.constructor && object.constructor.name === 'BigNumber'))
 }
 
 const toBigNumber = number => {
@@ -33,8 +30,5 @@ const toBigNumber = number => {
 }
 
 const isString = object => {
-  return (
-    typeof object === 'string' ||
-    (object && object.constructor && object.constructor.name === 'String')
-  )
+  return typeof object === 'string' || (object && object.constructor && object.constructor.name === 'String')
 }

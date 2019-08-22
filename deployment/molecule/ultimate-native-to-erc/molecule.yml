@@ -4,9 +4,21 @@ driver:
 platforms:
   - name: oracle-native-to-erc-host
     groups:
-      - example
+      - ultimate
+      - native-to-erc
     children:
       - oracle
+    image: ubuntu:16.04
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  - name: ui-native-to-erc-host
+    groups:
+      - ultimate
+      - native-to-erc
+    children:
+      - ui
     image: ubuntu:16.04
     privileged: true
     network_mode: host
@@ -16,22 +28,19 @@ provisioner:
   name: ansible
   playbooks:
     prepare: ../prepare.yml
-    converge: ../../site.yml
+    converge: ../ultimate-commons/converge.yml
   inventory:
     host_vars:
       oracle-native-to-erc-host:
         bridge_repo_branch: $CODEBASE_BRANCH
+        HOME_RPC_URL: "http://parity1:8545"
+        FOREIGN_RPC_URL: "http://parity2:8545"
         VALIDATOR_ADDRESS: "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b"
         VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
-        HOME_BRIDGE_ADDRESS: "0x32198D570fffC7033641F8A9094FFDCaAEF42624"
-        FOREIGN_BRIDGE_ADDRESS: "0x2B6871b9B02F73fa24F4864322CdC78604207769"
-        ERC20_TOKEN_ADDRESS: "0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B"
-        QUEUE_URL: "amqp://$DOCKER_LOCALHOST"
-        REDIS_URL: "redis://$DOCKER_LOCALHOST:6379"
-        HOME_RPC_URL: "http://$DOCKER_LOCALHOST:8541"
-        FOREIGN_RPC_URL: "http://$DOCKER_LOCALHOST:8542"
-        ALLOW_HTTP: yes
-        LOG_LEVEL: debug
+      ui-native-to-erc-host:
+        bridge_repo_branch: $CODEBASE_BRANCH
+        HOME_RPC_URL: "http://localhost:8541"
+        FOREIGN_RPC_URL: "http://localhost:8542"
 verifier:
   name: testinfra
   lint:

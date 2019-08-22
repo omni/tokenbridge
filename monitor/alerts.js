@@ -45,25 +45,15 @@ async function main() {
   )
 
   logger.debug('extracting most recent transactionHash')
-  const { transactionHash: xSignaturesMostRecentTxHash = '' } =
-    xSignatures.sort(sortEvents).reverse()[0] || {}
-  const { transactionHash: xAffirmationsMostRecentTxHash = '' } =
-    xAffirmations.sort(sortEvents).reverse()[0] || {}
+  const { transactionHash: xSignaturesMostRecentTxHash = '' } = xSignatures.sort(sortEvents).reverse()[0] || {}
+  const { transactionHash: xAffirmationsMostRecentTxHash = '' } = xAffirmations.sort(sortEvents).reverse()[0] || {}
 
   logger.debug('building transaction objects')
-  const foreignValidators = await Promise.all(
-    xSignatures.map(event => findTxSender(web3Foreign)(event))
-  )
-  const homeValidators = await Promise.all(
-    xAffirmations.map(event => findTxSender(web3Home)(event))
-  )
+  const foreignValidators = await Promise.all(xSignatures.map(event => findTxSender(web3Foreign)(event)))
+  const homeValidators = await Promise.all(xAffirmations.map(event => findTxSender(web3Home)(event)))
 
-  const xSignaturesTxs = xSignatures
-    .map(normalizeEventInformation)
-    .reduce(buildTxList(foreignValidators), {})
-  const xAffirmationsTxs = xAffirmations
-    .map(normalizeEventInformation)
-    .reduce(buildTxList(homeValidators), {})
+  const xSignaturesTxs = xSignatures.map(normalizeEventInformation).reduce(buildTxList(foreignValidators), {})
+  const xAffirmationsTxs = xAffirmations.map(normalizeEventInformation).reduce(buildTxList(homeValidators), {})
 
   logger.debug('Done')
 
@@ -181,9 +171,7 @@ const findDifferences = src => dest => {
   return (
     src
       .map(normalizeEventInformation)
-      .filter(
-        a => a.referenceTx === b.referenceTx && a.recipient === b.recipient && a.value === b.value
-      ).length === 0
+      .filter(a => a.referenceTx === b.referenceTx && a.recipient === b.recipient && a.value === b.value).length === 0
   )
 }
 

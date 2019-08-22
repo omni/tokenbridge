@@ -3,18 +3,7 @@ const fetch = require('node-fetch')
 const rpcUrlsManager = require('../services/getRpcUrlsManager')
 
 // eslint-disable-next-line consistent-return
-async function sendTx({
-  chain,
-  privateKey,
-  data,
-  nonce,
-  gasPrice,
-  amount,
-  gasLimit,
-  to,
-  chainId,
-  web3
-}) {
+async function sendTx({ chain, privateKey, data, nonce, gasPrice, amount, gasLimit, to, chainId, web3 }) {
   const serializedTx = await web3.eth.accounts.signTransaction(
     {
       nonce: Number(nonce),
