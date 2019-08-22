@@ -1,12 +1,12 @@
 ---
-- name: Create repo directory
-  file: 
-    path: "{{ bridge_path }}"
-    state: directory
-- name: Synchronize the repository with current files
-  synchronize:
+- name: Get bridge repo
+  git:
+    repo: "{{ bridge_repo }}"
     dest: "{{ bridge_path }}"
-    src: ../../../..
-    rsync_opts:
-      - "--cvs-exclude"
-      - "--exclude-from=../../../.gitignore"
+    force: no
+    update: no
+    version: "{{ bridge_repo_branch }}"
+- name: Initialize submodules
+  shell: git submodule update --init
+  args:
+    chdir: "{{ bridge_path }}"
