@@ -98,7 +98,7 @@ function processCollectedSignaturesBuilder(config) {
               throw e
             }
           }
-          const data = await foreignBridge.methods.executeSignatures(message, v, r, s).encodeABI()
+          const data = await foreignBridge.methods.executeSignatures(message, signatures).encodeABI()
           const gasPriceOptions = generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed })
           txToSend.push({
             data,
