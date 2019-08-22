@@ -23,7 +23,7 @@ const foreignAMB = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, amb.foreign)
 const foreignBox = new foreignWeb3.eth.Contract(BOX_ABI, amb.foreignBox)
 
 const oneEther = foreignWeb3.utils.toWei('1', 'ether')
-const subsidizedHash = homeWeb3.utils.toHex('AMB-subsidized-mode')
+const subsidizedHash = homeWeb3.utils.toBN(0)
 
 describe('arbitrary message bridging', () => {
   describe('Home to Foreign', () => {
