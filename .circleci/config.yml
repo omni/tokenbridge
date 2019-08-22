@@ -185,7 +185,9 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - run: yarn initialize
+      - tokenbridge-orb/install-node
+      - tokenbridge-orb/install-yarn
+      - tokenbridge-orb/yarn-install-cached-on-machine
       - run: deployment/molecule/molecule.sh repo
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
