@@ -23,7 +23,7 @@ const foreignAMB = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, amb.foreign)
 const foreignBox = new foreignWeb3.eth.Contract(BOX_ABI, amb.foreignBox)
 
 const oneEther = foreignWeb3.utils.toWei('1', 'ether')
-const subsidizedMode = homeWeb3.utils.toBN(0)
+const subsidizedMode = toBN(0)
 
 describe('arbitrary message bridging', () => {
   describe('Home to Foreign', () => {
@@ -155,8 +155,8 @@ describe('arbitrary message bridging', () => {
         })
         const foreignMode = await foreignAMB.methods.homeToForeignMode().call()
 
-        assert(homeMode.eq(subsidizedMode), 'home mode incorrect')
-        assert(foreignMode.eq(subsidizedMode), 'foreign mode incorrect')
+        assert(toBN(homeMode).eq(subsidizedMode), 'home mode incorrect')
+        assert(toBN(foreignMode).eq(subsidizedMode), 'foreign mode incorrect')
 
         const initialValue = await foreignBox.methods.value().call()
         assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
@@ -298,8 +298,8 @@ describe('arbitrary message bridging', () => {
 
         const foreignMode = await foreignAMB.methods.foreignToHomeMode().call()
 
-        assert(homeMode.eq(subsidizedMode), 'home mode incorrect')
-        assert(foreignMode.eq(subsidizedMode), 'foreign mode incorrect')
+        assert(toBN(homeMode).eq(subsidizedMode), 'home mode incorrect')
+        assert(toBN(foreignMode).eq(subsidizedMode), 'foreign mode incorrect')
 
         const initialValue = await homeBox.methods.value().call()
         assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
