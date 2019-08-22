@@ -1,5 +1,6 @@
 require('../../env')
 const fetch = require('node-fetch')
+const Web3Utils = require('web3-utils')
 const { web3Home, web3Foreign } = require('../services/web3')
 const { bridgeConfig } = require('../../config/base.config')
 const logger = require('../services/logger').child({
@@ -39,12 +40,13 @@ let fetchGasPriceInterval = null
 const fetchGasPrice = async (speedType, factor, bridgeContract, oracleFetchFn) => {
   const contractOptions = { logger }
   const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger, returnAllSpeeds: true }
-  const { gasPrice, oracleGasPriceSpeeds } = await gasPriceFromOracle(oracleFetchFn, oracleOptions)
+  const oracleGasPriceData = await gasPriceFromOracle(oracleFetchFn, oracleOptions)
   cachedGasPrice =
-    gasPrice ||
+    (oracleGasPriceData && oracleGasPriceData.gasPrice) ||
     (await gasPriceFromContract(bridgeContract, contractOptions)) ||
     cachedGasPrice
-  cachedGasPriceOracleSpeeds = oracleGasPriceSpeeds || cachedGasPriceOracleSpeeds
+  cachedGasPriceOracleSpeeds =
+    (oracleGasPriceData && oracleGasPriceData.oracleGasPriceSpeeds) || cachedGasPriceOracleSpeeds
   return cachedGasPrice
 }
 

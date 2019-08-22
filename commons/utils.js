@@ -224,7 +224,7 @@ const gasPriceFromOracle = async (fetchFn, options = {}) => {
       options.logger.debug &&
       options.logger.debug({ oracleGasPrice, normalizedGasPrice }, 'Gas price updated using the API')
 
-    return normalizedGasPrice
+    return options.returnAllSpeeds ? { gasPrice: normalizedGasPrice, oracleGasPriceSpeeds: json } : normalizedGasPrice
   } catch (e) {
     options.logger && options.logger.error && options.logger.error(`Gas Price API is not available. ${e.message}`)
   }
