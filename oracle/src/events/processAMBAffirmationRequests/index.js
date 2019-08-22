@@ -8,11 +8,7 @@ const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
 const { addTxHashToData, parseAMBMessage } = require('../../../../commons')
 const { generateGasPriceOptions } = require('../../utils/utils')
-const {
-  AlreadyProcessedError,
-  AlreadySignedError,
-  InvalidValidatorError
-} = require('../../utils/errors')
+const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
@@ -48,10 +44,7 @@ function processAffirmationRequestsBuilder(config) {
 
         const { sender, executor, dataType, gasPrice, gasPriceSpeed } = parseAMBMessage(message)
 
-        logger.info(
-          { sender, executor },
-          `Processing affirmationRequest ${affirmationRequest.transactionHash}`
-        )
+        logger.info({ sender, executor }, `Processing affirmationRequest ${affirmationRequest.transactionHash}`)
 
         let gasEstimate
         try {
@@ -67,9 +60,7 @@ function processAffirmationRequestsBuilder(config) {
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {
           if (e instanceof HttpListProviderError) {
-            throw new Error(
-              'RPC Connection Error: submitSignature Gas Estimate cannot be obtained.'
-            )
+            throw new Error('RPC Connection Error: submitSignature Gas Estimate cannot be obtained.')
           } else if (e instanceof InvalidValidatorError) {
             logger.fatal({ address: config.validatorAddress }, 'Invalid validator')
             process.exit(EXIT_CODES.INCOMPATIBILITY)
@@ -78,9 +69,7 @@ function processAffirmationRequestsBuilder(config) {
             return
           } else if (e instanceof AlreadyProcessedError) {
             logger.info(
-              `affirmationRequest ${
-                affirmationRequest.transactionHash
-              } was already processed by other validators`
+              `affirmationRequest ${affirmationRequest.transactionHash} was already processed by other validators`
             )
             return
           } else {

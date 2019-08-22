@@ -36,15 +36,13 @@ async function main(mode) {
   let isExternalErc20
   let erc20Contract
   if (bridgeMode !== BRIDGE_MODES.ARBITRARY_MESSAGE) {
-    const tokenType = await getTokenType(foreignBridge, FOREIGN_BRIDGE_ADDRESS)
+    const erc20MethodName = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
+    const erc20Address = await foreignBridge.methods[erc20MethodName]().call()
+    const tokenType = await getTokenType(
+      new web3Foreign.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, erc20Address),
+      FOREIGN_BRIDGE_ADDRESS
+    )
     isExternalErc20 = tokenType === ERC_TYPES.ERC20
-    const erc20MethodName =
-      bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
-    const erc20Address = await foreignBridge.methods[erc20MethodName]().call()const tokenType = await getTokenType(
-    new web3Foreign.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, erc20Address),
-    FOREIGN_BRIDGE_ADDRESS
-  )
-  const isExternalErc20 = tokenType === ERC_TYPES.ERC20
     erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
   }
 

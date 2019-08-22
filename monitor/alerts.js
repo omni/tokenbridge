@@ -15,13 +15,7 @@ const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 async function main() {
-  const {
-    foreignDeposits,
-    homeDeposits,
-    homeWithdrawals,
-    foreignWithdrawals,
-    bridgeMode
-  } = await eventsInfo()
+  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals, bridgeMode } = await eventsInfo()
 
   let xSignatures
   let xAffirmations

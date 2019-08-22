@@ -70,28 +70,18 @@ async function main() {
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {
       home: {
-        deliveredMsgNotProcessedInForeign: homeDeposits.filter(
-          deliveredMsgNotProcessed(foreignDeposits)
-        ),
-        processedMsgNotDeliveredInForeign: homeWithdrawals.filter(
-          processedMsgNotDelivered(foreignWithdrawals)
-        )
+        deliveredMsgNotProcessedInForeign: homeDeposits.filter(deliveredMsgNotProcessed(foreignDeposits)),
+        processedMsgNotDeliveredInForeign: homeWithdrawals.filter(processedMsgNotDelivered(foreignWithdrawals))
       },
       foreign: {
-        deliveredMsgNotProcessedInHome: foreignWithdrawals.filter(
-          deliveredMsgNotProcessed(homeWithdrawals)
-        ),
-        processedMsgNotDeliveredInHome: foreignDeposits.filter(
-          processedMsgNotDelivered(homeDeposits)
-        )
+        deliveredMsgNotProcessedInHome: foreignWithdrawals.filter(deliveredMsgNotProcessed(homeWithdrawals)),
+        processedMsgNotDeliveredInHome: foreignDeposits.filter(processedMsgNotDelivered(homeDeposits))
       },
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else {
     const onlyInHomeDeposits = homeDeposits.filter(compareDepositsHome(foreignDeposits))
-    const onlyInForeignDeposits = foreignDeposits
-      .concat([])
-      .filter(compareDepositsForeign(homeDeposits))
+    const onlyInForeignDeposits = foreignDeposits.concat([]).filter(compareDepositsForeign(homeDeposits))
 
     const onlyInHomeWithdrawals = isExternalErc20
       ? homeWithdrawals.filter(compareTransferHome(foreignWithdrawals))

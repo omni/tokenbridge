@@ -33,9 +33,7 @@ describe('addTxHashToData', () => {
     const msgGasLimit = '000000000000000000000000000000000000000000000000000000005b877705'
     const msgDataType = '00'
     const msgData = '0xb1591967aed668a4b27645ff40c444892d91bf5951b382995d4d4f6ee3a2ce03'
-    const encodedData = `0x${strip0x(msgSender)}${strip0x(
-      msgExecutor
-    )}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
+    const encodedData = `0x${strip0x(msgSender)}${strip0x(msgExecutor)}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
 
     const transactionHash = '0xbdceda9d8c94838aca10c687da1411a07b1390e88239c0638cb9cc264219cc10'
     const message = `0x${strip0x(transactionHash)}${strip0x(msgSender)}${strip0x(
@@ -62,16 +60,7 @@ describe('parseAMBMessage', () => {
     )}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
 
     // when
-    const {
-      sender,
-      executor,
-      txHash,
-      gasLimit,
-      dataType,
-      gasPrice,
-      gasPriceSpeed,
-      data
-    } = parseAMBMessage(message)
+    const { sender, executor, txHash, gasLimit, dataType, gasPrice, gasPriceSpeed, data } = parseAMBMessage(message)
 
     // then
     expect(sender).to.be.equal(msgSender)
@@ -96,16 +85,7 @@ describe('parseAMBMessage', () => {
     )}${msgGasLimit}${msgDataType}${msgGasPrice}${strip0x(msgData)}`
 
     // when
-    const {
-      sender,
-      executor,
-      txHash,
-      gasLimit,
-      dataType,
-      gasPrice,
-      gasPriceSpeed,
-      data
-    } = parseAMBMessage(message)
+    const { sender, executor, txHash, gasLimit, dataType, gasPrice, gasPriceSpeed, data } = parseAMBMessage(message)
 
     // then
     expect(sender).to.be.equal(msgSender)
@@ -130,16 +110,7 @@ describe('parseAMBMessage', () => {
     )}${msgGasLimit}${msgDataType}${strip0x(msgGasPriceSpeed)}${strip0x(msgData)}`
 
     // when
-    const {
-      sender,
-      executor,
-      txHash,
-      gasLimit,
-      dataType,
-      gasPrice,
-      gasPriceSpeed,
-      data
-    } = parseAMBMessage(message)
+    const { sender, executor, txHash, gasLimit, dataType, gasPrice, gasPriceSpeed, data } = parseAMBMessage(message)
 
     // then
     expect(sender).to.be.equal(msgSender)

@@ -98,12 +98,7 @@ describe('arbitrary message bridging', () => {
         const initialUserBalance = toBN(await foreignWeb3.eth.getBalance(user.address))
 
         const tx = await homeBox.methods
-          .withdrawFromDepositOnOtherNetworkGasPrice(
-            user.address,
-            amb.home,
-            amb.foreign,
-            '1000000000'
-          )
+          .withdrawFromDepositOnOtherNetworkGasPrice(user.address, amb.home, amb.foreign, '1000000000')
           .send({
             from: user.address,
             gas: '1000000'
@@ -164,10 +159,7 @@ describe('arbitrary message bridging', () => {
         assert(foreignMode === subsidizedHash, 'foreign mode incorrect')
 
         const initialValue = await foreignBox.methods.value().call()
-        assert(
-          !toBN(initialValue).eq(toBN(newValue)),
-          'initial value should be different from new value'
-        )
+        assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
         const setValueTx = await homeBox.methods
           .setValueOnOtherNetworkGasPrice(newValue, amb.home, amb.foreignBox, '1000000000')
@@ -265,12 +257,7 @@ describe('arbitrary message bridging', () => {
         const initialUserBalance = toBN(await homeWeb3.eth.getBalance(user.address))
 
         await foreignBox.methods
-          .withdrawFromDepositOnOtherNetworkGasPrice(
-            user.address,
-            amb.foreign,
-            amb.home,
-            '1000000000'
-          )
+          .withdrawFromDepositOnOtherNetworkGasPrice(user.address, amb.foreign, amb.home, '1000000000')
           .send({
             from: user.address,
             gas: '1000000'
@@ -315,10 +302,7 @@ describe('arbitrary message bridging', () => {
         assert(foreignMode === subsidizedHash, 'foreign mode incorrect')
 
         const initialValue = await homeBox.methods.value().call()
-        assert(
-          !toBN(initialValue).eq(toBN(newValue)),
-          'initial value should be different from new value'
-        )
+        assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
         await foreignBox.methods
           .setValueOnOtherNetworkGasPrice(newValue, amb.home, amb.foreignBox, '1000000000')

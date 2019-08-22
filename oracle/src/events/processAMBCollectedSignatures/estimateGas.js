@@ -1,10 +1,6 @@
 const Web3 = require('web3')
 const { HttpListProviderError } = require('http-list-provider')
-const {
-  AlreadyProcessedError,
-  IncompatibleContractError,
-  InvalidValidatorError
-} = require('../../utils/errors')
+const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
 const logger = require('../../services/logger').child({
   module: 'processCollectedSignatures:estimateGas'
 })
@@ -26,12 +22,10 @@ async function estimateGas({
   gasPrice
 }) {
   try {
-    const gasEstimate = await foreignBridge.methods
-      .executeSignatures(message, signatures)
-      .estimateGas({
-        from: address,
-        gasPrice
-      })
+    const gasEstimate = await foreignBridge.methods.executeSignatures(message, signatures).estimateGas({
+      from: address,
+      gasPrice
+    })
     return gasEstimate
   } catch (e) {
     if (e instanceof HttpListProviderError) {
