@@ -68,8 +68,32 @@ function signatureToVRS(signature) {
   return { v, r, s }
 }
 
+function signatureToVRSAMB(rawSignature) {
+  const signature = strip0x(rawSignature)
+  const v = signature.substr(64 * 2)
+  const r = signature.substr(0, 32 * 2)
+  const s = signature.substr(32 * 2, 32 * 2)
+  return { v, r, s }
+}
+
+function packSignatures(array) {
+  const length = Web3Utils.toHex(array.length)
+  let v = ''
+  let r = ''
+  let s = ''
+  array.forEach(e => {
+    v = v.concat(e.v)
+    r = r.concat(e.r)
+    s = s.concat(e.s)
+  })
+
+  return `${length}${v}${r}${s}`
+}
+
 module.exports = {
   createMessage,
   parseMessage,
-  signatureToVRS
+  signatureToVRS,
+  signatureToVRSAMB,
+  packSignatures
 }

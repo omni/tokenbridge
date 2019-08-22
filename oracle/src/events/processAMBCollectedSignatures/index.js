@@ -4,7 +4,7 @@ const { HttpListProviderError } = require('http-list-provider')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
-const { signatureToVRS } = require('../../utils/message')
+const { signatureToVRS, signatureToVRSAMB, packSignatures } = require('../../utils/message')
 const { parseAMBMessage } = require('../../../../commons')
 const { generateGasPriceOptions } = require('../../utils/utils')
 const estimateGas = require('./estimateGas')
@@ -64,18 +64,22 @@ function processCollectedSignaturesBuilder(config) {
           requiredSignatures.length = NumberOfCollectedSignatures
           requiredSignatures.fill(0)
 
+          const signaturesArray = []
           const [v, r, s] = [[], [], []]
           logger.debug('Getting message signatures')
           const signaturePromises = requiredSignatures.map(async (el, index) => {
             logger.debug({ index }, 'Getting message signature')
             const signature = await homeBridge.methods.signature(messageHash, index).call()
-            const recover = signatureToVRS(signature)
-            v.push(recover.v)
-            r.push(recover.r)
-            s.push(recover.s)
+            const vrs = signatureToVRS(signature)
+            v.push(vrs.v)
+            r.push(vrs.r)
+            s.push(vrs.s)
+            const recover = signatureToVRSAMB(signature)
+            signaturesArray.push(recover)
           })
 
           await Promise.all(signaturePromises)
+          const signatures = packSignatures(signaturesArray)
 
           const { dataType, gasPrice, gasPriceSpeed, txHash } = parseAMBMessage(message)
 
@@ -88,6 +92,7 @@ function processCollectedSignaturesBuilder(config) {
               v,
               r,
               s,
+              signatures,
               message,
               numberOfCollectedSignatures: NumberOfCollectedSignatures,
               txHash,
