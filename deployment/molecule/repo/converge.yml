@@ -1,0 +1,11 @@
+---
+- name: Install Repository
+  hosts: all
+  become: true
+  tasks:
+    - import_role:
+        name: ../../roles/common
+        tasks_from: dependencies
+    - import_role:
+        name: ../../roles/common
+        tasks_from: repo
