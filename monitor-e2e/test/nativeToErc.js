@@ -1,7 +1,7 @@
 const assert = require('assert')
 const axios = require('axios')
 const { nativeToErcBridge, user, homeRPC } = require('../../e2e-commons/constants.json')
-const { checkAll, sendEther } = require('../utils')
+const { waitUntil, sendEther } = require('../utils')
 
 const baseUrl = nativeToErcBridge.monitor
 
@@ -26,8 +26,10 @@ describe('NATIVE TO ERC with changing state of contracts', () => {
 
   it('should change balanceDiff', async () => {
     await sendEther(homeRPC.URL, user, nativeToErcBridge.home)
-    checkAll()
-    ;({ data } = await axios.get(`${baseUrl}`))
-    assert(data.balanceDiff !== 0)
+
+    await waitUntil(async () => {
+      ;({ data } = await axios.get(`${baseUrl}`))
+      return data.balanceDiff !== 0
+    })
   })
 })

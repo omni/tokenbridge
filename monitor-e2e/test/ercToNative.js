@@ -1,7 +1,7 @@
 const assert = require('assert')
 const axios = require('axios')
 const { ercToNativeBridge, user, foreignRPC } = require('../../e2e-commons/constants.json')
-const { checkAll, sendTokens } = require('../utils')
+const { waitUntil, sendTokens } = require('../utils')
 
 const baseUrl = ercToNativeBridge.monitor
 
@@ -26,8 +26,10 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
   it('should change balanceDiff', async () => {
     await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
-    checkAll()
-    ;({ data } = await axios.get(`${baseUrl}`))
-    assert(data.balanceDiff !== 0)
+
+    await waitUntil(async () => {
+      ;({ data } = await axios.get(`${baseUrl}`))
+      return data.balanceDiff !== 0
+    })
   })
 })

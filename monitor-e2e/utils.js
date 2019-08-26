@@ -1,14 +1,16 @@
-const shell = require('shelljs')
 const Web3 = require('web3')
 const { ERC677_BRIDGE_TOKEN_ABI } = require('../commons')
 
-const checkAll = () => {
-  // the different prefixes come from macOS/linux docker differences and/or different docker-compose versions
-  ;['e2e-commons_', 'e2e_commons_', 'e2ecommons_'].forEach(prefix =>
-    ['monitor_1', 'monitor-erc20_1', 'monitor-erc20-native_1'].forEach(container =>
-      shell.exec(`docker exec ${prefix}${container} yarn check-all`)
-    )
-  )
+const waitUntil = async (predicate, step = 100, timeout = 10000) => {
+  const stopTime = Date.now() + timeout
+  while (Date.now() <= stopTime) {
+    const result = await predicate()
+    if (result) {
+      return result
+    }
+    await new Promise(resolve => setTimeout(resolve, step)) // sleep
+  }
+  throw new Error(`waitUntil timed out after ${timeout} ms`)
 }
 
 const sendEther = async (rpcUrl, account, to) => {
@@ -36,7 +38,7 @@ const sendTokens = async (rpcUrl, account, tokenAddress, recipientAddress) => {
 }
 
 module.exports = {
-  checkAll,
+  waitUntil,
   sendEther,
   sendTokens
 }
