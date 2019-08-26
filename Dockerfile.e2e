@@ -1,7 +1,5 @@
 FROM node:10
 
-RUN curl -sSL https://get.docker.com/ | sh
-
 WORKDIR /mono
 COPY package.json .
 COPY oracle-e2e/package.json ./oracle-e2e/
