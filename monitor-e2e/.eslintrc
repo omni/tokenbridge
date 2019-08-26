@@ -7,7 +7,8 @@
   "plugins": ["node"],
   "rules": {
     "node/no-unpublished-require": "off",
-    "node/no-extraneous-require": "off"
+    "node/no-extraneous-require": "off",
+    "import/no-extraneous-dependencies": "off"
   },
   "env": {
     "mocha": true
