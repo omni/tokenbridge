@@ -1,6 +1,6 @@
 const assert = require('assert')
 const axios = require('axios')
-const { nativeToErcBridge, ercToErcBridge, ercToNativeBridge } = require('../../e2e-commons/constants.json')
+const { nativeToErcBridge, ercToErcBridge, ercToNativeBridge, validator } = require('../../e2e-commons/constants.json')
 
 const types = [
   { description: 'NATIVE TO ERC', baseUrl: nativeToErcBridge.monitor },
@@ -43,9 +43,21 @@ types.forEach(type => {
         ;({ data } = await axios.get(`${type.baseUrl}/validators`))
       })
 
-      it('home', () => assert(typeof data.home.validators === 'object'))
-      it('foreign', () => assert(typeof data.foreign.validators === 'object'))
-      it('requiredSignaturesMatch', () => assert(data.requiredSignaturesMatch))
+      it('home', () => {
+        assert(typeof data.home.validators === 'object')
+        assert(data.home.validators[validator.address].balance > 0)
+        assert(data.home.validators[validator.address].leftTx > 0)
+        assert(data.home.validators[validator.address].gasPrice > 0)
+      })
+
+      it('foreign', () => {
+        assert(typeof data.foreign.validators === 'object')
+        assert(data.foreign.validators[validator.address].balance > 0)
+        assert(data.foreign.validators[validator.address].leftTx > 0)
+        assert(data.foreign.validators[validator.address].gasPrice > 0)
+      })
+
+      it('requiredSignaturesMatch', () => assert(data.requiredSignaturesMatch, 1))
       it('validatorsMatch', () => assert(data.validatorsMatch))
       it('lastChecked', () => assert(data.lastChecked >= 0))
       it('timeDiff', () => assert(data.timeDiff >= 0))
