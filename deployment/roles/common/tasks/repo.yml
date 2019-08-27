@@ -9,4 +9,4 @@
     src: ../../../..
     rsync_opts:
       - "--cvs-exclude"
-      - "--exclude-from=../../../.gitignore"
+      - "--exclude-from=../.gitignore"
