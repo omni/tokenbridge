@@ -19,20 +19,23 @@
     "home": "0x32198D570fffC7033641F8A9094FFDCaAEF42624",
     "foreign": "0x2B6871b9B02F73fa24F4864322CdC78604207769",
     "foreignToken": "0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B",
-    "ui": "http://localhost:3000"
+    "ui": "http://localhost:3000",
+    "monitor": "http://monitor:3010"
   },
   "ercToErcBridge": {
     "home": "0x1feB40aD9420b186F019A717c37f5546165d411E",
     "foreign": "0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127",
     "homeToken": "0x792455a6bCb62Ed4C4362D323E0590654CA4765c",
     "foreignToken": "0x3C665A31199694Bf723fD08844AD290207B5797f",
-    "ui": "http://localhost:3001"
+    "ui": "http://localhost:3001",
+    "monitor": "http://monitor-erc20:3011"
   },
   "ercToNativeBridge": {
     "home": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
     "foreign": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
     "foreignToken": "0x3C665A31199694Bf723fD08844AD290207B5797f",
-    "ui": "http://localhost:3002"
+    "ui": "http://localhost:3002",
+    "monitor": "http://monitor-erc20-native:3012"
   },
   "homeRPC": {
     "URL": "http://parity1:8545",
