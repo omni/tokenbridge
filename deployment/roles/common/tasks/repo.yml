@@ -8,5 +8,5 @@
     dest: "{{ bridge_path }}"
     src: ../../../..
     rsync_opts:
-      - "--cvs-exclude"
+      - "--exclude=.git"
       - "--exclude-from=../.gitignore"
