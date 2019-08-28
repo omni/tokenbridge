@@ -6,32 +6,20 @@
 
 - name: Register files for copying
   shell: |
-    git ls-tree -r HEAD --name-only > rsync_synchronize.tmp
-    cd contracts; git ls-tree -r HEAD --name-only > rsync_synchronize.tmp
+    git ls-tree -r HEAD --name-only
+    cd contracts; git ls-tree -r HEAD --name-only | sed -e 's/^/contracts\//'
+  register: rsync_files
   delegate_to: 127.0.0.1
   become: false
   args:
     chdir: ".."
 
-- name: Synchronize the monorepository
+- name: Copy the files
   synchronize:
     dest: "{{ bridge_path }}"
     src: ../../../..
     rsync_opts:
-      - "--files-from=../rsync_synchronize.tmp"
+      - "--include=\"{{ item }}\""
+      - "--exclude='*'"
       - "-avz"
-
-- name: Synchronize the submodules
-  synchronize:
-    dest: "{{ bridge_path }}/contracts"
-    src: ../../../../contracts
-    rsync_opts:
-      - "--files-from=../contracts/rsync_synchronize.tmp"
-      - "-avz"
-
-- name: Delete temporary files
-  shell: "rm rsync_synchronize.tmp contracts/rsync_synchronize.tmp"
-  delegate_to: 127.0.0.1
-  become: false
-  args:
-    chdir: ".."
+  with_items: rsync_files.stdout_lines
