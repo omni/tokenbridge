@@ -3,10 +3,35 @@
   file: 
     path: "{{ bridge_path }}"
     state: directory
-- name: Synchronize the repository with current files
+
+- name: Register files for copying
+  shell: |
+    git ls-tree -r HEAD --name-only > rsync_synchronize.tmp
+    cd contracts; git ls-tree -r HEAD --name-only > rsync_synchronize.tmp
+  delegate_to: 127.0.0.1
+  become: false
+  args:
+    chdir: ".."
+
+- name: Synchronize the monorepository
   synchronize:
     dest: "{{ bridge_path }}"
     src: ../../../..
     rsync_opts:
-      - "--exclude=.git"
-      - "--exclude-from=../.gitignore"
+      - "--files-from=../rsync_synchronize.tmp"
+      - "-avz"
+
+- name: Synchronize the submodules
+  synchronize:
+    dest: "{{ bridge_path }}/contracts"
+    src: ../../../../contracts
+    rsync_opts:
+      - "--files-from=../contracts/rsync_synchronize.tmp"
+      - "-avz"
+
+- name: Delete temporary files
+  shell: "rm rsync_synchronize.tmp contracts/rsync_synchronize.tmp"
+  delegate_to: 127.0.0.1
+  become: false
+  args:
+    chdir: ".."
