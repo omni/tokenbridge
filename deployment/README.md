@@ -16,7 +16,7 @@ Please refer to [Execution](./EXECUTION.md).
 
 ## Testing
 
-Please refer to [Testing](./molecule/TESTING.md).
+Please refer to [Deployment-E2E](../deployment-e2e/README.md).
 
 ## Contributing
 

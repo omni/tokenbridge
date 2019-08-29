@@ -170,19 +170,19 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment/molecule/molecule.sh oracle
+      - run: deployment-e2e/molecule.sh oracle
   deployment-ui:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment/molecule/molecule.sh ui
+      - run: deployment-e2e/molecule.sh ui
   deployment-monitor:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment/molecule/molecule.sh monitor
+      - run: deployment-e2e/molecule.sh monitor
   deployment-repo:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
@@ -191,7 +191,8 @@ jobs:
       - tokenbridge-orb/install-node
       - tokenbridge-orb/install-yarn
       - tokenbridge-orb/yarn-install-cached-on-machine
-      - run: deployment/molecule/molecule.sh repo
+      - run: deployment-e2e/molecule.sh repo
+      
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
