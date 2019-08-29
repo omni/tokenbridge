@@ -169,16 +169,19 @@ jobs:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
+      - run: git submodule update --init
       - run: deployment/molecule/molecule.sh oracle
   deployment-ui:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
+      - run: git submodule update --init
       - run: deployment/molecule/molecule.sh ui
   deployment-monitor:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
+      - run: git submodule update --init
       - run: deployment/molecule/molecule.sh monitor
   deployment-repo:
     executor: tokenbridge-orb/machine-with-docker-caching
