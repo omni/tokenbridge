@@ -1,4 +1,5 @@
-import { processValidatorsEvents, parseValidatorEvent } from '../contract'
+const { expect } = require('chai')
+const { processValidatorsEvents, parseValidatorEvent } = require('..')
 
 describe('parseValidatorEvent', () => {
   it('should parse ValidatorAdded event from v1', () => {
@@ -14,8 +15,8 @@ describe('parseValidatorEvent', () => {
     parseValidatorEvent(event)
 
     // Then
-    expect(event.event).toBe('ValidatorAdded')
-    expect(event.returnValues.validator).toBe('0xcfef0c6bb765321529ffe81507f6d099693cd225')
+    expect(event.event).to.be.equal('ValidatorAdded')
+    expect(event.returnValues.validator).to.be.equal('0xcfef0c6bb765321529ffe81507f6d099693cd225')
   })
   it('should parse ValidatorAdded event', () => {
     // Given
@@ -33,8 +34,8 @@ describe('parseValidatorEvent', () => {
     parseValidatorEvent(event)
 
     // Then
-    expect(event.event).toBe('ValidatorAdded')
-    expect(event.returnValues.validator).toBe('0xcfef0c6bb765321529ffe81507f6d099693cd225')
+    expect(event.event).to.be.equal('ValidatorAdded')
+    expect(event.returnValues.validator).to.be.equal('0xcfef0c6bb765321529ffe81507f6d099693cd225')
   })
   it('should parse ValidatorAdded event from rewardableValidators', () => {
     // Given
@@ -52,8 +53,8 @@ describe('parseValidatorEvent', () => {
     parseValidatorEvent(event)
 
     // Then
-    expect(event.event).toBe('ValidatorAdded')
-    expect(event.returnValues.validator).toBe('0xcfef0c6bb765321529ffe81507f6d099693cd225')
+    expect(event.event).to.be.equal('ValidatorAdded')
+    expect(event.returnValues.validator).to.be.equal('0xcfef0c6bb765321529ffe81507f6d099693cd225')
   })
   it('should parse ValidatorRemoved event', () => {
     // Given
@@ -71,8 +72,8 @@ describe('parseValidatorEvent', () => {
     parseValidatorEvent(event)
 
     // Then
-    expect(event.event).toBe('ValidatorRemoved')
-    expect(event.returnValues.validator).toBe('0xcfef0c6bb765321529ffe81507f6d099693cd225')
+    expect(event.event).to.be.equal('ValidatorRemoved')
+    expect(event.returnValues.validator).to.be.equal('0xcfef0c6bb765321529ffe81507f6d099693cd225')
   })
   it('should parse ValidatorRemoved event from v1', () => {
     // Given
@@ -87,8 +88,8 @@ describe('parseValidatorEvent', () => {
     parseValidatorEvent(event)
 
     // Then
-    expect(event.event).toBe('ValidatorRemoved')
-    expect(event.returnValues.validator).toBe('0xcfef0c6bb765321529ffe81507f6d099693cd225')
+    expect(event.event).to.be.equal('ValidatorRemoved')
+    expect(event.returnValues.validator).to.be.equal('0xcfef0c6bb765321529ffe81507f6d099693cd225')
   })
 })
 describe('processValidatorsEvents', () => {
@@ -169,9 +170,9 @@ describe('processValidatorsEvents', () => {
     const validatorList = processValidatorsEvents(events)
 
     // Then
-    expect(validatorList.length).toBe(3)
-    expect(validatorList[0]).toBe('0xCbd25A2a5708051747a052dBB1b291865Fc0e474')
-    expect(validatorList[1]).toBe('0xBac68A86Cf596E3b124781E0bdbC47bb458bec62')
-    expect(validatorList[2]).toBe('0xf4BEF13F9f4f2B203FAF0C3cBbaAbe1afE056955')
+    expect(validatorList.length).to.be.equal(3)
+    expect(validatorList[0]).to.be.equal('0xCbd25A2a5708051747a052dBB1b291865Fc0e474')
+    expect(validatorList[1]).to.be.equal('0xBac68A86Cf596E3b124781E0bdbC47bb458bec62')
+    expect(validatorList[2]).to.be.equal('0xf4BEF13F9f4f2B203FAF0C3cBbaAbe1afE056955')
   })
 })

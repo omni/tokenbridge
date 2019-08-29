@@ -17,10 +17,7 @@ async function getStartBlock(rpcUrl, bridgeAddress, bridgeAbi) {
     const deployedAtBlock = await bridgeContract.methods.deployedAtBlock().call()
 
     const validatorContractAddress = await bridgeContract.methods.validatorContract().call()
-    const validatorContract = new web3Instance.eth.Contract(
-      BRIDGE_VALIDATORS_ABI,
-      validatorContractAddress
-    )
+    const validatorContract = new web3Instance.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
 
     const validatorDeployedAtBlock = await validatorContract.methods.deployedAtBlock().call()
 

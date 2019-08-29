@@ -59,22 +59,14 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       foreignBalanceBefore = await mainPage.getForeignPOABalance()
       console.log('foreignBalanceBefore = ' + foreignBalanceBefore)
       const result = foreignBalanceBefore === 0
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Foreign POA balance is zero or not displayed '
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Foreign POA balance is zero or not displayed ')
     })
 
     test.it('Main page: home POA balance is displayed', async () => {
       homeBalanceBefore = await mainPage.getHomePOABalance()
       console.log('homeBalanceBefore = ' + homeBalanceBefore)
       const result = homeBalanceBefore !== 0
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Home POA balance is zero or not displayed '
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Home POA balance is zero or not displayed ')
     })
 
     test.it('User is able to send tokens from Home account to Foreign account', async () => {
@@ -93,30 +85,19 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newHomeBalance) < maxAmountPerTransactionLimit / 100
       homeBalanceBefore = newHomeBalance
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Home POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Home POA balance is not correct after transaction')
     })
 
-    test.it(
-      'Foreign account has received correct amount of tokens after transaction ',
-      async () => {
-        const newForeignBalance = await mainPage.getForeignPOABalance()
+    test.it('Foreign account has received correct amount of tokens after transaction ', async () => {
+      const newForeignBalance = await mainPage.getForeignPOABalance()
 
-        const shouldBe = foreignBalanceBefore + maxAmountPerTransactionLimit
-        console.log('newForeignBalance = ' + newForeignBalance)
-        console.log('shouldBe = ' + shouldBe)
+      const shouldBe = foreignBalanceBefore + maxAmountPerTransactionLimit
+      console.log('newForeignBalance = ' + newForeignBalance)
+      console.log('shouldBe = ' + shouldBe)
 
-        const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
-        return await assert.strictEqual(
-          result,
-          true,
-          'Test FAILED. Foreign POA balance is not correct after transaction'
-        )
-      }
-    )
+      const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
+      return await assert.strictEqual(result, true, 'Test FAILED. Foreign POA balance is not correct after transaction')
+    })
 
     test.it('User is able to send tokens from Foreign account to Home account', async () => {
       await foreignAccount.setMetaMaskNetwork()
@@ -135,11 +116,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('newForeignBalance = ' + newForeignBalance)
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Foreign POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Foreign POA balance is not correct after transaction')
     })
 
     test.it('Home account has received correct amount of tokens after transaction', async () => {
@@ -148,16 +125,13 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('newHomeBalance = ' + newHomeBalance)
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newHomeBalance) < maxAmountPerTransactionLimit / 100
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Home POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Home POA balance is not correct after transaction')
     })
   })
 
   test.describe('ERC TO ERC', async () => {
     test.it('User is able to open main page of bridge-ui ', async () => {
+      await foreignAccount.setMetaMaskNetwork()
       startURL = await Utils.getErc20StartURL()
       const result = await mainPage.open(startURL)
       console.log('Test URL:  ' + startURL)
@@ -173,22 +147,14 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       foreignBalanceBefore = await mainPage.getForeignPOABalance()
       console.log('foreignBalanceBefore = ' + foreignBalanceBefore)
       const result = foreignBalanceBefore === 0
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED. Foreign erc20 balance is not zero'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED. Foreign erc20 balance is not zero')
     })
 
     test.it('Main page: home erc20 balance is displayed', async () => {
       homeBalanceBefore = await mainPage.getHomePOABalance()
       console.log('homeBalanceBefore = ' + homeBalanceBefore)
       const result = homeBalanceBefore !== 0
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED. Home erc20 balance is zero or not displayed '
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED. Home erc20 balance is zero or not displayed ')
     })
 
     test.it('User is able to send tokens from Foreign account to Home account ', async () => {
@@ -208,11 +174,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('newForeignBalance = ' + newForeignBalance)
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Foreign POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Foreign POA balance is not correct after transaction')
     })
 
     test.it('Home account has received correct amount of tokens after transaction ', async () => {
@@ -221,11 +183,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('newHomeBalance = ' + newHomeBalance)
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newHomeBalance) < maxAmountPerTransactionLimit / 100
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Home POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Home POA balance is not correct after transaction')
     })
     test.it('User is able to send tokens from Home account to Foreign account ', async () => {
       await homeAccount.setMetaMaskNetwork()
@@ -246,30 +204,19 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newHomeBalance) < maxAmountPerTransactionLimit / 100
       homeBalanceBefore = newHomeBalance
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Home POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Home POA balance is not correct after transaction')
     })
 
-    test.it(
-      'Foreign account has received correct amount of tokens after transaction ',
-      async () => {
-        const newForeignBalance = await mainPage.getForeignPOABalance()
+    test.it('Foreign account has received correct amount of tokens after transaction ', async () => {
+      const newForeignBalance = await mainPage.getForeignPOABalance()
 
-        const shouldBe = foreignBalanceBefore + maxAmountPerTransactionLimit
-        console.log('newForeignBalance = ' + newForeignBalance)
-        console.log('shouldBe = ' + shouldBe)
+      const shouldBe = foreignBalanceBefore + maxAmountPerTransactionLimit
+      console.log('newForeignBalance = ' + newForeignBalance)
+      console.log('shouldBe = ' + shouldBe)
 
-        const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
-        return await assert.strictEqual(
-          result,
-          true,
-          'Test FAILED. Foreign POA balance is not correct after transaction'
-        )
-      }
-    )
+      const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
+      return await assert.strictEqual(result, true, 'Test FAILED. Foreign POA balance is not correct after transaction')
+    })
   })
 
   test.describe('ERC TO NATIVE', async () => {
@@ -297,11 +244,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       homeBalanceBefore = await mainPage.getHomePOABalance()
       console.log('homeBalanceBefore = ' + homeBalanceBefore)
       const result = homeBalanceBefore !== 0
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED. Home erc20 balance is zero or not displayed '
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED. Home erc20 balance is zero or not displayed ')
     })
 
     test.it('User is able to send tokens from Foreign account to Home account', async () => {
@@ -321,11 +264,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('newForeignBalance = ' + newForeignBalance)
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Foreign POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Foreign POA balance is not correct after transaction')
     })
 
     test.it('Home account has received correct amount of tokens after transaction', async () => {
@@ -334,11 +273,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('newHomeBalance = ' + newHomeBalance)
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newHomeBalance) < maxAmountPerTransactionLimit / 100
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Home POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Home POA balance is not correct after transaction')
     })
     test.it('User is able to send tokens from Home account to Foreign account', async () => {
       await homeAccount.setMetaMaskNetwork()
@@ -359,11 +294,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('shouldBe = ' + shouldBe)
       const result = Math.abs(shouldBe - newHomeBalance) < maxAmountPerTransactionLimit / 100
       homeBalanceBefore = newHomeBalance
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED.Home POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED.Home POA balance is not correct after transaction')
     })
 
     test.it('Foreign account has received correct amount of tokens after transaction', async () => {
@@ -374,11 +305,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
       console.log('shouldBe = ' + shouldBe)
 
       const result = Math.abs(shouldBe - newForeignBalance) < maxAmountPerTransactionLimit / 100
-      return await assert.strictEqual(
-        result,
-        true,
-        'Test FAILED. Foreign POA balance is not correct after transaction'
-      )
+      return await assert.strictEqual(result, true, 'Test FAILED. Foreign POA balance is not correct after transaction')
     })
   })
 })

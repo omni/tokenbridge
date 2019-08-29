@@ -5,9 +5,7 @@ const Web3 = require('web3')
 const retrySequence = [1, 2, 3, 5, 8, 13, 21, 34, 55, 60]
 
 function getRetrySequence(count) {
-  return count > retrySequence.length
-    ? retrySequence[retrySequence.length - 1]
-    : retrySequence[count - 1]
+  return count > retrySequence.length ? retrySequence[retrySequence.length - 1] : retrySequence[count - 1]
 }
 
 async function syncForEach(array, callback) {
@@ -23,9 +21,7 @@ function checkHTTPS(ALLOW_HTTP, logger) {
         if (ALLOW_HTTP !== 'yes') {
           throw new Error(`http is not allowed: ${url}`)
         } else {
-          logger.warn(
-            `You are using http (${url}) on ${network} network. In production https must be used instead.`
-          )
+          logger.warn(`You are using http (${url}) on ${network} network. In production https must be used instead.`)
         }
       }
     }
@@ -38,16 +34,10 @@ async function waitForFunds(web3, address, minimumBalance, cb, logger) {
       logger.debug('Getting balance of validator account')
       const newBalance = web3.utils.toBN(await web3.eth.getBalance(address))
       if (newBalance.gte(minimumBalance)) {
-        logger.debug(
-          { balance: newBalance, minimumBalance },
-          'Validator has minimum necessary balance'
-        )
+        logger.debug({ balance: newBalance, minimumBalance }, 'Validator has minimum necessary balance')
         cb(newBalance)
       } else {
-        logger.debug(
-          { balance: newBalance, minimumBalance },
-          'Balance of validator is still less than the minimum'
-        )
+        logger.debug({ balance: newBalance, minimumBalance }, 'Balance of validator is still less than the minimum')
         retry()
       }
     },
@@ -99,9 +89,7 @@ function add0xPrefix(s) {
 }
 
 function privateKeyToAddress(privateKey) {
-  return privateKey
-    ? new Web3().eth.accounts.privateKeyToAccount(add0xPrefix(privateKey)).address
-    : null
+  return privateKey ? new Web3().eth.accounts.privateKeyToAccount(add0xPrefix(privateKey)).address : null
 }
 
 function nonceError(e) {

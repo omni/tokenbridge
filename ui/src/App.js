@@ -1,14 +1,5 @@
 import React from 'react'
-import {
-  Header,
-  Bridge,
-  RelayEvents,
-  Footer,
-  SweetAlert,
-  Loading,
-  StatusPage,
-  StatisticsPage
-} from './components'
+import { Header, Bridge, RelayEvents, Footer, SweetAlert, Loading, StatusPage, StatisticsPage } from './components'
 import { Route } from 'react-router-dom'
 import './assets/stylesheets/application.css'
 import { Disclaimer } from './components'
@@ -45,11 +36,7 @@ export class App extends React.Component {
       <div className={showMobileMenu ? 'mobile-menu-is-open' : ''}>
         <Route component={Loading} />
         <Route component={SweetAlert} />
-        <Route
-          render={() => (
-            <Header onMenuToggle={this.toggleMobileMenu} showMobileMenu={showMobileMenu} />
-          )}
-        />
+        <Route render={() => <Header onMenuToggle={this.toggleMobileMenu} showMobileMenu={showMobileMenu} />} />
         <div className="app-container">
           {showMobileMenu && <Route render={() => <div className="mobile-menu-open" />} />}
           <Route exact path="/" component={Bridge} />

@@ -10,7 +10,8 @@ const {
   HOME_ERC_TO_ERC_ABI,
   ERC20_ABI,
   ERC677_BRIDGE_TOKEN_ABI,
-  getTokenType
+  getTokenType,
+  getPastEvents
 } = require('../../commons')
 
 const { HOME_RPC_URL, FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } = process.env
@@ -23,7 +24,7 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
-const { getPastEvents, getBlockNumber } = require('./contract')
+const { getBlockNumber } = require('./contract')
 
 async function main(mode) {
   const homeErcBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
@@ -32,8 +33,7 @@ async function main(mode) {
   const homeBridge = new web3Home.eth.Contract(HOME_ABI, HOME_BRIDGE_ADDRESS)
   const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ABI, FOREIGN_BRIDGE_ADDRESS)
   const v1Bridge = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1
-  const erc20MethodName =
-    bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
+  const erc20MethodName = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
   const erc20Address = await foreignBridge.methods[erc20MethodName]().call()
   const tokenType = await getTokenType(
     new web3Foreign.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, erc20Address),
@@ -46,36 +46,29 @@ async function main(mode) {
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
-  const homeDeposits = await getPastEvents({
-    contract: homeBridge,
+  const homeDeposits = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
     fromBlock: HOME_DEPLOYMENT_BLOCK,
-    toBlock: homeBlockNumber,
-    options: {}
+    toBlock: homeBlockNumber
   })
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
-  const foreignDeposits = await getPastEvents({
-    contract: foreignBridge,
+  const foreignDeposits = await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Deposit' : 'RelayedMessage',
     fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
-    toBlock: foreignBlockNumber,
-    options: {}
+    toBlock: foreignBlockNumber
   })
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
-  const homeWithdrawals = await getPastEvents({
-    contract: homeBridge,
+  const homeWithdrawals = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Withdraw' : 'AffirmationCompleted',
     fromBlock: HOME_DEPLOYMENT_BLOCK,
-    toBlock: homeBlockNumber,
-    options: {}
+    toBlock: homeBlockNumber
   })
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
   const foreignWithdrawals = isExternalErc20
-    ? await getPastEvents({
-        contract: erc20Contract,
+    ? await getPastEvents(erc20Contract, {
         event: 'Transfer',
         fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
         toBlock: foreignBlockNumber,
@@ -83,12 +76,10 @@ async function main(mode) {
           filter: { to: FOREIGN_BRIDGE_ADDRESS }
         }
       })
-    : await getPastEvents({
-        contract: foreignBridge,
+    : await getPastEvents(foreignBridge, {
         event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
         fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
-        toBlock: foreignBlockNumber,
-        options: {}
+        toBlock: foreignBlockNumber
       })
   logger.debug('Done')
   return {

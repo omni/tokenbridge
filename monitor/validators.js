@@ -2,8 +2,7 @@ require('dotenv').config()
 const Web3 = require('web3')
 const fetch = require('node-fetch')
 const logger = require('./logger')('validators')
-const { getBridgeABIs, BRIDGE_VALIDATORS_ABI } = require('../commons')
-const { getValidatorList } = require('./utils/validatorUtils')
+const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, getValidatorList, gasPriceFromOracle } = require('../commons')
 const { getBlockNumber } = require('./utils/contract')
 
 const {
@@ -33,38 +32,22 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
+const homeGasOracleOpts = {
+  speedType: HOME_GAS_PRICE_SPEED_TYPE,
+  factor: HOME_GAS_PRICE_FACTOR,
+  logger
+}
+
+const foreignGasOracleOpts = {
+  speedType: FOREIGN_GAS_PRICE_SPEED_TYPE,
+  factor: FOREIGN_GAS_PRICE_FACTOR,
+  logger
+}
+
 const asyncForEach = async (array, callback) => {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array)
   }
-}
-
-function getGasPrices(url, type, factor, fallback) {
-  if (!url) {
-    return Web3Utils.toBN(fallback)
-  }
-  return fetchGasPrices(url, type, factor, fallback)
-}
-
-async function fetchGasPrices(url, type, factor, fallback) {
-  try {
-    const response = await fetch(url)
-    const json = await response.json()
-    logger.log('Fetched gasprice: ' + json[type])
-    const gasPrice = json[type]
-    if (!gasPrice) {
-      throw new Error(`Response from Oracle didn't include gas price for ${type} type.`)
-    }
-    return normalizeGasPrice(gasPrice, factor)
-  } catch (e) {
-    logger.error('Gas Price API is not available', e)
-    return Web3Utils.toBN(fallback)
-  }
-}
-
-function normalizeGasPrice(oracleGasPrice, factor) {
-  const gasPrice = oracleGasPrice * factor
-  return Web3Utils.toBN(Web3Utils.toWei(gasPrice.toFixed(2).toString(), 'gwei'))
 }
 
 async function main(bridgeMode) {
@@ -72,36 +55,28 @@ async function main(bridgeMode) {
   const homeBridge = new web3Home.eth.Contract(HOME_ABI, HOME_BRIDGE_ADDRESS)
   const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ABI, FOREIGN_BRIDGE_ADDRESS)
   const homeValidatorsAddress = await homeBridge.methods.validatorContract().call()
-  const homeBridgeValidators = new web3Home.eth.Contract(
-    BRIDGE_VALIDATORS_ABI,
-    homeValidatorsAddress
-  )
+  const homeBridgeValidators = new web3Home.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorsAddress)
 
   logger.debug('getting last block numbers')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
   logger.debug('calling foreignBridge.methods.validatorContract().call()')
   const foreignValidatorsAddress = await foreignBridge.methods.validatorContract().call()
-  const foreignBridgeValidators = new web3Foreign.eth.Contract(
-    BRIDGE_VALIDATORS_ABI,
-    foreignValidatorsAddress
-  )
+  const foreignBridgeValidators = new web3Foreign.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
 
   logger.debug('calling foreignBridgeValidators getValidatorList()')
-  const foreignValidators = await getValidatorList(
-    foreignValidatorsAddress,
-    web3Foreign.eth,
-    FOREIGN_DEPLOYMENT_BLOCK,
-    foreignBlockNumber
-  )
+  const foreignValidators = await getValidatorList(foreignValidatorsAddress, web3Foreign.eth, {
+    from: FOREIGN_DEPLOYMENT_BLOCK,
+    to: foreignBlockNumber,
+    logger
+  })
 
   logger.debug('calling homeBridgeValidators getValidatorList()')
-  const homeValidators = await getValidatorList(
-    homeValidatorsAddress,
-    web3Home.eth,
-    HOME_DEPLOYMENT_BLOCK,
-    homeBlockNumber
-  )
+  const homeValidators = await getValidatorList(homeValidatorsAddress, web3Home.eth, {
+    from: HOME_DEPLOYMENT_BLOCK,
+    to: homeBlockNumber,
+    logger
+  })
 
   const homeBalances = {}
   logger.debug('calling asyncForEach homeValidators homeBalances')
@@ -112,22 +87,16 @@ async function main(bridgeMode) {
   const homeVBalances = {}
 
   logger.debug('calling home getGasPrices')
-  const homeGasPrice = await getGasPrices(
-    HOME_GAS_PRICE_ORACLE_URL,
-    HOME_GAS_PRICE_SPEED_TYPE,
-    HOME_GAS_PRICE_FACTOR,
-    HOME_GAS_PRICE_FALLBACK
-  )
+  const homeGasPrice =
+    (await gasPriceFromOracle(() => fetch(HOME_GAS_PRICE_ORACLE_URL), homeGasOracleOpts)) ||
+    Web3Utils.toBN(HOME_GAS_PRICE_FALLBACK)
   const homeGasPriceGwei = Web3Utils.fromWei(homeGasPrice.toString(), 'gwei')
   const homeTxCost = homeGasPrice.mul(Web3Utils.toBN(HOME_GAS_LIMIT))
 
   logger.debug('calling foreign getGasPrices')
-  const foreignGasPrice = await getGasPrices(
-    FOREIGN_GAS_PRICE_ORACLE_URL,
-    FOREIGN_GAS_PRICE_SPEED_TYPE,
-    FOREIGN_GAS_PRICE_FACTOR,
-    FOREIGN_GAS_PRICE_FALLBACK
-  )
+  const foreignGasPrice =
+    (await gasPriceFromOracle(() => fetch(FOREIGN_GAS_PRICE_ORACLE_URL), foreignGasOracleOpts)) ||
+    Web3Utils.toBN(FOREIGN_GAS_PRICE_FALLBACK)
   const foreignGasPriceGwei = Web3Utils.fromWei(foreignGasPrice.toString(), 'gwei')
   const foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(FOREIGN_GAS_LIMIT))
 

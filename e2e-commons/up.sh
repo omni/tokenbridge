@@ -41,11 +41,19 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "monitor" ]; then
-    docker-compose up -d monitor
+    docker-compose up -d monitor monitor-erc20 monitor-erc20-native
   fi
 
   if [ "$1" == "native-to-erc" ]; then
     ../deployment/molecule/molecule.sh ultimate-native-to-erc
+  fi
+
+  if [ "$1" == "erc-to-native" ]; then
+    ../deployment/molecule/molecule.sh ultimate-erc-to-native
+  fi
+
+  if [ "$1" == "erc-to-erc" ]; then
+    ../deployment/molecule/molecule.sh ultimate-erc-to-erc
   fi
 
   shift # Shift all the parameters down by one
