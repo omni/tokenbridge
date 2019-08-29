@@ -29,7 +29,7 @@ provisioner:
       r: ["bug"]
   playbooks:
     prepare: ../prepare.yml
-    converge: ../../site.yml
+    converge: ../../../deployment/site.yml
   inventory:
     host_vars:
       oracle-host:

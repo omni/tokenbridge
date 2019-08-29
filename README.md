@@ -26,6 +26,7 @@ Sub-repositories maintained within this monorepo are listed below.
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
 | [Monitor-E2E](monitor-e2e/README.md) | End to end tests for the Monitor |
 | [UI-E2E](ui-e2e/README.md) | End to end tests for the UI |
+| [Deployment-E2E](deployment-e2e/README.md) | End to end tests for the Deployment |
 | [Commons](commons/README.md) | Interfaces, constants and utilities shared between the sub-repositories |
 | [E2E-Commons](e2e-commons/README.md) | Common utilities and configuration used in end to end tests |
 
