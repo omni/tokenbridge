@@ -4,8 +4,8 @@
   become: true
   tasks:
     - import_role:
-        name: ../../deployment/roles/common
+        name: ../../../deployment/roles/common
         tasks_from: dependencies
     - import_role:
-        name: ../../deployment/roles/common
+        name: ../../../deployment/roles/common
         tasks_from: repo

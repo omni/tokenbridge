@@ -12,7 +12,7 @@
   delegate_to: 127.0.0.1
   become: false
   args:
-    chdir: ".."
+    chdir: "{{ lookup('env', 'PWD') }}/.."
 
 - name: Copy the files
   synchronize:
