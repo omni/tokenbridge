@@ -6,3 +6,7 @@
     - import_role:
         name: ../../../deployment/roles/common
         tasks_from: repo
+    # Test that running the task again works
+    - import_role:
+        name: ../../../deployment/roles/common
+        tasks_from: repo
