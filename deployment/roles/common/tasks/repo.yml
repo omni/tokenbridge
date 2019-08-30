@@ -1,8 +1,8 @@
 ---
 - name: Create archives of the monorepository
   shell: |
-    (git ls-tree -r HEAD --name-only | sed '/^contracts$/d') | xargs tar cfv monorepo.tar --files-from -
-    cd contracts; (git ls-tree -r HEAD --name-only) | xargs tar cfv ../contracts.tar --files-from -
+    (git ls-tree -r HEAD --name-only | sed '/^contracts$/d') | xargs tar zcfv monorepo.tar.gz --files-from -
+    cd contracts; (git ls-tree -r HEAD --name-only) | xargs tar zcfv ../contracts.tar.gz --files-from -
   delegate_to: 127.0.0.1
   become: false
   args:
@@ -13,13 +13,13 @@
     src: ../../../../{{ item }}
     dest: "{{ bridge_path }}/"
   with_items:
-    - monorepo.tar
-    - contracts.tar
+    - monorepo.tar.gz
+    - contracts.tar.gz
 
 - name: Untar the archives
   shell: |
-    tar xfv monorepo.tar && rm monorepo.tar
-    mkdir -p contracts && tar xfv contracts.tar -C ./contracts && rm contracts.tar
+    tar zxfv monorepo.tar.gz && rm monorepo.tar.gz
+    mkdir -p contracts && tar zxfv contracts.tar.gz -C ./contracts && rm contracts.tar.gz
   args:
     chdir: "{{ bridge_path }}"
 
@@ -30,5 +30,5 @@
   args:
     chdir: "{{ lookup('env', 'PWD') }}/.."
   with_items:
-    - monorepo.tar
-    - contracts.tar
+    - monorepo.tar.gz
+    - contracts.tar.gz
