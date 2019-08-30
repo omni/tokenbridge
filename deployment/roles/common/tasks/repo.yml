@@ -24,6 +24,7 @@
     chdir: "{{ bridge_path }}"
 
 - name: Remove local archives
+  shell: rm {{ item }}
   delegate_to: 127.0.0.1
   become: false
   args:
