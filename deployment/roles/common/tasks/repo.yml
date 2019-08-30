@@ -19,7 +19,7 @@
 - name: Untar the archives
   shell: |
     tar xfv monorepo.tar && rm monorepo.tar
-    mkdir contracts && tar xfv contracts.tar -C ./contracts && rm contracts.tar
+    mkdir -p contracts && tar xfv contracts.tar -C ./contracts && rm contracts.tar
   args:
     chdir: "{{ bridge_path }}"
 
