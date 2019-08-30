@@ -1,23 +1,33 @@
 ---
-- name: Register files for copying
+- name: Create archives of the monorepository
   shell: |
-    git ls-tree -r HEAD --name-only | sed '/^contracts$/d'
-    cd contracts; git ls-tree -r HEAD --name-only | sed -e 's/^/contracts\//'
-  register: registered_files
+    (git ls-tree -r HEAD --name-only | sed '/^contracts$/d') | xargs tar cfv monorepo.tar --files-from -
+    cd contracts; (git ls-tree -r HEAD --name-only) | xargs tar cfv ../contracts.tar --files-from -
   delegate_to: 127.0.0.1
   become: false
   args:
     chdir: "{{ lookup('env', 'PWD') }}/.."
 
-- name: Create repo directory structure
-  file: 
-    path: "{{ (bridge_path + '/' + item) }}"
-    state: directory
-    recurse: yes
-  with_items: "{{ registered_files.stdout_lines | map('dirname') | list | unique }}"
-
-- name: Copy the files
+- name: Copy the archives
   copy:
     src: ../../../../{{ item }}
-    dest: "{{ bridge_path }}/{{ item }}"
-  with_items: "{{ registered_files.stdout_lines }}"
+    dest: "{{ bridge_path }}/"
+  with_items:
+    - monorepo.tar
+    - contracts.tar
+
+- name: Untar the archives
+  shell: |
+    tar xfv monorepo.tar && rm monorepo.tar
+    mkdir contracts && tar xfv contracts.tar -C ./contracts && rm contracts.tar
+  args:
+    chdir: "{{ bridge_path }}"
+
+- name: Remove local archives
+  delegate_to: 127.0.0.1
+  become: false
+  args:
+    chdir: "{{ lookup('env', 'PWD') }}/.."
+  with_items:
+    - monorepo.tar
+    - contracts.tar
