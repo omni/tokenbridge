@@ -1,7 +1,7 @@
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, validator, homeRPC, foreignRPC, amb } = require('../../e2e-commons/constants.json')
+const { user, homeRPC, foreignRPC, amb } = require('../../e2e-commons/constants.json')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 const { BOX_ABI } = require('../../commons')
 
@@ -13,27 +13,23 @@ const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 
-homeWeb3.eth.accounts.wallet.add(validator.privateKey)
-foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
-
 const homeBox = new homeWeb3.eth.Contract(BOX_ABI, amb.homeBox)
-
 const foreignBox = new foreignWeb3.eth.Contract(BOX_ABI, amb.foreignBox)
 
 describe('arbitrary message bridging', () => {
   describe('Home to Foreign', () => {
     describe('Subsidized Mode', () => {
-      it('should bridge message without taking fees', async () => {
+      it('should bridge message', async () => {
         const newValue = 3
 
         const initialValue = await foreignBox.methods.value().call()
         assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
         const setValueTx = await homeBox.methods
-          .setValueOnOtherNetworkGasPrice(newValue, amb.home, amb.foreignBox, '1000000000')
+          .setValueOnOtherNetwork(newValue, amb.home, amb.foreignBox)
           .send({
             from: user.address,
-            gas: '1000000'
+            gas: '400000'
           })
           .catch(e => {
             console.error(e)
@@ -73,17 +69,17 @@ describe('arbitrary message bridging', () => {
   })
   describe('Foreign to Home', () => {
     describe('Subsidized Mode', () => {
-      it('should bridge message without taking fees', async () => {
+      it('should bridge message', async () => {
         const newValue = 7
 
         const initialValue = await homeBox.methods.value().call()
         assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
         await foreignBox.methods
-          .setValueOnOtherNetworkGasPrice(newValue, amb.home, amb.foreignBox, '1000000000')
+          .setValueOnOtherNetwork(newValue, amb.home, amb.foreignBox)
           .send({
             from: user.address,
-            gas: '1000000'
+            gas: '400000'
           })
           .catch(e => {
             console.error(e)
