@@ -21,7 +21,7 @@ async function main() {
   try {
     await isValidAmount(HOME_MIN_AMOUNT_PER_TX, bridge)
 
-    const homeChaindId = await sendRawTx({
+    const homeChainId = await sendRawTx({
       chain: 'home',
       params: [],
       method: 'net_version'
@@ -44,7 +44,7 @@ async function main() {
         gasLimit: 100000,
         to: HOME_BRIDGE_ADDRESS,
         web3: web3Home,
-        chainId: homeChaindId
+        chainId: homeChainId
       })
       if (txHash !== undefined) {
         nonce++
