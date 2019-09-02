@@ -4,8 +4,9 @@ services:
   molecule_runner:
     build:
       context: ..
-      dockerfile: molecule/Dockerfile
+      dockerfile: deployment-e2e/Dockerfile
     restart: 'no'
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ..:/mono

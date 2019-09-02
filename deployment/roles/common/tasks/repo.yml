@@ -1,12 +1,25 @@
 ---
-- name: Get bridge repo
-  git:
-    repo: "{{ bridge_repo }}"
-    dest: "{{ bridge_path }}"
-    force: no
-    update: no
-    version: "{{ bridge_repo_branch }}"
-- name: Initialize submodules
-  shell: git submodule update --init
+- name: Create repo directory
+  file: 
+    path: "{{ bridge_path }}"
+    state: directory
+
+- name: Register files for copying
+  shell: |
+    git ls-tree -r HEAD --name-only
+    cd contracts; git ls-tree -r HEAD --name-only | sed -e 's/^/contracts\//'
+  register: rsync_files
+  delegate_to: 127.0.0.1
+  become: false
   args:
-    chdir: "{{ bridge_path }}"
+    chdir: ".."
+
+- name: Copy the files
+  synchronize:
+    dest: "{{ bridge_path }}"
+    src: ../../../..
+    rsync_opts:
+      - "--include=\"{{ item }}\""
+      - "--exclude='*'"
+      - "-avz"
+  with_items: rsync_files.stdout_lines

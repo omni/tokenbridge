@@ -29,13 +29,14 @@
     "ui",
     "ui-e2e",
     "monitor",
+    "monitor-e2e",
     "contracts"
   ],
   "scripts": {
     "initialize": "yarn clean && git submodule update --init && yarn install --unsafe-perm --frozen-lockfile && yarn install:deploy && yarn compile:contracts",
     "build": "yarn workspace ui run build",
     "lint": "yarn wsrun --exclude token-bridge-contracts lint",
-    "test": "yarn wsrun --exclude monitor --exclude oracle-e2e --exclude ui-e2e test",
+    "test": "yarn wsrun --exclude monitor --exclude oracle-e2e --exclude ui-e2e --exclude monitor-e2e test",
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
     "ui-e2e": "./ui-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build",

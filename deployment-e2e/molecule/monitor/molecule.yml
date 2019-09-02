@@ -10,11 +10,11 @@ lint:
     config-data:
       ignore: ../../hosts.yml
 platforms:
-  - name: ui-host
+  - name: monitor-host
     groups:
       - example
     children:
-      - ui
+      - monitor
     image: ubuntu:16.04
     privileged: true
     network_mode: host
@@ -29,12 +29,11 @@ provisioner:
       r: ["bug"]
   playbooks:
     prepare: ../prepare.yml
-    converge: ../../site.yml
+    converge: ../../../deployment/site.yml
   inventory:
     host_vars:
-      ui-host:
+      monitor-host:
         syslog_server_port: "udp://127.0.0.1:514"
-        bridge_repo_branch: $CODEBASE_BRANCH
 verifier:
   name: testinfra
   lint:
@@ -42,7 +41,7 @@ verifier:
   additional_files_or_dirs:
     - ../../tests/*
 scenario:
-  name: ui
+  name: monitor
   test_sequence:
     - lint
     - cleanup

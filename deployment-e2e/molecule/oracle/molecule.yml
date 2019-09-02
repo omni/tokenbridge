@@ -10,11 +10,11 @@ lint:
     config-data:
       ignore: ../../hosts.yml
 platforms:
-  - name: monitor-host
+  - name: oracle-host
     groups:
       - example
     children:
-      - monitor
+      - oracle
     image: ubuntu:16.04
     privileged: true
     network_mode: host
@@ -29,11 +29,11 @@ provisioner:
       r: ["bug"]
   playbooks:
     prepare: ../prepare.yml
-    converge: ../../site.yml
+    converge: ../../../deployment/site.yml
   inventory:
     host_vars:
-      monitor-host:
-        bridge_repo_branch: $CODEBASE_BRANCH
+      oracle-host:
+        VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
         syslog_server_port: "udp://127.0.0.1:514"
 verifier:
   name: testinfra
@@ -42,7 +42,7 @@ verifier:
   additional_files_or_dirs:
     - ../../tests/*
 scenario:
-  name: monitor
+  name: oracle
   test_sequence:
     - lint
     - cleanup

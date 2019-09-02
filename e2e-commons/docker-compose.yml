@@ -269,7 +269,7 @@ services:
     - FOREIGN_GAS_PRICE_FACTOR=1
     - LEFT_TX_THRESHOLD=100
     - PORT=3010
-    entrypoint: yarn start
+    entrypoint: yarn check-and-start
     ports:
       - "3010:3010"
     networks:
@@ -297,7 +297,7 @@ services:
     - FOREIGN_GAS_PRICE_FACTOR=1
     - LEFT_TX_THRESHOLD=100
     - PORT=3011
-    entrypoint: yarn start
+    entrypoint: yarn check-and-start
     ports:
       - "3011:3011"
     networks:
@@ -325,7 +325,7 @@ services:
     - FOREIGN_GAS_PRICE_FACTOR=1
     - LEFT_TX_THRESHOLD=100
     - PORT=3012
-    entrypoint: yarn start
+    entrypoint: yarn check-and-start
     ports:
       - "3012:3012"
     networks:
