@@ -290,8 +290,14 @@ const description = () => {
   console.log('\nCommon parameters:\n')
   console.table(commonParameters.map(p => ({ name: p.name, description: p.description })))
 
-  console.log('\nOracle parameters:\n')
+  console.log('\nOracle specific parameters:\n')
   console.table(oracleParameters.map(p => ({ name: p.name, description: p.description })))
+
+  console.log('\nUI specific parameters:\n')
+  console.table(uiParameters.map(p => ({ name: p.name, description: p.description })))
+
+  console.log('\nMonitor specific parameters:\n')
+  console.table(monitorParameters.map(p => ({ name: p.name, description: p.description })))
 }
 
 const check = parameters => {
