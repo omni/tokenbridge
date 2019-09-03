@@ -10,5 +10,8 @@
   "dependencies": {
     "console.table": "^0.10.0",
     "web3-utils": "1.0.0-beta.30"
+  },
+  "devDependencies": {
+    "shelljs": "0.8.2"
   }
 }

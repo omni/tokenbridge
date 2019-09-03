@@ -1,32 +1,32 @@
+#!/bin/bash
 set -e # exit when any command fails
 
 usage() {
   echo "env validator usage:"
-  echo "./env.sh validate {oracle,ui,monitor} <path/to/.env} - validate configuration environment parameters"
+  echo "./env.sh validate <path/to/.env> ...components - validate configuration environment parameters. e.g. ./env.sh validate ../oracle/.env oracle"
   echo "./env.sh description - print out description of all parameters"
   echo "./env.sh print - prints out markdown"
 }
 
+export_parameters_from_file() {
+  [ ! -f "$1" ] && (echo "Invalid path to .env file"; exit -1)
+
+  set -o allexport
+  source "$1"
+  set +o allexport
+}
+
 validate() {
-  if [ ! -f "$2" ]; then
-    echo "Invalid path to .env file"
-    exit -1
-  fi
+  export_parameters_from_file "$1"
 
-  if [ "$1" == "oracle" ]; then
-    MODE=VALIDATE_ORACLE env $(cat "$2" | xargs) node validator.js
-    exit "$?"
-  fi
+  while [ "$2" != "" ]; do
+    [ "$2" == "oracle" ] && export VALIDATE_ORACLE=true
+    [ "$2" == "ui" ] && export VALIDATE_UI=true
+    [ "$2" == "monitor" ] && export VALIDATE_MONITOR=true
+    shift # Shift all the parameters down by one
+  done
 
-  if [ "$1" == "ui" ]; then
-    MODE=VALIDATE_UI node validator.js
-    exit "$?"
-  fi
-
-  if [ "$1" == "monitor" ]; then
-    MODE=VALIDATE_MONITOR node validator.js
-    exit "$?"
-  fi
+  MODE=VALIDATE node validator.js
 }
 
 if [ "$1" == "description" ]; then
@@ -34,8 +34,7 @@ if [ "$1" == "description" ]; then
 elif [ "$1" == "validate" ]; then
   validate "$2" "$3"
 elif [ "$1" == "print" ]; then
-  echo "Not implemented"
-  exit -1
+  MODE=PRINT node validator.js
 else
   usage
 fi
