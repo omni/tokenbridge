@@ -10,7 +10,7 @@ const logger = pino({
   base:
     process.env.NODE_ENV === 'production'
       ? {
-          validator: process.env.VALIDATOR_ADDRESS
+          validator: process.env.ORACLE_VALIDATOR_ADDRESS
         }
       : {}
 })

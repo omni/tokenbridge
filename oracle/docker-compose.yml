@@ -53,7 +53,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
-      - VALIDATOR_ADDRESS=${VALIDATOR_ADDRESS}
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
     restart: unless-stopped
     entrypoint: yarn watcher:collected-signatures
     networks:
@@ -68,7 +68,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
-      - VALIDATOR_ADDRESS=${VALIDATOR_ADDRESS}
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
     restart: unless-stopped
     entrypoint: yarn watcher:affirmation-request
     networks:

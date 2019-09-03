@@ -20,7 +20,7 @@ const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
 
 const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
-const VALIDATOR_ADDRESS = privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
+const ORACLE_VALIDATOR_ADDRESS = privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -71,7 +71,7 @@ async function readNonce(forceUpdate) {
   logger.debug('Reading nonce')
   if (forceUpdate) {
     logger.debug('Forcing update of nonce')
-    return getNonce(web3Instance, VALIDATOR_ADDRESS)
+    return getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
   }
 
   const nonce = await redis.get(nonceKey)
@@ -80,7 +80,7 @@ async function readNonce(forceUpdate) {
     return Number(nonce)
   } else {
     logger.debug("Nonce wasn't found in the DB")
-    return getNonce(web3Instance, VALIDATOR_ADDRESS)
+    return getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
   }
 }
 
@@ -140,7 +140,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
 
         if (e.message.includes('Insufficient funds')) {
           insufficientFunds = true
-          const currentBalance = await web3Instance.eth.getBalance(VALIDATOR_ADDRESS)
+          const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
           minimumBalance = gasLimit.multipliedBy(gasPrice)
           logger.error(
             `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
@@ -164,7 +164,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     if (insufficientFunds) {
       logger.warn('Insufficient funds. Stop sending transactions until the account has the minimum balance')
       channel.close()
-      waitForFunds(web3Instance, VALIDATOR_ADDRESS, minimumBalance, resume, logger)
+      waitForFunds(web3Instance, ORACLE_VALIDATOR_ADDRESS, minimumBalance, resume, logger)
     }
   } catch (e) {
     logger.error(e)

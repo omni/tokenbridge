@@ -13,7 +13,7 @@ const {
 const { web3Home, web3Foreign } = require('../src/services/web3')
 const { privateKeyToAddress } = require('../src/utils/utils')
 
-const { VALIDATOR_ADDRESS, ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
+const { ORACLE_VALIDATOR_ADDRESS, ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
 let homeAbi
 let foreignAbi
@@ -60,7 +60,7 @@ const bridgeConfig = {
   foreignBridgeAddress: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS,
   foreignBridgeAbi: foreignAbi,
   eventFilter: {},
-  validatorAddress: VALIDATOR_ADDRESS || privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY),
+  validatorAddress: ORACLE_VALIDATOR_ADDRESS || privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY),
   maxProcessingTime
 }
 
