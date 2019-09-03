@@ -266,7 +266,7 @@ services:
     - COMMON_FOREIGN_GAS_PRICE_FALLBACK=1000000000
     - COMMON_FOREIGN_GAS_PRICE_FACTOR=1
     - MONITOR_TX_NUMBER_THRESHOLD=100
-    - PORT=3011
+    - MONITOR_PORT=3011
     entrypoint: yarn check-and-start
     ports:
       - "3011:3011"
@@ -294,7 +294,7 @@ services:
     - COMMON_FOREIGN_GAS_PRICE_FALLBACK=1000000000
     - COMMON_FOREIGN_GAS_PRICE_FACTOR=1
     - MONITOR_TX_NUMBER_THRESHOLD=100
-    - PORT=3012
+    - MONITOR_PORT=3012
     entrypoint: yarn check-and-start
     ports:
       - "3012:3012"
