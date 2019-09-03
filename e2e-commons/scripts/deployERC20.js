@@ -40,7 +40,7 @@ async function deployErc20() {
       nonce: foreignNonce,
       to: poa20foreign.options.address,
       privateKey: deploymentPrivateKey,
-      url: process.env.COMMON_FOREIGN_RPC_URL
+      url: process.env.FOREIGN_RPC_URL
     })
   } catch (e) {
     console.log(e)
