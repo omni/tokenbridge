@@ -13,13 +13,13 @@ const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
 
 const {
-  FOREIGN_BRIDGE_ADDRESS,
+  COMMON_FOREIGN_BRIDGE_ADDRESS,
   FOREIGN_GAS_PRICE_FALLBACK,
   FOREIGN_GAS_PRICE_ORACLE_URL,
   FOREIGN_GAS_PRICE_SPEED_TYPE,
   FOREIGN_GAS_PRICE_UPDATE_INTERVAL,
   FOREIGN_GAS_PRICE_FACTOR,
-  HOME_BRIDGE_ADDRESS,
+  COMMON_HOME_BRIDGE_ADDRESS,
   HOME_GAS_PRICE_FALLBACK,
   HOME_GAS_PRICE_ORACLE_URL,
   HOME_GAS_PRICE_SPEED_TYPE,
@@ -27,9 +27,9 @@ const {
   HOME_GAS_PRICE_FACTOR
 } = process.env
 
-const homeBridge = new web3Home.eth.Contract(HomeABI, HOME_BRIDGE_ADDRESS)
+const homeBridge = new web3Home.eth.Contract(HomeABI, COMMON_HOME_BRIDGE_ADDRESS)
 
-const foreignBridge = new web3Foreign.eth.Contract(ForeignABI, FOREIGN_BRIDGE_ADDRESS)
+const foreignBridge = new web3Foreign.eth.Contract(ForeignABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
 
 let cachedGasPrice = null
 

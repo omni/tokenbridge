@@ -14,7 +14,7 @@ const {
   getPastEvents
 } = require('../../commons')
 
-const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } = process.env
+const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL, COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
 const HOME_DEPLOYMENT_BLOCK = toBN(Number(process.env.HOME_DEPLOYMENT_BLOCK) || 0)
 const FOREIGN_DEPLOYMENT_BLOCK = toBN(Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0)
 
@@ -27,17 +27,17 @@ const web3Foreign = new Web3(foreignProvider)
 const { getBlockNumber } = require('./contract')
 
 async function main(mode) {
-  const homeErcBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
+  const homeErcBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
   const bridgeMode = mode || (await getBridgeMode(homeErcBridge))
   const { HOME_ABI, FOREIGN_ABI } = getBridgeABIs(bridgeMode)
-  const homeBridge = new web3Home.eth.Contract(HOME_ABI, HOME_BRIDGE_ADDRESS)
-  const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ABI, FOREIGN_BRIDGE_ADDRESS)
+  const homeBridge = new web3Home.eth.Contract(HOME_ABI, COMMON_HOME_BRIDGE_ADDRESS)
+  const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
   const v1Bridge = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1
   const erc20MethodName = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
   const erc20Address = await foreignBridge.methods[erc20MethodName]().call()
   const tokenType = await getTokenType(
     new web3Foreign.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, erc20Address),
-    FOREIGN_BRIDGE_ADDRESS
+    COMMON_FOREIGN_BRIDGE_ADDRESS
   )
   const isExternalErc20 = tokenType === ERC_TYPES.ERC20
   const erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
@@ -73,7 +73,7 @@ async function main(mode) {
         fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
         toBlock: foreignBlockNumber,
         options: {
-          filter: { to: FOREIGN_BRIDGE_ADDRESS }
+          filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
         }
       })
     : await getPastEvents(foreignBridge, {

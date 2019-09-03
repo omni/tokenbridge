@@ -7,7 +7,7 @@ const getBalances = require('./getBalances')
 const getShortEventStats = require('./getShortEventStats')
 const validators = require('./validators')
 
-const { HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL } = process.env
+const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL } = process.env
 const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
@@ -15,7 +15,7 @@ const { HOME_ERC_TO_ERC_ABI } = require('../commons')
 
 async function checkWorker() {
   try {
-    const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
+    const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
     const bridgeMode = await getBridgeMode(homeBridge)
     logger.debug('Bridge mode:', bridgeMode)
     logger.debug('calling getBalances()')

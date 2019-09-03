@@ -55,9 +55,9 @@ if (String(process.env.MAX_PROCESSING_TIME) === '0') {
 }
 
 const bridgeConfig = {
-  homeBridgeAddress: process.env.HOME_BRIDGE_ADDRESS,
+  homeBridgeAddress: process.env.COMMON_HOME_BRIDGE_ADDRESS,
   homeBridgeAbi: homeAbi,
-  foreignBridgeAddress: process.env.FOREIGN_BRIDGE_ADDRESS,
+  foreignBridgeAddress: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS,
   foreignBridgeAbi: foreignAbi,
   eventFilter: {},
   validatorAddress: VALIDATOR_ADDRESS || privateKeyToAddress(VALIDATOR_ADDRESS_PRIVATE_KEY),
@@ -65,9 +65,9 @@ const bridgeConfig = {
 }
 
 const homeConfig = {
-  eventContractAddress: process.env.HOME_BRIDGE_ADDRESS,
+  eventContractAddress: process.env.COMMON_HOME_BRIDGE_ADDRESS,
   eventAbi: homeAbi,
-  bridgeContractAddress: process.env.HOME_BRIDGE_ADDRESS,
+  bridgeContractAddress: process.env.COMMON_HOME_BRIDGE_ADDRESS,
   bridgeAbi: homeAbi,
   pollingInterval: process.env.HOME_POLLING_INTERVAL,
   startBlock: toBN(process.env.HOME_START_BLOCK || 0),
@@ -75,9 +75,9 @@ const homeConfig = {
 }
 
 const foreignConfig = {
-  eventContractAddress: process.env.FOREIGN_BRIDGE_ADDRESS,
+  eventContractAddress: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS,
   eventAbi: foreignAbi,
-  bridgeContractAddress: process.env.FOREIGN_BRIDGE_ADDRESS,
+  bridgeContractAddress: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS,
   bridgeAbi: foreignAbi,
   pollingInterval: process.env.FOREIGN_POLLING_INTERVAL,
   startBlock: toBN(process.env.FOREIGN_START_BLOCK || 0),

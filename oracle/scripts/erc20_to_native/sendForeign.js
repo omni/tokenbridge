@@ -7,7 +7,7 @@ const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
 const {
   USER_ADDRESS,
   USER_ADDRESS_PRIVATE_KEY,
-  FOREIGN_BRIDGE_ADDRESS,
+  COMMON_FOREIGN_BRIDGE_ADDRESS,
   FOREIGN_MIN_AMOUNT_PER_TX,
   FOREIGN_TEST_TX_GAS_PRICE
 } = process.env
@@ -21,7 +21,7 @@ const foreignProvider = new Web3.providers.HttpProvider(foreignRpcUrl)
 const web3Foreign = new Web3(foreignProvider)
 
 async function main() {
-  const bridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, FOREIGN_BRIDGE_ADDRESS)
+  const bridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
   const ERC20_TOKEN_ADDRESS = await bridge.methods.erc20token().call()
   const poa20 = new web3Foreign.eth.Contract(ERC20_ABI, ERC20_TOKEN_ADDRESS)
 
@@ -40,10 +40,10 @@ async function main() {
     let actualSent = 0
     for (let i = 0; i < Number(NUMBER_OF_DEPOSITS_TO_SEND); i++) {
       const gasLimit = await poa20.methods
-        .transfer(FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX))
+        .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX))
         .estimateGas({ from: USER_ADDRESS })
       const data = await poa20.methods
-        .transfer(FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX))
+        .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX))
         .encodeABI({ from: USER_ADDRESS })
       const txHash = await sendTx({
         chain: 'foreign',

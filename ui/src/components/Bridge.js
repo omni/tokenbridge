@@ -100,7 +100,7 @@ export class Bridge extends React.Component {
         alertStore.setLoading(true)
         if (isErcToErcMode) {
           return txStore.erc677transferAndCall({
-            to: homeStore.HOME_BRIDGE_ADDRESS,
+            to: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
             from: web3Store.defaultAccount.address,
             value: toDecimals(amount, homeStore.tokenDecimals),
             contract: homeStore.tokenContract,
@@ -109,7 +109,7 @@ export class Bridge extends React.Component {
         } else {
           const value = toHex(toDecimals(amount, homeStore.tokenDecimals))
           return txStore.doSend({
-            to: homeStore.HOME_BRIDGE_ADDRESS,
+            to: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
             from: web3Store.defaultAccount.address,
             value,
             data: '0x',
@@ -161,13 +161,13 @@ export class Bridge extends React.Component {
         alertStore.setLoading(true)
         if (isExternalErc20) {
           return await txStore.erc20transfer({
-            to: foreignStore.FOREIGN_BRIDGE_ADDRESS,
+            to: foreignStore.COMMON_FOREIGN_BRIDGE_ADDRESS,
             from: web3Store.defaultAccount.address,
             value: toDecimals(amount, foreignStore.tokenDecimals)
           })
         } else {
           return await txStore.erc677transferAndCall({
-            to: foreignStore.FOREIGN_BRIDGE_ADDRESS,
+            to: foreignStore.COMMON_FOREIGN_BRIDGE_ADDRESS,
             from: web3Store.defaultAccount.address,
             value: toHex(toDecimals(amount, foreignStore.tokenDecimals)),
             contract: foreignStore.tokenContract,
@@ -267,7 +267,7 @@ export class Bridge extends React.Component {
       networkData: web3Store.homeNet,
       url: web3Store.HOME_HTTP_PARITY_URL,
       logo: homeLogoPurple,
-      address: homeStore.HOME_BRIDGE_ADDRESS,
+      address: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
       currency: homeStore.symbol,
       maxCurrentLimit: homeStore.maxCurrentDeposit,
       maxPerTx: homeStore.maxPerTx,
@@ -296,7 +296,7 @@ export class Bridge extends React.Component {
       networkData: web3Store.foreignNet,
       url: foreignDisplayUrl,
       logo: foreignLogoPurple,
-      address: foreignStore.FOREIGN_BRIDGE_ADDRESS,
+      address: foreignStore.COMMON_FOREIGN_BRIDGE_ADDRESS,
       currency: foreignStore.symbol,
       maxCurrentLimit: foreignStore.maxCurrentDeposit,
       maxPerTx: foreignStore.maxPerTx,

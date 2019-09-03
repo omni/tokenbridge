@@ -3,7 +3,7 @@ const Web3 = require('web3')
 const logger = require('./logger')('stuckTransfers.js')
 const { FOREIGN_V1_ABI } = require('../commons/abis')
 
-const { COMMON_FOREIGN_RPC_URL, FOREIGN_BRIDGE_ADDRESS } = process.env
+const { COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
 const FOREIGN_DEPLOYMENT_BLOCK = Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0
 
 const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
@@ -75,14 +75,14 @@ function compareTransfers(transfersNormal) {
 }
 
 async function main() {
-  const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_V1_ABI, FOREIGN_BRIDGE_ADDRESS)
+  const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_V1_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
   const erc20Address = await foreignBridge.methods.erc677token().call()
   const tokenContract = new web3Foreign.eth.Contract(ABITransferWithoutData, erc20Address)
   const tokenContractWithData = new web3Foreign.eth.Contract(ABIWithData, erc20Address)
   logger.debug('calling tokenContract.getPastEvents Transfer')
   const transfersNormal = await tokenContract.getPastEvents('Transfer', {
     filter: {
-      to: FOREIGN_BRIDGE_ADDRESS
+      to: COMMON_FOREIGN_BRIDGE_ADDRESS
     },
     fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
     toBlock: 'latest'
@@ -90,7 +90,7 @@ async function main() {
   logger.debug('calling tokenContractWithData.getPastEvents Transfer')
   const transfersWithData = await tokenContractWithData.getPastEvents('Transfer', {
     filter: {
-      to: FOREIGN_BRIDGE_ADDRESS
+      to: COMMON_FOREIGN_BRIDGE_ADDRESS
     },
     fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
     toBlock: 'latest'
