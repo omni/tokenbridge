@@ -124,7 +124,7 @@ class TxStore {
               this.alertStore.setBlockConfirmations(8)
               this.alertStore.setLoadingStepIndex(2)
 
-              if (yn(process.env.REACT_APP_FOREIGN_WITHOUT_EVENTS)) {
+              if (yn(process.env.UI_FOREIGN_WITHOUT_EVENTS)) {
                 this.foreignStore.waitUntilProcessed(hash).then(() => {
                   this.alertStore.setLoadingStepIndex(3)
                   const unitReceived = getUnit(this.rootStore.bridgeMode).unitForeign
@@ -151,7 +151,7 @@ class TxStore {
               this.alertStore.setBlockConfirmations(8)
               this.alertStore.setLoadingStepIndex(2)
 
-              if (yn(process.env.REACT_APP_HOME_WITHOUT_EVENTS)) {
+              if (yn(process.env.UI_HOME_WITHOUT_EVENTS)) {
                 this.homeStore.waitUntilProcessed(hash, this.txsValues[hash]).then(() => {
                   this.alertStore.setLoadingStepIndex(3)
                   const unitReceived = getUnit(this.rootStore.bridgeMode).unitHome

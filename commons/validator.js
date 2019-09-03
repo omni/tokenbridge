@@ -193,79 +193,81 @@ const oracleParameters = [
 const uiParameters = [
   {
     name: 'UI_APP_TITLE',
-    description: '',
+    description: 'The title for the bridge UI page. `%c` will be replaced by the name of the network.',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_APP_DESCRIPTION',
-    description: '',
+    description: 'The meta description for the deployed bridge page.',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_NATIVE_TOKEN_DISPLAY_NAME',
-    description: '',
+    description: 'name of the home native coin',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_HOME_NETWORK_DISPLAY_NAME',
-    description: '',
+    description: 'name to be displayed for home network',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_FOREIGN_NETWORK_DISPLAY_NAME',
-    description: '',
+    description: 'name to be displayed for foreign network',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_HOME_WITHOUT_EVENTS',
-    description: '',
+    description: "`true` if home network doesn't support events",
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_FOREIGN_WITHOUT_EVENTS',
-    description: '',
+    description: "`true` if foreign network doesn't support events",
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_HOME_EXPLORER_TX_TEMPLATE',
-    description: '',
+    description: 'template link to transaction on home explorer. `%s` will be replaced by transaction hash',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_FOREIGN_EXPLORER_TX_TEMPLATE',
-    description: '',
+    description: 'template link to transaction on foreign explorer. `%s` will be replaced by transaction hash',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_HOME_EXPLORER_ADDRESS_TEMPLATE',
-    description: '',
+    description: 'template link to address on home explorer. `%s` will be replaced by address',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE',
-    description: '',
+    description: 'template link to address on foreign explorer. `%s` will be replaced by address',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_HOME_GAS_PRICE_UPDATE_INTERVAL',
-    description: '',
+    description:
+      'An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract.',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL',
-    description: '',
+    description:
+      'An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract.',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
@@ -277,7 +279,7 @@ const uiParameters = [
   },
   {
     name: 'UI_APP_STYLES',
-    description: '',
+    description: 'The set of styles to render the bridge UI page. Currently only `classic` is implemented',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   }

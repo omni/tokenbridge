@@ -101,7 +101,7 @@ class HomeStore {
   tokenAddress = ''
 
   @observable
-  symbol = process.env.REACT_APP_HOME_NATIVE_NAME || 'NONAME'
+  symbol = process.env.UI_NATIVE_TOKEN_DISPLAY_NAME || 'NONAME'
 
   @observable
   tokenName = ''
@@ -140,12 +140,12 @@ class HomeStore {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
   }
-  networkName = process.env.REACT_APP_HOME_NETWORK_NAME || 'Unknown'
+  networkName = process.env.UI_HOME_NETWORK_DISPLAY_NAME || 'Unknown'
   filteredBlockNumber = 0
   homeBridge = {}
-  COMMON_HOME_BRIDGE_ADDRESS = process.env.REACT_APP_HOME_BRIDGE_ADDRESS
-  explorerTxTemplate = process.env.REACT_APP_HOME_EXPLORER_TX_TEMPLATE || ''
-  explorerAddressTemplate = process.env.REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE || ''
+  COMMON_HOME_BRIDGE_ADDRESS = process.env.COMMON_HOME_BRIDGE_ADDRESS
+  explorerTxTemplate = process.env.UI_HOME_EXPLORER_TX_TEMPLATE || ''
+  explorerAddressTemplate = process.env.UI_HOME_EXPLORER_ADDRESS_TEMPLATE || ''
   tokenContract = {}
   tokenDecimals = 18
   blockRewardContract = {}
