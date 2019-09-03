@@ -6,8 +6,8 @@ const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, getValidatorList, gasPriceFromOrac
 const { getBlockNumber } = require('./utils/contract')
 
 const {
-  HOME_RPC_URL,
-  FOREIGN_RPC_URL,
+  COMMON_HOME_RPC_URL,
+  COMMON_FOREIGN_RPC_URL,
   HOME_BRIDGE_ADDRESS,
   FOREIGN_BRIDGE_ADDRESS,
   HOME_GAS_LIMIT,
@@ -26,10 +26,10 @@ const FOREIGN_DEPLOYMENT_BLOCK = Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) ||
 
 const Web3Utils = Web3.utils
 
-const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
+const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
-const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
+const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 const homeGasOracleOpts = {

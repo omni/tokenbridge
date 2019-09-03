@@ -1,8 +1,8 @@
 const Web3 = require('web3')
 const { BRIDGE_MODES, getBridgeMode, HOME_ERC_TO_ERC_ABI } = require('../../commons')
 
-const { HOME_BRIDGE_ADDRESS, HOME_RPC_URL } = process.env
-const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
+const { HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL } = process.env
+const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
 async function isV1Bridge() {

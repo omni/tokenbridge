@@ -3,10 +3,10 @@ const Web3 = require('web3')
 const logger = require('./logger')('stuckTransfers.js')
 const { FOREIGN_V1_ABI } = require('../commons/abis')
 
-const { FOREIGN_RPC_URL, FOREIGN_BRIDGE_ADDRESS } = process.env
+const { COMMON_FOREIGN_RPC_URL, FOREIGN_BRIDGE_ADDRESS } = process.env
 const FOREIGN_DEPLOYMENT_BLOCK = Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0
 
-const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
+const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 const ABITransferWithoutData = [

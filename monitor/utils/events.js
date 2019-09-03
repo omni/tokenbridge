@@ -14,14 +14,14 @@ const {
   getPastEvents
 } = require('../../commons')
 
-const { HOME_RPC_URL, FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } = process.env
+const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } = process.env
 const HOME_DEPLOYMENT_BLOCK = toBN(Number(process.env.HOME_DEPLOYMENT_BLOCK) || 0)
 const FOREIGN_DEPLOYMENT_BLOCK = toBN(Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0)
 
-const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
+const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
-const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
+const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 const { getBlockNumber } = require('./contract')
