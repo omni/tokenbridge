@@ -273,7 +273,7 @@ const uiParameters = [
   },
   {
     name: 'UI_PORT',
-    description: '',
+    description: 'The port for the UI app.',
     valuesDescription: '',
     valuesCheck: p => typeof p === 'string'
   },
