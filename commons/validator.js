@@ -35,7 +35,7 @@ const commonParameters = [
     valuesCheck: p => typeof p === 'string'
   },
   {
-    name: 'COMMON_HOME_GAS_PRICE_ORACLE_URL',
+    name: 'COMMON_HOME_GAS_PRICE_SUPPLIER_URL',
     description:
       "The URL used to get a JSON response from the gas price prediction oracle for the Home network. The gas price provided by the oracle is used to send the validator's transactions to the RPC node. Since it is assumed that the Home network has a predefined gas price (e.g. the gas price in the Core of POA.Network is `1 GWei`), the gas price oracle parameter can be omitted for such networks.",
     valuesDescription: 'URL',
@@ -44,7 +44,7 @@ const commonParameters = [
   {
     name: 'COMMON_HOME_GAS_PRICE_SPEED_TYPE',
     description:
-      'Assuming the gas price oracle responds with the following JSON structure: `{"fast": 20.0, "block_time": 12.834, "health": true, "standard": 6.0, "block_number": 6470469, "instant": 71.0, "slow": 1.889}`, this parameter specifies the desirable transaction speed. The speed type can be omitted when `HOME_GAS_PRICE_ORACLE_URL` is not used.',
+      'Assuming the gas price oracle responds with the following JSON structure: `{"fast": 20.0, "block_time": 12.834, "health": true, "standard": 6.0, "block_number": 6470469, "instant": 71.0, "slow": 1.889}`, this parameter specifies the desirable transaction speed. The speed type can be omitted when `COMMON_HOME_GAS_PRICE_SUPPLIER_URL` is not used.',
     valuesDescription: '`instant` / `fast` / `standard` / `slow`',
     valuesCheck: p => typeof p === 'string'
   },
@@ -63,7 +63,7 @@ const commonParameters = [
     valuesCheck: p => typeof p === 'string'
   },
   {
-    name: 'COMMON_FOREIGN_GAS_PRICE_ORACLE_URL',
+    name: 'COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL',
     description:
       "The URL used to get a JSON response from the gas price prediction oracle for the Foreign network. The provided gas price is used to send the validator's transactions to the RPC node. If the Foreign network is Ethereum Foundation mainnet, the oracle URL can be: https://gasprice.poa.network. Otherwise this parameter can be omitted.",
     valuesDescription: 'URL',
@@ -72,7 +72,7 @@ const commonParameters = [
   {
     name: 'COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE',
     description:
-      'Assuming the gas price oracle responds with the following JSON structure: `{"fast": 20.0, "block_time": 12.834, "health": true, "standard": 6.0, "block_number": 6470469, "instant": 71.0, "slow": 1.889}`, this parameter specifies the desirable transaction speed. The speed type can be omitted when `FOREIGN_GAS_PRICE_ORACLE_URL`is not used.',
+      'Assuming the gas price oracle responds with the following JSON structure: `{"fast": 20.0, "block_time": 12.834, "health": true, "standard": 6.0, "block_number": 6470469, "instant": 71.0, "slow": 1.889}`, this parameter specifies the desirable transaction speed. The speed type can be omitted when `COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL`is not used.',
     valuesDescription: '`instant` / `fast` / `standard` / `slow`',
     valuesCheck: p => typeof p === 'string'
   },
