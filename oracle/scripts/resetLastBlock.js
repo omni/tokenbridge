@@ -3,7 +3,7 @@ const Redis = require('ioredis')
 const { id } = require('../config/base.config')
 const { EXIT_CODES } = require('../src/utils/constants')
 
-const redis = new Redis(process.env.REDIS_URL)
+const redis = new Redis(process.env.ORACLE_REDIS_URL)
 
 redis.on('error', () => {
   logError('Error: Cannot connect to redis')

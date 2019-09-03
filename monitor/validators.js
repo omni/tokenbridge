@@ -11,15 +11,15 @@ const {
   COMMON_HOME_BRIDGE_ADDRESS,
   COMMON_FOREIGN_BRIDGE_ADDRESS,
   HOME_GAS_LIMIT,
-  HOME_GAS_PRICE_ORACLE_URL,
-  HOME_GAS_PRICE_SPEED_TYPE,
-  HOME_GAS_PRICE_FALLBACK,
-  HOME_GAS_PRICE_FACTOR,
+  COMMON_HOME_GAS_PRICE_SUPPLIER_URL,
+  COMMON_HOME_GAS_PRICE_SPEED_TYPE,
+  COMMON_HOME_GAS_PRICE_FALLBACK,
+  COMMON_HOME_GAS_PRICE_FACTOR,
   FOREIGN_GAS_LIMIT,
-  FOREIGN_GAS_PRICE_ORACLE_URL,
-  FOREIGN_GAS_PRICE_SPEED_TYPE,
-  FOREIGN_GAS_PRICE_FALLBACK,
-  FOREIGN_GAS_PRICE_FACTOR
+  COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL,
+  COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE,
+  COMMON_FOREIGN_GAS_PRICE_FALLBACK,
+  COMMON_FOREIGN_GAS_PRICE_FACTOR
 } = process.env
 const HOME_DEPLOYMENT_BLOCK = Number(process.env.HOME_DEPLOYMENT_BLOCK) || 0
 const FOREIGN_DEPLOYMENT_BLOCK = Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0
@@ -33,14 +33,14 @@ const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 const homeGasOracleOpts = {
-  speedType: HOME_GAS_PRICE_SPEED_TYPE,
-  factor: HOME_GAS_PRICE_FACTOR,
+  speedType: COMMON_HOME_GAS_PRICE_SPEED_TYPE,
+  factor: COMMON_HOME_GAS_PRICE_FACTOR,
   logger
 }
 
 const foreignGasOracleOpts = {
-  speedType: FOREIGN_GAS_PRICE_SPEED_TYPE,
-  factor: FOREIGN_GAS_PRICE_FACTOR,
+  speedType: COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE,
+  factor: COMMON_FOREIGN_GAS_PRICE_FACTOR,
   logger
 }
 
@@ -88,15 +88,15 @@ async function main(bridgeMode) {
 
   logger.debug('calling home getGasPrices')
   const homeGasPrice =
-    (await gasPriceFromOracle(() => fetch(HOME_GAS_PRICE_ORACLE_URL), homeGasOracleOpts)) ||
-    Web3Utils.toBN(HOME_GAS_PRICE_FALLBACK)
+    (await gasPriceFromOracle(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasOracleOpts)) ||
+    Web3Utils.toBN(COMMON_HOME_GAS_PRICE_FALLBACK)
   const homeGasPriceGwei = Web3Utils.fromWei(homeGasPrice.toString(), 'gwei')
   const homeTxCost = homeGasPrice.mul(Web3Utils.toBN(HOME_GAS_LIMIT))
 
   logger.debug('calling foreign getGasPrices')
   const foreignGasPrice =
-    (await gasPriceFromOracle(() => fetch(FOREIGN_GAS_PRICE_ORACLE_URL), foreignGasOracleOpts)) ||
-    Web3Utils.toBN(FOREIGN_GAS_PRICE_FALLBACK)
+    (await gasPriceFromOracle(() => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL), foreignGasOracleOpts)) ||
+    Web3Utils.toBN(COMMON_FOREIGN_GAS_PRICE_FALLBACK)
   const foreignGasPriceGwei = Web3Utils.fromWei(foreignGasPrice.toString(), 'gwei')
   const foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(FOREIGN_GAS_LIMIT))
 

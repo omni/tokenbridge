@@ -1,7 +1,7 @@
 const Redis = require('ioredis')
 const logger = require('./logger')
 
-const redis = new Redis(process.env.REDIS_URL)
+const redis = new Redis(process.env.ORACLE_REDIS_URL)
 
 redis.on('connect', () => {
   logger.info('Connected to redis')

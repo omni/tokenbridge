@@ -24,4 +24,4 @@ COPY ./commons ./commons
 COPY ./oracle ./oracle
 WORKDIR /mono/oracle
 CMD echo "To start a bridge process run:" \
-  "VALIDATOR_ADDRESS=<validator address> VALIDATOR_ADDRESS_PRIVATE_KEY=<validator address private key> docker-compose up -d --build"
+  "VALIDATOR_ADDRESS=<validator address> ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=<validator address private key> docker-compose up -d --build"

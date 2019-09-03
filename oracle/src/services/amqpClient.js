@@ -1,5 +1,5 @@
 require('../../env')
-const connection = require('amqp-connection-manager').connect(process.env.QUEUE_URL)
+const connection = require('amqp-connection-manager').connect(process.env.ORACLE_QUEUE_URL)
 const logger = require('./logger')
 const { getRetrySequence } = require('../utils/utils')
 

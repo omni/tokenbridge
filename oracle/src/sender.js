@@ -18,9 +18,9 @@ const {
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
 
-const { VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
+const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
-const VALIDATOR_ADDRESS = privateKeyToAddress(VALIDATOR_ADDRESS_PRIVATE_KEY)
+const VALIDATOR_ADDRESS = privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -35,7 +35,7 @@ let chainId = 0
 
 async function initialize() {
   try {
-    const checkHttps = checkHTTPS(process.env.ALLOW_HTTP, logger)
+    const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
     rpcUrlsManager.homeUrls.forEach(checkHttps('home'))
     rpcUrlsManager.foreignUrls.forEach(checkHttps('foreign'))
@@ -117,7 +117,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
           gasPrice: gasPrice.toString(10),
           amount: '0',
           gasLimit,
-          privateKey: VALIDATOR_ADDRESS_PRIVATE_KEY,
+          privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
           to: job.to,
           chainId,
           web3: web3Instance
