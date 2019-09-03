@@ -15,8 +15,8 @@ const {
 } = require('../../commons')
 
 const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL, COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
-const HOME_DEPLOYMENT_BLOCK = toBN(Number(process.env.HOME_DEPLOYMENT_BLOCK) || 0)
-const FOREIGN_DEPLOYMENT_BLOCK = toBN(Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0)
+const MONITOR_HOME_START_BLOCK = toBN(Number(process.env.MONITOR_HOME_START_BLOCK) || 0)
+const MONITOR_FOREIGN_START_BLOCK = toBN(Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0)
 
 const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
@@ -48,21 +48,21 @@ async function main(mode) {
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
   const homeDeposits = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
-    fromBlock: HOME_DEPLOYMENT_BLOCK,
+    fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber
   })
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
   const foreignDeposits = await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Deposit' : 'RelayedMessage',
-    fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
+    fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: foreignBlockNumber
   })
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
   const homeWithdrawals = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Withdraw' : 'AffirmationCompleted',
-    fromBlock: HOME_DEPLOYMENT_BLOCK,
+    fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber
   })
 
@@ -70,7 +70,7 @@ async function main(mode) {
   const foreignWithdrawals = isExternalErc20
     ? await getPastEvents(erc20Contract, {
         event: 'Transfer',
-        fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
+        fromBlock: MONITOR_FOREIGN_START_BLOCK,
         toBlock: foreignBlockNumber,
         options: {
           filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
@@ -78,7 +78,7 @@ async function main(mode) {
       })
     : await getPastEvents(foreignBridge, {
         event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
-        fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
+        fromBlock: MONITOR_FOREIGN_START_BLOCK,
         toBlock: foreignBlockNumber
       })
   logger.debug('Done')

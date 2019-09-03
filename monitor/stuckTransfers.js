@@ -4,7 +4,7 @@ const logger = require('./logger')('stuckTransfers.js')
 const { FOREIGN_V1_ABI } = require('../commons/abis')
 
 const { COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
-const FOREIGN_DEPLOYMENT_BLOCK = Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0
+const MONITOR_FOREIGN_START_BLOCK = Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0
 
 const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
@@ -84,7 +84,7 @@ async function main() {
     filter: {
       to: COMMON_FOREIGN_BRIDGE_ADDRESS
     },
-    fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
+    fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: 'latest'
   })
   logger.debug('calling tokenContractWithData.getPastEvents Transfer')
@@ -92,7 +92,7 @@ async function main() {
     filter: {
       to: COMMON_FOREIGN_BRIDGE_ADDRESS
     },
-    fromBlock: FOREIGN_DEPLOYMENT_BLOCK,
+    fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: 'latest'
   })
   const stuckTransfers = transfersNormal.filter(compareTransfers(transfersWithData))

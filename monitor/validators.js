@@ -10,19 +10,19 @@ const {
   COMMON_FOREIGN_RPC_URL,
   COMMON_HOME_BRIDGE_ADDRESS,
   COMMON_FOREIGN_BRIDGE_ADDRESS,
-  HOME_GAS_LIMIT,
+  MONITOR_VALIDATOR_HOME_TX_LIMIT,
   COMMON_HOME_GAS_PRICE_SUPPLIER_URL,
   COMMON_HOME_GAS_PRICE_SPEED_TYPE,
   COMMON_HOME_GAS_PRICE_FALLBACK,
   COMMON_HOME_GAS_PRICE_FACTOR,
-  FOREIGN_GAS_LIMIT,
+  MONITOR_VALIDATOR_FOREIGN_TX_LIMIT,
   COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL,
   COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE,
   COMMON_FOREIGN_GAS_PRICE_FALLBACK,
   COMMON_FOREIGN_GAS_PRICE_FACTOR
 } = process.env
-const HOME_DEPLOYMENT_BLOCK = Number(process.env.HOME_DEPLOYMENT_BLOCK) || 0
-const FOREIGN_DEPLOYMENT_BLOCK = Number(process.env.FOREIGN_DEPLOYMENT_BLOCK) || 0
+const MONITOR_HOME_START_BLOCK = Number(process.env.MONITOR_HOME_START_BLOCK) || 0
+const MONITOR_FOREIGN_START_BLOCK = Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0
 
 const Web3Utils = Web3.utils
 
@@ -66,14 +66,14 @@ async function main(bridgeMode) {
 
   logger.debug('calling foreignBridgeValidators getValidatorList()')
   const foreignValidators = await getValidatorList(foreignValidatorsAddress, web3Foreign.eth, {
-    from: FOREIGN_DEPLOYMENT_BLOCK,
+    from: MONITOR_FOREIGN_START_BLOCK,
     to: foreignBlockNumber,
     logger
   })
 
   logger.debug('calling homeBridgeValidators getValidatorList()')
   const homeValidators = await getValidatorList(homeValidatorsAddress, web3Home.eth, {
-    from: HOME_DEPLOYMENT_BLOCK,
+    from: MONITOR_HOME_START_BLOCK,
     to: homeBlockNumber,
     logger
   })
@@ -91,14 +91,14 @@ async function main(bridgeMode) {
     (await gasPriceFromOracle(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasOracleOpts)) ||
     Web3Utils.toBN(COMMON_HOME_GAS_PRICE_FALLBACK)
   const homeGasPriceGwei = Web3Utils.fromWei(homeGasPrice.toString(), 'gwei')
-  const homeTxCost = homeGasPrice.mul(Web3Utils.toBN(HOME_GAS_LIMIT))
+  const homeTxCost = homeGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_HOME_TX_LIMIT))
 
   logger.debug('calling foreign getGasPrices')
   const foreignGasPrice =
     (await gasPriceFromOracle(() => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL), foreignGasOracleOpts)) ||
     Web3Utils.toBN(COMMON_FOREIGN_GAS_PRICE_FALLBACK)
   const foreignGasPriceGwei = Web3Utils.fromWei(foreignGasPrice.toString(), 'gwei')
-  const foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(FOREIGN_GAS_LIMIT))
+  const foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_FOREIGN_TX_LIMIT))
 
   let validatorsMatch = true
   logger.debug('calling asyncForEach foreignValidators foreignVBalances')
