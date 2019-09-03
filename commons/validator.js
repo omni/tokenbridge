@@ -1,4 +1,5 @@
 require('console.table')
+const shell = require('shelljs')
 // const path = require('path')
 // require('dotenv').config({
 //   path: path.join(__dirname, contractsPath, '/deploy/.env')
@@ -7,74 +8,86 @@ require('console.table')
 const commonParameters = [
   {
     name: 'COMMON_HOME_RPC_URL',
-    description: 'The home rpc url',
-    valuesDescription: 'URL e.g. https://kovan.infura.io/mew',
+    description:
+      'The HTTPS URL(s) used to communicate to the RPC nodes in the Home network. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection.',
+    valuesDescription: 'URL(s)',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_FOREIGN_RPC_URL',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The HTTPS URL(s) used to communicate to the RPC nodes in the Foreign network. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection.',
+    valuesDescription: 'URL(s)',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_HOME_BRIDGE_ADDRESS',
-    description: '',
-    valuesDescription: '',
+    description:
+      "The address of the bridge contract address in the Home network. It is used to listen to events from and send validators' transactions to the Home network.",
+    valuesDescription: 'hexidecimal beginning with "0x"',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_FOREIGN_BRIDGE_ADDRESS',
-    description: '',
-    valuesDescription: '',
+    description:
+      "The  address of the bridge contract address in the Foreign network. It is used to listen to events from and send validators' transactions to the Foreign network.",
+    valuesDescription: 'hexidecimal beginning with "0x"',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_HOME_GAS_PRICE_ORACLE_URL',
-    description: '',
-    valuesDescription: '',
+    description:
+      "The URL used to get a JSON response from the gas price prediction oracle for the Home network. The gas price provided by the oracle is used to send the validator's transactions to the RPC node. Since it is assumed that the Home network has a predefined gas price (e.g. the gas price in the Core of POA.Network is `1 GWei`), the gas price oracle parameter can be omitted for such networks.",
+    valuesDescription: 'URL',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_HOME_GAS_PRICE_SPEED_TYPE',
-    description: '',
-    valuesDescription: '',
+    description:
+      'Assuming the gas price oracle responds with the following JSON structure: `{"fast": 20.0, "block_time": 12.834, "health": true, "standard": 6.0, "block_number": 6470469, "instant": 71.0, "slow": 1.889}`, this parameter specifies the desirable transaction speed. The speed type can be omitted when `HOME_GAS_PRICE_ORACLE_URL` is not used.',
+    valuesDescription: '`instant` / `fast` / `standard` / `slow`',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_HOME_GAS_PRICE_FALLBACK',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The gas price (in Wei) that is used if both the oracle and the fall back gas price specified in the Home Bridge contract are not available.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_HOME_GAS_PRICE_FACTOR',
-    description: '',
-    valuesDescription: '',
+    description:
+      'A value that will multiply the gas price of the oracle to convert it to gwei. If the oracle API returns gas prices in gwei then this can be set to `1`. Also, it could be used to intentionally pay more gas than suggested by the oracle to guarantee the transaction verification. E.g. `1.25` or `1.5`.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_FOREIGN_GAS_PRICE_ORACLE_URL',
-    description: '',
-    valuesDescription: '',
+    description:
+      "The URL used to get a JSON response from the gas price prediction oracle for the Foreign network. The provided gas price is used to send the validator's transactions to the RPC node. If the Foreign network is Ethereum Foundation mainnet, the oracle URL can be: https://gasprice.poa.network. Otherwise this parameter can be omitted.",
+    valuesDescription: 'URL',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE',
-    description: '',
-    valuesDescription: '',
+    description:
+      'Assuming the gas price oracle responds with the following JSON structure: `{"fast": 20.0, "block_time": 12.834, "health": true, "standard": 6.0, "block_number": 6470469, "instant": 71.0, "slow": 1.889}`, this parameter specifies the desirable transaction speed. The speed type can be omitted when `FOREIGN_GAS_PRICE_ORACLE_URL`is not used.',
+    valuesDescription: '`instant` / `fast` / `standard` / `slow`',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_FOREIGN_GAS_PRICE_FALLBACK',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The gas price (in Wei) used if both the oracle and fall back gas price specified in the Foreign Bridge contract are not available.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'COMMON_FOREIGN_GAS_PRICE_FACTOR',
-    description: '',
-    valuesDescription: '',
+    description:
+      'A value that will multiply the gas price of the oracle to convert it to gwei. If the oracle API returns gas prices in gwei then this can be set to `1`. Also, it could be used to intentionally pay more gas than suggested by the oracle to guarantee the transaction verification. E.g. `1.25` or `1.5`.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   }
 ]
@@ -82,50 +95,57 @@ const commonParameters = [
 const oracleParameters = [
   {
     name: 'ORACLE_BRIDGE_MODE',
-    description: 'The bridge mode',
+    description: 'The bridge mode. The bridge starts listening to a different set of events based on this parameter.',
     valuesDescription: 'NATIVE_TO_ERC / ERC_TO_ERC / ERC_TO_NATIVE',
     valuesCheck: p => p === 'NATIVE_TO_ERC' || p === 'NATIVE_TO_ERC' || p === 'NATIVE_TO_ERC'
   },
   {
     name: 'ORACLE_ALLOW_HTTP_FOR_RPC',
-    description: '',
-    valuesDescription: '',
+    description:
+      '**Only use in test environments - must be omitted in production environments.**. If this parameter is specified and set to `yes`, RPC URLs can be specified in form of HTTP links. A warning that the connection is insecure will be written to the logs.',
+    valuesDescription: '`yes` / `no`',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_HOME_RPC_POLLING_INTERVAL',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The interval in milliseconds used to request the RPC node in the Home network for new blocks. The interval should match the average production time for a new block.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_FOREIGN_RPC_POLLING_INTERVAL',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The interval in milliseconds used to request the RPC node in the Foreign network for new blocks. The interval should match the average production time for a new block.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL',
-    description: '',
-    valuesDescription: '',
+    description:
+      'An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_QUEUE_URL',
-    description: '',
-    valuesDescription: '',
+    description:
+      'RabbitMQ URL used by watchers and senders to communicate to the message queue. Typically set to: `amqp://127.0.0.1`.',
+    valuesDescription: 'local URL',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_REDIS_URL',
-    description: '',
-    valuesDescription: '',
+    description:
+      'Redis DB URL used by watchers and senders to communicate to the database. Typically set to: `redis://127.0.0.1:6379`.',
+    valuesDescription: 'local URL',
     valuesCheck: p => typeof p === 'string'
   },
   {
@@ -142,14 +162,15 @@ const oracleParameters = [
   },
   {
     name: 'ORACLE_LOG_LEVEL',
-    description: '',
-    valuesDescription: '',
+    description: 'Set the level of details in the logs.',
+    valuesDescription: '`trace` / `debug` / `info` / `warn` / `error` / `fatal`',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_MAX_PROCESSING_TIME',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The workers processes will be killed if this amount of time (in milliseconds) is elapsed before they finish processing. It is recommended to set this value to 4 times the value of the longest polling time (set with the `HOME_POLLING_INTERVAL` and `FOREIGN_POLLING_INTERVAL` variables). To disable this, set the time to 0.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   }
 ]
@@ -311,6 +332,32 @@ const check = parameters => {
   return validationErrors
 }
 
+const print = () => {
+  shell.exec('echo "<!-- This file is auto-generated, please do not modify. -->\n" > ../CONFIGURATION.md')
+  shell.exec('echo "# Configuration\n" >> ../CONFIGURATION.md')
+
+  shell.exec('echo "## Oracle configuration\n" >> ../CONFIGURATION.md')
+  shell.exec('echo "name | description | value" >> ../CONFIGURATION.md')
+  shell.exec('echo "--- | --- | ---" >> ../CONFIGURATION.md')
+  oracleParameters.forEach(p =>
+    shell.exec(`echo "${p.name} | ${p.description} | ${p.valuesDescription}" >> ../CONFIGURATION.md`)
+  )
+
+  shell.exec('echo "\n## UI configuration\n" >> ../CONFIGURATION.md')
+  shell.exec('echo "name | description | value" >> ../CONFIGURATION.md')
+  shell.exec('echo "--- | --- | ---" >> ../CONFIGURATION.md')
+  uiParameters.forEach(p =>
+    shell.exec(`echo "${p.name} | ${p.description} | ${p.valuesDescription}" >> ../CONFIGURATION.md`)
+  )
+
+  shell.exec('echo "\n## Monitor configuration\n" >> ../CONFIGURATION.md')
+  shell.exec('echo "name | description | value" >> ../CONFIGURATION.md')
+  shell.exec('echo "--- | --- | ---" >> ../CONFIGURATION.md')
+  monitorParameters.forEach(p =>
+    shell.exec(`echo "${p.name} | ${p.description} | ${p.valuesDescription}" >> ../CONFIGURATION.md`)
+  )
+}
+
 if (process.env.MODE === 'VALIDATE_ORACLE') {
   console.log('\nValidating Oracle parameters...\n')
   const validationErrors = [...check(commonParameters), ...check(oracleParameters)]
@@ -323,8 +370,7 @@ if (process.env.MODE === 'VALIDATE_ORACLE') {
 } else if (process.env.MODE === 'VALIDATE_MONITOR') {
   console.log('this is validate monitor')
 } else if (process.env.MODE === 'PRINT') {
-  console.log('Not implemented')
-  process.exit(-1)
+  print()
 } else {
   description()
 }
