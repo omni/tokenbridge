@@ -265,7 +265,7 @@ export class Bridge extends React.Component {
     const modalData = {
       isHome: true,
       networkData: web3Store.homeNet,
-      url: web3Store.HOME_HTTP_PARITY_URL,
+      url: web3Store.COMMON_HOME_RPC_URL,
       logo: homeLogoPurple,
       address: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
       currency: homeStore.symbol,
@@ -288,7 +288,7 @@ export class Bridge extends React.Component {
   loadForeignDetails = () => {
     const { web3Store, foreignStore } = this.props.RootStore
     const isExternalErc20 = foreignStore.tokenType === ERC_TYPES.ERC20
-    const foreignURL = new URL(web3Store.FOREIGN_HTTP_PARITY_URL)
+    const foreignURL = new URL(web3Store.COMMON_FOREIGN_RPC_URL)
     const foreignDisplayUrl = `${foreignURL.protocol}//${foreignURL.hostname}`
 
     const modalData = {

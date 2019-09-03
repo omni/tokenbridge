@@ -36,8 +36,8 @@ class Web3Store {
   @observable
   walletInstalled = true
 
-  HOME_HTTP_PARITY_URL = process.env.COMMON_HOME_RPC_URL
-  FOREIGN_HTTP_PARITY_URL = process.env.COMMON_FOREIGN_RPC_URL
+  COMMON_HOME_RPC_URL = process.env.COMMON_HOME_RPC_URL
+  COMMON_FOREIGN_RPC_URL = process.env.COMMON_FOREIGN_RPC_URL
 
   constructor(rootStore) {
     this.alertStore = rootStore.alertStore
@@ -81,7 +81,7 @@ class Web3Store {
 
   @action
   async setWeb3Home() {
-    this.homeWeb3 = getWeb3Instance(this.HOME_HTTP_PARITY_URL)
+    this.homeWeb3 = getWeb3Instance(this.COMMON_HOME_RPC_URL)
     this.setHomeWeb3Promise = getNetwork(this.homeWeb3).then(homeNet => {
       this.homeNet = homeNet
     })
@@ -89,7 +89,7 @@ class Web3Store {
 
   @action
   async setWeb3Foreign() {
-    this.foreignWeb3 = getWeb3Instance(this.FOREIGN_HTTP_PARITY_URL)
+    this.foreignWeb3 = getWeb3Instance(this.COMMON_FOREIGN_RPC_URL)
     this.foreignNet = await getNetwork(this.foreignWeb3)
   }
 
