@@ -150,14 +150,16 @@ const oracleParameters = [
   },
   {
     name: 'ORACLE_HOME_START_BLOCK',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The block number in the Home network used to start watching for events when the bridge instance is run for the first time. Usually this is the same block where the Home Bridge contract is deployed. If a new validator instance is being deployed for an existing set of validators, the block number could be the latest block in the chain.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
     name: 'ORACLE_FOREIGN_START_BLOCK',
-    description: '',
-    valuesDescription: '',
+    description:
+      'The block number in the Foreign network used to start watching for events when the bridge instance runs for the first time. Usually this is the same block where the Foreign Bridge contract was deployed to. If a new validator instance is being deployed for an existing set of validators, the block number could be the latest block in the chain.',
+    valuesDescription: 'integer',
     valuesCheck: p => typeof p === 'string'
   },
   {
@@ -171,6 +173,13 @@ const oracleParameters = [
     description:
       'The workers processes will be killed if this amount of time (in milliseconds) is elapsed before they finish processing. It is recommended to set this value to 4 times the value of the longest polling time (set with the `HOME_POLLING_INTERVAL` and `FOREIGN_POLLING_INTERVAL` variables). To disable this, set the time to 0.',
     valuesDescription: 'integer',
+    valuesCheck: p => typeof p === 'string'
+  },
+  {
+    name: 'ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY',
+    description:
+      'The private key of the bridge validator used to sign confirmations before sending transactions to the bridge contracts. The validator account is calculated automatically from the private key. Every bridge instance (set of watchers and senders) must have its own unique private key. The specified private key is used to sign transactions on both sides of the bridge.',
+    valuesDescription: 'hexidecimal without "0x"',
     valuesCheck: p => typeof p === 'string'
   }
 ]
