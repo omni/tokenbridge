@@ -239,7 +239,7 @@ workflows:
               only: master
       - oracle-e2e
       - ui-e2e
-      # - monitor-e2e
+      - monitor-e2e
       # - deployment-oracle
       # - deployment-ui
       # - deployment-monitor
