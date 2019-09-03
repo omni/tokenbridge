@@ -225,9 +225,9 @@ workflows:
       - build:
           requires:
             - initialize
-      - lint:
-          requires:
-            - initialize
+      # - lint:
+      #     requires:
+      #       - initialize
       - test:
           requires:
             - initialize
