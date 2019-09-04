@@ -190,6 +190,15 @@ const oracleParameters = [
   }
 ]
 
+const oracleTestParameters = [
+  {
+    name: 'FOREIGN_MIN_AMOUNT_PER_TX',
+    description: '',
+    valuesDescription: '',
+    valuesCheck: p => typeof p === 'string'
+  }
+]
+
 const uiParameters = [
   {
     name: 'UI_APP_TITLE',

@@ -107,14 +107,14 @@ class ForeignStore {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
   }
-  networkName = process.env.UI_FOREIGN_NETWORK_DISPLAY_NAME || 'Unknown'
+  networkName = process.env.REACT_APP_UI_FOREIGN_NETWORK_DISPLAY_NAME || 'Unknown'
   filteredBlockNumber = 0
   foreignBridge = {}
   tokenContract = {}
   tokenDecimals = 18
-  COMMON_FOREIGN_BRIDGE_ADDRESS = process.env.COMMON_FOREIGN_BRIDGE_ADDRESS
-  explorerTxTemplate = process.env.UI_FOREIGN_EXPLORER_TX_TEMPLATE || ''
-  explorerAddressTemplate = process.env.UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE || ''
+  COMMON_FOREIGN_BRIDGE_ADDRESS = process.env.REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS
+  explorerTxTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_TX_TEMPLATE || ''
+  explorerAddressTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE || ''
 
   constructor(rootStore) {
     this.web3Store = rootStore.web3Store

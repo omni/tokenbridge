@@ -36,8 +36,8 @@ class Web3Store {
   @observable
   walletInstalled = true
 
-  COMMON_HOME_RPC_URL = process.env.COMMON_HOME_RPC_URL
-  COMMON_FOREIGN_RPC_URL = process.env.COMMON_FOREIGN_RPC_URL
+  COMMON_HOME_RPC_URL = process.env.REACT_APP_COMMON_HOME_RPC_URL
+  COMMON_FOREIGN_RPC_URL = process.env.REACT_APP_COMMON_FOREIGN_RPC_URL
 
   constructor(rootStore) {
     this.alertStore = rootStore.alertStore

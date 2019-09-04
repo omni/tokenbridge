@@ -15,7 +15,7 @@ export class StatisticsPage extends React.Component {
     const isNativeToErc = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC
     const leftTitle = isNativeToErc ? 'Deposits' : 'Withdraws'
     const rightTitle = isNativeToErc ? 'Withdraws' : 'Deposits'
-    const { UI_HOME_WITHOUT_EVENTS: HOME, UI_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
+    const { REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME, REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
     const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
 
     return withoutEvents ? (
