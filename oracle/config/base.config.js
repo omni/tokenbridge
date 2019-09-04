@@ -49,7 +49,8 @@ let maxProcessingTime = null
 if (String(process.env.ORACLE_MAX_PROCESSING_TIME) === '0') {
   maxProcessingTime = 0
 } else if (!process.env.ORACLE_MAX_PROCESSING_TIME) {
-  maxProcessingTime = 4 * Math.max(process.env.ORACLE_HOME_RPC_POLLING_INTERVAL, process.env.ORACLE_FOREIGN_RPC_POLLING_INTERVAL)
+  maxProcessingTime =
+    4 * Math.max(process.env.ORACLE_HOME_RPC_POLLING_INTERVAL, process.env.ORACLE_FOREIGN_RPC_POLLING_INTERVAL)
 } else {
   maxProcessingTime = Number(process.env.ORACLE_MAX_PROCESSING_TIME)
 }

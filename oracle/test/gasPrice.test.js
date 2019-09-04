@@ -33,7 +33,9 @@ describe('gasPrice', () => {
       // then
       expect(process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL).to.equal('15000')
       expect(process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL).to.not.equal(DEFAULT_UPDATE_INTERVAL.toString())
-      expect(utils.setIntervalAndRun.args[0][1]).to.equal(process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL.toString())
+      expect(utils.setIntervalAndRun.args[0][1]).to.equal(
+        process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL.toString()
+      )
     })
     it('should call setIntervalAndRun with default interval value on Home', async () => {
       // given
