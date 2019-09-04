@@ -6,7 +6,12 @@ const { BRIDGE_MODES } = require('../commons')
 
 const Web3Utils = Web3.utils
 
-const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL, COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
+const {
+  COMMON_HOME_RPC_URL,
+  COMMON_FOREIGN_RPC_URL,
+  COMMON_HOME_BRIDGE_ADDRESS,
+  COMMON_FOREIGN_BRIDGE_ADDRESS
+} = process.env
 
 const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
