@@ -40,5 +40,5 @@
     path: /etc/rsyslog.conf
     insertbefore: "# Where to place spool and state files"
     marker: "#{mark} add string to discarding unwanted messages"
-    content: ':msg, contains, "VALIDATOR_ADDRESS_PRIVATE_KEY" ~'
+    content: ':msg, contains, "ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY" ~'
   notify: restart rsyslog

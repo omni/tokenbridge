@@ -16,14 +16,14 @@
 
 - name: Get validator address
   become_user: "{{ compose_service_user }}"
-  shell: docker-compose run -e VALIDATOR_ADDRESS_PRIVATE_KEY="{{ VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
+  shell: docker-compose run -e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="{{ ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: VADDRESS
 
-- name: Set VALIDATOR_ADDRESS variable
+- name: Set ORACLE_VALIDATOR_ADDRESS variable
   set_fact:
-    VALIDATOR_ADDRESS: "{{ VADDRESS.stdout }}"
+    ORACLE_VALIDATOR_ADDRESS: "{{ VADDRESS.stdout }}"
 
 - name: Install .key config
   template:
