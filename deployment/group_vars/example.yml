@@ -1,6 +1,7 @@
 ---
 ## General settings
 ORACLE_BRIDGE_MODE: "NATIVE_TO_ERC"
+ORACLE_LOG_LEVEL: debug
 
 ## Home contract
 COMMON_HOME_RPC_URL: "https://sokol.poa.network"
