@@ -36,7 +36,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
 
   test.after(async () => {
     try {
-      // await driver.quit()
+      await driver.quit()
     } catch (e) {
       console.log(e)
     }
