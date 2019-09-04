@@ -225,9 +225,9 @@ workflows:
       - build:
           requires:
             - initialize
-      # - lint:
-      #     requires:
-      #       - initialize
+      - lint:
+          requires:
+            - initialize
       - test:
           requires:
             - initialize
@@ -243,18 +243,18 @@ workflows:
       - deployment-oracle
       - deployment-ui
       - deployment-monitor
-      # - ultimate:
-      #     name: "ultimate: native to erc" 
-      #     scenario-name: native-to-erc
-      #     redis-key: native-erc-collected-signatures:lastProcessedBlock
-      #     ui-e2e-grep: "NATIVE TO ERC"
-      # - ultimate:
-      #     name: "ultimate: erc to native" 
-      #     scenario-name: erc-to-native
-      #     redis-key: erc-native-collected-signatures:lastProcessedBlock
-      #     ui-e2e-grep: "ERC TO NATIVE"
-      # - ultimate:
-      #     name: "ultimate: erc to erc" 
-      #     scenario-name: erc-to-erc
-      #     redis-key: erc-erc-collected-signatures:lastProcessedBlock
-      #     ui-e2e-grep: "ERC TO ERC"
+      - ultimate:
+          name: "ultimate: native to erc" 
+          scenario-name: native-to-erc
+          redis-key: native-erc-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "NATIVE TO ERC"
+      - ultimate:
+          name: "ultimate: erc to native" 
+          scenario-name: erc-to-native
+          redis-key: erc-native-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "ERC TO NATIVE"
+      - ultimate:
+          name: "ultimate: erc to erc" 
+          scenario-name: erc-to-erc
+          redis-key: erc-erc-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "ERC TO ERC"
