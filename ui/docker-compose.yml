@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: ui/Dockerfile
     ports:
-    - "${UI_PORT}:${UI_PORT}"
+    - "${REACT_APP_UI_PORT}:${REACT_APP_UI_PORT}"
     env_file: ./.env
     environment: 
       - NODE_ENV=production
