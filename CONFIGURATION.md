@@ -40,6 +40,8 @@ ORACLE_VALIDATOR_ADDRESS |  | hexidecimal with "0x"
 
 ## UI configuration
 
+Please note that the common configuration parameters need to be prefixed with `REACT_APP_`, e.g. `REACT_APP_COMMON_HOME_RPC_URL`
+
 name | description | value
 --- | --- | ---
 UI_APP_TITLE | The title for the bridge UI page. `%c` will be replaced by the name of the network. | 

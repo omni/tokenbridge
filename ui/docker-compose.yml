@@ -10,9 +10,5 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production
-      - REACT_APP_COMMON_HOME_BRIDGE_ADDRESS=${COMMON_HOME_BRIDGE_ADDRESS}
-      - REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS=${COMMON_FOREIGN_BRIDGE_ADDRESS}
-      - REACT_APP_COMMON_FOREIGN_RPC_URL=${COMMON_FOREIGN_RPC_URL}
-      - REACT_APP_COMMON_HOME_RPC_URL=${COMMON_HOME_RPC_URL}
     restart: unless-stopped
     entrypoint: yarn start
