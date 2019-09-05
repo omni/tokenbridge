@@ -1,6 +1,6 @@
 # POA TokenBridge / Deployment Configuration
 
-Please see the [Oracle](../oracle/README.md) for additional configuration and execution details.
+Please see the [Configuration](../CONFIGURATION.md) for additional configuration and execution details.
 
 ## Prerequisites
 
