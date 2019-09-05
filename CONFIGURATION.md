@@ -65,9 +65,9 @@ REACT_APP_STYLES | The set of styles to render the bridge UI page. Currently onl
 
 name | description | value
 --- | --- | ---
-MONITOR_HOME_START_BLOCK |  | 
-MONITOR_FOREIGN_START_BLOCK |  | 
+MONITOR_HOME_START_BLOCK | The app will monitor transactions starting from this block | 
+MONITOR_FOREIGN_START_BLOCK | The app will monitor transactions starting from this block | 
 MONITOR_VALIDATOR_HOME_TX_LIMIT |  | 
 MONITOR_VALIDATOR_FOREIGN_TX_LIMIT |  | 
 MONITOR_TX_NUMBER_THRESHOLD |  | 
-MONITOR_PORT |  | 
+MONITOR_PORT | The port for the Monitor | 
