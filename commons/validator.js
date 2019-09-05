@@ -1,5 +1,6 @@
 require('console.table')
 const shell = require('shelljs')
+const fs = require('fs');
 // const path = require('path')
 // require('dotenv').config({
 //   path: path.join(__dirname, contractsPath, '/deploy/.env')
@@ -359,28 +360,33 @@ const check = parameters => {
 }
 
 const print = () => {
-  shell.exec('echo "<!-- This file is auto-generated, please do not modify. -->\n" > ../CONFIGURATION.md')
-  shell.exec('echo "# Configuration\n" >> ../CONFIGURATION.md')
+  fs.appendFileSync('../CONFIGURATION.md', '# Configuration\n')
+  fs.appendFileSync('../CONFIGURATION.md', '\n## Common configuration\n')
+  fs.appendFileSync('../CONFIGURATION.md', 'name | description | value\n')
+  fs.appendFileSync('../CONFIGURATION.md', '--- | --- | ---\n')
+  commonParameters.forEach(p =>
+    fs.appendFileSync('../CONFIGURATION.md', `${p.name} | ${p.description} | ${p.valuesDescription}\n`)
+  )
 
-  shell.exec('echo "## Oracle configuration\n" >> ../CONFIGURATION.md')
-  shell.exec('echo "name | description | value" >> ../CONFIGURATION.md')
-  shell.exec('echo "--- | --- | ---" >> ../CONFIGURATION.md')
+  fs.appendFileSync('../CONFIGURATION.md', `## Oracle configuration\n`)
+  fs.appendFileSync('../CONFIGURATION.md', `name | description | value\n`)
+  fs.appendFileSync('../CONFIGURATION.md', `--- | --- | ---"\n`)
   oracleParameters.forEach(p =>
-    shell.exec(`echo "${p.name} | ${p.description} | ${p.valuesDescription}" >> ../CONFIGURATION.md`)
+    fs.appendFileSync('../CONFIGURATION.md', `${p.name} | ${p.description} | ${p.valuesDescription}\n`)
   )
 
-  shell.exec('echo "\n## UI configuration\n" >> ../CONFIGURATION.md')
-  shell.exec('echo "name | description | value" >> ../CONFIGURATION.md')
-  shell.exec('echo "--- | --- | ---" >> ../CONFIGURATION.md')
+  fs.appendFileSync('../CONFIGURATION.md', `## UI configuration\n`)
+  fs.appendFileSync('../CONFIGURATION.md', `name | description | value\n`)
+  fs.appendFileSync('../CONFIGURATION.md', `--- | --- | ---\n`)
   uiParameters.forEach(p =>
-    shell.exec(`echo "${p.name} | ${p.description} | ${p.valuesDescription}" >> ../CONFIGURATION.md`)
+    fs.appendFileSync('../CONFIGURATION.md', `${p.name} | ${p.description} | ${p.valuesDescription}\n`)
   )
 
-  shell.exec('echo "\n## Monitor configuration\n" >> ../CONFIGURATION.md')
-  shell.exec('echo "name | description | value" >> ../CONFIGURATION.md')
-  shell.exec('echo "--- | --- | ---" >> ../CONFIGURATION.md')
+  fs.appendFileSync('../CONFIGURATION.md', `## Monitor configuration\n`)
+  fs.appendFileSync('../CONFIGURATION.md', `name | description | value\n`)
+  fs.appendFileSync('../CONFIGURATION.md', `--- | --- | ---\n`)
   monitorParameters.forEach(p =>
-    shell.exec(`echo "${p.name} | ${p.description} | ${p.valuesDescription}" >> ../CONFIGURATION.md`)
+    fs.appendFileSync('../CONFIGURATION.md', `${p.name} | ${p.description} | ${p.valuesDescription}\n`)
   )
 }
 
