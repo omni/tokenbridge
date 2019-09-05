@@ -34,7 +34,7 @@ COMMON_FOREIGN_GAS_PRICE_FACTOR: 1
 ## UI
 REACT_APP_TITLE: "TokenBridge UI app - %c"
 REACT_APP_DESCRIPTION: "The TokenBridge serves as a method of transferring native tokens from the Ethereum Classic Network to the Ethereum network in a quick and cost-efficient manner."
-REACT_APP_PORT: 3001
+PORT: 3001
 REACT_APP_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/etc/mainnet/tx/%s
 REACT_APP_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
 REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/etc/mainnet/address/%s

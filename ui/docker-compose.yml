@@ -6,10 +6,9 @@ services:
       context: ..
       dockerfile: ui/Dockerfile
     ports:
-    - "${REACT_APP_PORT}:${REACT_APP_PORT}"
+    - "${PORT}:${PORT}"
     env_file: ./.env
     environment: 
       - NODE_ENV=production
-      - PORT=${REACT_APP_PORT}
     restart: unless-stopped
     entrypoint: yarn start

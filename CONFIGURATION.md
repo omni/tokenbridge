@@ -58,7 +58,7 @@ REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE | template link to address on home expl
 REACT_APP_FOREIGN_EXPLORER_ADDRESS_TEMPLATE | template link to address on foreign explorer. `%s` will be replaced by address | 
 REACT_APP_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract. | 
 REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | 
-REACT_APP_PORT | The port for the UI app. | 
+PORT | The port for the UI app. | 
 REACT_APP_STYLES | The set of styles to render the bridge UI page. Currently only `classic` is implemented | 
 
 

@@ -45,7 +45,7 @@ REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 
 REACT_APP_TITLE: "TokenBridge UI app - %c"
 REACT_APP_DESCRIPTION: "The POA cross-chain bridge serves as a method of transferring POA native tokens from the POA Network to the Ethereum network in a quick and cost-efficient manner."
-REACT_APP_PORT: 3001
+PORT: 3001
 REACT_APP_STYLES: classic
 
 
