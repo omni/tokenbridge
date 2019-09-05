@@ -44,21 +44,21 @@ Please note that the common configuration parameters need to be prefixed with `R
 
 name | description | value
 --- | --- | ---
-UI_APP_TITLE | The title for the bridge UI page. `%c` will be replaced by the name of the network. | 
-UI_APP_DESCRIPTION | The meta description for the deployed bridge page. | 
-UI_NATIVE_TOKEN_DISPLAY_NAME | name of the home native coin | 
-UI_HOME_NETWORK_DISPLAY_NAME | name to be displayed for home network | 
-UI_FOREIGN_NETWORK_DISPLAY_NAME | name to be displayed for foreign network | 
-UI_HOME_WITHOUT_EVENTS | `true` if home network doesn't support events | 
-UI_FOREIGN_WITHOUT_EVENTS | `true` if foreign network doesn't support events | 
-UI_HOME_EXPLORER_TX_TEMPLATE | template link to transaction on home explorer. `%s` will be replaced by transaction hash | 
-UI_FOREIGN_EXPLORER_TX_TEMPLATE | template link to transaction on foreign explorer. `%s` will be replaced by transaction hash | 
-UI_HOME_EXPLORER_ADDRESS_TEMPLATE | template link to address on home explorer. `%s` will be replaced by address | 
-UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE | template link to address on foreign explorer. `%s` will be replaced by address | 
-UI_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract. | 
-UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | 
-UI_PORT | The port for the UI app. | 
-UI_APP_STYLES | The set of styles to render the bridge UI page. Currently only `classic` is implemented | 
+REACT_APP_TITLE | The title for the bridge UI page. `%c` will be replaced by the name of the network. | 
+REACT_APP_DESCRIPTION | The meta description for the deployed bridge page. | 
+REACT_APP_NATIVE_TOKEN_DISPLAY_NAME | name of the home native coin | 
+REACT_APP_HOME_NETWORK_DISPLAY_NAME | name to be displayed for home network | 
+REACT_APP_FOREIGN_NETWORK_DISPLAY_NAME | name to be displayed for foreign network | 
+REACT_APP_HOME_WITHOUT_EVENTS | `true` if home network doesn't support events | 
+REACT_APP_FOREIGN_WITHOUT_EVENTS | `true` if foreign network doesn't support events | 
+REACT_APP_HOME_EXPLORER_TX_TEMPLATE | template link to transaction on home explorer. `%s` will be replaced by transaction hash | 
+REACT_APP_FOREIGN_EXPLORER_TX_TEMPLATE | template link to transaction on foreign explorer. `%s` will be replaced by transaction hash | 
+REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE | template link to address on home explorer. `%s` will be replaced by address | 
+REACT_APP_FOREIGN_EXPLORER_ADDRESS_TEMPLATE | template link to address on foreign explorer. `%s` will be replaced by address | 
+REACT_APP_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract. | 
+REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | 
+REACT_APP_PORT | The port for the UI app. | 
+REACT_APP_STYLES | The set of styles to render the bridge UI page. Currently only `classic` is implemented | 
 
 
 ## Monitor configuration
