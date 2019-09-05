@@ -170,19 +170,28 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment-e2e/molecule.sh oracle
+      - run:
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh oracle
+          no_output_timeout: 20m
   deployment-ui:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment-e2e/molecule.sh ui
+      - run:
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh ui
+          no_output_timeout: 20m
   deployment-monitor:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment-e2e/molecule.sh monitor
+      - run:
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh monitor
+          no_output_timeout: 20m
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
