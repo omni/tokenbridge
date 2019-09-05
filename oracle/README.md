@@ -107,7 +107,7 @@ cd oracle
 cp .env.example .env
 ```
 
-2. Fill in the required information using the JSON output data. Check the tables with the [set of parameters](#configuration-parameters) below to see their explanation. 
+2. Fill in the required information using the JSON output data. Check [Configuration](../CONFIGURATION.md) to see their explanation. 
 
 ## Run the Processes
 
