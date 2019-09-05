@@ -214,7 +214,7 @@ jobs:
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy << parameters.scenario-name >>
-          no_output_timeout: 30m
+          no_output_timeout: 40m
       - tokenbridge-orb/wait-for-oracle:
           redis-key: << parameters.redis-key >>
       - run:
