@@ -26,7 +26,7 @@ async function main() {
   const poa20 = new web3Foreign.eth.Contract(ERC20_ABI, ERC20_TOKEN_ADDRESS)
 
   try {
-    const foreignChaindId = await sendRawTx({
+    const foreignChainId = await sendRawTx({
       chain: 'foreign',
       params: [],
       method: 'net_version'
@@ -55,7 +55,7 @@ async function main() {
         gasLimit,
         to: ERC20_TOKEN_ADDRESS,
         web3: web3Foreign,
-        chainId: foreignChaindId
+        chainId: foreignChainId
       })
       if (txHash !== undefined) {
         nonce++
