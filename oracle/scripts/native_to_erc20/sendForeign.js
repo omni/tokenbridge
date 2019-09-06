@@ -53,7 +53,7 @@ async function main() {
   try {
     await isValidAmount(FOREIGN_MIN_AMOUNT_PER_TX, bridge)
 
-    const foreignChaindId = await sendRawTx({
+    const foreignChainId = await sendRawTx({
       chain: 'foreign',
       params: [],
       method: 'net_version'
@@ -82,7 +82,7 @@ async function main() {
         gasLimit,
         to: ERC20_TOKEN_ADDRESS,
         web3: web3Foreign,
-        chainId: foreignChaindId
+        chainId: foreignChainId
       })
       if (txHash !== undefined) {
         nonce++

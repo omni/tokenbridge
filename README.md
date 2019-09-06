@@ -86,7 +86,7 @@ Running tests for all projects:
 yarn test
 ```
 
-Additionaly there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [UI](ui-e2e/README.md).
+Additionally there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [UI](ui-e2e/README.md).
 
 For details on building, running and developing please refer to respective READMEs in sub-repositories.
 
