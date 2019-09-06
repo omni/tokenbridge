@@ -1,0 +1,30 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: repo-host
+    image: ubuntu:16.04
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ../prepare.yml
+    converge: ./converge.yml
+  inventory:
+    host_vars:
+      repo-host:
+        bridge_repo_branch: master
+verifier:
+  name: testinfra
+scenario:
+  name: repo
+  test_sequence:
+    - destroy
+    - create
+    - prepare
+    - converge
+    - verify
+    - destroy

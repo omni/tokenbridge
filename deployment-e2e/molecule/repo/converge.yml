@@ -1,0 +1,12 @@
+---
+- name: Install Repository
+  hosts: all
+  become: true
+  tasks:
+    - import_role:
+        name: ../../../deployment/roles/common
+        tasks_from: repo
+    # Test that running the task again works
+    - import_role:
+        name: ../../../deployment/roles/common
+        tasks_from: repo
