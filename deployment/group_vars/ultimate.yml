@@ -1,19 +1,19 @@
 ---
 ## General settings
-REACT_APP_NATIVE_TOKEN_DISPLAY_NAME: "POA"
+UI_NATIVE_TOKEN_DISPLAY_NAME: "POA"
 ORACLE_ALLOW_HTTP_FOR_RPC: yes
 ORACLE_LOG_LEVEL: debug
 
 ## Home contract
 COMMON_HOME_RPC_URL: "https://sokol.poa.network"
-REACT_APP_HOME_NETWORK_DISPLAY_NAME: "POA Sokol"
-REACT_APP_HOME_WITHOUT_EVENTS: false
+UI_HOME_NETWORK_DISPLAY_NAME: "POA Sokol"
+UI_HOME_WITHOUT_EVENTS: false
 ORACLE_HOME_RPC_POLLING_INTERVAL: 5000
 
 ## Foreign contract
 COMMON_FOREIGN_RPC_URL: "https://sokol.poa.network"
-REACT_APP_FOREIGN_NETWORK_DISPLAY_NAME: "Kovan"
-REACT_APP_FOREIGN_WITHOUT_EVENTS: false
+UI_FOREIGN_NETWORK_DISPLAY_NAME: "Kovan"
+UI_FOREIGN_WITHOUT_EVENTS: false
 ORACLE_FOREIGN_RPC_POLLING_INTERVAL: 1000
 
 ## Home Gasprice
@@ -32,14 +32,14 @@ ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 
 
 #ui
-REACT_APP_TITLE: "TokenBridge UI app - %c"
-REACT_APP_DESCRIPTION: "The POA cross-chain bridge serves as a method of transferring POA native tokens from the POA Network to the Ethereum network in a quick and cost-efficient manner."
-REACT_APP_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/sokol/tx/%s
-REACT_APP_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/kovan/tx/%s
-REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/sokol/address/%s
-REACT_APP_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/kovan/address/%s
-REACT_APP_HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
-REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
+UI_TITLE: "TokenBridge UI app - %c"
+UI_DESCRIPTION: "The POA cross-chain bridge serves as a method of transferring POA native tokens from the POA Network to the Ethereum network in a quick and cost-efficient manner."
+UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/sokol/tx/%s
+UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/kovan/tx/%s
+UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/sokol/address/%s
+UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/kovan/address/%s
+UI_HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
+UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 
 #montior
 MONITOR_HOME_START_BLOCK: 0

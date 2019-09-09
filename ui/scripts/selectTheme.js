@@ -8,7 +8,7 @@ const stylePath = path.resolve(__dirname, '..', 'src', 'assets', 'stylesheets')
 const destinationFilename = 'application.css'
 let filename
 
-if (process.env.REACT_APP_STYLES === 'classic') {
+if (process.env.UI_STYLES === 'classic') {
   filename = 'application.classic.css'
 } else {
   filename = 'application.core.css'

@@ -130,13 +130,13 @@ cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json
 
 ```bash
     # HomeBridge address in bridgeDeploymentResults.json
-    REACT_APP_COMMON_HOME_BRIDGE_ADDRESS=0x.. 
+    COMMON_HOME_BRIDGE_ADDRESS=0x.. 
     # ForeignBridge address in bridgeDeploymentResults.json
-    REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS=0x..
+    COMMON_FOREIGN_BRIDGE_ADDRESS=0x..
     # https public RPC node for Foreign network
-    REACT_APP_COMMON_FOREIGN_RPC_URL=https://kovan.infura.io/mew
+    COMMON_FOREIGN_RPC_URL=https://kovan.infura.io/mew
     # public RPC node for Home network 
-    REACT_APP_COMMON_HOME_RPC_URL=https://sokol.poa.network 
+    COMMON_HOME_RPC_URL=https://sokol.poa.network 
 ```
 
   * Run the dApp

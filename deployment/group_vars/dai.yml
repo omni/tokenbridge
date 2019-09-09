@@ -1,19 +1,19 @@
 ---
 ## General settings
 ORACLE_BRIDGE_MODE: "ERC_TO_NATIVE"
-REACT_APP_NATIVE_TOKEN_DISPLAY_NAME: "xDai"
+UI_NATIVE_TOKEN_DISPLAY_NAME: "xDai"
 
 ## Home contract
 COMMON_HOME_RPC_URL: "https://dai.poa.network"
-REACT_APP_HOME_NETWORK_DISPLAY_NAME: "xDai chain"
-REACT_APP_HOME_WITHOUT_EVENTS: false
+UI_HOME_NETWORK_DISPLAY_NAME: "xDai chain"
+UI_HOME_WITHOUT_EVENTS: false
 COMMON_HOME_BRIDGE_ADDRESS: "0x7301CFA0e1756B71869E93d4e4Dca5c7d0eb0AA6"
 ORACLE_HOME_RPC_POLLING_INTERVAL: 5000
 
 ## Foreign contract
 COMMON_FOREIGN_RPC_URL: "https://mainnet.infura.io"
-REACT_APP_FOREIGN_NETWORK_DISPLAY_NAME: "Ethereum Mainnet"
-REACT_APP_FOREIGN_WITHOUT_EVENTS: false
+UI_FOREIGN_NETWORK_DISPLAY_NAME: "Ethereum Mainnet"
+UI_FOREIGN_WITHOUT_EVENTS: false
 COMMON_FOREIGN_BRIDGE_ADDRESS: "0x4aa42145Aa6Ebf72e164C9bBC74fbD3788045016"
 ERC20_TOKEN_ADDRESS: "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"
 ORACLE_FOREIGN_RPC_POLLING_INTERVAL: 5000
@@ -32,13 +32,13 @@ ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 COMMON_FOREIGN_GAS_PRICE_FACTOR: 1
 
 ## UI
-REACT_APP_TITLE: "TokenBridge UI app - %c"
-REACT_APP_DESCRIPTION: "The TokenBridge serves as a method of transferring MakerDAO stable tokens between the Ethereum network to xDai chain in a quick and cost-efficient manner."
-PORT: 3001
-REACT_APP_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/dai/tx/%s
-REACT_APP_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
-REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/dai/address/%s
-REACT_APP_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
+UI_TITLE: "TokenBridge UI app - %c"
+UI_DESCRIPTION: "The TokenBridge serves as a method of transferring MakerDAO stable tokens between the Ethereum network to xDai chain in a quick and cost-efficient manner."
+UI_PORT: 3001
+UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/dai/tx/%s
+UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
+UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/dai/address/%s
+UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
 
 ## Monitor
 MONITOR_PORT: 3003

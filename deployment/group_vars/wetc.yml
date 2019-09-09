@@ -1,19 +1,19 @@
 ---
 ## General settings
 ORACLE_BRIDGE_MODE: "NATIVE_TO_ERC"
-REACT_APP_NATIVE_TOKEN_DISPLAY_NAME: "ETC"
+UI_NATIVE_TOKEN_DISPLAY_NAME: "ETC"
 
 ## Home contract
 COMMON_HOME_RPC_URL: "https://ethereumclassic.network"
-REACT_APP_HOME_NETWORK_DISPLAY_NAME: "Ethereum Classic"
-REACT_APP_HOME_WITHOUT_EVENTS: false
+UI_HOME_NETWORK_DISPLAY_NAME: "Ethereum Classic"
+UI_HOME_WITHOUT_EVENTS: false
 COMMON_HOME_BRIDGE_ADDRESS: "0x073081832B4Ecdce79d4D6753565c85Ba4b3BeA9"
 ORACLE_HOME_RPC_POLLING_INTERVAL: 7000
 
 ## Foreign contract
 COMMON_FOREIGN_RPC_URL: "https://mainnet.infura.io/"
-REACT_APP_FOREIGN_NETWORK_DISPLAY_NAME: "Ethereum Mainnet"
-REACT_APP_FOREIGN_WITHOUT_EVENTS: false
+UI_FOREIGN_NETWORK_DISPLAY_NAME: "Ethereum Mainnet"
+UI_FOREIGN_WITHOUT_EVENTS: false
 COMMON_FOREIGN_BRIDGE_ADDRESS: "0x0cB781EE62F815bdD9CD4c2210aE8600d43e7040"
 ERC20_TOKEN_ADDRESS: "0x86aaBCc646f290b9Fc9Bd05CE17C3858d1511Da1"
 ORACLE_FOREIGN_RPC_POLLING_INTERVAL: 7000
@@ -33,13 +33,13 @@ ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 COMMON_FOREIGN_GAS_PRICE_FACTOR: 1
 
 ## UI
-REACT_APP_TITLE: "TokenBridge UI app - %c"
-REACT_APP_DESCRIPTION: "The TokenBridge serves as a method of transferring native tokens from the Ethereum Classic Network to the Ethereum network in a quick and cost-efficient manner."
-PORT: 3001
-REACT_APP_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/etc/mainnet/tx/%s
-REACT_APP_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
-REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/etc/mainnet/address/%s
-REACT_APP_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
+UI_TITLE: "TokenBridge UI app - %c"
+UI_DESCRIPTION: "The TokenBridge serves as a method of transferring native tokens from the Ethereum Classic Network to the Ethereum network in a quick and cost-efficient manner."
+UI_PORT: 3001
+UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/etc/mainnet/tx/%s
+UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
+UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/etc/mainnet/address/%s
+UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
 
 ## Monitor
 MONITOR_PORT: 3003
