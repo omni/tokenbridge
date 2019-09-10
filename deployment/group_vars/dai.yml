@@ -39,6 +39,8 @@ UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/dai/tx/%s
 UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/mainnet/tx/%s
 UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/dai/address/%s
 UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
+UI_HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
+UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 
 ## Monitor
 MONITOR_PORT: 3003
