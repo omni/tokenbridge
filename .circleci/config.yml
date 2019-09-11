@@ -5,6 +5,12 @@ orbs:
     commands:
       install-chrome:
         steps:
+          - run:
+              name: Update dpkg
+              command: |
+                sudo apt-get clean
+                sudo apt-get update
+                sudo apt-get install dpkg
           - run: 
               name: Install Chrome
               command: |
@@ -170,19 +176,41 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment-e2e/molecule.sh oracle
+      - run:
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh oracle
+          no_output_timeout: 40m
   deployment-ui:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment-e2e/molecule.sh ui
+      - run:
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh ui
+          no_output_timeout: 40m
   deployment-monitor:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
       - run: git submodule update --init
-      - run: deployment-e2e/molecule.sh monitor
+      - run: 
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh monitor
+          no_output_timeout: 40m
+  deployment-repo:
+    executor: tokenbridge-orb/machine-with-docker-caching
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - tokenbridge-orb/install-node
+      - tokenbridge-orb/install-yarn
+      - tokenbridge-orb/yarn-install-cached-on-machine
+      - run:
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh repo
+          no_output_timeout: 40m
+      
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
@@ -205,7 +233,7 @@ jobs:
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy << parameters.scenario-name >>
-          no_output_timeout: 30m
+          no_output_timeout: 50m
       - tokenbridge-orb/wait-for-oracle:
           redis-key: << parameters.redis-key >>
       - run:
@@ -243,6 +271,7 @@ workflows:
       - deployment-oracle
       - deployment-ui
       - deployment-monitor
+      - deployment-repo
       - ultimate:
           name: "ultimate: native to erc" 
           scenario-name: native-to-erc
