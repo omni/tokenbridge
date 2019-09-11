@@ -219,6 +219,9 @@ jobs:
           command: |
             echo "CIRCLE_PULL_REQUEST is $CIRCLE_PULL_REQUEST"
             echo "CIRCLE_REPOSITORY_URL is $CIRCLE_REPOSITORY_URL"
+            echo "CIRCLE_PR_USERNAME is $CIRCLE_PR_USERNAME"
+            echo "CIRCLE_PR_REPONAME is $CIRCLE_PR_REPONAME"
+            echo "CIRCLE_PR_NUMBER is $CIRCLE_PR_NUMBER"
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
