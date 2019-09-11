@@ -64,9 +64,9 @@ UI_STYLES | The set of styles to render the bridge UI page. Currently only `clas
 
 name | description | value
 --- | --- | ---
-MONITOR_HOME_START_BLOCK | The app will monitor transactions starting from this block | integer
-MONITOR_FOREIGN_START_BLOCK | The app will monitor transactions starting from this block | integer
-MONITOR_VALIDATOR_HOME_TX_LIMIT |  | integer
-MONITOR_VALIDATOR_FOREIGN_TX_LIMIT |  | integer
-MONITOR_TX_NUMBER_THRESHOLD |  | integer
-MONITOR_PORT | The port for the Monitor | integer
+MONITOR_HOME_START_BLOCK | The app will monitor transactions starting from this block. | integer
+MONITOR_FOREIGN_START_BLOCK | The app will monitor transactions starting from this block. | integer
+MONITOR_VALIDATOR_HOME_TX_LIMIT | Average gas usage of a transaction sent by a validator, it is used to estimate the number of transaction that can be paid by the validator. | integer
+MONITOR_VALIDATOR_FOREIGN_TX_LIMIT | Average gas usage of a transaction sent by a validator, it is used to estimate the number of transaction that can be paid by the validator. | integer
+MONITOR_TX_NUMBER_THRESHOLD | If estimated number of transaction is equal to or below this value, the monitor will report that the validator has less funds than it is required. | integer
+MONITOR_PORT | The port for the Monitor. | integer
