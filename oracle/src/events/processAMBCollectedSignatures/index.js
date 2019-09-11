@@ -6,7 +6,6 @@ const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
 const { signatureToVRS, signatureToVRSAMB, packSignatures } = require('../../utils/message')
 const { parseAMBMessage } = require('../../../../commons')
-const { generateGasPriceOptions } = require('../../utils/utils')
 const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
 const { MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
@@ -65,7 +64,7 @@ function processCollectedSignaturesBuilder(config) {
           await Promise.all(signaturePromises)
           const signatures = packSignatures(signaturesArray)
 
-          const { dataType, gasPrice, gasPriceSpeed, txHash } = parseAMBMessage(message)
+          const { txHash } = parseAMBMessage(message)
 
           let gasEstimate
           try {
@@ -80,8 +79,7 @@ function processCollectedSignaturesBuilder(config) {
               message,
               numberOfCollectedSignatures: NumberOfCollectedSignatures,
               txHash,
-              address: config.validatorAddress,
-              gasPrice
+              address: config.validatorAddress
             })
             logger.debug({ gasEstimate }, 'Gas estimated')
           } catch (e) {
@@ -99,13 +97,12 @@ function processCollectedSignaturesBuilder(config) {
             }
           }
           const data = await foreignBridge.methods.executeSignatures(message, signatures).encodeABI()
-          const gasPriceOptions = generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed })
+
           txToSend.push({
             data,
             gasEstimate,
             transactionReference: colSignature.transactionHash,
-            to: config.foreignBridgeAddress,
-            gasPriceOptions
+            to: config.foreignBridgeAddress
           })
         } else {
           logger.info(`Validator not responsible for relaying CollectedSignatures ${colSignature.transactionHash}`)

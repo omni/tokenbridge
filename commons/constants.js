@@ -17,23 +17,8 @@ const FEE_MANAGER_MODE = {
   UNDEFINED: 'UNDEFINED'
 }
 
-const GAS_PRICE_OPTIONS = {
-  UNDEFINED: '00',
-  GAS_PRICE: '01',
-  SPEED: '02'
-}
-
-const ORACLE_GAS_PRICE_SPEEDS = {
-  SLOW: 'slow',
-  STANDARD: 'standard',
-  FAST: 'fast',
-  INSTANT: 'instant'
-}
-
 module.exports = {
   BRIDGE_MODES,
   ERC_TYPES,
-  FEE_MANAGER_MODE,
-  GAS_PRICE_OPTIONS,
-  ORACLE_GAS_PRICE_SPEEDS
+  FEE_MANAGER_MODE
 }

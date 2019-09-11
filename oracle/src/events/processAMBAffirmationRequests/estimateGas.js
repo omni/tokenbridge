@@ -4,11 +4,10 @@ const logger = require('../../services/logger').child({
   module: 'processAffirmationRequests:estimateGas'
 })
 
-async function estimateGas({ web3, homeBridge, validatorContract, message, address, gasPrice }) {
+async function estimateGas({ web3, homeBridge, validatorContract, message, address }) {
   try {
     const gasEstimate = await homeBridge.methods.executeAffirmation(message).estimateGas({
-      from: address,
-      gasPrice
+      from: address
     })
 
     return gasEstimate

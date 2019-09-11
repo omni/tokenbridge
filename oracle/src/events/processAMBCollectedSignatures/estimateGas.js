@@ -18,13 +18,11 @@ async function estimateGas({
   s,
   signatures,
   txHash,
-  address,
-  gasPrice
+  address
 }) {
   try {
     const gasEstimate = await foreignBridge.methods.executeSignatures(message, signatures).estimateGas({
-      from: address,
-      gasPrice
+      from: address
     })
     return gasEstimate
   } catch (e) {

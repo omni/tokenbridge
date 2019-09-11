@@ -1,6 +1,5 @@
 require('../../env')
 const fetch = require('node-fetch')
-const Web3Utils = require('web3-utils')
 const { web3Home, web3Foreign } = require('../services/web3')
 const { bridgeConfig } = require('../../config/base.config')
 const logger = require('../services/logger').child({
@@ -8,7 +7,7 @@ const logger = require('../services/logger').child({
 })
 const { setIntervalAndRun } = require('../utils/utils')
 const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES, DEFAULT_GAS_PRICE_FACTOR } = require('../utils/constants')
-const { gasPriceFromOracle, gasPriceFromContract, GAS_PRICE_OPTIONS } = require('../../../commons')
+const { gasPriceFromOracle, gasPriceFromContract } = require('../../../commons')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
@@ -33,20 +32,16 @@ const homeBridge = new web3Home.eth.Contract(HomeABI, HOME_BRIDGE_ADDRESS)
 const foreignBridge = new web3Foreign.eth.Contract(ForeignABI, FOREIGN_BRIDGE_ADDRESS)
 
 let cachedGasPrice = null
-let cachedGasPriceOracleSpeeds = null
 
 let fetchGasPriceInterval = null
 
 const fetchGasPrice = async (speedType, factor, bridgeContract, oracleFetchFn) => {
   const contractOptions = { logger }
-  const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger, returnAllSpeeds: true }
-  const oracleGasPriceData = await gasPriceFromOracle(oracleFetchFn, oracleOptions)
+  const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
   cachedGasPrice =
-    (oracleGasPriceData && oracleGasPriceData.gasPrice) ||
+    (await gasPriceFromOracle(oracleFetchFn, oracleOptions)) ||
     (await gasPriceFromContract(bridgeContract, contractOptions)) ||
     cachedGasPrice
-  cachedGasPriceOracleSpeeds =
-    (oracleGasPriceData && oracleGasPriceData.oracleGasPriceSpeeds) || cachedGasPriceOracleSpeeds
   return cachedGasPrice
 }
 
@@ -84,26 +79,12 @@ async function start(chainId) {
   )
 }
 
-function getPrice(options) {
-  return processGasPriceOptions({ options, cachedGasPrice, cachedGasPriceOracleSpeeds })
-}
-
-function processGasPriceOptions({ options, cachedGasPrice, cachedGasPriceOracleSpeeds }) {
-  let gasPrice = cachedGasPrice
-  if (options && options.type && options.value) {
-    if (options.type === GAS_PRICE_OPTIONS.GAS_PRICE) {
-      return options.value
-    } else if (options.type === GAS_PRICE_OPTIONS.SPEED) {
-      const speedOption = cachedGasPriceOracleSpeeds[options.value]
-      gasPrice = speedOption ? Web3Utils.toWei(speedOption.toString(), 'gwei') : cachedGasPrice
-    }
-  }
-  return gasPrice
+function getPrice() {
+  return cachedGasPrice
 }
 
 module.exports = {
   start,
   getPrice,
-  processGasPriceOptions,
   fetchGasPrice
 }

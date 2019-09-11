@@ -1,7 +1,6 @@
-const { BN, toBN } = require('web3-utils')
+const { BN } = require('web3-utils')
 const { expect } = require('chai').use(require('bn-chai')(BN))
 const { parseAMBMessage, strip0x, addTxHashToData } = require('../message')
-const { ORACLE_GAS_PRICE_SPEEDS } = require('../constants')
 
 describe('strip0x', () => {
   it('should remove 0x from input', () => {
@@ -60,66 +59,11 @@ describe('parseAMBMessage', () => {
     )}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
 
     // when
-    const { sender, executor, txHash, gasLimit, dataType, gasPrice, gasPriceSpeed, data } = parseAMBMessage(message)
+    const { sender, executor, txHash } = parseAMBMessage(message)
 
     // then
     expect(sender).to.be.equal(msgSender)
     expect(executor).to.be.equal(msgExecutor)
     expect(txHash).to.be.equal(msgTxHash)
-    expect(gasLimit).to.eq.BN(toBN(msgGasLimit))
-    expect(dataType).to.be.equal(msgDataType)
-    expect(gasPrice).to.be.equal(null)
-    expect(gasPriceSpeed).to.be.equal(null)
-    expect(data).to.be.equal(msgData)
-  })
-  it('should parse data type 01', () => {
-    const msgSender = '0x003667154bb32e42bb9e1e6532f19d187fa0082e'
-    const msgExecutor = '0xf4bef13f9f4f2b203faf0c3cbbaabe1afe056955'
-    const msgTxHash = '0xbdceda9d8c94838aca10c687da1411a07b1390e88239c0638cb9cc264219cc10'
-    const msgGasLimit = '000000000000000000000000000000000000000000000000000000005b877705'
-    const msgDataType = '01'
-    const msgGasPrice = '0000000000000000000000000000000000000000000000000000000165a0bc00'
-    const msgData = '0xb1591967aed668a4b27645ff40c444892d91bf5951b382995d4d4f6ee3a2ce03'
-    const message = `0x${strip0x(msgTxHash)}${strip0x(msgSender)}${strip0x(
-      msgExecutor
-    )}${msgGasLimit}${msgDataType}${msgGasPrice}${strip0x(msgData)}`
-
-    // when
-    const { sender, executor, txHash, gasLimit, dataType, gasPrice, gasPriceSpeed, data } = parseAMBMessage(message)
-
-    // then
-    expect(sender).to.be.equal(msgSender)
-    expect(executor).to.be.equal(msgExecutor)
-    expect(txHash).to.be.equal(msgTxHash)
-    expect(gasLimit).to.eq.BN(toBN(msgGasLimit))
-    expect(dataType).to.be.equal(msgDataType)
-    expect(gasPrice).to.eq.BN(toBN(msgGasPrice))
-    expect(gasPriceSpeed).to.be.equal(null)
-    expect(data).to.be.equal(msgData)
-  })
-  it('should parse data type 02', () => {
-    const msgSender = '0x003667154bb32e42bb9e1e6532f19d187fa0082e'
-    const msgExecutor = '0xf4bef13f9f4f2b203faf0c3cbbaabe1afe056955'
-    const msgTxHash = '0xbdceda9d8c94838aca10c687da1411a07b1390e88239c0638cb9cc264219cc10'
-    const msgGasLimit = '000000000000000000000000000000000000000000000000000000005b877705'
-    const msgDataType = '02'
-    const msgGasPriceSpeed = '0x03'
-    const msgData = '0xb1591967aed668a4b27645ff40c444892d91bf5951b382995d4d4f6ee3a2ce03'
-    const message = `0x${strip0x(msgTxHash)}${strip0x(msgSender)}${strip0x(
-      msgExecutor
-    )}${msgGasLimit}${msgDataType}${strip0x(msgGasPriceSpeed)}${strip0x(msgData)}`
-
-    // when
-    const { sender, executor, txHash, gasLimit, dataType, gasPrice, gasPriceSpeed, data } = parseAMBMessage(message)
-
-    // then
-    expect(sender).to.be.equal(msgSender)
-    expect(executor).to.be.equal(msgExecutor)
-    expect(txHash).to.be.equal(msgTxHash)
-    expect(gasLimit).to.eq.BN(toBN(msgGasLimit))
-    expect(dataType).to.be.equal(msgDataType)
-    expect(gasPrice).to.be.equal(null)
-    expect(gasPriceSpeed).to.be.equal(ORACLE_GAS_PRICE_SPEEDS.STANDARD)
-    expect(data).to.be.equal(msgData)
   })
 })

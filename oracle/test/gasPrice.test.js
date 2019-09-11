@@ -1,10 +1,7 @@
 const sinon = require('sinon')
 const { expect } = require('chai')
 const proxyquire = require('proxyquire').noPreserveCache()
-const Web3Utils = require('web3-utils')
-const { processGasPriceOptions } = require('../src/services/gasPrice')
 const { DEFAULT_UPDATE_INTERVAL } = require('../src/utils/constants')
-const { GAS_PRICE_OPTIONS, ORACLE_GAS_PRICE_SPEEDS } = require('../../commons')
 
 describe('gasPrice', () => {
   describe('start', () => {
@@ -161,88 +158,6 @@ describe('gasPrice', () => {
 
       // then
       expect(fakeLogger.error.calledTwice).to.equal(true) // two errors
-    })
-  })
-  describe('processGasPriceOptions', () => {
-    const oracleMockResponse = {
-      fast: 17.64,
-      block_time: 13.548,
-      health: true,
-      standard: 10.64,
-      block_number: 6704240,
-      instant: 51.9,
-      slow: 4.4
-    }
-    it('should return cached gas price if no options provided', async () => {
-      // given
-      const options = {}
-      const cachedGasPrice = '1000000000'
-
-      // when
-      const gasPrice = await processGasPriceOptions({
-        options,
-        cachedGasPrice,
-        cachedGasPriceOracleSpeeds: oracleMockResponse
-      })
-
-      // then
-      expect(gasPrice).to.equal(cachedGasPrice)
-    })
-    it('should return gas price provided by options', async () => {
-      // given
-      const options = {
-        type: GAS_PRICE_OPTIONS.GAS_PRICE,
-        value: '3000000000'
-      }
-      const cachedGasPrice = '1000000000'
-
-      // when
-      const gasPrice = await processGasPriceOptions({
-        options,
-        cachedGasPrice,
-        cachedGasPriceOracleSpeeds: oracleMockResponse
-      })
-
-      // then
-      expect(gasPrice).to.equal(options.value)
-    })
-    it('should return gas price provided by oracle speed option', async () => {
-      // given
-      const options = {
-        type: GAS_PRICE_OPTIONS.SPEED,
-        value: ORACLE_GAS_PRICE_SPEEDS.STANDARD
-      }
-      const cachedGasPrice = '1000000000'
-      const oracleGasPriceGwei = oracleMockResponse[ORACLE_GAS_PRICE_SPEEDS.STANDARD]
-      const oracleGasPrice = Web3Utils.toWei(oracleGasPriceGwei.toString(), 'gwei')
-
-      // when
-      const gasPrice = await processGasPriceOptions({
-        options,
-        cachedGasPrice,
-        cachedGasPriceOracleSpeeds: oracleMockResponse
-      })
-
-      // then
-      expect(gasPrice).to.equal(oracleGasPrice)
-    })
-    it('should return cached gas price if invalid speed option', async () => {
-      // given
-      const options = {
-        type: GAS_PRICE_OPTIONS.SPEED,
-        value: 'unknown'
-      }
-      const cachedGasPrice = '1000000000'
-
-      // when
-      const gasPrice = await processGasPriceOptions({
-        options,
-        cachedGasPrice,
-        cachedGasPriceOracleSpeeds: oracleMockResponse
-      })
-
-      // then
-      expect(gasPrice).to.equal(cachedGasPrice)
     })
   })
 })

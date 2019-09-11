@@ -80,9 +80,7 @@ function processSignatureRequestsBuilder(config) {
           }
         }
 
-        const data = await homeBridge.methods
-          .submitSignature(signature.signature, message)
-          .encodeABI({ from: config.validatorAddress })
+        const data = await homeBridge.methods.submitSignature(signature.signature, message).encodeABI()
 
         txToSend.push({
           data,

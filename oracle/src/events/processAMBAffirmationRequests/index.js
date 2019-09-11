@@ -7,7 +7,6 @@ const bridgeValidatorsABI = require('../../../../contracts/build/contracts/Bridg
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
 const { addTxHashToData, parseAMBMessage } = require('../../../../commons')
-const { generateGasPriceOptions } = require('../../utils/utils')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
@@ -42,7 +41,7 @@ function processAffirmationRequestsBuilder(config) {
           transactionHash: affirmationRequest.transactionHash
         })
 
-        const { sender, executor, dataType, gasPrice, gasPriceSpeed } = parseAMBMessage(message)
+        const { sender, executor } = parseAMBMessage(message)
 
         logger.info({ sender, executor }, `Processing affirmationRequest ${affirmationRequest.transactionHash}`)
 
@@ -54,8 +53,7 @@ function processAffirmationRequestsBuilder(config) {
             homeBridge,
             validatorContract,
             message,
-            address: config.validatorAddress,
-            gasPrice
+            address: config.validatorAddress
           })
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {
@@ -80,14 +78,11 @@ function processAffirmationRequestsBuilder(config) {
 
         const data = await homeBridge.methods.executeAffirmation(message).encodeABI()
 
-        const gasPriceOptions = generateGasPriceOptions({ dataType, gasPrice, gasPriceSpeed })
-
         txToSend.push({
           data,
           gasEstimate,
           transactionReference: affirmationRequest.transactionHash,
-          to: config.homeBridgeAddress,
-          gasPriceOptions
+          to: config.homeBridgeAddress
         })
       })
     )

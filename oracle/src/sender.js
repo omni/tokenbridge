@@ -97,6 +97,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
 
     const txArray = JSON.parse(msg.content)
     logger.info(`Msg received with ${txArray.length} Tx to send`)
+    const gasPrice = GasPrice.getPrice()
 
     let nonce = await readNonce()
     let insufficientFunds = false
@@ -106,7 +107,6 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     logger.debug(`Sending ${txArray.length} transactions`)
     await syncForEach(txArray, async job => {
       const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE)
-      const gasPrice = GasPrice.getPrice(job.gasPriceOptions)
 
       try {
         logger.info(`Sending transaction with nonce ${nonce}`)
@@ -114,7 +114,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
           chain: config.id,
           data: job.data,
           nonce,
-          gasPrice,
+          gasPrice: gasPrice.toString(10),
           amount: '0',
           gasLimit,
           privateKey: VALIDATOR_ADDRESS_PRIVATE_KEY,
