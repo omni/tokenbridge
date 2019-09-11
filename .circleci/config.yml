@@ -222,6 +222,7 @@ jobs:
             echo "CIRCLE_PR_USERNAME is $CIRCLE_PR_USERNAME"
             echo "CIRCLE_PR_REPONAME is $CIRCLE_PR_REPONAME"
             echo "CIRCLE_PR_NUMBER is $CIRCLE_PR_NUMBER"
+            echo "CIRCLE_BRANCH is $CIRCLE_BRANCH"
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
