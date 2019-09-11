@@ -22,6 +22,9 @@ RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./b
 COPY ./commons ./commons
 
 COPY ./oracle ./oracle
+ARG DOT_ENV_PATH=./oracle/.env
+COPY ${DOT_ENV_PATH} ./oracle/.env
+
 WORKDIR /mono/oracle
 CMD echo "To start a bridge process run:" \
   "ORACLE_VALIDATOR_ADDRESS=<validator address> ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=<validator address private key> docker-compose up -d --build"
