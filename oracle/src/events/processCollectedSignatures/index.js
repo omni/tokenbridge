@@ -38,62 +38,63 @@ function processCollectedSignaturesBuilder(config) {
           eventTransactionHash: colSignature.transactionHash
         })
 
-        if (authorityResponsibleForRelay === web3Home.utils.toChecksumAddress(config.validatorAddress)) {
-          logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
-          const message = await homeBridge.methods.message(messageHash).call()
-
-          const requiredSignatures = new Array(NumberOfCollectedSignatures).fill(0)
-
-          const [v, r, s] = [[], [], []]
-          logger.debug('Getting message signatures')
-          const signaturePromises = requiredSignatures.map(async (el, index) => {
-            logger.debug({ index }, 'Getting message signature')
-            const signature = await homeBridge.methods.signature(messageHash, index).call()
-            const recover = signatureToVRS(signature)
-            v.push(recover.v)
-            r.push(recover.r)
-            s.push(recover.s)
-          })
-
-          await Promise.all(signaturePromises)
-
-          let gasEstimate
-          try {
-            logger.debug('Estimate gas')
-            gasEstimate = await estimateGas({
-              foreignBridge,
-              validatorContract,
-              v,
-              r,
-              s,
-              message,
-              numberOfCollectedSignatures: NumberOfCollectedSignatures
-            })
-            logger.debug({ gasEstimate }, 'Gas estimated')
-          } catch (e) {
-            if (e instanceof HttpListProviderError) {
-              throw new Error('RPC Connection Error: submitSignature Gas Estimate cannot be obtained.')
-            } else if (e instanceof AlreadyProcessedError) {
-              logger.info(`Already processed CollectedSignatures ${colSignature.transactionHash}`)
-              return
-            } else if (e instanceof IncompatibleContractError || e instanceof InvalidValidatorError) {
-              logger.error(`The message couldn't be processed; skipping: ${e.message}`)
-              return
-            } else {
-              logger.error(e, 'Unknown error while processing transaction')
-              throw e
-            }
-          }
-          const data = await foreignBridge.methods.executeSignatures(v, r, s, message).encodeABI()
-          txToSend.push({
-            data,
-            gasEstimate,
-            transactionReference: colSignature.transactionHash,
-            to: config.foreignBridgeAddress
-          })
-        } else {
+        if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
           logger.info(`Validator not responsible for relaying CollectedSignatures ${colSignature.transactionHash}`)
+          return
         }
+
+        logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
+        const message = await homeBridge.methods.message(messageHash).call()
+
+        const requiredSignatures = new Array(NumberOfCollectedSignatures).fill(0)
+
+        const [v, r, s] = [[], [], []]
+        logger.debug('Getting message signatures')
+        const signaturePromises = requiredSignatures.map(async (el, index) => {
+          logger.debug({ index }, 'Getting message signature')
+          const signature = await homeBridge.methods.signature(messageHash, index).call()
+          const recover = signatureToVRS(signature)
+          v.push(recover.v)
+          r.push(recover.r)
+          s.push(recover.s)
+        })
+
+        await Promise.all(signaturePromises)
+
+        let gasEstimate
+        try {
+          logger.debug('Estimate gas')
+          gasEstimate = await estimateGas({
+            foreignBridge,
+            validatorContract,
+            v,
+            r,
+            s,
+            message,
+            numberOfCollectedSignatures: NumberOfCollectedSignatures
+          })
+          logger.debug({ gasEstimate }, 'Gas estimated')
+        } catch (e) {
+          if (e instanceof HttpListProviderError) {
+            throw new Error('RPC Connection Error: submitSignature Gas Estimate cannot be obtained.')
+          } else if (e instanceof AlreadyProcessedError) {
+            logger.info(`Already processed CollectedSignatures ${colSignature.transactionHash}`)
+            return
+          } else if (e instanceof IncompatibleContractError || e instanceof InvalidValidatorError) {
+            logger.error(`The message couldn't be processed; skipping: ${e.message}`)
+            return
+          } else {
+            logger.error(e, 'Unknown error while processing transaction')
+            throw e
+          }
+        }
+        const data = await foreignBridge.methods.executeSignatures(v, r, s, message).encodeABI()
+        txToSend.push({
+          data,
+          gasEstimate,
+          transactionReference: colSignature.transactionHash,
+          to: config.foreignBridgeAddress
+        })
       })
     )
 
