@@ -27,8 +27,8 @@ function processTransfersBuilder(config) {
     }
 
     rootLogger.debug(`Processing ${transfers.length} Transfer events`)
-    const callbacks = transfers.map(transfer =>
-      limit(async () => {
+    const callbacks = transfers
+      .map(transfer => async () => {
         const { from, value } = transfer.returnValues
 
         const logger = rootLogger.child({
@@ -79,7 +79,7 @@ function processTransfersBuilder(config) {
           to: config.homeBridgeAddress
         })
       })
-    )
+      .map(promise => limit(promise))
 
     await Promise.all(callbacks)
     return txToSend

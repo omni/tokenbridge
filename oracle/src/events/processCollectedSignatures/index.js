@@ -30,8 +30,8 @@ function processCollectedSignaturesBuilder(config) {
     }
 
     rootLogger.debug(`Processing ${signatures.length} CollectedSignatures events`)
-    const callbacks = signatures.map(colSignature =>
-      limit(async () => {
+    const callbacks = signatures
+      .map(colSignature => async () => {
         const { authorityResponsibleForRelay, messageHash, NumberOfCollectedSignatures } = colSignature.returnValues
 
         const logger = rootLogger.child({
@@ -96,7 +96,7 @@ function processCollectedSignaturesBuilder(config) {
           to: config.foreignBridgeAddress
         })
       })
-    )
+      .map(promise => limit(promise))
 
     await Promise.all(callbacks)
 

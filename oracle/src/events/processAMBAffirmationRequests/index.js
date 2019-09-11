@@ -28,8 +28,8 @@ function processAffirmationRequestsBuilder(config) {
     }
 
     rootLogger.debug(`Processing ${affirmationRequests.length} AffirmationRequest events`)
-    const callbacks = affirmationRequests.map(affirmationRequest =>
-      limit(async () => {
+    const callbacks = affirmationRequests
+      .map(affirmationRequest => async () => {
         const { encodedData } = affirmationRequest.returnValues
 
         const logger = rootLogger.child({
@@ -85,7 +85,7 @@ function processAffirmationRequestsBuilder(config) {
           to: config.homeBridgeAddress
         })
       })
-    )
+      .map(promise => limit(promise))
 
     await Promise.all(callbacks)
     return txToSend

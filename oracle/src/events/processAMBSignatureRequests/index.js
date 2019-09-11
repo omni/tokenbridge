@@ -30,8 +30,8 @@ function processSignatureRequestsBuilder(config) {
     }
 
     rootLogger.debug(`Processing ${signatureRequests.length} SignatureRequest events`)
-    const callbacks = signatureRequests.map(signatureRequest =>
-      limit(async () => {
+    const callbacks = signatureRequests
+      .map(signatureRequest => async () => {
         const { encodedData } = signatureRequest.returnValues
 
         const logger = rootLogger.child({
@@ -89,7 +89,7 @@ function processSignatureRequestsBuilder(config) {
           to: config.homeBridgeAddress
         })
       })
-    )
+      .map(promise => limit(promise))
 
     await Promise.all(callbacks)
     return txToSend
