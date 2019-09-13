@@ -5,8 +5,16 @@
     dest: "{{ bridge_path }}"
     force: no
     update: no
-    refspec: "{{ bridge_repo_branch }}"
-    version: "{{ bridge_repo_branch }}"
+    version: "master"
+
+- name: Checkout proper branch
+  shell: |
+    # If this is a forked PR, the branch needs to be fetched in a special way
+    [ ! "CIRCLE_PR_NUMBER" = "" ] && git fetch --force origin -- "{{ bridge_repo_branch }}/head:remotes/origin/{{ bridge_repo_branch }}"
+    git checkout {{ bridge_repo_branch }}
+  args:
+    chdir: "{{ bridge_path }}"
+
 - name: Initialize submodules
   shell: git submodule update --init
   args:
