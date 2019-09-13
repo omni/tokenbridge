@@ -35,6 +35,7 @@ provisioner:
       oracle-host:
         ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
         syslog_server_port: "udp://127.0.0.1:514"
+        bridge_repo_branch: $CODEBASE_BRANCH
 verifier:
   name: testinfra
   lint:

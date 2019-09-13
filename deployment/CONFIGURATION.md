@@ -89,6 +89,10 @@ Example config for installing only UI:
 
 2.1 `compose_service_user` - specifies the user created by the playbooks. This user runs the TokenBridge Oracle.
 
+2.2 `bridge_repo` contains the address of the TokenBridge Oracle repository. The default value is https://github.com/poanetwork/tokenbridge.
+
+2.3 `bridge_repo_branch` points to the specific branch or commit to use with the `bridge_repo`. If `bridge_repo_branch` is not specified, the default (`master`) branch is used.
+
 2.4 `bridge_path` sets the path where the TokenBridge Oracle is installed. By default, it points. to the home folder of `compose_service_user`
 
 2.5 `docker_compose_version` - specifies a version of docker-compose to be installed.
