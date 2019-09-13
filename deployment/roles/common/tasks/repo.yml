@@ -5,7 +5,8 @@
     dest: "{{ bridge_path }}"
     force: no
     update: no
-    version: "-- {{ bridge_repo_branch }}" ## The '--'' is necessary for branches with '/' in name, like forked branches: 'pull/x'
+    refspec: "{{ bridge_repo_branch }}"
+    version: "{{ bridge_repo_branch }}"
 - name: Initialize submodules
   shell: git submodule update --init
   args:
