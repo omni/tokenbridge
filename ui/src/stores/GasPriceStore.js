@@ -1,6 +1,6 @@
 import { observable, computed } from 'mobx'
 import { toHex } from 'web3-utils'
-import { gasPriceFromOracle } from '../../../commons'
+import { gasPriceFromSupplier } from '../../../commons'
 
 const {
   REACT_APP_COMMON_HOME_GAS_PRICE_FALLBACK,
@@ -53,7 +53,7 @@ class GasPriceStore {
     }
 
     const oracleOptions = { speedType: this.speedType, factor: this.factor, logger: console }
-    this.gasPrice = (await gasPriceFromOracle(() => fetch(this.oracleUrl), oracleOptions)) || this.gasPrice
+    this.gasPrice = (await gasPriceFromSupplier(() => fetch(this.oracleUrl), oracleOptions)) || this.gasPrice
 
     setTimeout(() => this.updateGasPrice(), this.updateInterval)
   }

@@ -7,7 +7,7 @@ const logger = require('../services/logger').child({
 })
 const { setIntervalAndRun } = require('../utils/utils')
 const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES, DEFAULT_GAS_PRICE_FACTOR } = require('../utils/constants')
-const { gasPriceFromOracle, gasPriceFromContract } = require('../../../commons')
+const { gasPriceFromSupplier, gasPriceFromContract } = require('../../../commons')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
@@ -39,7 +39,7 @@ const fetchGasPrice = async (speedType, factor, bridgeContract, oracleFetchFn) =
   const contractOptions = { logger }
   const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
   cachedGasPrice =
-    (await gasPriceFromOracle(oracleFetchFn, oracleOptions)) ||
+    (await gasPriceFromSupplier(oracleFetchFn, oracleOptions)) ||
     (await gasPriceFromContract(bridgeContract, contractOptions)) ||
     cachedGasPrice
   return cachedGasPrice

@@ -2,7 +2,7 @@ require('dotenv').config()
 const Web3 = require('web3')
 const fetch = require('node-fetch')
 const logger = require('./logger')('validators')
-const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, getValidatorList, gasPriceFromOracle } = require('../commons')
+const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, getValidatorList, gasPriceFromSupplier } = require('../commons')
 const { getBlockNumber } = require('./utils/contract')
 
 const {
@@ -88,14 +88,14 @@ async function main(bridgeMode) {
 
   logger.debug('calling home getGasPrices')
   const homeGasPrice =
-    (await gasPriceFromOracle(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasOracleOpts)) ||
+    (await gasPriceFromSupplier(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasOracleOpts)) ||
     Web3Utils.toBN(COMMON_HOME_GAS_PRICE_FALLBACK)
   const homeGasPriceGwei = Web3Utils.fromWei(homeGasPrice.toString(), 'gwei')
   const homeTxCost = homeGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_HOME_TX_LIMIT))
 
   logger.debug('calling foreign getGasPrices')
   const foreignGasPrice =
-    (await gasPriceFromOracle(() => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL), foreignGasOracleOpts)) ||
+    (await gasPriceFromSupplier(() => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL), foreignGasOracleOpts)) ||
     Web3Utils.toBN(COMMON_FOREIGN_GAS_PRICE_FALLBACK)
   const foreignGasPriceGwei = Web3Utils.fromWei(foreignGasPrice.toString(), 'gwei')
   const foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_FOREIGN_TX_LIMIT))
