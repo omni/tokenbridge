@@ -210,19 +210,6 @@ jobs:
           name: Run the scenario
           command: deployment-e2e/molecule.sh repo
           no_output_timeout: 40m
-  forked-pr:
-    executor: tokenbridge-orb/machine-with-docker-caching
-    steps:
-      - checkout
-      - run:
-          name: Test env variables
-          command: |
-            echo "CIRCLE_PULL_REQUEST is $CIRCLE_PULL_REQUEST"
-            echo "CIRCLE_REPOSITORY_URL is $CIRCLE_REPOSITORY_URL"
-            echo "CIRCLE_PR_USERNAME is $CIRCLE_PR_USERNAME"
-            echo "CIRCLE_PR_REPONAME is $CIRCLE_PR_REPONAME"
-            echo "CIRCLE_PR_NUMBER is $CIRCLE_PR_NUMBER"
-            echo "CIRCLE_BRANCH is $CIRCLE_BRANCH"
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
@@ -257,46 +244,45 @@ jobs:
 workflows:
   tokenbridge:
     jobs:
-      - forked-pr
-      # - initialize
-      # - initialize-root:
-      #     filters:
-      #       branches:
-      #         only: master
-      # - build:
-      #     requires:
-      #       - initialize
-      # - lint:
-      #     requires:
-      #       - initialize
-      # - test:
-      #     requires:
-      #       - initialize
-      # - cover:
-      #     requires:
-      #       - initialize
-      #     filters:
-      #       branches:
-      #         only: master
-      # - oracle-e2e
-      # - ui-e2e
-      # - monitor-e2e
-      # - deployment-oracle
-      # - deployment-ui
-      # - deployment-monitor
-      # - deployment-repo
-      # - ultimate:
-      #     name: "ultimate: native to erc" 
-      #     scenario-name: native-to-erc
-      #     redis-key: native-erc-collected-signatures:lastProcessedBlock
-      #     ui-e2e-grep: "NATIVE TO ERC"
-      # - ultimate:
-      #     name: "ultimate: erc to native" 
-      #     scenario-name: erc-to-native
-      #     redis-key: erc-native-collected-signatures:lastProcessedBlock
-      #     ui-e2e-grep: "ERC TO NATIVE"
-      # - ultimate:
-      #     name: "ultimate: erc to erc" 
-      #     scenario-name: erc-to-erc
-      #     redis-key: erc-erc-collected-signatures:lastProcessedBlock
-      #     ui-e2e-grep: "ERC TO ERC"
+      - initialize
+      - initialize-root:
+          filters:
+            branches:
+              only: master
+      - build:
+          requires:
+            - initialize
+      - lint:
+          requires:
+            - initialize
+      - test:
+          requires:
+            - initialize
+      - cover:
+          requires:
+            - initialize
+          filters:
+            branches:
+              only: master
+      - oracle-e2e
+      - ui-e2e
+      - monitor-e2e
+      - deployment-oracle
+      - deployment-ui
+      - deployment-monitor
+      - deployment-repo
+      - ultimate:
+          name: "ultimate: native to erc" 
+          scenario-name: native-to-erc
+          redis-key: native-erc-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "NATIVE TO ERC"
+      - ultimate:
+          name: "ultimate: erc to native" 
+          scenario-name: erc-to-native
+          redis-key: erc-native-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "ERC TO NATIVE"
+      - ultimate:
+          name: "ultimate: erc to erc" 
+          scenario-name: erc-to-erc
+          redis-key: erc-erc-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "ERC TO ERC"
