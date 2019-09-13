@@ -66,7 +66,7 @@ describe('gasPrice', () => {
   describe('fetching gas price', () => {
     const utils = { setIntervalAndRun: () => {} }
 
-    it('should fall back to default if contract and oracle/supplier are not working', async () => {
+    it('should fall back to default if contract and supplier are not working', async () => {
       // given
       process.env.COMMON_HOME_GAS_PRICE_FALLBACK = '101000000000'
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
@@ -79,20 +79,20 @@ describe('gasPrice', () => {
       expect(gasPrice.getPrice()).to.equal('101000000000')
     })
 
-    it('should fetch gas from oracle/supplier', async () => {
+    it('should fetch gas from supplier', async () => {
       // given
       process.env.COMMON_HOME_GAS_PRICE_FALLBACK = '101000000000'
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
       await gasPrice.start('home')
 
-      const oracleFetchFn = () => ({
+      const gasPriceSupplierFetchFn = () => ({
         json: () => ({
           standard: '103'
         })
       })
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, null, oracleFetchFn)
+      await gasPrice.fetchGasPrice('standard', 1, null, gasPriceSupplierFetchFn)
 
       // then
       expect(gasPrice.getPrice().toString()).to.equal('103000000000')
@@ -133,14 +133,14 @@ describe('gasPrice', () => {
         }
       }
 
-      const oracleFetchFn = () => ({
+      const gasPriceSupplierFetchFn = () => ({
         json: () => ({
           standard: '103'
         })
       })
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, oracleFetchFn)
+      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, gasPriceSupplierFetchFn)
 
       // then
       expect(gasPrice.getPrice().toString()).to.equal('103000000000')
