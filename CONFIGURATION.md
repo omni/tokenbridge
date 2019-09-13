@@ -21,7 +21,7 @@ COMMON_FOREIGN_GAS_PRICE_FACTOR | A value that will multiply the gas price of th
 ## Oracle configuration
 
 name | description | value
---- | --- | ---"
+--- | --- | ---
 ORACLE_BRIDGE_MODE | The bridge mode. The bridge starts listening to a different set of events based on this parameter. | NATIVE_TO_ERC / ERC_TO_ERC / ERC_TO_NATIVE
 ORACLE_ALLOW_HTTP_FOR_RPC | **Only use in test environments - must be omitted in production environments.**. If this parameter is specified and set to `yes`, RPC URLs can be specified in form of HTTP links. A warning that the connection is insecure will be written to the logs. | `yes` / `no`
 ORACLE_HOME_RPC_POLLING_INTERVAL | The interval in milliseconds used to request the RPC node in the Home network for new blocks. The interval should match the average production time for a new block. | integer
