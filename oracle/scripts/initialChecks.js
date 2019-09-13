@@ -4,7 +4,6 @@ const {
   ERC677_BRIDGE_TOKEN_ABI,
   FOREIGN_ERC_TO_ERC_ABI,
   FOREIGN_ERC_TO_NATIVE_ABI,
-  FOREIGN_NATIVE_TO_ERC_ABI,
   getTokenType
 } = require('../../commons')
 
@@ -19,11 +18,6 @@ async function initialChecks() {
   } else if (ORACLE_BRIDGE_MODE === 'ERC_TO_NATIVE') {
     const bridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
     result.ERC20_TOKEN_ADDRESS = await bridge.methods.erc20token().call()
-  } else if (ORACLE_BRIDGE_MODE === 'NATIVE_TO_ERC') {
-    const bridge = new foreignWeb3.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
-    result.ERC20_TOKEN_ADDRESS = await bridge.methods.erc677token().call()
-  } else {
-    throw new Error(`Unsupported type of bridge: ${ORACLE_BRIDGE_MODE}`)
   }
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {
