@@ -6,11 +6,11 @@ const config = process.env.NODE_ENV !== 'test' ? require(path.join('../../config
 const logger = pino({
   enabled: process.env.NODE_ENV !== 'test',
   name: config.name,
-  level: process.env.LOG_LEVEL || 'debug',
+  level: process.env.ORACLE_LOG_LEVEL || 'debug',
   base:
     process.env.NODE_ENV === 'production'
       ? {
-          validator: process.env.VALIDATOR_ADDRESS
+          validator: process.env.ORACLE_VALIDATOR_ADDRESS
         }
       : {}
 })

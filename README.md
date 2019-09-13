@@ -93,6 +93,7 @@ For details on building, running and developing please refer to respective READM
 ## Building, running and deploying
 
 Please refer to the instructions in sub-directories.
+Configuration details are available [here](./CONFIGURATION.md).
 
 ## Contributing
 

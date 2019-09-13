@@ -4,12 +4,12 @@ const logger = require('./logger')('alerts')
 const eventsInfo = require('./utils/events')
 const { getBlockNumber } = require('./utils/contract')
 
-const { HOME_RPC_URL, FOREIGN_RPC_URL } = process.env
+const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL } = process.env
 
-const homeProvider = new Web3.providers.HttpProvider(HOME_RPC_URL)
+const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
 const web3Home = new Web3(homeProvider)
 
-const foreignProvider = new Web3.providers.HttpProvider(FOREIGN_RPC_URL)
+const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 async function main() {

@@ -8,8 +8,8 @@ const { generateNewBlock } = require('../../e2e-commons/utils')
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
 
-const HOME_BRIDGE_ADDRESS = ercToErcBridge.home
-const FOREIGN_BRIDGE_ADDRESS = ercToErcBridge.foreign
+const COMMON_HOME_BRIDGE_ADDRESS = ercToErcBridge.home
+const COMMON_FOREIGN_BRIDGE_ADDRESS = ercToErcBridge.foreign
 
 const { toBN } = foreignWeb3.utils
 
@@ -26,7 +26,7 @@ describe('erc to erc', () => {
 
     // send tokens to foreign bridge
     await erc20Token.methods
-      .transfer(FOREIGN_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'))
+      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'))
       .send({
         from: user.address,
         gas: '1000000'
@@ -56,7 +56,7 @@ describe('erc to erc', () => {
 
     // send transaction to home bridge
     const depositTx = await erc677Token.methods
-      .transferAndCall(HOME_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'), '0x')
+      .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'), '0x')
       .send({
         from: user.address,
         gas: '1000000'

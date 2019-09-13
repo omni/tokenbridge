@@ -23,7 +23,7 @@ async function getStartBlock(rpcUrl, bridgeAddress, bridgeAbi) {
 
     const validatorAddedEvents = await validatorContract.getPastEvents('ValidatorAdded', {
       fromBlock: validatorDeployedAtBlock,
-      filter: { validator: process.env.VALIDATOR_ADDRESS }
+      filter: { validator: process.env.ORACLE_VALIDATOR_ADDRESS }
     })
 
     return validatorAddedEvents.length ? validatorAddedEvents[0].blockNumber : deployedAtBlock
@@ -33,12 +33,12 @@ async function getStartBlock(rpcUrl, bridgeAddress, bridgeAbi) {
 }
 
 async function main() {
-  const { HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } = process.env
+  const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
 
   const homeRpcUrl = rpcUrlsManager.homeUrls[0]
   const foreignRpcUrl = rpcUrlsManager.foreignUrls[0]
-  const homeStartBlock = await getStartBlock(homeRpcUrl, HOME_BRIDGE_ADDRESS, homeABI)
-  const foreignStartBlock = await getStartBlock(foreignRpcUrl, FOREIGN_BRIDGE_ADDRESS, foreignABI)
+  const homeStartBlock = await getStartBlock(homeRpcUrl, COMMON_HOME_BRIDGE_ADDRESS, homeABI)
+  const foreignStartBlock = await getStartBlock(foreignRpcUrl, COMMON_FOREIGN_BRIDGE_ADDRESS, foreignABI)
   const result = {
     homeStartBlock,
     foreignStartBlock

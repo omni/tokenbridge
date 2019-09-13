@@ -38,7 +38,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
-      - VALIDATOR_ADDRESS_PRIVATE_KEY=${VALIDATOR_ADDRESS_PRIVATE_KEY}
+      - ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
     entrypoint: yarn watcher:signature-request
     networks:
@@ -53,7 +53,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
-      - VALIDATOR_ADDRESS=${VALIDATOR_ADDRESS}
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
     restart: unless-stopped
     entrypoint: yarn watcher:collected-signatures
     networks:
@@ -68,7 +68,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
-      - VALIDATOR_ADDRESS=${VALIDATOR_ADDRESS}
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
     restart: unless-stopped
     entrypoint: yarn watcher:affirmation-request
     networks:
@@ -83,7 +83,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
-      - VALIDATOR_ADDRESS_PRIVATE_KEY=${VALIDATOR_ADDRESS_PRIVATE_KEY}
+      - ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
     entrypoint: yarn sender:home
     networks:
@@ -98,7 +98,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production 
-      - VALIDATOR_ADDRESS_PRIVATE_KEY=${VALIDATOR_ADDRESS_PRIVATE_KEY}
+      - ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
     entrypoint: yarn sender:foreign
     networks:

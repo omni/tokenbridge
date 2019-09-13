@@ -8,7 +8,7 @@ const { HOME_NATIVE_TO_ERC_ABI } = require('../../../commons')
 const {
   USER_ADDRESS,
   USER_ADDRESS_PRIVATE_KEY,
-  HOME_BRIDGE_ADDRESS,
+  COMMON_HOME_BRIDGE_ADDRESS,
   HOME_MIN_AMOUNT_PER_TX,
   HOME_TEST_TX_GAS_PRICE
 } = process.env
@@ -16,7 +16,7 @@ const {
 const NUMBER_OF_DEPOSITS_TO_SEND = process.argv[2] || 1
 
 async function main() {
-  const bridge = new web3Home.eth.Contract(HOME_NATIVE_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
+  const bridge = new web3Home.eth.Contract(HOME_NATIVE_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 
   try {
     await isValidAmount(HOME_MIN_AMOUNT_PER_TX, bridge)
@@ -42,7 +42,7 @@ async function main() {
         gasPrice: HOME_TEST_TX_GAS_PRICE,
         amount: HOME_MIN_AMOUNT_PER_TX,
         gasLimit: 100000,
-        to: HOME_BRIDGE_ADDRESS,
+        to: COMMON_HOME_BRIDGE_ADDRESS,
         web3: web3Home,
         chainId: homeChainId
       })

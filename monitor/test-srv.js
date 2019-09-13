@@ -9,5 +9,5 @@ app.all('/', (req, res) => {
   }, 2000)
 })
 
-const PORT = process.env.PORT || 4000
-app.listen(PORT, () => console.log('Listening on port ' + PORT))
+const MONITOR_PORT = process.env.MONITOR_PORT || 4000
+app.listen(MONITOR_PORT, () => console.log('Listening on port ' + MONITOR_PORT))

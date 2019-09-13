@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: monitor/Dockerfile
     ports:
-    - "${PORT}:${PORT}"
+    - "${MONITOR_PORT}:${MONITOR_PORT}"
     env_file: ./.env
     environment: 
       - NODE_ENV=production

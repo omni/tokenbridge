@@ -110,6 +110,8 @@ cd monitor
 cp .env.example .env
 ```
 
+Please refer to [Configuration](../CONFIGURATION.md) for details on configuration parameters.
+
 ## Run web interface
 
 Using Yarn:

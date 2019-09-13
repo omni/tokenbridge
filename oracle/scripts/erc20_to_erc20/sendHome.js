@@ -9,7 +9,7 @@ const { HOME_ERC_TO_ERC_ABI } = require('../../../commons')
 const {
   USER_ADDRESS,
   USER_ADDRESS_PRIVATE_KEY,
-  HOME_BRIDGE_ADDRESS,
+  COMMON_HOME_BRIDGE_ADDRESS,
   HOME_MIN_AMOUNT_PER_TX,
   HOME_TEST_TX_GAS_PRICE
 } = process.env
@@ -51,7 +51,7 @@ const homeProvider = new Web3.providers.HttpProvider(homeRpcUrl)
 const web3Home = new Web3(homeProvider)
 
 async function main() {
-  const bridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, HOME_BRIDGE_ADDRESS)
+  const bridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
   const BRIDGEABLE_TOKEN_ADDRESS = await bridge.methods.erc677token().call()
   const erc677 = new web3Home.eth.Contract(BRIDGEABLE_TOKEN_ABI, BRIDGEABLE_TOKEN_ADDRESS)
 
@@ -72,10 +72,10 @@ async function main() {
     let actualSent = 0
     for (let i = 0; i < Number(NUMBER_OF_WITHDRAWALS_TO_SEND); i++) {
       const gasLimit = await erc677.methods
-        .transferAndCall(HOME_BRIDGE_ADDRESS, Web3Utils.toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
+        .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, Web3Utils.toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
         .estimateGas({ from: USER_ADDRESS })
       const data = await erc677.methods
-        .transferAndCall(HOME_BRIDGE_ADDRESS, Web3Utils.toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
+        .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, Web3Utils.toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
         .encodeABI({ from: USER_ADDRESS })
       const txHash = await sendTx({
         chain: 'home',

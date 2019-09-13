@@ -1,6 +1,6 @@
 ---
 bridge_path: "/home/{{ compose_service_user }}/bridge"
-ALLOW_HTTP: no
-QUEUE_URL: amqp://rabbit
-REDIS_URL: redis://redis
+ORACLE_ALLOW_HTTP_FOR_RPC: no
+ORACLE_QUEUE_URL: amqp://rabbit
+ORACLE_REDIS_URL: redis://redis
 keyfile_path: "/root/.key"

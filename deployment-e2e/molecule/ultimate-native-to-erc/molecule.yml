@@ -32,13 +32,13 @@ provisioner:
   inventory:
     host_vars:
       oracle-native-to-erc-host:
-        HOME_RPC_URL: "http://parity1:8545"
-        FOREIGN_RPC_URL: "http://parity2:8545"
-        VALIDATOR_ADDRESS: "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b"
-        VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
+        COMMON_HOME_RPC_URL: "http://parity1:8545"
+        COMMON_FOREIGN_RPC_URL: "http://parity2:8545"
+        ORACLE_VALIDATOR_ADDRESS: "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b"
+        ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
       ui-native-to-erc-host:
-        HOME_RPC_URL: "http://localhost:8541"
-        FOREIGN_RPC_URL: "http://localhost:8542"
+        COMMON_HOME_RPC_URL: "http://localhost:8541"
+        COMMON_FOREIGN_RPC_URL: "http://localhost:8542"
 verifier:
   name: testinfra
   lint:
