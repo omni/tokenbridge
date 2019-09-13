@@ -7,7 +7,7 @@ const logger = require('../services/logger').child({
 })
 const { setIntervalAndRun } = require('../utils/utils')
 const { DEFAULT_UPDATE_INTERVAL, GAS_PRICE_BOUNDARIES, DEFAULT_GAS_PRICE_FACTOR } = require('../utils/constants')
-const { gasPriceFromOracle, gasPriceFromContract } = require('../../../commons')
+const { gasPriceFromSupplier, gasPriceFromContract } = require('../../../commons')
 
 const HomeABI = bridgeConfig.homeBridgeAbi
 const ForeignABI = bridgeConfig.foreignBridgeAbi
@@ -35,11 +35,11 @@ let cachedGasPrice = null
 
 let fetchGasPriceInterval = null
 
-const fetchGasPrice = async (speedType, factor, bridgeContract, oracleFetchFn) => {
+const fetchGasPrice = async (speedType, factor, bridgeContract, gasPriceSupplierFetchFn) => {
   const contractOptions = { logger }
-  const oracleOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
+  const supplierOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
   cachedGasPrice =
-    (await gasPriceFromOracle(oracleFetchFn, oracleOptions)) ||
+    (await gasPriceFromSupplier(gasPriceSupplierFetchFn, supplierOptions)) ||
     (await gasPriceFromContract(bridgeContract, contractOptions)) ||
     cachedGasPrice
   return cachedGasPrice
@@ -49,13 +49,13 @@ async function start(chainId) {
   clearInterval(fetchGasPriceInterval)
 
   let bridgeContract = null
-  let oracleUrl = null
+  let gasPriceSupplierUrl = null
   let speedType = null
   let updateInterval = null
   let factor = null
   if (chainId === 'home') {
     bridgeContract = homeBridge
-    oracleUrl = COMMON_HOME_GAS_PRICE_SUPPLIER_URL
+    gasPriceSupplierUrl = COMMON_HOME_GAS_PRICE_SUPPLIER_URL
     speedType = COMMON_HOME_GAS_PRICE_SPEED_TYPE
     updateInterval = ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
     factor = Number(COMMON_HOME_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
@@ -63,7 +63,7 @@ async function start(chainId) {
     cachedGasPrice = COMMON_HOME_GAS_PRICE_FALLBACK
   } else if (chainId === 'foreign') {
     bridgeContract = foreignBridge
-    oracleUrl = COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL
+    gasPriceSupplierUrl = COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL
     speedType = COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE
     updateInterval = ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
     factor = Number(COMMON_FOREIGN_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
@@ -74,7 +74,7 @@ async function start(chainId) {
   }
 
   fetchGasPriceInterval = setIntervalAndRun(
-    () => fetchGasPrice(speedType, factor, bridgeContract, () => fetch(oracleUrl)),
+    () => fetchGasPrice(speedType, factor, bridgeContract, () => fetch(gasPriceSupplierUrl)),
     updateInterval
   )
 }
