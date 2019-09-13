@@ -21,7 +21,7 @@ const DEFAULT_GAS_PRICE_UPDATE_INTERVAL = 900000
 class GasPriceStore {
   @observable
   gasPrice = null
-  oracleUrl = null
+  gasPriceSupplierUrl = null
   speedType = null
   updateInterval = null
   factor = null
@@ -40,20 +40,20 @@ class GasPriceStore {
 
     if (await this.web3Store.onHomeSide()) {
       this.gasPrice = REACT_APP_COMMON_HOME_GAS_PRICE_FALLBACK
-      this.oracleUrl = REACT_APP_COMMON_HOME_GAS_PRICE_SUPPLIER_URL
+      this.gasPriceSupplierUrl = REACT_APP_COMMON_HOME_GAS_PRICE_SUPPLIER_URL
       this.speedType = REACT_APP_COMMON_HOME_GAS_PRICE_SPEED_TYPE
       this.updateInterval = REACT_APP_UI_HOME_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_GAS_PRICE_UPDATE_INTERVAL
       this.factor = Number(REACT_APP_COMMON_HOME_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
     } else {
       this.gasPrice = REACT_APP_COMMON_FOREIGN_GAS_PRICE_FALLBACK
-      this.oracleUrl = REACT_APP_COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL
+      this.gasPriceSupplierUrl = REACT_APP_COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL
       this.speedType = REACT_APP_COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE
       this.updateInterval = REACT_APP_UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_GAS_PRICE_UPDATE_INTERVAL
       this.factor = Number(REACT_APP_COMMON_FOREIGN_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
     }
 
     const oracleOptions = { speedType: this.speedType, factor: this.factor, logger: console }
-    this.gasPrice = (await gasPriceFromSupplier(() => fetch(this.oracleUrl), oracleOptions)) || this.gasPrice
+    this.gasPrice = (await gasPriceFromSupplier(() => fetch(this.gasPriceSupplierUrl), oracleOptions)) || this.gasPrice
 
     setTimeout(() => this.updateGasPrice(), this.updateInterval)
   }
