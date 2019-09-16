@@ -47,8 +47,8 @@ const ERC677_ABI = [
 
 async function main() {
   const bridge = new web3Foreign.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
-  const ERC20_TOKEN_ADDRESS = await bridge.methods.erc677token().call()
-  const poa20 = new web3Foreign.eth.Contract(ERC677_ABI, ERC20_TOKEN_ADDRESS)
+  const bridgeableTokenAddress = await bridge.methods.erc677token().call()
+  const poa20 = new web3Foreign.eth.Contract(ERC677_ABI, bridgeableTokenAddress)
 
   try {
     await isValidAmount(FOREIGN_MIN_AMOUNT_PER_TX, bridge)
@@ -80,7 +80,7 @@ async function main() {
         gasPrice: FOREIGN_TEST_TX_GAS_PRICE,
         amount: '0',
         gasLimit,
-        to: ERC20_TOKEN_ADDRESS,
+        to: bridgeableTokenAddress,
         web3: web3Foreign,
         chainId: foreignChainId
       })
