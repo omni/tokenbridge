@@ -6,22 +6,30 @@ The deployment playbooks are tested using [Molecule](https://molecule.readthedoc
 
 The deployment playbooks are cloning the monorepository on target hosts, using your current local git branch name. If the branch does not exists on remote, you need to push it.
 
-```
+```bash
 git push
 ```
 
 Alternatively, if there are no changes except the playbooks, you can use the `master` branch:
 
-```
+```bash
 CIRCLE_BRANCH=master ./molecule.sh <scenario_name>
 ```
 
 In this case `master` branch will be used as a codebase for Monitor, UI, Oracle and Contracts deployed by your local playbook.
 
+## Forked repository
+
+If using forked repository, in order to run the tests please specify your repository url:
+
+```bash
+CODEBASE_REPO="https://github.com/<USER>/tokenbridge.git" ./molecule.sh <scenario_name>
+```
+
 ## Run the tests
 
-```
-CIRCLE_BRANCH=master ./molecule.sh <scenario_name>
+```bash
+./molecule.sh <scenario_name>
 ```
 
 Available scenarios:

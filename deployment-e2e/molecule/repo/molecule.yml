@@ -17,6 +17,7 @@ provisioner:
     host_vars:
       repo-host:
         bridge_repo_branch: $CODEBASE_BRANCH
+        bridge_repo: $CODEBASE_REPO
 verifier:
   name: testinfra
 scenario:
