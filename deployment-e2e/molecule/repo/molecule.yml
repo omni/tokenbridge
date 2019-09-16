@@ -18,6 +18,7 @@ provisioner:
       repo-host:
         bridge_repo_branch: $CODEBASE_BRANCH
         bridge_repo: $CODEBASE_REPO
+        CIRCLE_PR_NUMBER: $CIRCLE_PR_NUMBER
 verifier:
   name: testinfra
 scenario:

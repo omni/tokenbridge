@@ -37,6 +37,7 @@ provisioner:
         syslog_server_port: "udp://127.0.0.1:514"
         bridge_repo_branch: $CODEBASE_BRANCH
         bridge_repo: $CODEBASE_REPO
+        CIRCLE_PR_NUMBER: $CIRCLE_PR_NUMBER
 verifier:
   name: testinfra
   lint:

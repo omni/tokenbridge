@@ -38,11 +38,13 @@ provisioner:
         ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
         bridge_repo_branch: $CODEBASE_BRANCH
         bridge_repo: $CODEBASE_REPO
+        CIRCLE_PR_NUMBER: $CIRCLE_PR_NUMBER
       ui-native-to-erc-host:
         COMMON_HOME_RPC_URL: "http://localhost:8541"
         COMMON_FOREIGN_RPC_URL: "http://localhost:8542"
         bridge_repo_branch: $CODEBASE_BRANCH
         bridge_repo: $CODEBASE_REPO
+        CIRCLE_PR_NUMBER: $CIRCLE_PR_NUMBER
 verifier:
   name: testinfra
   lint:
