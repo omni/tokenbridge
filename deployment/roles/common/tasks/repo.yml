@@ -12,6 +12,8 @@
     if [ ! "$CIRCLE_PR_NUMBER" = "" ]
     then # If this is a forked PR, the branch needs to be fetched in a special way
       git fetch --force --depth 1 origin -- "{{ bridge_repo_branch }}/head:remotes/origin/{{ bridge_repo_branch }}"
+      git branch {{ bridge_repo_branch }} origin/{{ bridge_repo_branch }} 
+      echo 'Branch from forked PR fetched'
     fi
 
     git checkout {{ bridge_repo_branch }}
