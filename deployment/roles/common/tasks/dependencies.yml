@@ -22,7 +22,6 @@
     - git
     - python3
     - python3-pip
-    - rsync
 
 - name: Install Docker Compose
   get_url:
