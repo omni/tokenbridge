@@ -7,7 +7,9 @@ CODEBASE_REPO=${CODEBASE_REPO-'https://github.com/poanetwork/tokenbridge.git'}
 
 
 while [ "$1" != "" ]; do
-  docker-compose build && docker-compose run -e CODEBASE_BRANCH=$CODEBASE_BRANCH -e CODEBASE_REPO=$CODEBASE_REPO molecule_runner /bin/bash -c "molecule test --scenario-name $1"
+  docker-compose build && \
+    docker-compose run -e CODEBASE_BRANCH=$CODEBASE_BRANCH -e CODEBASE_REPO=$CODEBASE_REPO -e CIRCLE_PR_NUMBER=$CIRCLE_PR_NUMBER \
+    molecule_runner /bin/bash -c "molecule test --scenario-name $1"
 
   shift # Shift all the parameters down by one
 done
