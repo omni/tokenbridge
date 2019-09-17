@@ -24,7 +24,7 @@ orbs:
                 export NVM_DIR="/opt/circleci/.nvm"
                 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-                nvm install 11.4.0 && nvm alias default 11.4.0
+                nvm install 10.16.3 && nvm alias default 10.16.3
 
                 echo 'export NVM_DIR="/opt/circleci/.nvm"' >> $BASH_ENV
                 echo ' [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
