@@ -3,32 +3,37 @@ const eventsInfo = require('./utils/events')
 const { BRIDGE_MODES } = require('../commons')
 
 async function main(bridgeMode) {
-  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals } = await eventsInfo(bridgeMode)
+  const {
+    homeToForeignConfirmations,
+    homeToForeignRequests,
+    foreignToHomeConfirmations,
+    foreignToHomeRequests
+  } = await eventsInfo(bridgeMode)
 
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {
-      fromHomeToForeignDiff: homeDeposits.length - foreignDeposits.length,
-      fromForeignToHomeDiff: homeWithdrawals.length - foreignWithdrawals.length,
+      fromHomeToForeignDiff: homeToForeignRequests.length - homeToForeignConfirmations.length,
+      fromForeignToHomeDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length,
       home: {
-        toForeign: homeDeposits.length,
-        fromForeign: homeWithdrawals.length
+        toForeign: homeToForeignRequests.length,
+        fromForeign: foreignToHomeConfirmations.length
       },
       foreign: {
-        fromHome: foreignDeposits.length,
-        toHome: foreignWithdrawals.length
+        fromHome: homeToForeignConfirmations.length,
+        toHome: foreignToHomeRequests.length
       }
     }
   } else {
     return {
-      depositsDiff: homeDeposits.length - foreignDeposits.length,
-      withdrawalDiff: homeWithdrawals.length - foreignWithdrawals.length,
+      depositsDiff: homeToForeignRequests.length - homeToForeignConfirmations.length,
+      withdrawalDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length,
       home: {
-        deposits: homeDeposits.length,
-        withdrawals: homeWithdrawals.length
+        deposits: homeToForeignRequests.length,
+        withdrawals: foreignToHomeConfirmations.length
       },
       foreign: {
-        deposits: foreignDeposits.length,
-        withdrawals: foreignWithdrawals.length
+        deposits: homeToForeignConfirmations.length,
+        withdrawals: foreignToHomeRequests.length
       }
     }
   }

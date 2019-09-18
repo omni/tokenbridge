@@ -15,16 +15,22 @@ const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 async function main() {
-  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals, bridgeMode } = await eventsInfo()
+  const {
+    homeToForeignRequests,
+    homeToForeignConfirmations,
+    foreignToHomeConfirmations,
+    foreignToHomeRequests,
+    bridgeMode
+  } = await eventsInfo()
 
   let xSignatures
   let xAffirmations
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
-    xSignatures = foreignDeposits.filter(processedMsgNotDelivered(homeDeposits))
-    xAffirmations = homeWithdrawals.filter(processedMsgNotDelivered(foreignWithdrawals))
+    xSignatures = homeToForeignConfirmations.filter(processedMsgNotDelivered(homeToForeignRequests))
+    xAffirmations = foreignToHomeConfirmations.filter(processedMsgNotDelivered(foreignToHomeRequests))
   } else {
-    xSignatures = foreignDeposits.filter(findDifferences(homeDeposits))
-    xAffirmations = homeWithdrawals.filter(findDifferences(foreignWithdrawals))
+    xSignatures = homeToForeignConfirmations.filter(findDifferences(homeToForeignRequests))
+    xAffirmations = foreignToHomeConfirmations.filter(findDifferences(foreignToHomeRequests))
   }
 
   logger.debug('building misbehavior blocks')

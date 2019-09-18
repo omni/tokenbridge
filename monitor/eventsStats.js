@@ -59,10 +59,10 @@ function compareTransferForeign(home) {
 
 async function main() {
   const {
-    foreignDeposits,
-    homeDeposits,
-    homeWithdrawals,
-    foreignWithdrawals,
+    homeToForeignRequests,
+    homeToForeignConfirmations,
+    foreignToHomeConfirmations,
+    foreignToHomeRequests,
     isExternalErc20,
     bridgeMode
   } = await eventsInfo()
@@ -70,25 +70,35 @@ async function main() {
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {
       home: {
-        deliveredMsgNotProcessedInForeign: homeDeposits.filter(deliveredMsgNotProcessed(foreignDeposits)),
-        processedMsgNotDeliveredInForeign: homeWithdrawals.filter(processedMsgNotDelivered(foreignWithdrawals))
+        deliveredMsgNotProcessedInForeign: homeToForeignRequests.filter(
+          deliveredMsgNotProcessed(homeToForeignConfirmations)
+        ),
+        processedMsgNotDeliveredInForeign: foreignToHomeConfirmations.filter(
+          processedMsgNotDelivered(foreignToHomeRequests)
+        )
       },
       foreign: {
-        deliveredMsgNotProcessedInHome: foreignWithdrawals.filter(deliveredMsgNotProcessed(homeWithdrawals)),
-        processedMsgNotDeliveredInHome: foreignDeposits.filter(processedMsgNotDelivered(homeDeposits))
+        deliveredMsgNotProcessedInHome: foreignToHomeRequests.filter(
+          deliveredMsgNotProcessed(foreignToHomeConfirmations)
+        ),
+        processedMsgNotDeliveredInHome: homeToForeignConfirmations.filter(
+          processedMsgNotDelivered(homeToForeignRequests)
+        )
       },
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else {
-    const onlyInHomeDeposits = homeDeposits.filter(compareDepositsHome(foreignDeposits))
-    const onlyInForeignDeposits = foreignDeposits.concat([]).filter(compareDepositsForeign(homeDeposits))
+    const onlyInHomeDeposits = homeToForeignRequests.filter(compareDepositsHome(homeToForeignConfirmations))
+    const onlyInForeignDeposits = homeToForeignConfirmations
+      .concat([])
+      .filter(compareDepositsForeign(homeToForeignRequests))
 
     const onlyInHomeWithdrawals = isExternalErc20
-      ? homeWithdrawals.filter(compareTransferHome(foreignWithdrawals))
-      : homeWithdrawals.filter(compareDepositsForeign(foreignWithdrawals))
+      ? foreignToHomeConfirmations.filter(compareTransferHome(foreignToHomeRequests))
+      : foreignToHomeConfirmations.filter(compareDepositsForeign(foreignToHomeRequests))
     const onlyInForeignWithdrawals = isExternalErc20
-      ? foreignWithdrawals.filter(compareTransferForeign(homeWithdrawals))
-      : foreignWithdrawals.filter(compareDepositsHome(homeWithdrawals))
+      ? foreignToHomeRequests.filter(compareTransferForeign(foreignToHomeConfirmations))
+      : foreignToHomeRequests.filter(compareDepositsHome(foreignToHomeConfirmations))
 
     return {
       onlyInHomeDeposits,

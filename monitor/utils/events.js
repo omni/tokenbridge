@@ -55,28 +55,28 @@ async function main(mode) {
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
-  const homeDeposits = await getPastEvents(homeBridge, {
+  const homeToForeignRequests = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
     fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber
   })
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
-  const foreignDeposits = await getPastEvents(foreignBridge, {
+  const homeToForeignConfirmations = await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Deposit' : 'RelayedMessage',
     fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: foreignBlockNumber
   })
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
-  const homeWithdrawals = await getPastEvents(homeBridge, {
+  const foreignToHomeConfirmations = await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Withdraw' : 'AffirmationCompleted',
     fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber
   })
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
-  const foreignWithdrawals = isExternalErc20
+  const foreignToHomeRequests = isExternalErc20
     ? await getPastEvents(erc20Contract, {
         event: 'Transfer',
         fromBlock: MONITOR_FOREIGN_START_BLOCK,
@@ -92,10 +92,10 @@ async function main(mode) {
       })
   logger.debug('Done')
   return {
-    homeDeposits,
-    foreignDeposits,
-    homeWithdrawals,
-    foreignWithdrawals,
+    homeToForeignRequests,
+    homeToForeignConfirmations,
+    foreignToHomeConfirmations,
+    foreignToHomeRequests,
     isExternalErc20,
     bridgeMode
   }
