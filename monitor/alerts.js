@@ -3,6 +3,8 @@ const Web3 = require('web3')
 const logger = require('./logger')('alerts')
 const eventsInfo = require('./utils/events')
 const { getBlockNumber } = require('./utils/contract')
+const { processedMsgNotDelivered } = require('./utils/message')
+const { BRIDGE_MODES } = require('../commons')
 
 const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL } = process.env
 
@@ -13,10 +15,23 @@ const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
 const web3Foreign = new Web3(foreignProvider)
 
 async function main() {
-  const { foreignDeposits, homeDeposits, homeWithdrawals, foreignWithdrawals } = await eventsInfo()
+  const {
+    homeToForeignRequests,
+    homeToForeignConfirmations,
+    foreignToHomeConfirmations,
+    foreignToHomeRequests,
+    bridgeMode
+  } = await eventsInfo()
 
-  const xSignatures = foreignDeposits.filter(findDifferences(homeDeposits))
-  const xAffirmations = homeWithdrawals.filter(findDifferences(foreignWithdrawals))
+  let xSignatures
+  let xAffirmations
+  if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    xSignatures = homeToForeignConfirmations.filter(processedMsgNotDelivered(homeToForeignRequests))
+    xAffirmations = foreignToHomeConfirmations.filter(processedMsgNotDelivered(foreignToHomeRequests))
+  } else {
+    xSignatures = homeToForeignConfirmations.filter(findDifferences(homeToForeignRequests))
+    xAffirmations = foreignToHomeConfirmations.filter(findDifferences(foreignToHomeRequests))
+  }
 
   logger.debug('building misbehavior blocks')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)

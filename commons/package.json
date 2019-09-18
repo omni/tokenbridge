@@ -8,6 +8,10 @@
     "test": "NODE_ENV=test mocha"
   },
   "dependencies": {
-    "web3-utils": "1.0.0-beta.30"
+    "web3-utils": "1.0.0-beta.34"
+  },
+  "devDependencies": {
+    "bn-chai": "^1.0.1",
+    "chai": "^4.2.0"
   }
 }

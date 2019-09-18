@@ -21,6 +21,9 @@ const processSignatureRequests = require('./events/processSignatureRequests')(co
 const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
 const processAffirmationRequests = require('./events/processAffirmationRequests')(config)
 const processTransfers = require('./events/processTransfers')(config)
+const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
+const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
+const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
 
 const ZERO = toBN(0)
 const ONE = toBN(1)
@@ -97,6 +100,12 @@ function processEvents(events) {
     case 'erc-erc-affirmation-request':
     case 'erc-native-affirmation-request':
       return processTransfers(events)
+    case 'amb-signature-request':
+      return processAMBSignatureRequests(events)
+    case 'amb-collected-signatures':
+      return processAMBCollectedSignatures(events)
+    case 'amb-affirmation-request':
+      return processAMBAffirmationRequests(events)
     default:
       return []
   }

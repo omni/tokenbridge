@@ -61,6 +61,17 @@ services:
     command: "true"
     networks:
       - ultimate
+  oracle-amb:
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
+      args:
+        DOT_ENV_PATH: e2e-commons/components-envs/oracle-amb.env
+    environment:
+    - NODE_ENV=production
+    command: "true"
+    networks:
+      - ultimate
   ui:
     build:
       context: ..

@@ -8,7 +8,9 @@ const {
   HOME_ERC_TO_ERC_ABI,
   FOREIGN_ERC_TO_ERC_ABI,
   HOME_ERC_TO_NATIVE_ABI,
-  FOREIGN_ERC_TO_NATIVE_ABI
+  FOREIGN_ERC_TO_NATIVE_ABI,
+  HOME_AMB_ABI,
+  FOREIGN_AMB_ABI
 } = require('../../commons')
 const { web3Home, web3Foreign } = require('../src/services/web3')
 const { privateKeyToAddress } = require('../src/utils/utils')
@@ -34,6 +36,11 @@ switch (process.env.ORACLE_BRIDGE_MODE) {
     homeAbi = HOME_ERC_TO_NATIVE_ABI
     foreignAbi = FOREIGN_ERC_TO_NATIVE_ABI
     id = 'erc-native'
+    break
+  case BRIDGE_MODES.ARBITRARY_MESSAGE:
+    homeAbi = HOME_AMB_ABI
+    foreignAbi = FOREIGN_AMB_ABI
+    id = 'amb'
     break
   default:
     if (process.env.NODE_ENV !== 'test') {

@@ -10,7 +10,7 @@ The Oracle is deployed on specified validator nodes (only nodes whose private ke
 
 ## Architecture
 
-### Native-to-ERC20
+### Native-to-ERC20 and Arbitrary-Message
 
 ![Native-to-ERC](Native-to-ERC.png)
 
@@ -27,7 +27,7 @@ There are three Watchers:
 - **Signature Request Watcher**: Listens to `UserRequestForSignature` events on the Home network.
 - **Collected Signatures Watcher**: Listens to `CollectedSignatures` events on the Home network.
 - **Affirmation Request Watcher**: Depends on the bridge mode. 
-   - `Native-to-ERC20`: Listens to `UserRequestForAffirmation` raised by the bridge contract.
+   - `Native-to-ERC20` and `Arbitrary-Message`: Listens to `UserRequestForAffirmation` raised by the bridge contract.
    - `ERC20-to-ERC20` and `ERC20-to-Native`: Listens to `Transfer` events raised by the token contract.
 
 ### Sender

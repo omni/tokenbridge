@@ -1,21 +1,24 @@
-require('../../../env')
+require('dotenv').config()
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
-const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
+const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
+const { addTxHashToData, parseAMBMessage } = require('../../../../commons')
+const estimateGas = require('../processSignatureRequests/estimateGas')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
-const estimateGas = require('../processAffirmationRequests/estimateGas')
+
+const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
 let validatorContract = null
 
-function processTransfersBuilder(config) {
+function processSignatureRequestsBuilder(config) {
   const homeBridge = new web3Home.eth.Contract(config.homeBridgeAbi, config.homeBridgeAddress)
 
-  return async function processTransfers(transfers) {
+  return async function processSignatureRequests(signatureRequests) {
     const txToSend = []
 
     if (validatorContract === null) {
@@ -23,19 +26,27 @@ function processTransfersBuilder(config) {
       const validatorContractAddress = await homeBridge.methods.validatorContract().call()
       rootLogger.debug({ validatorContractAddress }, 'Validator contract address obtained')
 
-      validatorContract = new web3Home.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
+      validatorContract = new web3Home.eth.Contract(bridgeValidatorsABI, validatorContractAddress)
     }
 
-    rootLogger.debug(`Processing ${transfers.length} Transfer events`)
-    const callbacks = transfers
-      .map(transfer => async () => {
-        const { from, value } = transfer.returnValues
+    rootLogger.debug(`Processing ${signatureRequests.length} SignatureRequest events`)
+    const callbacks = signatureRequests
+      .map(signatureRequest => async () => {
+        const { encodedData } = signatureRequest.returnValues
 
         const logger = rootLogger.child({
-          eventTransactionHash: transfer.transactionHash
+          eventTransactionHash: signatureRequest.transactionHash
         })
 
-        logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
+        const message = addTxHashToData({
+          encodedData,
+          transactionHash: signatureRequest.transactionHash
+        })
+
+        const { sender, executor } = parseAMBMessage(message)
+        logger.info({ sender, executor }, `Processing signatureRequest ${signatureRequest.transactionHash}`)
+
+        const signature = web3Home.eth.accounts.sign(message, `0x${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}`)
 
         let gasEstimate
         try {
@@ -44,9 +55,8 @@ function processTransfersBuilder(config) {
             web3: web3Home,
             homeBridge,
             validatorContract,
-            recipient: from,
-            value,
-            txHash: transfer.transactionHash,
+            signature: signature.signature,
+            message,
             address: config.validatorAddress
           })
           logger.debug({ gasEstimate }, 'Gas estimated')
@@ -57,10 +67,12 @@ function processTransfersBuilder(config) {
             logger.fatal({ address: config.validatorAddress }, 'Invalid validator')
             process.exit(EXIT_CODES.INCOMPATIBILITY)
           } else if (e instanceof AlreadySignedError) {
-            logger.info(`Already signed transfer ${transfer.transactionHash}`)
+            logger.info(`Already signed signatureRequest ${signatureRequest.transactionHash}`)
             return
           } else if (e instanceof AlreadyProcessedError) {
-            logger.info(`transfer ${transfer.transactionHash} was already processed by other validators`)
+            logger.info(
+              `signatureRequest ${signatureRequest.transactionHash} was already processed by other validators`
+            )
             return
           } else {
             logger.error(e, 'Unknown error while processing transaction')
@@ -68,14 +80,12 @@ function processTransfersBuilder(config) {
           }
         }
 
-        const data = await homeBridge.methods
-          .executeAffirmation(from, value, transfer.transactionHash)
-          .encodeABI({ from: config.validatorAddress })
+        const data = await homeBridge.methods.submitSignature(signature.signature, message).encodeABI()
 
         txToSend.push({
           data,
           gasEstimate,
-          transactionReference: transfer.transactionHash,
+          transactionReference: signatureRequest.transactionHash,
           to: config.homeBridgeAddress
         })
       })
@@ -86,4 +96,4 @@ function processTransfersBuilder(config) {
   }
 }
 
-module.exports = processTransfersBuilder
+module.exports = processSignatureRequestsBuilder

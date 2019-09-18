@@ -10,6 +10,8 @@ function decodeBridgeMode(bridgeModeHash) {
       return BRIDGE_MODES.ERC_TO_ERC
     case '0x18762d46':
       return BRIDGE_MODES.ERC_TO_NATIVE
+    case '0x2544fbb9':
+      return BRIDGE_MODES.ARBITRARY_MESSAGE
     default:
       throw new Error(`Unrecognized bridge mode hash: '${bridgeModeHash}'`)
   }
