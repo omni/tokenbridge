@@ -7,15 +7,15 @@ async function main(bridgeMode) {
 
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {
-      deliveryDiff: homeDeposits.length - foreignDeposits.length,
-      processedDiff: homeWithdrawals.length - foreignWithdrawals.length,
+      fromHomeToForeignDiff: homeDeposits.length - foreignDeposits.length,
+      fromForeignToHomeDiff: homeWithdrawals.length - foreignWithdrawals.length,
       home: {
-        delivered: homeDeposits.length,
-        processed: homeWithdrawals.length
+        toForeign: homeDeposits.length,
+        fromForeign: homeWithdrawals.length
       },
       foreign: {
-        delivered: foreignWithdrawals.length,
-        processed: foreignDeposits.length
+        fromHome: foreignDeposits.length,
+        toHome: foreignWithdrawals.length
       }
     }
   } else {
