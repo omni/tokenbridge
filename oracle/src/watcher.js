@@ -36,7 +36,7 @@ let lastProcessedBlock = BN.max(config.startBlock.sub(ONE), ZERO)
 
 async function initialize() {
   try {
-    const checkHttps = checkHTTPS(process.env.ALLOW_HTTP, logger)
+    const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
     rpcUrlsManager.homeUrls.forEach(checkHttps('home'))
     rpcUrlsManager.foreignUrls.forEach(checkHttps('foreign'))

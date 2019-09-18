@@ -26,9 +26,9 @@ module.exports =
         ...baseConfig.bridgeConfig,
         ...baseConfig.foreignConfig,
         event: 'Transfer',
-        eventContractAddress: process.env.ERC20_TOKEN_ADDRESS,
+        eventContractAddress: initialChecks.bridgeableTokenAddress,
         eventAbi: ERC20_ABI,
-        eventFilter: { to: process.env.FOREIGN_BRIDGE_ADDRESS },
+        eventFilter: { to: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS },
         queue: 'home',
         name: `watcher-${id}`,
         id

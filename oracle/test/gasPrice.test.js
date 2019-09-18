@@ -9,54 +9,56 @@ describe('gasPrice', () => {
     beforeEach(() => {
       utils.setIntervalAndRun.resetHistory()
     })
-    it('should call setIntervalAndRun with HOME_GAS_PRICE_UPDATE_INTERVAL interval value on Home', async () => {
+    it('should call setIntervalAndRun with ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL interval value on Home', async () => {
       // given
-      process.env.HOME_GAS_PRICE_UPDATE_INTERVAL = 15000
+      process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL = 15000
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
 
       // when
       await gasPrice.start('home')
 
       // then
-      expect(process.env.HOME_GAS_PRICE_UPDATE_INTERVAL).to.equal('15000')
-      expect(process.env.HOME_GAS_PRICE_UPDATE_INTERVAL).to.not.equal(DEFAULT_UPDATE_INTERVAL.toString())
-      expect(utils.setIntervalAndRun.args[0][1]).to.equal(process.env.HOME_GAS_PRICE_UPDATE_INTERVAL.toString())
+      expect(process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL).to.equal('15000')
+      expect(process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL).to.not.equal(DEFAULT_UPDATE_INTERVAL.toString())
+      expect(utils.setIntervalAndRun.args[0][1]).to.equal(process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL.toString())
     })
-    it('should call setIntervalAndRun with FOREIGN_GAS_PRICE_UPDATE_INTERVAL interval value on Foreign', async () => {
+    it('should call setIntervalAndRun with ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL interval value on Foreign', async () => {
       // given
-      process.env.FOREIGN_GAS_PRICE_UPDATE_INTERVAL = 15000
+      process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL = 15000
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
 
       // when
       await gasPrice.start('foreign')
 
       // then
-      expect(process.env.FOREIGN_GAS_PRICE_UPDATE_INTERVAL).to.equal('15000')
-      expect(process.env.HOME_GAS_PRICE_UPDATE_INTERVAL).to.not.equal(DEFAULT_UPDATE_INTERVAL.toString())
-      expect(utils.setIntervalAndRun.args[0][1]).to.equal(process.env.FOREIGN_GAS_PRICE_UPDATE_INTERVAL.toString())
+      expect(process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL).to.equal('15000')
+      expect(process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL).to.not.equal(DEFAULT_UPDATE_INTERVAL.toString())
+      expect(utils.setIntervalAndRun.args[0][1]).to.equal(
+        process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL.toString()
+      )
     })
     it('should call setIntervalAndRun with default interval value on Home', async () => {
       // given
-      delete process.env.HOME_GAS_PRICE_UPDATE_INTERVAL
+      delete process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
 
       // when
       await gasPrice.start('home')
 
       // then
-      expect(process.env.HOME_GAS_PRICE_UPDATE_INTERVAL).to.equal(undefined)
+      expect(process.env.ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL).to.equal(undefined)
       expect(utils.setIntervalAndRun.args[0][1]).to.equal(DEFAULT_UPDATE_INTERVAL)
     })
     it('should call setIntervalAndRun with default interval value on Foreign', async () => {
       // given
-      delete process.env.FOREIGN_GAS_PRICE_UPDATE_INTERVAL
+      delete process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
 
       // when
       await gasPrice.start('foreign')
 
       // then
-      expect(process.env.FOREIGN_GAS_PRICE_UPDATE_INTERVAL).to.equal(undefined)
+      expect(process.env.ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL).to.equal(undefined)
       expect(utils.setIntervalAndRun.args[0][1]).to.equal(DEFAULT_UPDATE_INTERVAL)
     })
   })
@@ -64,9 +66,9 @@ describe('gasPrice', () => {
   describe('fetching gas price', () => {
     const utils = { setIntervalAndRun: () => {} }
 
-    it('should fall back to default if contract and oracle/supplier are not working', async () => {
+    it('should fall back to default if contract and supplier are not working', async () => {
       // given
-      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      process.env.COMMON_HOME_GAS_PRICE_FALLBACK = '101000000000'
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
       await gasPrice.start('home')
 
@@ -77,20 +79,20 @@ describe('gasPrice', () => {
       expect(gasPrice.getPrice()).to.equal('101000000000')
     })
 
-    it('should fetch gas from oracle/supplier', async () => {
+    it('should fetch gas from supplier', async () => {
       // given
-      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      process.env.COMMON_HOME_GAS_PRICE_FALLBACK = '101000000000'
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
       await gasPrice.start('home')
 
-      const oracleFetchFn = () => ({
+      const gasPriceSupplierFetchFn = () => ({
         json: () => ({
           standard: '103'
         })
       })
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, null, oracleFetchFn)
+      await gasPrice.fetchGasPrice('standard', 1, null, gasPriceSupplierFetchFn)
 
       // then
       expect(gasPrice.getPrice().toString()).to.equal('103000000000')
@@ -98,7 +100,7 @@ describe('gasPrice', () => {
 
     it('should fetch gas from contract', async () => {
       // given
-      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      process.env.COMMON_HOME_GAS_PRICE_FALLBACK = '101000000000'
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
       await gasPrice.start('home')
 
@@ -119,7 +121,7 @@ describe('gasPrice', () => {
 
     it('should fetch the gas price from the oracle first', async () => {
       // given
-      process.env.HOME_GAS_PRICE_FALLBACK = '101000000000'
+      process.env.COMMON_HOME_GAS_PRICE_FALLBACK = '101000000000'
       const gasPrice = proxyquire('../src/services/gasPrice', { '../utils/utils': utils })
       await gasPrice.start('home')
 
@@ -131,14 +133,14 @@ describe('gasPrice', () => {
         }
       }
 
-      const oracleFetchFn = () => ({
+      const gasPriceSupplierFetchFn = () => ({
         json: () => ({
           standard: '103'
         })
       })
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, oracleFetchFn)
+      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, gasPriceSupplierFetchFn)
 
       // then
       expect(gasPrice.getPrice().toString()).to.equal('103000000000')

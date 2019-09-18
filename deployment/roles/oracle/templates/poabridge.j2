@@ -14,8 +14,8 @@ WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridg
 
 #Getting path to private key file and variable name for parsing key file
 keyfile="{{ keyfile_path }}"
-vaddr="VALIDATOR_ADDRESS="
-vkey="VALIDATOR_ADDRESS_PRIVATE_KEY="
+vaddr="ORACLE_VALIDATOR_ADDRESS="
+vkey="ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="
 
 #Parsing file content and add key to variable
 while read -r line
@@ -35,7 +35,7 @@ start(){
     cd $WORKDIR
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
-    sudo -u "{{ compose_service_user }}" VALIDATOR_ADDRESS=$vaddr VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose  up  --detach
+    sudo -u "{{ compose_service_user }}" ORACLE_VALIDATOR_ADDRESS=$vaddr ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose  up  --detach
 }
 
 stop(){
@@ -56,7 +56,7 @@ rebuild(){
     cd $WORKDIR
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
-    sudo -u "{{ compose_service_user }}" VALIDATOR_ADDRESS=$vaddr VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose  up  --detach --force-recreate --no-deps --build
+    sudo -u "{{ compose_service_user }}" ORACLE_VALIDATOR_ADDRESS=$vaddr ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose  up  --detach --force-recreate --no-deps --build
 }
 
 

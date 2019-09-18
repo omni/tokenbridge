@@ -16,8 +16,8 @@ const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
 const { toBN } = foreignWeb3.utils
 
-const HOME_BRIDGE_ADDRESS = nativeToErcBridge.home
-const FOREIGN_BRIDGE_ADDRESS = nativeToErcBridge.foreign
+const COMMON_HOME_BRIDGE_ADDRESS = nativeToErcBridge.home
+const COMMON_FOREIGN_BRIDGE_ADDRESS = nativeToErcBridge.foreign
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
 homeWeb3.eth.accounts.wallet.add(validator.privateKey)
@@ -39,7 +39,7 @@ describe('native to erc', () => {
     // send transaction to home chain
     const depositTx = await homeWeb3.eth.sendTransaction({
       from: user.address,
-      to: HOME_BRIDGE_ADDRESS,
+      to: COMMON_HOME_BRIDGE_ADDRESS,
       gasPrice: '1',
       gas: '50000',
       value: '1000000000000000000'
@@ -81,7 +81,7 @@ describe('native to erc', () => {
 
     // send tokens to foreign bridge
     await token.methods
-      .transferAndCall(FOREIGN_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'), '0x')
+      .transferAndCall(COMMON_FOREIGN_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'), '0x')
       .send({
         from: user.address,
         gas: '1000000'
@@ -113,7 +113,7 @@ describe('native to erc', () => {
     // send transaction to home chain
     const depositTx = await homeWeb3.eth.sendTransaction({
       from: user.address,
-      to: HOME_BRIDGE_ADDRESS,
+      to: COMMON_HOME_BRIDGE_ADDRESS,
       gasPrice: '1',
       gas: '50000',
       value: '1000000000000000000'
@@ -170,7 +170,7 @@ describe('native to erc', () => {
     // send transaction to home chain
     await homeWeb3.eth.sendTransaction({
       from: user.address,
-      to: HOME_BRIDGE_ADDRESS,
+      to: COMMON_HOME_BRIDGE_ADDRESS,
       gasPrice: '1',
       gas: '50000',
       value: '1000000000000000000'

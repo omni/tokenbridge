@@ -101,7 +101,7 @@ class HomeStore {
   tokenAddress = ''
 
   @observable
-  symbol = process.env.REACT_APP_HOME_NATIVE_NAME || 'NONAME'
+  symbol = process.env.REACT_APP_UI_NATIVE_TOKEN_DISPLAY_NAME || 'NONAME'
 
   @observable
   tokenName = ''
@@ -140,12 +140,12 @@ class HomeStore {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
   }
-  networkName = process.env.REACT_APP_HOME_NETWORK_NAME || 'Unknown'
+  networkName = process.env.REACT_APP_UI_HOME_NETWORK_DISPLAY_NAME || 'Unknown'
   filteredBlockNumber = 0
   homeBridge = {}
-  HOME_BRIDGE_ADDRESS = process.env.REACT_APP_HOME_BRIDGE_ADDRESS
-  explorerTxTemplate = process.env.REACT_APP_HOME_EXPLORER_TX_TEMPLATE || ''
-  explorerAddressTemplate = process.env.REACT_APP_HOME_EXPLORER_ADDRESS_TEMPLATE || ''
+  COMMON_HOME_BRIDGE_ADDRESS = process.env.REACT_APP_COMMON_HOME_BRIDGE_ADDRESS
+  explorerTxTemplate = process.env.REACT_APP_UI_HOME_EXPLORER_TX_TEMPLATE || ''
+  explorerAddressTemplate = process.env.REACT_APP_UI_HOME_EXPLORER_ADDRESS_TEMPLATE || ''
   tokenContract = {}
   tokenDecimals = 18
   blockRewardContract = {}
@@ -165,7 +165,7 @@ class HomeStore {
       return
     }
     const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
-    this.homeBridge = new this.homeWeb3.eth.Contract(HOME_ABI, this.HOME_BRIDGE_ADDRESS)
+    this.homeBridge = new this.homeWeb3.eth.Contract(HOME_ABI, this.COMMON_HOME_BRIDGE_ADDRESS)
     if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {
       await this.getTokenInfo()
     } else if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
@@ -250,11 +250,11 @@ class HomeStore {
           balanceLoaded()
         })
       } else if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
-        const mintedCoins = await mintedTotallyByBridge(this.blockRewardContract, this.HOME_BRIDGE_ADDRESS)
+        const mintedCoins = await mintedTotallyByBridge(this.blockRewardContract, this.COMMON_HOME_BRIDGE_ADDRESS)
         const burntCoins = await totalBurntCoins(this.homeBridge)
         this.balance = fromDecimals(mintedCoins.minus(burntCoins).toString(10), this.tokenDecimals)
       } else {
-        this.balance = await getBalance(this.homeWeb3, this.HOME_BRIDGE_ADDRESS)
+        this.balance = await getBalance(this.homeWeb3, this.COMMON_HOME_BRIDGE_ADDRESS)
       }
     } catch (e) {
       console.error(e)
@@ -426,7 +426,7 @@ class HomeStore {
       const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
       const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
       const abi = [...HOME_V1_ABI, ...HOME_ABI]
-      const contract = new this.homeWeb3.eth.Contract(abi, this.HOME_BRIDGE_ADDRESS)
+      const contract = new this.homeWeb3.eth.Contract(abi, this.COMMON_HOME_BRIDGE_ADDRESS)
       const events = await getPastEvents(contract, deployedAtBlock, 'latest')
       processLargeArrayAsync(events, this.processEvent, () => {
         this.statistics.finished = true

@@ -1,6 +1,6 @@
 # POA TokenBridge / Deployment Configuration
 
-Please see the [Oracle](../oracle/README.md) for additional configuration and execution details.
+Please see the [Configuration](../CONFIGURATION.md) for additional configuration and execution details.
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ cp hosts.yml.example hosts.yml
       hosts:
         <host_ip_A>:
           ansible_user: <user>
-          VALIDATOR_ADDRESS_PRIVATE_KEY: "<private_key>"
+          ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "<private_key>"
           #syslog_server_port: "<protocol>://<ip>:<port>" # When this parameter is set all bridge logs will be redirected to <ip>:<port> address.
         <host_ip_B>:
           # (...)
@@ -69,7 +69,7 @@ Example config for installing only UI:
 | `<bridge_name>` | The bridge name which tells Ansible which file to use. This is located in `group_vars/<bridge_name>.yml`. |
 | `<host_ip>` | Remote server IP address. |
 | ansible_user: `<user>` | User that will ssh into the node. This is typically `ubuntu` or `root`. |
-| VALIDATOR_ADDRESS_PRIVATE_KEY: `"<private_key>"` | The private key for the specified validator address. |
+| ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: `"<private_key>"` | The private key for the specified validator address. |
 | syslog_server_port: `"<protocol>://<ip>:<port>"` | Optional port specification for bridge logs. This value will be provided by an administrator if required.  |
 
 `hosts.yml` can contain multiple bridge configurations at once.

@@ -1,17 +1,19 @@
 import { observable, computed } from 'mobx'
 import { toHex } from 'web3-utils'
-import { gasPriceFromOracle } from '../../../commons'
+import { gasPriceFromSupplier } from '../../../commons'
 
-const HOME_GAS_PRICE_FALLBACK = process.env.REACT_APP_HOME_GAS_PRICE_FALLBACK
-const HOME_GAS_PRICE_ORACLE_URL = process.env.REACT_APP_HOME_GAS_PRICE_ORACLE_URL
-const HOME_GAS_PRICE_SPEED_TYPE = process.env.REACT_APP_HOME_GAS_PRICE_SPEED_TYPE
-const HOME_GAS_PRICE_UPDATE_INTERVAL = process.env.REACT_APP_HOME_GAS_PRICE_UPDATE_INTERVAL
-const HOME_GAS_PRICE_FACTOR = process.env.REACT_APP_HOME_GAS_PRICE_FACTOR
-const FOREIGN_GAS_PRICE_FALLBACK = process.env.REACT_APP_FOREIGN_GAS_PRICE_FALLBACK
-const FOREIGN_GAS_PRICE_ORACLE_URL = process.env.REACT_APP_FOREIGN_GAS_PRICE_ORACLE_URL
-const FOREIGN_GAS_PRICE_SPEED_TYPE = process.env.REACT_APP_FOREIGN_GAS_PRICE_SPEED_TYPE
-const FOREIGN_GAS_PRICE_UPDATE_INTERVAL = process.env.REACT_APP_FOREIGN_GAS_PRICE_UPDATE_INTERVAL
-const FOREIGN_GAS_PRICE_FACTOR = process.env.REACT_APP_FOREIGN_GAS_PRICE_FACTOR
+const {
+  REACT_APP_COMMON_HOME_GAS_PRICE_FALLBACK,
+  REACT_APP_COMMON_HOME_GAS_PRICE_SUPPLIER_URL,
+  REACT_APP_COMMON_HOME_GAS_PRICE_SPEED_TYPE,
+  REACT_APP_UI_HOME_GAS_PRICE_UPDATE_INTERVAL,
+  REACT_APP_COMMON_HOME_GAS_PRICE_FACTOR,
+  REACT_APP_COMMON_FOREIGN_GAS_PRICE_FALLBACK,
+  REACT_APP_COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL,
+  REACT_APP_COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE,
+  REACT_APP_UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL,
+  REACT_APP_COMMON_FOREIGN_GAS_PRICE_FACTOR
+} = process.env
 
 const DEFAULT_GAS_PRICE_FACTOR = 1
 const DEFAULT_GAS_PRICE_UPDATE_INTERVAL = 900000
@@ -19,7 +21,7 @@ const DEFAULT_GAS_PRICE_UPDATE_INTERVAL = 900000
 class GasPriceStore {
   @observable
   gasPrice = null
-  oracleUrl = null
+  gasPriceSupplierUrl = null
   speedType = null
   updateInterval = null
   factor = null
@@ -37,21 +39,21 @@ class GasPriceStore {
     await this.web3Store.setHomeWeb3Promise
 
     if (await this.web3Store.onHomeSide()) {
-      this.gasPrice = HOME_GAS_PRICE_FALLBACK
-      this.oracleUrl = HOME_GAS_PRICE_ORACLE_URL
-      this.speedType = HOME_GAS_PRICE_SPEED_TYPE
-      this.updateInterval = HOME_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_GAS_PRICE_UPDATE_INTERVAL
-      this.factor = Number(HOME_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
+      this.gasPrice = REACT_APP_COMMON_HOME_GAS_PRICE_FALLBACK
+      this.gasPriceSupplierUrl = REACT_APP_COMMON_HOME_GAS_PRICE_SUPPLIER_URL
+      this.speedType = REACT_APP_COMMON_HOME_GAS_PRICE_SPEED_TYPE
+      this.updateInterval = REACT_APP_UI_HOME_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_GAS_PRICE_UPDATE_INTERVAL
+      this.factor = Number(REACT_APP_COMMON_HOME_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
     } else {
-      this.gasPrice = FOREIGN_GAS_PRICE_FALLBACK
-      this.oracleUrl = FOREIGN_GAS_PRICE_ORACLE_URL
-      this.speedType = FOREIGN_GAS_PRICE_SPEED_TYPE
-      this.updateInterval = FOREIGN_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_GAS_PRICE_UPDATE_INTERVAL
-      this.factor = Number(FOREIGN_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
+      this.gasPrice = REACT_APP_COMMON_FOREIGN_GAS_PRICE_FALLBACK
+      this.gasPriceSupplierUrl = REACT_APP_COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL
+      this.speedType = REACT_APP_COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE
+      this.updateInterval = REACT_APP_UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_GAS_PRICE_UPDATE_INTERVAL
+      this.factor = Number(REACT_APP_COMMON_FOREIGN_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
     }
 
     const oracleOptions = { speedType: this.speedType, factor: this.factor, logger: console }
-    this.gasPrice = (await gasPriceFromOracle(() => fetch(this.oracleUrl), oracleOptions)) || this.gasPrice
+    this.gasPrice = (await gasPriceFromSupplier(() => fetch(this.gasPriceSupplierUrl), oracleOptions)) || this.gasPrice
 
     setTimeout(() => this.updateGasPrice(), this.updateInterval)
   }

@@ -4,7 +4,7 @@ set -e # exit when any command fails
 
 CONTRACTS_PATH="../../contracts"
 DEPLOY_PATH="$CONTRACTS_PATH/deploy"
-ENVS_PATH="../envs"
+ENVS_PATH="../contracts-envs"
 
 echo -e "\n\n############ Deploying native-to-erc ############\n"
 cp "$ENVS_PATH/native-to-erc.env" "$DEPLOY_PATH/.env"

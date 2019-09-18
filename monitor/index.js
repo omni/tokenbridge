@@ -5,8 +5,8 @@ const { isV1Bridge } = require('./utils/serverUtils')
 
 const app = express()
 
-const LEFT_TX_THRESHOLD = Number(process.env.LEFT_TX_THRESHOLD) || 100
-console.log('LEFT_TX_THRESHOLD = ' + LEFT_TX_THRESHOLD)
+const MONITOR_TX_NUMBER_THRESHOLD = Number(process.env.MONITOR_TX_NUMBER_THRESHOLD) || 100
+console.log('MONITOR_TX_NUMBER_THRESHOLD = ' + MONITOR_TX_NUMBER_THRESHOLD)
 
 async function readFile(path) {
   try {
@@ -53,13 +53,13 @@ app.get('/validators', async (req, res, next) => {
     results.homeOk = true
     results.foreignOk = true
     for (const hv in results.home.validators) {
-      if (results.home.validators[hv].leftTx < LEFT_TX_THRESHOLD) {
+      if (results.home.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
         results.homeOk = false
         break
       }
     }
     for (const hv in results.foreign.validators) {
-      if (results.foreign.validators[hv].leftTx < LEFT_TX_THRESHOLD) {
+      if (results.foreign.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
         results.foreignOk = false
         break
       }
@@ -100,6 +100,6 @@ app.get('/alerts', async (req, res, next) => {
 
 initV1routes(app)
 
-const port = process.env.PORT || 3003
+const port = process.env.MONITOR_PORT || 3003
 app.set('port', port)
 app.listen(port, () => console.log(`Monitoring app listening on port ${port}!`))

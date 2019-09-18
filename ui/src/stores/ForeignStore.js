@@ -107,14 +107,14 @@ class ForeignStore {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
   }
-  networkName = process.env.REACT_APP_FOREIGN_NETWORK_NAME || 'Unknown'
+  networkName = process.env.REACT_APP_UI_FOREIGN_NETWORK_DISPLAY_NAME || 'Unknown'
   filteredBlockNumber = 0
   foreignBridge = {}
   tokenContract = {}
   tokenDecimals = 18
-  FOREIGN_BRIDGE_ADDRESS = process.env.REACT_APP_FOREIGN_BRIDGE_ADDRESS
-  explorerTxTemplate = process.env.REACT_APP_FOREIGN_EXPLORER_TX_TEMPLATE || ''
-  explorerAddressTemplate = process.env.REACT_APP_FOREIGN_EXPLORER_ADDRESS_TEMPLATE || ''
+  COMMON_FOREIGN_BRIDGE_ADDRESS = process.env.REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS
+  explorerTxTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_TX_TEMPLATE || ''
+  explorerAddressTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE || ''
 
   constructor(rootStore) {
     this.web3Store = rootStore.web3Store
@@ -132,7 +132,7 @@ class ForeignStore {
       return
     }
     const { FOREIGN_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
-    this.foreignBridge = new this.foreignWeb3.eth.Contract(FOREIGN_ABI, this.FOREIGN_BRIDGE_ADDRESS)
+    this.foreignBridge = new this.foreignWeb3.eth.Contract(FOREIGN_ABI, this.COMMON_FOREIGN_BRIDGE_ADDRESS)
     await this.getBlockNumber()
     await this.getTokenInfo()
     this.getMinPerTxLimit()
@@ -187,7 +187,7 @@ class ForeignStore {
           ? await getErc20TokenAddress(this.foreignBridge)
           : await getErc677TokenAddress(this.foreignBridge)
       this.tokenContract = new this.foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, this.tokenAddress)
-      this.tokenType = await getTokenType(this.tokenContract, this.FOREIGN_BRIDGE_ADDRESS)
+      this.tokenType = await getTokenType(this.tokenContract, this.COMMON_FOREIGN_BRIDGE_ADDRESS)
       const alternativeContract = new this.foreignWeb3.eth.Contract(ERC20_BYTES32_ABI, this.tokenAddress)
       try {
         this.symbol = await getSymbol(this.tokenContract)

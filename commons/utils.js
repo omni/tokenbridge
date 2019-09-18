@@ -205,7 +205,7 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
 // fetchFn has to be supplied (instead of just url to oracle),
 // because this utility function is shared between Browser and Node,
 // we use built-in 'fetch' on browser side, and `node-fetch` package in Node.
-const gasPriceFromOracle = async (fetchFn, options = {}) => {
+const gasPriceFromSupplier = async (fetchFn, options = {}) => {
   try {
     const response = await fetchFn()
     const json = await response.json()
@@ -258,7 +258,7 @@ module.exports = {
   getPastEvents,
   getDeployedAtBlock,
   normalizeGasPrice,
-  gasPriceFromOracle,
+  gasPriceFromSupplier,
   gasPriceFromContract,
   gasPriceWithinLimits
 }

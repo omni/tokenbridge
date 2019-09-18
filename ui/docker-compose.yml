@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: ui/Dockerfile
     ports:
-    - "${PORT}:${PORT}"
+    - "${UI_PORT}:${UI_PORT}"
     env_file: ./.env
     environment: 
       - NODE_ENV=production

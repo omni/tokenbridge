@@ -14,11 +14,11 @@ async function syncForEach(array, callback) {
   }
 }
 
-function checkHTTPS(ALLOW_HTTP, logger) {
+function checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger) {
   return function(network) {
     return function(url) {
       if (!/^https.*/.test(url)) {
-        if (ALLOW_HTTP !== 'yes') {
+        if (ORACLE_ALLOW_HTTP_FOR_RPC !== 'yes') {
           throw new Error(`http is not allowed: ${url}`)
         } else {
           logger.warn(`You are using http (${url}) on ${network} network. In production https must be used instead.`)
