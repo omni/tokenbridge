@@ -113,8 +113,8 @@ async function main(bridgeMode) {
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
-    const homeBalance = await web3Home.eth.getBalance(HOME_BRIDGE_ADDRESS)
-    const foreignBalance = await web3Foreign.eth.getBalance(FOREIGN_BRIDGE_ADDRESS)
+    const homeBalance = await web3Home.eth.getBalance(COMMON_HOME_BRIDGE_ADDRESS)
+    const foreignBalance = await web3Foreign.eth.getBalance(COMMON_FOREIGN_BRIDGE_ADDRESS)
 
     const diff = new BN(homeBalance).minus(new BN(foreignBalance)).toString()
 
