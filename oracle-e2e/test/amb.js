@@ -76,7 +76,7 @@ describe('arbitrary message bridging', () => {
         assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
         await foreignBox.methods
-          .setValueOnOtherNetwork(newValue, amb.home, amb.foreignBox)
+          .setValueOnOtherNetwork(newValue, amb.foreign, amb.homeBox)
           .send({
             from: user.address,
             gas: '400000'
