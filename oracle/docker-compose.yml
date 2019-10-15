@@ -11,6 +11,7 @@ services:
       - net_rabbit_bridge_request
       - net_rabbit_bridge_collected
       - net_rabbit_bridge_affirmation
+      - net_rabbit_bridge_transfer
       - net_rabbit_bridge_senderhome
       - net_rabbit_bridge_senderforeign
     restart: unless-stopped
@@ -25,6 +26,7 @@ services:
       - net_db_bridge_request
       - net_db_bridge_collected
       - net_db_bridge_affirmation
+      - net_db_bridge_transfer
       - net_db_bridge_senderhome
       - net_db_bridge_senderforeign
     restart: unless-stopped
@@ -74,6 +76,21 @@ services:
     networks:
       - net_db_bridge_affirmation
       - net_rabbit_bridge_affirmation
+  bridge_transfer:
+    cpus: 0.1
+    mem_limit: 500m
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
+    restart: unless-stopped
+    entrypoint: yarn watcher:transfer
+    networks:
+      - net_db_bridge_transfer
+      - net_rabbit_bridge_transfer
   bridge_senderhome:
     cpus: 0.1
     mem_limit: 500m
@@ -112,6 +129,8 @@ networks:
     driver: bridge
   net_db_bridge_affirmation:
     driver: bridge
+  net_db_bridge_transfer:
+    driver: bridge
   net_db_bridge_senderhome:
     driver: bridge
   net_db_bridge_senderforeign:
@@ -121,6 +140,8 @@ networks:
   net_rabbit_bridge_collected:
     driver: bridge
   net_rabbit_bridge_affirmation:
+    driver: bridge
+  net_rabbit_bridge_transfer:
     driver: bridge
   net_rabbit_bridge_senderhome:
     driver: bridge

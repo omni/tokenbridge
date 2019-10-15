@@ -1,5 +1,5 @@
 const baseConfig = require('./base.config')
-const { ERC20_ABI, ERC_TYPES } = require('../../commons')
+const { ERC_TYPES } = require('../../commons')
 
 const initialChecksJson = process.argv[3]
 
@@ -20,24 +20,11 @@ if (baseConfig.id === 'erc-erc' && initialChecks.foreignERC === ERC_TYPES.ERC677
 
 const id = `${baseConfig.id}-affirmation-request`
 
-module.exports =
-  (baseConfig.id === 'erc-erc' && initialChecks.foreignERC === ERC_TYPES.ERC20) || baseConfig.id === 'erc-native'
-    ? {
-        ...baseConfig.bridgeConfig,
-        ...baseConfig.foreignConfig,
-        event: 'Transfer',
-        eventContractAddress: initialChecks.bridgeableTokenAddress,
-        eventAbi: ERC20_ABI,
-        eventFilter: { to: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS },
-        queue: 'home',
-        name: `watcher-${id}`,
-        id
-      }
-    : {
-        ...baseConfig.bridgeConfig,
-        ...baseConfig.foreignConfig,
-        event: 'UserRequestForAffirmation',
-        queue: 'home',
-        name: `watcher-${id}`,
-        id
-      }
+module.exports = {
+  ...baseConfig.bridgeConfig,
+  ...baseConfig.foreignConfig,
+  event: 'UserRequestForAffirmation',
+  queue: 'home',
+  name: `watcher-${id}`,
+  id
+}

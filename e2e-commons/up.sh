@@ -17,9 +17,11 @@ while [ "$1" != "" ]; do
     docker-compose run -d oracle-erc20 yarn watcher:signature-request
     docker-compose run -d oracle-erc20 yarn watcher:collected-signatures
     docker-compose run -d oracle-erc20 yarn watcher:affirmation-request
+    docker-compose run -d oracle-erc20 yarn watcher:transfer
     docker-compose run -d oracle-erc20-native yarn watcher:signature-request
     docker-compose run -d oracle-erc20-native yarn watcher:collected-signatures
     docker-compose run -d oracle-erc20-native yarn watcher:affirmation-request
+    docker-compose run -d oracle-erc20-native yarn watcher:transfer
     docker-compose run -d oracle-amb yarn watcher:signature-request
     docker-compose run -d oracle-amb yarn watcher:collected-signatures
     docker-compose run -d oracle-amb yarn watcher:affirmation-request
