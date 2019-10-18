@@ -39,7 +39,7 @@ describe('erc to native', () => {
 
     // call bridge method to transfer tokens to a different recipient
     await foreignBridge.methods
-      .relayTokens(secondUser, homeWeb3.utils.toWei('0.01'))
+      .relayTokens(secondUser.address, homeWeb3.utils.toWei('0.01'))
       .send({
         from: user.address,
         gas: '1000000'
