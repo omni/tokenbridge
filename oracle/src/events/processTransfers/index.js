@@ -3,7 +3,7 @@ const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
 const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
-const { web3Home } = require('../../services/web3')
+const { web3Home, web3Foreign } = require('../../services/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('../processAffirmationRequests/estimateGas')
@@ -14,6 +14,10 @@ let validatorContract = null
 
 function processTransfersBuilder(config) {
   const homeBridge = new web3Home.eth.Contract(config.homeBridgeAbi, config.homeBridgeAddress)
+  const userRequestForAffirmationAbi = config.foreignBridgeAbi.filter(
+    e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
+  )[0]
+  const userRequestForAffirmationHash = web3Home.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
 
   return async function processTransfers(transfers) {
     const txToSend = []
@@ -36,6 +40,20 @@ function processTransfersBuilder(config) {
         })
 
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
+
+        const receipt = await web3Foreign.eth.getTransactionReceipt(transfer.transactionHash)
+        const existsAffirmationEvent = receipt.logs.some(
+          e => e.address === config.foreignBridgeAddress && e.topics[0] === userRequestForAffirmationHash
+        )
+
+        if (existsAffirmationEvent) {
+          logger.info(
+            `Transfer event discarded because UserRequestForAffirmation event is also present in the same transaction ${
+              transfer.transactionHash
+            }`
+          )
+          return
+        }
 
         let gasEstimate
         try {
