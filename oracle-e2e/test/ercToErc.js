@@ -86,7 +86,7 @@ describe('erc to erc', () => {
       if (toBN(balance).isZero()) {
         retry()
       } else {
-        assert(toBN(balance).eq(toBN(secondTransferValue)), 'User balance should be the same')
+        assert(toBN(balance).eq(toBN(secondTransferValue)), 'User balance should be increased only by second transfer')
       }
     })
   })
