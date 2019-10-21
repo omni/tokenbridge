@@ -1,10 +1,11 @@
-require('../../../env')
+require('dotenv').config()
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
-const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
+const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
-const { signatureToVRS } = require('../../utils/message')
+const { signatureToVRS, signatureToVRSAMB, packSignatures } = require('../../utils/message')
+const { parseAMBMessage } = require('../../../../commons')
 const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
 const { MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
@@ -26,7 +27,7 @@ function processCollectedSignaturesBuilder(config) {
       const validatorContractAddress = await foreignBridge.methods.validatorContract().call()
       rootLogger.debug({ validatorContractAddress }, 'Validator contract address obtained')
 
-      validatorContract = new web3Foreign.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
+      validatorContract = new web3Foreign.eth.Contract(bridgeValidatorsABI, validatorContractAddress)
     }
 
     rootLogger.debug(`Processing ${signatures.length} CollectedSignatures events`)
@@ -48,18 +49,24 @@ function processCollectedSignaturesBuilder(config) {
 
         const requiredSignatures = new Array(NumberOfCollectedSignatures).fill(0)
 
+        const signaturesArray = []
         const [v, r, s] = [[], [], []]
         logger.debug('Getting message signatures')
         const signaturePromises = requiredSignatures.map(async (el, index) => {
           logger.debug({ index }, 'Getting message signature')
           const signature = await homeBridge.methods.signature(messageHash, index).call()
-          const recover = signatureToVRS(signature)
-          v.push(recover.v)
-          r.push(recover.r)
-          s.push(recover.s)
+          const vrs = signatureToVRS(signature)
+          v.push(vrs.v)
+          r.push(vrs.r)
+          s.push(vrs.s)
+          const recover = signatureToVRSAMB(signature)
+          signaturesArray.push(recover)
         })
 
         await Promise.all(signaturePromises)
+        const signatures = packSignatures(signaturesArray)
+
+        const { txHash } = parseAMBMessage(message)
 
         let gasEstimate
         try {
@@ -70,8 +77,11 @@ function processCollectedSignaturesBuilder(config) {
             v,
             r,
             s,
+            signatures,
             message,
-            numberOfCollectedSignatures: NumberOfCollectedSignatures
+            numberOfCollectedSignatures: NumberOfCollectedSignatures,
+            txHash,
+            address: config.validatorAddress
           })
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {
@@ -88,7 +98,8 @@ function processCollectedSignaturesBuilder(config) {
             throw e
           }
         }
-        const data = await foreignBridge.methods.executeSignatures(v, r, s, message).encodeABI()
+        const data = await foreignBridge.methods.executeSignatures(message, signatures).encodeABI()
+
         txToSend.push({
           data,
           gasEstimate,

@@ -9,7 +9,7 @@ docker-compose up -d parity1 parity2 e2e
 
 while [ "$1" != "" ]; do
   if [ "$1" == "oracle" ]; then
-    docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native
+    docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native oracle-amb
 
     docker-compose run -d oracle yarn watcher:signature-request
     docker-compose run -d oracle yarn watcher:collected-signatures
@@ -20,6 +20,9 @@ while [ "$1" != "" ]; do
     docker-compose run -d oracle-erc20-native yarn watcher:signature-request
     docker-compose run -d oracle-erc20-native yarn watcher:collected-signatures
     docker-compose run -d oracle-erc20-native yarn watcher:affirmation-request
+    docker-compose run -d oracle-amb yarn watcher:signature-request
+    docker-compose run -d oracle-amb yarn watcher:collected-signatures
+    docker-compose run -d oracle-amb yarn watcher:affirmation-request
     docker-compose run -d oracle yarn sender:home
     docker-compose run -d oracle yarn sender:foreign
   fi

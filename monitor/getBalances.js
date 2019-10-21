@@ -112,6 +112,12 @@ async function main(bridgeMode) {
       balanceDiff: Number(Web3Utils.fromWei(diff)),
       lastChecked: Math.floor(Date.now() / 1000)
     }
+  } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    return {
+      home: {},
+      foreign: {},
+      lastChecked: Math.floor(Date.now() / 1000)
+    }
   } else {
     throw new Error(`Unrecognized bridge mode: '${bridgeMode}'`)
   }

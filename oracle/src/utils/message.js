@@ -1,10 +1,6 @@
 const assert = require('assert')
 const Web3Utils = require('web3-utils')
-
-// strips leading "0x" if present
-function strip0x(input) {
-  return input.replace(/^0x/, '')
-}
+const { strip0x } = require('../../../commons')
 
 function createMessage({ recipient, value, transactionHash, bridgeAddress, expectedMessageLength }) {
   recipient = strip0x(recipient)
@@ -63,8 +59,32 @@ function signatureToVRS(signature) {
   return { v, r, s }
 }
 
+function signatureToVRSAMB(rawSignature) {
+  const signature = strip0x(rawSignature)
+  const v = signature.substr(64 * 2)
+  const r = signature.substr(0, 32 * 2)
+  const s = signature.substr(32 * 2, 32 * 2)
+  return { v, r, s }
+}
+
+function packSignatures(array) {
+  const length = strip0x(Web3Utils.toHex(array.length))
+  const msgLength = length.length === 1 ? `0${length}` : length
+  let v = ''
+  let r = ''
+  let s = ''
+  array.forEach(e => {
+    v = v.concat(e.v)
+    r = r.concat(e.r)
+    s = s.concat(e.s)
+  })
+  return `0x${msgLength}${v}${r}${s}`
+}
+
 module.exports = {
   createMessage,
   parseMessage,
-  signatureToVRS
+  signatureToVRS,
+  signatureToVRSAMB,
+  packSignatures
 }
