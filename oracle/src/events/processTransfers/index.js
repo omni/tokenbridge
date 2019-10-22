@@ -48,7 +48,7 @@ function processTransfersBuilder(config) {
 
         if (existsAffirmationEvent) {
           logger.info(
-            `Transfer event discarded because UserRequestForAffirmation event is also present in the same transaction ${
+            `Transfer event discarded because a transaction with alternative receiver detected in transaction ${
               transfer.transactionHash
             }`
           )
