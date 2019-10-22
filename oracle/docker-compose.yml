@@ -86,7 +86,7 @@ services:
     environment:
       - NODE_ENV=production
       - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
-    restart: unless-stopped
+    restart: on-failure
     entrypoint: yarn watcher:transfer
     networks:
       - net_db_bridge_transfer
