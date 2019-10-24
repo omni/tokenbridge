@@ -14,7 +14,7 @@ orbs:
           - run: 
               name: Install Chrome
               command: |
-                wget -O chrome.deb http://archive.ubuntu.com/ubuntu/pool/universe/c/chromium-browser/chromium-browser_76.0.3809.100-0ubuntu0.19.04.1_amd64.deb
+                wget -O chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
                 sudo dpkg -i chrome.deb
       install-node:
         steps:
