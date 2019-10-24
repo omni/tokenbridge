@@ -1,61 +1,7 @@
 require('dotenv').config()
 const eventsInfo = require('./utils/events')
-const { processedMsgNotDelivered, deliveredMsgNotProcessed } = require('./utils/message')
+const { processedMsgNotDelivered, deliveredMsgNotProcessed, eventWithoutReference } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
-
-function compareDepositsHome(foreign) {
-  return homeDeposit => {
-    return (
-      foreign.filter(foreignDeposit => {
-        return (
-          foreignDeposit.returnValues.transactionHash === homeDeposit.transactionHash &&
-          foreignDeposit.returnValues.recipient === homeDeposit.returnValues.recipient &&
-          foreignDeposit.returnValues.value === homeDeposit.returnValues.value
-        )
-      }).length === 0
-    )
-  }
-}
-function compareDepositsForeign(home) {
-  return foreignDeposit => {
-    return (
-      home.filter(homeDeposit => {
-        return (
-          homeDeposit.transactionHash === foreignDeposit.returnValues.transactionHash &&
-          homeDeposit.returnValues.recipient === foreignDeposit.returnValues.recipient &&
-          homeDeposit.returnValues.value === foreignDeposit.returnValues.value
-        )
-      }).length === 0
-    )
-  }
-}
-
-function compareTransferHome(foreign) {
-  return homeDeposit => {
-    return (
-      foreign.filter(foreignDeposit => {
-        return (
-          homeDeposit.returnValues.transactionHash === foreignDeposit.transactionHash &&
-          homeDeposit.returnValues.recipient === foreignDeposit.returnValues.from &&
-          homeDeposit.returnValues.value === foreignDeposit.returnValues.value
-        )
-      }).length === 0
-    )
-  }
-}
-function compareTransferForeign(home) {
-  return foreignDeposit => {
-    return (
-      home.filter(homeDeposit => {
-        return (
-          foreignDeposit.transactionHash === homeDeposit.returnValues.transactionHash &&
-          foreignDeposit.returnValues.from === homeDeposit.returnValues.recipient &&
-          foreignDeposit.returnValues.value === homeDeposit.returnValues.value
-        )
-      }).length === 0
-    )
-  }
-}
 
 async function main() {
   const {
@@ -63,7 +9,6 @@ async function main() {
     homeToForeignConfirmations,
     foreignToHomeConfirmations,
     foreignToHomeRequests,
-    isExternalErc20,
     bridgeMode
   } = await eventsInfo()
 
@@ -88,17 +33,11 @@ async function main() {
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else {
-    const onlyInHomeDeposits = homeToForeignRequests.filter(compareDepositsHome(homeToForeignConfirmations))
-    const onlyInForeignDeposits = homeToForeignConfirmations
-      .concat([])
-      .filter(compareDepositsForeign(homeToForeignRequests))
+    const onlyInHomeDeposits = homeToForeignRequests.filter(eventWithoutReference(homeToForeignConfirmations))
+    const onlyInForeignDeposits = homeToForeignConfirmations.filter(eventWithoutReference(homeToForeignRequests))
 
-    const onlyInHomeWithdrawals = isExternalErc20
-      ? foreignToHomeConfirmations.filter(compareTransferHome(foreignToHomeRequests))
-      : foreignToHomeConfirmations.filter(compareDepositsForeign(foreignToHomeRequests))
-    const onlyInForeignWithdrawals = isExternalErc20
-      ? foreignToHomeRequests.filter(compareTransferForeign(foreignToHomeConfirmations))
-      : foreignToHomeRequests.filter(compareDepositsHome(foreignToHomeConfirmations))
+    const onlyInHomeWithdrawals = foreignToHomeConfirmations.filter(eventWithoutReference(foreignToHomeRequests))
+    const onlyInForeignWithdrawals = foreignToHomeRequests.filter(eventWithoutReference(foreignToHomeConfirmations))
 
     return {
       onlyInHomeDeposits,

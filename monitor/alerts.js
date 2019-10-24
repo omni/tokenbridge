@@ -3,7 +3,7 @@ const Web3 = require('web3')
 const logger = require('./logger')('alerts')
 const eventsInfo = require('./utils/events')
 const { getBlockNumber } = require('./utils/contract')
-const { processedMsgNotDelivered } = require('./utils/message')
+const { processedMsgNotDelivered, eventWithoutReference } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
 
 const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL } = process.env
@@ -29,10 +29,9 @@ async function main() {
     xSignatures = homeToForeignConfirmations.filter(processedMsgNotDelivered(homeToForeignRequests))
     xAffirmations = foreignToHomeConfirmations.filter(processedMsgNotDelivered(foreignToHomeRequests))
   } else {
-    xSignatures = homeToForeignConfirmations.filter(findDifferences(homeToForeignRequests))
-    xAffirmations = foreignToHomeConfirmations.filter(findDifferences(foreignToHomeRequests))
+    xSignatures = homeToForeignConfirmations.filter(eventWithoutReference(homeToForeignRequests))
+    xAffirmations = foreignToHomeConfirmations.filter(eventWithoutReference(foreignToHomeRequests))
   }
-
   logger.debug('building misbehavior blocks')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
@@ -52,8 +51,8 @@ async function main() {
   const foreignValidators = await Promise.all(xSignatures.map(event => findTxSender(web3Foreign)(event)))
   const homeValidators = await Promise.all(xAffirmations.map(event => findTxSender(web3Home)(event)))
 
-  const xSignaturesTxs = xSignatures.map(normalizeEventInformation).reduce(buildTxList(foreignValidators), {})
-  const xAffirmationsTxs = xAffirmations.map(normalizeEventInformation).reduce(buildTxList(homeValidators), {})
+  const xSignaturesTxs = xSignatures.reduce(buildTxList(foreignValidators), {})
+  const xAffirmationsTxs = xAffirmations.reduce(buildTxList(homeValidators), {})
 
   logger.debug('Done')
 
@@ -150,7 +149,7 @@ const findTxSender = web3 => async ({ transactionHash }) => {
  * }}}
  */
 const buildTxList = validatorsList => (acc, event, index) => {
-  acc[event.txHash] = {
+  acc[event.transactionHash] = {
     value: event.value,
     block: event.blockNumber,
     referenceTx: event.referenceTx,
@@ -159,39 +158,5 @@ const buildTxList = validatorsList => (acc, event, index) => {
   }
   return acc
 }
-
-/**
- * Finds a missing destDeposit in src list if there's any
- * @param {Array} src
- * @returns {function(*=): boolean}
- */
-const findDifferences = src => dest => {
-  const b = normalizeEventInformation(dest)
-
-  return (
-    src
-      .map(normalizeEventInformation)
-      .filter(a => a.referenceTx === b.referenceTx && a.recipient === b.recipient && a.value === b.value).length === 0
-  )
-}
-
-/**
- * Normalizes the different event objects to facilitate data processing
- * @param {Object} event
- * @returns {{
- *  txHash: string,
- *  blockNumber: number,
- *  referenceTx: string,
- *  recipient: string | *,
- *  value: *
- * }}
- */
-const normalizeEventInformation = event => ({
-  txHash: event.transactionHash,
-  blockNumber: event.blockNumber,
-  referenceTx: event.returnValues.transactionHash || event.transactionHash,
-  recipient: event.returnValues.recipient || event.returnValues.from,
-  value: event.returnValues.value
-})
 
 module.exports = main
