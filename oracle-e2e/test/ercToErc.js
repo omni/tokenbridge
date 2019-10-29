@@ -1,8 +1,8 @@
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, ercToErcBridge, homeRPC, foreignRPC } = require('../../e2e-commons/constants.json')
-const { ERC677_BRIDGE_TOKEN_ABI } = require('../../commons')
+const { user, secondUser, ercToErcBridge, homeRPC, foreignRPC } = require('../../e2e-commons/constants.json')
+const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI } = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
@@ -17,6 +17,7 @@ homeWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 
 const erc20Token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToErcBridge.foreignToken)
+const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
 const erc677Token = new homeWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToErcBridge.homeToken)
 
 describe('erc to erc', () => {
@@ -24,9 +25,49 @@ describe('erc to erc', () => {
     const balance = await erc20Token.methods.balanceOf(user.address).call()
     assert(!toBN(balance).isZero(), 'Account should have tokens')
 
+    const firstTransferValue = homeWeb3.utils.toWei('0.01')
+
+    // approve tokens to foreign bridge
+    await erc20Token.methods
+      .approve(COMMON_FOREIGN_BRIDGE_ADDRESS, firstTransferValue)
+      .send({
+        from: user.address,
+        gas: '1000000'
+      })
+      .catch(e => {
+        console.error(e)
+      })
+
+    // call bridge method to transfer tokens to a different recipient
+    await foreignBridge.methods
+      .relayTokens(secondUser.address, firstTransferValue)
+      .send({
+        from: user.address,
+        gas: '1000000'
+      })
+      .catch(e => {
+        console.error(e)
+      })
+
+    // Send a trivial transaction to generate a new block since the watcher
+    // is configured to wait 1 confirmation block
+    await generateNewBlock(foreignWeb3, user.address)
+
+    // check that balance increases
+    await promiseRetry(async retry => {
+      const balance = await erc677Token.methods.balanceOf(user.address).call()
+      const recipientBalance = await erc677Token.methods.balanceOf(secondUser.address).call()
+      assert(toBN(balance).isZero(), 'User balance should be the same')
+      if (toBN(recipientBalance).isZero()) {
+        retry()
+      }
+    })
+
+    const secondTransferValue = homeWeb3.utils.toWei('0.05')
+
     // send tokens to foreign bridge
     await erc20Token.methods
-      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'))
+      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, secondTransferValue)
       .send({
         from: user.address,
         gas: '1000000'
@@ -44,6 +85,8 @@ describe('erc to erc', () => {
       const balance = await erc677Token.methods.balanceOf(user.address).call()
       if (toBN(balance).isZero()) {
         retry()
+      } else {
+        assert(toBN(balance).eq(toBN(secondTransferValue)), 'User balance should be increased only by second transfer')
       }
     })
   })

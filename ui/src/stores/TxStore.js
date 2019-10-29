@@ -64,7 +64,7 @@ class TxStore {
     try {
       return this.web3Store.getWeb3Promise.then(async () => {
         if (this.web3Store.defaultAccount.address) {
-          const data = await contract.methods.transferAndCall(to, value, '0x00').encodeABI()
+          const data = await contract.methods.transferAndCall(to, value, '0x').encodeABI()
           return this.doSend({ to: tokenAddress, from, value: '0x00', data, sentValue: value })
         } else {
           this.alertStore.pushError('Please unlock wallet')
