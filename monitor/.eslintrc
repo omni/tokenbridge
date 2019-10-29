@@ -8,5 +8,8 @@
   "rules": {
     "no-use-before-define": "off",
     "node/no-unpublished-require": "off"
+  },
+  "env": {
+    "mocha": true
   }
 }

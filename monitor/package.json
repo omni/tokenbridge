@@ -8,7 +8,8 @@
     "start": "node index.js",
     "check-and-start": "yarn check-all && yarn start",
     "lint": "eslint . --ignore-path ../.eslintignore",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "NODE_ENV=test mocha"
   },
   "author": "",
   "license": "ISC",
@@ -23,5 +24,6 @@
     "node": ">=8.9"
   },
   "devDependencies": {
+    "chai": "^4.2.0"
   }
 }

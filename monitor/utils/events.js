@@ -13,6 +13,7 @@ const {
   getTokenType,
   getPastEvents
 } = require('../../commons')
+const { normalizeEventInformation } = require('./message')
 
 const {
   COMMON_HOME_RPC_URL,
@@ -40,6 +41,7 @@ async function main(mode) {
   const v1Bridge = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1
   let isExternalErc20
   let erc20Contract
+  let normalizeEvent = normalizeEventInformation
   if (bridgeMode !== BRIDGE_MODES.ARBITRARY_MESSAGE) {
     const erc20MethodName = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
     const erc20Address = await foreignBridge.methods[erc20MethodName]().call()
@@ -49,47 +51,59 @@ async function main(mode) {
     )
     isExternalErc20 = tokenType === ERC_TYPES.ERC20
     erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
+  } else {
+    normalizeEvent = e => e
   }
 
   logger.debug('getting last block numbers')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
 
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
-  const homeToForeignRequests = await getPastEvents(homeBridge, {
+  const homeToForeignRequests = (await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
     fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber
-  })
+  })).map(normalizeEvent)
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
-  const homeToForeignConfirmations = await getPastEvents(foreignBridge, {
+  const homeToForeignConfirmations = (await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Deposit' : 'RelayedMessage',
     fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: foreignBlockNumber
-  })
+  })).map(normalizeEvent)
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
-  const foreignToHomeConfirmations = await getPastEvents(homeBridge, {
+  const foreignToHomeConfirmations = (await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Withdraw' : 'AffirmationCompleted',
     fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber
-  })
+  })).map(normalizeEvent)
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
-  const foreignToHomeRequests = isExternalErc20
-    ? await getPastEvents(erc20Contract, {
-        event: 'Transfer',
-        fromBlock: MONITOR_FOREIGN_START_BLOCK,
-        toBlock: foreignBlockNumber,
-        options: {
-          filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
-        }
-      })
-    : await getPastEvents(foreignBridge, {
-        event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
-        fromBlock: MONITOR_FOREIGN_START_BLOCK,
-        toBlock: foreignBlockNumber
-      })
+  let foreignToHomeRequests = (await getPastEvents(foreignBridge, {
+    event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
+    fromBlock: MONITOR_FOREIGN_START_BLOCK,
+    toBlock: foreignBlockNumber
+  })).map(normalizeEvent)
+  if (isExternalErc20) {
+    logger.debug("calling erc20Contract.getPastEvents('Transfer')")
+    const transferEvents = (await getPastEvents(erc20Contract, {
+      event: 'Transfer',
+      fromBlock: MONITOR_FOREIGN_START_BLOCK,
+      toBlock: foreignBlockNumber,
+      options: {
+        filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
+      }
+    })).map(normalizeEvent)
+
+    // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
+    const directTransfers = transferEvents.filter(
+      e => foreignToHomeRequests.findIndex(t => t.referenceTx === e.referenceTx) === -1
+    )
+
+    foreignToHomeRequests = [...foreignToHomeRequests, ...directTransfers]
+  }
+
   logger.debug('Done')
   return {
     homeToForeignRequests,
