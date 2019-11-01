@@ -1,11 +1,11 @@
 require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
-const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
+const { BRIDGE_VALIDATORS_ABI, TOKENS_SWAPPED_EVENT_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
-const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
+const { EXIT_CODES, MAX_CONCURRENT_EVENTS, ZERO_ADDRESS } = require('../../utils/constants')
 const estimateGas = require('../processAffirmationRequests/estimateGas')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
@@ -18,6 +18,7 @@ function processTransfersBuilder(config) {
     e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
   )[0]
   const userRequestForAffirmationHash = web3Home.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
+  const tokensSwappedHash = web3Home.eth.abi.encodeEventSignature(TOKENS_SWAPPED_EVENT_ABI)
 
   return async function processTransfers(transfers) {
     const txToSend = []
@@ -42,6 +43,7 @@ function processTransfersBuilder(config) {
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
 
         const receipt = await web3Foreign.eth.getTransactionReceipt(transfer.transactionHash)
+
         const existsAffirmationEvent = receipt.logs.some(
           e => e.address === config.foreignBridgeAddress && e.topics[0] === userRequestForAffirmationHash
         )
@@ -51,6 +53,15 @@ function processTransfersBuilder(config) {
             `Transfer event discarded because a transaction with alternative receiver detected in transaction ${
               transfer.transactionHash
             }`
+          )
+          return
+        }
+
+        const existsTokensSwappedEvent = receipt.logs.some(e => e.topics[0] === tokensSwappedHash)
+
+        if (from === ZERO_ADDRESS && existsTokensSwappedEvent) {
+          logger.info(
+            `Transfer event discarded because token swap is detected in transaction ${transfer.transactionHash}`
           )
           return
         }
