@@ -11,7 +11,8 @@ const {
   ERC20_ABI,
   ERC677_BRIDGE_TOKEN_ABI,
   getTokenType,
-  getPastEvents
+  getPastEvents,
+  TOKENS_SWAPPED_EVENT_ABI
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
 
@@ -87,7 +88,7 @@ async function main(mode) {
   })).map(normalizeEvent)
   if (isExternalErc20) {
     logger.debug("calling erc20Contract.getPastEvents('Transfer')")
-    const transferEvents = (await getPastEvents(erc20Contract, {
+    let transferEvents = (await getPastEvents(erc20Contract, {
       event: 'Transfer',
       fromBlock: MONITOR_FOREIGN_START_BLOCK,
       toBlock: foreignBlockNumber,
@@ -96,9 +97,38 @@ async function main(mode) {
       }
     })).map(normalizeEvent)
 
+    const foreignBridgeSwapped = new web3Foreign.eth.Contract([TOKENS_SWAPPED_EVENT_ABI], COMMON_FOREIGN_BRIDGE_ADDRESS)
+    const tokensSwappedEvents = (await getPastEvents(foreignBridgeSwapped, {
+      event: 'TokensSwapped',
+      fromBlock: MONITOR_FOREIGN_START_BLOCK,
+      toBlock: foreignBlockNumber
+    })).map(normalizeEvent)
+
+    // Get transfer events for each previous erc20
+    await Promise.all(
+      tokensSwappedEvents.map(async swap => {
+        const previousERC20 = new web3Foreign.eth.Contract(ERC20_ABI, swap.recipient)
+
+        const previousTransferEvents = (await getPastEvents(previousERC20, {
+          event: 'Transfer',
+          fromBlock: MONITOR_FOREIGN_START_BLOCK,
+          toBlock: foreignBlockNumber,
+          options: {
+            filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
+          }
+        })).map(normalizeEvent)
+        transferEvents = [...previousTransferEvents, ...transferEvents]
+      })
+    )
+
     // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
-    const directTransfers = transferEvents.filter(
+    let directTransfers = transferEvents.filter(
       e => foreignToHomeRequests.findIndex(t => t.referenceTx === e.referenceTx) === -1
+    )
+
+    // filter transfer that is part of a token swap
+    directTransfers = directTransfers.filter(
+      e => tokensSwappedEvents.findIndex(t => t.referenceTx === e.referenceTx) === -1
     )
 
     foreignToHomeRequests = [...foreignToHomeRequests, ...directTransfers]
