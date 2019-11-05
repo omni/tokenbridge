@@ -12,7 +12,7 @@ const {
   ERC677_BRIDGE_TOKEN_ABI,
   getTokenType,
   getPastEvents,
-  TOKENS_SWAPPED_EVENT_ABI
+  ZERO_ADDRESS
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
 
@@ -97,17 +97,20 @@ async function main(mode) {
       }
     })).map(normalizeEvent)
 
-    const foreignBridgeSwapped = new web3Foreign.eth.Contract([TOKENS_SWAPPED_EVENT_ABI], COMMON_FOREIGN_BRIDGE_ADDRESS)
-    const tokensSwappedEvents = (await getPastEvents(foreignBridgeSwapped, {
+    const tokensSwappedEvents = await getPastEvents(foreignBridge, {
       event: 'TokensSwapped',
       fromBlock: MONITOR_FOREIGN_START_BLOCK,
       toBlock: foreignBlockNumber
-    })).map(normalizeEvent)
+    })
+
+    // Get token swap events emitted by foreign bridge
+    const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
 
     // Get transfer events for each previous erc20
+    const uniqueTokenAddresses = [...new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))]
     await Promise.all(
-      tokensSwappedEvents.map(async swap => {
-        const previousERC20 = new web3Foreign.eth.Contract(ERC20_ABI, swap.recipient)
+      uniqueTokenAddresses.map(async tokenAddress => {
+        const previousERC20 = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
 
         const previousTransferEvents = (await getPastEvents(previousERC20, {
           event: 'Transfer',
@@ -120,7 +123,6 @@ async function main(mode) {
         transferEvents = [...previousTransferEvents, ...transferEvents]
       })
     )
-
     // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
     let directTransfers = transferEvents.filter(
       e => foreignToHomeRequests.findIndex(t => t.referenceTx === e.referenceTx) === -1
@@ -128,9 +130,11 @@ async function main(mode) {
 
     // filter transfer that is part of a token swap
     directTransfers = directTransfers.filter(
-      e => tokensSwappedEvents.findIndex(t => t.referenceTx === e.referenceTx) === -1
+      e =>
+        bridgeTokensSwappedEvents.findIndex(
+          t => t.transactionHash === e.referenceTx && e.recipient === ZERO_ADDRESS
+        ) === -1
     )
-
     foreignToHomeRequests = [...foreignToHomeRequests, ...directTransfers]
   }
 

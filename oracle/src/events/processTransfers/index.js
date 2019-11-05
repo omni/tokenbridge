@@ -1,11 +1,11 @@
 require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
-const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
+const { BRIDGE_VALIDATORS_ABI, ZERO_ADDRESS } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
-const { EXIT_CODES, MAX_CONCURRENT_EVENTS, ZERO_ADDRESS } = require('../../utils/constants')
+const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('../processAffirmationRequests/estimateGas')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
