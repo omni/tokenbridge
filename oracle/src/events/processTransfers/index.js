@@ -19,7 +19,7 @@ function processTransfersBuilder(config) {
   )[0]
   const tokensSwappedAbi = config.foreignBridgeAbi.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
   const userRequestForAffirmationHash = web3Home.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
-  const tokensSwappedHash = web3Home.eth.abi.encodeEventSignature(tokensSwappedAbi)
+  const tokensSwappedHash = tokensSwappedAbi ? web3Home.eth.abi.encodeEventSignature(tokensSwappedAbi) : '0x'
 
   return async function processTransfers(transfers) {
     const txToSend = []
@@ -58,9 +58,9 @@ function processTransfersBuilder(config) {
           return
         }
 
-        const existsTokensSwappedEvent = receipt.logs.some(
-          e => e.address === config.foreignBridgeAddress && e.topics[0] === tokensSwappedHash
-        )
+        const existsTokensSwappedEvent = tokensSwappedAbi
+          ? receipt.logs.some(e => e.address === config.foreignBridgeAddress && e.topics[0] === tokensSwappedHash)
+          : false
 
         if (from === ZERO_ADDRESS && existsTokensSwappedEvent) {
           logger.info(
