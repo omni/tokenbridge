@@ -1,7 +1,7 @@
 require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('http-list-provider')
-const { BRIDGE_VALIDATORS_ABI, TOKENS_SWAPPED_EVENT_ABI } = require('../../../../commons')
+const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
@@ -17,8 +17,9 @@ function processTransfersBuilder(config) {
   const userRequestForAffirmationAbi = config.foreignBridgeAbi.filter(
     e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
   )[0]
+  const tokensSwappedAbi = config.foreignBridgeAbi.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
   const userRequestForAffirmationHash = web3Home.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
-  const tokensSwappedHash = web3Home.eth.abi.encodeEventSignature(TOKENS_SWAPPED_EVENT_ABI)
+  const tokensSwappedHash = web3Home.eth.abi.encodeEventSignature(tokensSwappedAbi)
 
   return async function processTransfers(transfers) {
     const txToSend = []
@@ -57,7 +58,9 @@ function processTransfersBuilder(config) {
           return
         }
 
-        const existsTokensSwappedEvent = receipt.logs.some(e => e.topics[0] === tokensSwappedHash)
+        const existsTokensSwappedEvent = receipt.logs.some(
+          e => e.address === config.foreignBridgeAddress && e.topics[0] === tokensSwappedHash
+        )
 
         if (from === ZERO_ADDRESS && existsTokensSwappedEvent) {
           logger.info(
