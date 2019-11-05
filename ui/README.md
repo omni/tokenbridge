@@ -52,7 +52,7 @@ The following is an example setup using the POA Sokol testnet as the Home networ
 
 ### Dependencies
 
-- [Smart Contracts](https://github.com/poanetwork/poa-bridge-contracts)
+- [Smart Contracts](https://github.com/poanetwork/tokenbridge-contracts)
 - [Oracle](../oracle/README.md)
 - [Node.js](https://nodejs.org/en/download/)
 - [AlphaWallet](https://alphawallet.com/) or [Nifty Wallet](https://github.com/poanetwork/nifty-wallet) or [MetaMask](https://metamask.io/)
@@ -72,8 +72,8 @@ The following is an example setup using the POA Sokol testnet as the Home networ
     * Get free Kovan Coins from the [gitter channel](https://gitter.im/kovan-testnet/faucet) or [Iracus faucet](https://github.com/kovan-testnet/faucet) for Foreign account(s). Get 5 Keth to 1 acc, and transfer from there to all other wallets if more than one account is used.
 
 4. Deploy the Sokol <-> Kovan Bridge contracts.
-    * Go to the the `sokol-kovan-bridge` folder created in step 1 and `git clone https://github.com/poanetwork/poa-bridge-contracts`
-    * Follow instructions in the [POA Bridge contracts repo](https://github.com/poanetwork/poa-bridge-contracts).
+    * Go to the the `sokol-kovan-bridge` folder created in step 1 and `git clone https://github.com/poanetwork/tokenbridge-contracts`
+    * Follow instructions in the [POA Bridge contracts repo](https://github.com/poanetwork/tokenbridge-contracts).
     * Set the parameters in the .env file.
       * `DEPLOYMENT_ACCOUNT_PRIVATE_KEY`: Export the private key from step 2
       * `HOME_RPC_URL`=https://sokol.poa.network
@@ -86,7 +86,7 @@ The following is an example setup using the POA Sokol testnet as the Home networ
         * `FOREIGN_UPGRADEABLE_ADMIN_BRIDGE`
         * `VALIDATORS` _Note: Wallet address(es) for validator(s) are separated by a space. For testing, you can use the same address that was used as the bridge contracts management account._
       * `FOREIGN_RPC_URL`=https://kovan.infura.io/mew
-    * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `poa-bridge-contracts/deploy` directory and includes the bridge contract addresses.  
+    * When deployment is finished, check that the `bridgeDeploymentResults.json` file exists in the `tokenbridge-contracts/deploy` directory and includes the bridge contract addresses.  
 
 5. Install and run the TokenBridge Oracle.
   * Go to the `sokol-kovan-bridge` folder
@@ -125,7 +125,7 @@ cp .env.example .env
 ````
   * Insert the addresses from the bridgeDeploymentResults.json file (from step 4) into the .env file. No other changes are needed, see [Env Parameter Details](#env-parameter-details) for information about each parameter.
 ```
-cat ../poa-bridge-contracts/deploy/bridgeDeploymentResults.json
+cat ../tokenbridge-contracts/deploy/bridgeDeploymentResults.json
 ```
 
 ```bash
