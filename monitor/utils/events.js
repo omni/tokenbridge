@@ -97,44 +97,50 @@ async function main(mode) {
       }
     })).map(normalizeEvent)
 
-    const tokensSwappedEvents = await getPastEvents(foreignBridge, {
-      event: 'TokensSwapped',
-      fromBlock: MONITOR_FOREIGN_START_BLOCK,
-      toBlock: foreignBlockNumber
-    })
-
-    // Get token swap events emitted by foreign bridge
-    const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
-
-    // Get transfer events for each previous erc20
-    const uniqueTokenAddresses = [...new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))]
-    await Promise.all(
-      uniqueTokenAddresses.map(async tokenAddress => {
-        const previousERC20 = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
-
-        const previousTransferEvents = (await getPastEvents(previousERC20, {
-          event: 'Transfer',
-          fromBlock: MONITOR_FOREIGN_START_BLOCK,
-          toBlock: foreignBlockNumber,
-          options: {
-            filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
-          }
-        })).map(normalizeEvent)
-        transferEvents = [...previousTransferEvents, ...transferEvents]
+    let directTransfers = transferEvents
+    const tokensSwappedAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
+    if (tokensSwappedAbiExists) {
+      const tokensSwappedEvents = await getPastEvents(foreignBridge, {
+        event: 'TokensSwapped',
+        fromBlock: MONITOR_FOREIGN_START_BLOCK,
+        toBlock: foreignBlockNumber
       })
-    )
+
+      // Get token swap events emitted by foreign bridge
+      const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
+
+      // Get transfer events for each previous erc20
+      const uniqueTokenAddresses = [...new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))]
+      await Promise.all(
+        uniqueTokenAddresses.map(async tokenAddress => {
+          const previousERC20 = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
+
+          const previousTransferEvents = (await getPastEvents(previousERC20, {
+            event: 'Transfer',
+            fromBlock: MONITOR_FOREIGN_START_BLOCK,
+            toBlock: foreignBlockNumber,
+            options: {
+              filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
+            }
+          })).map(normalizeEvent)
+          transferEvents = [...previousTransferEvents, ...transferEvents]
+        })
+      )
+
+      // filter transfer that is part of a token swap
+      directTransfers = transferEvents.filter(
+        e =>
+          bridgeTokensSwappedEvents.findIndex(
+            t => t.transactionHash === e.referenceTx && e.recipient === ZERO_ADDRESS
+          ) === -1
+      )
+    }
+
     // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
-    let directTransfers = transferEvents.filter(
+    directTransfers = directTransfers.filter(
       e => foreignToHomeRequests.findIndex(t => t.referenceTx === e.referenceTx) === -1
     )
 
-    // filter transfer that is part of a token swap
-    directTransfers = directTransfers.filter(
-      e =>
-        bridgeTokensSwappedEvents.findIndex(
-          t => t.transactionHash === e.referenceTx && e.recipient === ZERO_ADDRESS
-        ) === -1
-    )
     foreignToHomeRequests = [...foreignToHomeRequests, ...directTransfers]
   }
 
