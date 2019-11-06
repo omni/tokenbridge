@@ -48,29 +48,6 @@ const ERC20_BYTES32_ABI = [
   }
 ]
 
-const TOKENS_SWAPPED_EVENT_ABI = {
-  anonymous: false,
-  inputs: [
-    {
-      indexed: true,
-      name: 'from',
-      type: 'address'
-    },
-    {
-      indexed: true,
-      name: 'to',
-      type: 'address'
-    },
-    {
-      indexed: false,
-      name: 'value',
-      type: 'uint256'
-    }
-  ],
-  name: 'TokensSwapped',
-  type: 'event'
-}
-
 function getBridgeABIs(bridgeMode) {
   let HOME_ABI = null
   let FOREIGN_ABI = null
@@ -115,6 +92,5 @@ module.exports = {
   ERC20_BYTES32_ABI,
   HOME_AMB_ABI,
   FOREIGN_AMB_ABI,
-  BOX_ABI,
-  TOKENS_SWAPPED_EVENT_ABI
+  BOX_ABI
 }
