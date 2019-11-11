@@ -31,7 +31,6 @@ describe('AMB', () => {
       it('should contain lastChecked', () => assert(data.lastChecked >= 0))
     })
   })
-
   describe('validators', async () => {
     let data
 
@@ -61,7 +60,6 @@ describe('AMB', () => {
     it('foreignOk', () => assert(data.foreignOk))
     it('ok', () => assert(data.ok))
   })
-
   describe('eventsStats', async () => {
     let data
 
@@ -81,7 +79,6 @@ describe('AMB', () => {
     it('foreign-processedMsgNotDeliveredInForeign', () =>
       assert(typeof data.foreign.processedMsgNotDeliveredInForeign === 'object'))
   })
-
   describe('alerts', async () => {
     let data
 
@@ -95,31 +92,29 @@ describe('AMB', () => {
     it('executeSignatures', () => assert(typeof data.executeSignatures === 'object'))
     it('executeAffirmations', () => assert(typeof data.executeAffirmations === 'object'))
   })
-})
+  describe('changing state of contracts', () => {
+    let data
 
-describe('ERC TO ERC with changing state of contracts', () => {
-  let data
-
-  before(async () => {
-    assert((await axios.get(`${baseUrl}`)).data.balanceDiff === 0)
-    assert((await axios.get(`${baseUrl}/validators`)).data.validatorsMatch === true)
-  })
-
-  it('should change balanceDiff', async () => {
-    // send message
-    await sendAMBMessage(foreignRPC.URL, user, amb.foreignBox, amb.foreign, amb.homeBox)
-
-    await waitUntil(async () => {
-      ;({ data } = await axios.get(`${baseUrl}`))
-      return data.fromForeignToHomeDiff !== 0
+    before(async () => {
+      assert((await axios.get(`${baseUrl}/validators`)).data.validatorsMatch === true)
     })
-  })
 
-  it('should change validatorsMatch', async () => {
-    await addValidator(foreignRPC.URL, validator, amb.foreign)
-    await waitUntil(async () => {
-      ;({ data } = await axios.get(`${baseUrl}/validators`))
-      return data.validatorsMatch === false
+    it('should change fromForeignToHomeDiff', async () => {
+      // send message
+      await sendAMBMessage(foreignRPC.URL, user, amb.foreignBox, amb.foreign, amb.homeBox)
+
+      await waitUntil(async () => {
+        ;({ data } = await axios.get(`${baseUrl}`))
+        return data.fromForeignToHomeDiff !== 0
+      })
+    })
+
+    it('should change validatorsMatch', async () => {
+      await addValidator(foreignRPC.URL, validator, amb.foreign)
+      await waitUntil(async () => {
+        ;({ data } = await axios.get(`${baseUrl}/validators`))
+        return data.validatorsMatch === false
+      })
     })
   })
 })
