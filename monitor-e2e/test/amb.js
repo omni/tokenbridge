@@ -74,10 +74,10 @@ describe('AMB', () => {
       assert(typeof data.home.deliveredMsgNotProcessedInForeign === 'object'))
     it('home-processedMsgNotDeliveredInForeign', () =>
       assert(typeof data.home.processedMsgNotDeliveredInForeign === 'object'))
-    it('foreign-deliveredMsgNotProcessedInForeign', () =>
-      assert(typeof data.foreign.deliveredMsgNotProcessedInForeign === 'object'))
-    it('foreign-processedMsgNotDeliveredInForeign', () =>
-      assert(typeof data.foreign.processedMsgNotDeliveredInForeign === 'object'))
+    it('foreign-deliveredMsgNotProcessedInHome', () =>
+      assert(typeof data.foreign.deliveredMsgNotProcessedInHome === 'object'))
+    it('foreign-processedMsgNotDeliveredInHome', () =>
+      assert(typeof data.foreign.processedMsgNotDeliveredInHome === 'object'))
   })
   describe('alerts', async () => {
     let data
