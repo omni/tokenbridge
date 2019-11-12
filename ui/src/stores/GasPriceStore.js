@@ -60,7 +60,7 @@ class GasPriceStore {
 
   @computed
   get gasPriceInHex() {
-    return toHex(this.gasPrice)
+    return toHex(this.gasPrice.toString())
   }
 }
 

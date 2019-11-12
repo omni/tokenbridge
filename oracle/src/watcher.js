@@ -96,9 +96,11 @@ function processEvents(events) {
       return processCollectedSignatures(events)
     case 'native-erc-affirmation-request':
     case 'erc677-erc677-affirmation-request':
-      return processAffirmationRequests(events)
-    case 'erc-erc-affirmation-request':
     case 'erc-native-affirmation-request':
+    case 'erc-erc-affirmation-request':
+      return processAffirmationRequests(events)
+    case 'erc-erc-transfer':
+    case 'erc-native-transfer':
       return processTransfers(events)
     case 'amb-signature-request':
       return processAMBSignatureRequests(events)

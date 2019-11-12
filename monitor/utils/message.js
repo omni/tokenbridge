@@ -41,7 +41,32 @@ function messageEqualsEvent(parsedMsg, event) {
   )
 }
 
+/**
+ * Normalizes the different event objects to facilitate data processing
+ * @param {Object} event
+ * @returns {{
+ *  transactionHash: string,
+ *  blockNumber: number,
+ *  referenceTx: string,
+ *  recipient: string | *,
+ *  value: *
+ * }}
+ */
+const normalizeEventInformation = event => ({
+  transactionHash: event.transactionHash,
+  blockNumber: event.blockNumber,
+  referenceTx: event.returnValues.transactionHash || event.transactionHash,
+  recipient: event.returnValues.recipient || event.returnValues.from,
+  value: event.returnValues.value
+})
+
+const eventWithoutReference = otherSideEvents => e =>
+  otherSideEvents.filter(a => a.referenceTx === e.referenceTx && a.recipient === e.recipient && a.value === e.value)
+    .length === 0
+
 module.exports = {
   deliveredMsgNotProcessed,
-  processedMsgNotDelivered
+  processedMsgNotDelivered,
+  normalizeEventInformation,
+  eventWithoutReference
 }
