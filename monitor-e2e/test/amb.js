@@ -1,6 +1,6 @@
 const assert = require('assert')
 const axios = require('axios')
-const { amb, user, foreignRPC, validator } = require('../../e2e-commons/constants.json')
+const { amb, user, foreignRPC, homeRPC, validator } = require('../../e2e-commons/constants.json')
 const { waitUntil, sendAMBMessage, addValidator } = require('../utils')
 
 const baseUrl = amb.monitor
@@ -108,7 +108,15 @@ describe('AMB', () => {
         return data.fromForeignToHomeDiff !== 0
       })
     })
+    it('should change fromHomeToForeignDiff', async () => {
+      // send message
+      await sendAMBMessage(homeRPC.URL, user, amb.homeBox, amb.home, amb.foreignBox)
 
+      await waitUntil(async () => {
+        ;({ data } = await axios.get(`${baseUrl}`))
+        return data.fromHomeToForeignDiff !== 0
+      })
+    })
     it('should change validatorsMatch', async () => {
       await addValidator(foreignRPC.URL, validator, amb.foreign)
       await waitUntil(async () => {
