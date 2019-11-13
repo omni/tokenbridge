@@ -132,6 +132,17 @@ services:
       - "3012:3012"
     networks:
       - ultimate
+  monitor-amb:
+    build:
+      context: ..
+      dockerfile: monitor/Dockerfile
+      args:
+        DOT_ENV_PATH: e2e-commons/components-envs/monitor-amb.env
+    entrypoint: yarn check-and-start
+    ports:
+      - "3013:3013"
+    networks:
+      - ultimate
   e2e:
     build:
       context: ..

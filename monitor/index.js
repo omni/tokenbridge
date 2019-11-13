@@ -77,10 +77,10 @@ app.get('/eventsStats', async (req, res, next) => {
   try {
     const results = await readFile('./responses/eventsStats.json')
     results.ok =
-      results.onlyInHomeDeposits.length === 0 &&
-      results.onlyInForeignDeposits.length === 0 &&
-      results.onlyInHomeWithdrawals.length === 0 &&
-      results.onlyInForeignWithdrawals.length === 0
+      (results.onlyInHomeDeposits || results.home.deliveredMsgNotProcessedInForeign).length === 0 &&
+      (results.onlyInForeignDeposits || results.home.processedMsgNotDeliveredInForeign).length === 0 &&
+      (results.onlyInHomeWithdrawals || results.foreign.deliveredMsgNotProcessedInHome).length === 0 &&
+      (results.onlyInForeignWithdrawals || results.foreign.processedMsgNotDeliveredInHome).length === 0
     res.json(results)
   } catch (e) {
     // this will eventually be handled by your error handling middleware
