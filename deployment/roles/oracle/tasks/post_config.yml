@@ -11,8 +11,8 @@
     path: "{{ bridge_path }}/oracle/.env"
     marker: "## {mark} Calculated by scripts/getValidatorStartBlocks.js"
     block: |
-      HOME_START_BLOCK={{ (BLOCKS.stdout | from_json).homeStartBlock }}
-      FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
+      ORACLE_HOME_START_BLOCK={{ (BLOCKS.stdout | from_json).homeStartBlock }}
+      ORACLE_FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
 
 - name: Get validator address
   become_user: "{{ compose_service_user }}"
