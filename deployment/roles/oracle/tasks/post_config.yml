@@ -5,6 +5,7 @@
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: BLOCKS
+  when: (ORACLE_HOME_START_BLOCK is not defined) or (ORACLE_FOREIGN_START_BLOCK is not defined)
 
 - name: Write blocks
   blockinfile:
@@ -13,6 +14,7 @@
     block: |
       ORACLE_HOME_START_BLOCK={{ (BLOCKS.stdout | from_json).homeStartBlock }}
       ORACLE_FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
+  when: (ORACLE_HOME_START_BLOCK is not defined) or (ORACLE_FOREIGN_START_BLOCK is not defined)
 
 - name: Get validator address
   become_user: "{{ compose_service_user }}"

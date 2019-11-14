@@ -33,12 +33,20 @@ async function getStartBlock(rpcUrl, bridgeAddress, bridgeAbi) {
 }
 
 async function main() {
-  const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
+  const {
+    COMMON_HOME_BRIDGE_ADDRESS,
+    COMMON_FOREIGN_BRIDGE_ADDRESS,
+    ORACLE_HOME_START_BLOCK,
+    ORACLE_FOREIGN_START_BLOCK
+  } = process.env
 
   const homeRpcUrl = rpcUrlsManager.homeUrls[0]
   const foreignRpcUrl = rpcUrlsManager.foreignUrls[0]
-  const homeStartBlock = await getStartBlock(homeRpcUrl, COMMON_HOME_BRIDGE_ADDRESS, homeABI)
-  const foreignStartBlock = await getStartBlock(foreignRpcUrl, COMMON_FOREIGN_BRIDGE_ADDRESS, foreignABI)
+  const homeStartBlock =
+    Number(ORACLE_HOME_START_BLOCK) || (await getStartBlock(homeRpcUrl, COMMON_HOME_BRIDGE_ADDRESS, homeABI))
+  const foreignStartBlock =
+    Number(ORACLE_FOREIGN_START_BLOCK) ||
+    (await getStartBlock(foreignRpcUrl, COMMON_FOREIGN_BRIDGE_ADDRESS, foreignABI))
   const result = {
     homeStartBlock,
     foreignStartBlock
