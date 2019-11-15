@@ -5,14 +5,16 @@
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: BLOCKS
+  when: (ORACLE_HOME_START_BLOCK is not defined) or (ORACLE_FOREIGN_START_BLOCK is not defined)
 
 - name: Write blocks
   blockinfile:
     path: "{{ bridge_path }}/oracle/.env"
     marker: "## {mark} Calculated by scripts/getValidatorStartBlocks.js"
     block: |
-      HOME_START_BLOCK={{ (BLOCKS.stdout | from_json).homeStartBlock }}
-      FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
+      ORACLE_HOME_START_BLOCK={{ (BLOCKS.stdout | from_json).homeStartBlock }}
+      ORACLE_FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
+  when: (ORACLE_HOME_START_BLOCK is not defined) or (ORACLE_FOREIGN_START_BLOCK is not defined)
 
 - name: Get validator address
   become_user: "{{ compose_service_user }}"
