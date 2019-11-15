@@ -18,6 +18,25 @@
     content: "{{ docker_compose_parsed | to_yaml }}"
     dest: "{{ bridge_path }}/oracle/docker-compose.yml"
 
+- name: Slurp docker compose extended file
+  slurp:
+    src: "{{ bridge_path }}/oracle/docker-compose-transfer.yml"
+  register: docker_compose_extended_slurp
+
+- name: Parse docker compose extended file
+  set_fact:
+    docker_compose_extended_parsed: "{{ docker_compose_extended_slurp['content'] | b64decode | from_yaml }}"
+
+- name: Set logger to remote server for extended file
+  set_fact:
+    docker_compose_extended_parsed: "{{ docker_compose_extended_parsed |combine({'services': {item: {'logging': {'driver': 'syslog','options': {'tag': '{{.Name}}/{{.ID}}'}}}}}, recursive=True) }}"
+  with_items: "{{ docker_compose_extended_parsed.services }}"
+
+- name: Write new docker-compose-extended file
+  copy:
+    content: "{{ docker_compose_extended_parsed | to_yaml }}"
+    dest: "{{ bridge_path }}/oracle/docker-compose-transfer.yml"
+
 - name: Set the local container logs configuration file
   template:
     src: 31-oracle-docker.conf.j2

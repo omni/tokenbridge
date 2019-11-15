@@ -46,7 +46,7 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "monitor" ]; then
-    docker-compose up -d monitor monitor-erc20 monitor-erc20-native
+    docker-compose up -d monitor monitor-erc20 monitor-erc20-native monitor-amb
   fi
 
   if [ "$1" == "native-to-erc" ]; then

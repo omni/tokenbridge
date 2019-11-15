@@ -41,7 +41,8 @@
     "home": "0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0",
     "foreign": "0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0",
     "homeBox": "0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1",
-    "foreignBox": "0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1"
+    "foreignBox": "0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1",
+    "monitor": "http://monitor-amb:3013"
   },
   "homeRPC": {
     "URL": "http://parity1:8545",

@@ -1,5 +1,5 @@
 # Yarn:
-*/4 * * * * cd $HOME/bridge-monitor; yarn check-all >>cronWorker.out 2>>cronWorker.err
+*/4 * * * * cd $HOME/tokenbridge/monitor; yarn check-all >>cronWorker.out 2>>cronWorker.err
 
 # Docker:
-*/4 * * * * cd $HOME/bridge-monitor; docker-compose exec monitor yarn check-all >>cronWorker.out 2>>cronWorker.err
+*/4 * * * * cd $HOME/tokenbridge/monitor; docker-compose exec monitor yarn check-all >>cronWorker.out 2>>cronWorker.err
