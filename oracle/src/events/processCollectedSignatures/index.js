@@ -68,7 +68,7 @@ function processCollectedSignaturesBuilder(config) {
         if (v.length !== NumberOfCollectedSignatures) {
           throw new Error('Number of recovered signatures is not equal collected signatures')
         }
-        
+
         let gasEstimate
         try {
           logger.debug('Estimate gas')
