@@ -46,7 +46,7 @@ function processCollectedSignaturesBuilder(config) {
         logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
         const message = await homeBridge.methods.message(messageHash).call()
 
-        logger.debug(`Number of signatures to get ${NumberOfCollectedSignatures}`)
+        logger.debug({ NumberOfCollectedSignatures }, 'Number of signatures to get')
 
         const requiredSignatures = []
         requiredSignatures.length = NumberOfCollectedSignatures
@@ -64,10 +64,6 @@ function processCollectedSignaturesBuilder(config) {
         })
 
         await Promise.all(signaturePromises)
-
-        if (v.length !== NumberOfCollectedSignatures) {
-          throw new Error('Number of recovered signatures is not equal collected signatures')
-        }
 
         let gasEstimate
         try {
