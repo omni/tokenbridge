@@ -46,7 +46,11 @@ function processCollectedSignaturesBuilder(config) {
         logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
         const message = await homeBridge.methods.message(messageHash).call()
 
-        const requiredSignatures = new Array(NumberOfCollectedSignatures).fill(0)
+        logger.debug({ NumberOfCollectedSignatures }, 'Number of signatures to get')
+
+        const requiredSignatures = []
+        requiredSignatures.length = NumberOfCollectedSignatures
+        requiredSignatures.fill(0)
 
         const [v, r, s] = [[], [], []]
         logger.debug('Getting message signatures')
