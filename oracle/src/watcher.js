@@ -101,6 +101,7 @@ function processEvents(events) {
       return processAffirmationRequests(events)
     case 'erc-erc-transfer':
     case 'erc-native-transfer':
+    case 'erc-native-half-duplex-transfer':
       return processTransfers(events)
     case 'amb-signature-request':
       return processAMBSignatureRequests(events)

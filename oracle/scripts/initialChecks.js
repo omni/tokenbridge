@@ -18,6 +18,7 @@ async function initialChecks() {
   } else if (ORACLE_BRIDGE_MODE === 'ERC_TO_NATIVE') {
     const bridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
     result.bridgeableTokenAddress = await bridge.methods.erc20token().call()
+    result.halfDuplexTokenAddress = await bridge.methods.halfDuplexErc20token().call()
   }
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {
