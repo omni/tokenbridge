@@ -22,7 +22,7 @@ function processTransfersBuilder(config) {
   const userRequestForAffirmationHash = web3Home.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
   const tokensSwappedHash = tokensSwappedAbi ? web3Home.eth.abi.encodeEventSignature(tokensSwappedAbi) : '0x'
 
-  return async function processTransfers(transfers) {
+  return async function processTransfers(transfers, blockNumber) {
     const txToSend = []
 
     if (validatorContract === null) {
@@ -44,7 +44,7 @@ function processTransfersBuilder(config) {
 
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
 
-        const block = await web3Foreign.eth.getBlock('latest')
+        const block = await web3Foreign.eth.getBlock(blockNumber)
         const tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp)
 
         if (!tokenSwapAllowed) {

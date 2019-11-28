@@ -44,6 +44,7 @@ async function initialize() {
     await getLastProcessedBlock()
     connectWatcherToQueue({
       queueName: config.queue,
+      workerQueue: config.workerQueue,
       cb: runMain
     })
   } catch (e) {
@@ -52,16 +53,16 @@ async function initialize() {
   }
 }
 
-async function runMain({ sendToQueue }) {
+async function runMain({ sendToQueue, sendToWorker }) {
   try {
     if (connection.isConnected() && redis.status === 'ready') {
       if (config.maxProcessingTime) {
-        await watchdog(() => main({ sendToQueue }), config.maxProcessingTime, () => {
+        await watchdog(() => main({ sendToQueue, sendToWorker }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
           process.exit(EXIT_CODES.MAX_TIME_REACHED)
         })
       } else {
-        await main({ sendToQueue })
+        await main({ sendToQueue, sendToWorker })
       }
     }
   } catch (e) {
@@ -69,7 +70,7 @@ async function runMain({ sendToQueue }) {
   }
 
   setTimeout(() => {
-    runMain({ sendToQueue })
+    runMain({ sendToQueue, sendToWorker })
   }, config.pollingInterval)
 }
 
@@ -84,7 +85,7 @@ function updateLastProcessedBlock(lastBlockNumber) {
   return redis.set(lastBlockRedisKey, lastProcessedBlock.toString())
 }
 
-function processEvents(events) {
+function processEvents(events, blockNumber) {
   switch (config.id) {
     case 'native-erc-signature-request':
     case 'erc-erc-signature-request':
@@ -102,7 +103,7 @@ function processEvents(events) {
     case 'erc-erc-transfer':
     case 'erc-native-transfer':
     case 'erc-native-half-duplex-transfer':
-      return processTransfers(events)
+      return processTransfers(events, blockNumber)
     case 'amb-signature-request':
       return processAMBSignatureRequests(events)
     case 'amb-collected-signatures':
@@ -125,7 +126,7 @@ async function getLastBlockToProcess() {
   return lastBlockNumber.sub(requiredBlockConfirmations)
 }
 
-async function main({ sendToQueue }) {
+async function main({ sendToQueue, sendToWorker }) {
   try {
     const lastBlockToProcess = await getLastBlockToProcess()
 
@@ -147,10 +148,14 @@ async function main({ sendToQueue }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      const job = await processEvents(events)
+      const job = await processEvents(events, toBlock)
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {
+        if (sendToWorker) {
+          await sendToWorker({ blockNumber: toBlock.toString() })
+        }
+
         await sendToQueue(job)
       }
     }
