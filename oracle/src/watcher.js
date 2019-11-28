@@ -148,14 +148,14 @@ async function main({ sendToQueue, sendToWorker }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
+      if (sendToWorker) {
+        await sendToWorker({ blockNumber: toBlock.toString() })
+      }
+
       const job = await processEvents(events, toBlock)
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {
-        if (sendToWorker) {
-          await sendToWorker({ blockNumber: toBlock.toString() })
-        }
-
         await sendToQueue(job)
       }
     }
