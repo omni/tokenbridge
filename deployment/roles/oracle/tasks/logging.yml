@@ -1,41 +1,9 @@
 ---
-- name: Slurp docker compose file
-  slurp:
-    src: "{{ bridge_path }}/oracle/docker-compose.yml"
-  register: docker_compose_slurp
-
-- name: Parse docker compose file
-  set_fact:
-    docker_compose_parsed: "{{ docker_compose_slurp['content'] | b64decode | from_yaml }}"
-
-- name: Set logger to remote server
-  set_fact:
-    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {item: {'logging': {'driver': 'syslog','options': {'tag': '{{.Name}}/{{.ID}}'}}}}}, recursive=True) }}"
-  with_items: "{{ docker_compose_parsed.services }}"
-
-- name: Write new docker-compose file
-  copy:
-    content: "{{ docker_compose_parsed | to_yaml }}"
-    dest: "{{ bridge_path }}/oracle/docker-compose.yml"
-
-- name: Slurp docker compose extended file
-  slurp:
-    src: "{{ bridge_path }}/oracle/docker-compose-transfer.yml"
-  register: docker_compose_extended_slurp
-
-- name: Parse docker compose extended file
-  set_fact:
-    docker_compose_extended_parsed: "{{ docker_compose_extended_slurp['content'] | b64decode | from_yaml }}"
-
-- name: Set logger to remote server for extended file
-  set_fact:
-    docker_compose_extended_parsed: "{{ docker_compose_extended_parsed |combine({'services': {item: {'logging': {'driver': 'syslog','options': {'tag': '{{.Name}}/{{.ID}}'}}}}}, recursive=True) }}"
-  with_items: "{{ docker_compose_extended_parsed.services }}"
-
-- name: Write new docker-compose-extended file
-  copy:
-    content: "{{ docker_compose_extended_parsed | to_yaml }}"
-    dest: "{{ bridge_path }}/oracle/docker-compose-transfer.yml"
+- include_tasks: logging_remote.yml
+  with_items:
+    - docker-compose
+    - docker-compose-transfer
+    - docker-compose-erc-native
 
 - name: Set the local container logs configuration file
   template:

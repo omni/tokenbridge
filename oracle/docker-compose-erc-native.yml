@@ -49,6 +49,35 @@ services:
     networks:
       - net_db_bridge_transfer
       - net_rabbit_bridge_transfer
+  bridge_half_duplex_transfer:
+    cpus: 0.1
+    mem_limit: 500m
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
+    restart: unless-stopped
+    entrypoint: yarn watcher:half-duplex-transfer
+    networks:
+      - net_db_bridge_half_duplex_transfer
+      - net_rabbit_bridge_half_duplex_transfer
+  bridge_swap_tokens_worker:
+    cpus: 0.1
+    mem_limit: 500m
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
+    restart: unless-stopped
+    entrypoint: yarn worker:swap-tokens
+    networks:
+      - net_rabbit_bridge_swap_tokens_worker
   bridge_senderhome:
     extends:
       file: docker-compose.yml
@@ -73,6 +102,8 @@ networks:
     driver: bridge
   net_db_bridge_transfer:
     driver: bridge
+  net_db_bridge_half_duplex_transfer:
+    driver: bridge
   net_db_bridge_senderhome:
     driver: bridge
   net_db_bridge_senderforeign:
@@ -84,6 +115,10 @@ networks:
   net_rabbit_bridge_affirmation:
     driver: bridge
   net_rabbit_bridge_transfer:
+    driver: bridge
+  net_rabbit_bridge_half_duplex_transfer:
+    driver: bridge
+  net_rabbit_bridge_swap_tokens_worker:
     driver: bridge
   net_rabbit_bridge_senderhome:
     driver: bridge

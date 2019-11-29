@@ -40,7 +40,11 @@
 
 - name: Extend docker compose file
   set_fact: composefileoverride="-f docker-compose-transfer.yml"
-  when: ORACLE_BRIDGE_MODE == "ERC_TO_NATIVE" or ( ORACLE_BRIDGE_MODE == "ERC_TO_ERC" and FOREIGN_ERC_TYPE != "ERC677")
+  when: ORACLE_BRIDGE_MODE == "ERC_TO_ERC" and FOREIGN_ERC_TYPE != "ERC677"
+
+- name: Extend docker compose file for erc to native
+  set_fact: composefileoverride="-f docker-compose-erc-native.yml"
+  when: ORACLE_BRIDGE_MODE == "ERC_TO_NATIVE"
 
 - name: Install .key config
   template:
