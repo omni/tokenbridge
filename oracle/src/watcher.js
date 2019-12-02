@@ -21,6 +21,7 @@ const processSignatureRequests = require('./events/processSignatureRequests')(co
 const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
 const processAffirmationRequests = require('./events/processAffirmationRequests')(config)
 const processTransfers = require('./events/processTransfers')(config)
+const processHalfDuplexTransfers = require('./events/processHalfDuplexTransfers')(config)
 const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
@@ -102,8 +103,9 @@ function processEvents(events, blockNumber) {
       return processAffirmationRequests(events)
     case 'erc-erc-transfer':
     case 'erc-native-transfer':
+      return processTransfers(events)
     case 'erc-native-half-duplex-transfer':
-      return processTransfers(events, blockNumber)
+      return processHalfDuplexTransfers(events, blockNumber)
     case 'amb-signature-request':
       return processAMBSignatureRequests(events)
     case 'amb-collected-signatures':
@@ -152,7 +154,7 @@ async function main({ sendToQueue, sendToWorker }) {
         await sendToWorker({ blockNumber: toBlock.toString() })
       }
 
-      const job = await processEvents(events, toBlock)
+      const job = await processEvents(events, toBlock.toString())
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {

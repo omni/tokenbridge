@@ -14,7 +14,7 @@ let validatorContract = null
 
 function processTransfersBuilder(config) {
   const homeBridge = new web3Home.eth.Contract(config.homeBridgeAbi, config.homeBridgeAddress)
-  const foreignBridge = new web3Home.eth.Contract(config.foreignBridgeAbi, config.foreignBridgeAddress)
+  const foreignBridge = new web3Foreign.eth.Contract(config.foreignBridgeAbi, config.foreignBridgeAddress)
   const userRequestForAffirmationAbi = config.foreignBridgeAbi.filter(
     e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
   )[0]
@@ -45,7 +45,7 @@ function processTransfersBuilder(config) {
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
 
         const block = await web3Foreign.eth.getBlock(blockNumber)
-        const tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp)
+        const tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp).call()
 
         if (!tokenSwapAllowed) {
           logger.info(
