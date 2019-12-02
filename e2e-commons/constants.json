@@ -11,10 +11,6 @@
     "address": "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b",
     "privateKey": "0x8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
   },
-  "owner": {
-    "address": "0x379a38a225fadb4a3769391ab26e2440681bf098",
-    "privateKey": "0x19fba401d77e4113b15095e9aa7117bcd25adcfac7f6111f8298894eef443600"
-  },
   "blockGenerator": {
     "address": "0xB4579fd5AfEaB60B03Db3F408AAdD315035943f7",
     "privateKey": "0xd6143d390d8b28c33601bb0fe29392fb1c35c24ccfe8722c09c2bdd6ada2699f"
@@ -38,6 +34,7 @@
     "home": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
     "foreign": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
     "foreignToken": "0x7cc4b1851c35959d34e635a470f6b5c43ba3c9c9",
+    "saiTop": "0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3",
     "ui": "http://localhost:3002",
     "monitor": "http://monitor-erc20-native:3012"
   },
