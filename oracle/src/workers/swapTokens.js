@@ -35,11 +35,11 @@ function swapTokensBuilder(config) {
       return txToSend
     }
 
-    logger.debug(`Checking if half duplex balance if above the threshold`)
+    logger.debug(`Checking if half duplex balance is above the threshold`)
     const hdTokenBalanceAboveMinBalance = await foreignBridge.methods.isHDTokenBalanceAboveMinBalance().call()
 
     if (!hdTokenBalanceAboveMinBalance) {
-      logger.info(`Token swap discarded because half duplex balance if below the threshold`)
+      logger.info(`Token swap discarded because half duplex balance is below the threshold`)
       return txToSend
     }
 
