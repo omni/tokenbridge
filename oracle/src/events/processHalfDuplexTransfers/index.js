@@ -45,6 +45,8 @@ function processTransfersBuilder(config) {
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
 
         const block = await web3Foreign.eth.getBlock(blockNumber)
+        logger.debug({ blockNumber, timestamp: block.timestamp }, `Block obtained`)
+
         const tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp).call()
 
         if (!tokenSwapAllowed) {

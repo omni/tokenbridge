@@ -44,8 +44,8 @@ function swapTokensBuilder(config) {
       return txToSend
     }
 
-    logger.debug(`Getting block`)
     const block = await web3Foreign.eth.getBlock(blockNumber)
+    logger.debug({ timestamp: block.timestamp }, `Block obtained`)
 
     logger.debug(`Checking if SCD Emergency Shutdown has happened`)
     const tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp).call()
