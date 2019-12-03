@@ -1,5 +1,5 @@
 ---
-- include_tasks: logging_remote.yml
+- include_tasks: logging_by_syslog.yml
   with_items:
     - docker-compose
     - docker-compose-transfer
