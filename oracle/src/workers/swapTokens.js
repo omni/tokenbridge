@@ -3,9 +3,10 @@ const { HttpListProviderError } = require('http-list-provider')
 const rootLogger = require('../services/logger')
 const { web3Foreign } = require('../services/web3')
 
-const { BRIDGE_VALIDATORS_ABI } = require('../../../commons')
+const { BRIDGE_VALIDATORS_ABI, ERC20_ABI } = require('../../../commons')
 
 let validatorContract = null
+let halfDuplexTokenContract = null
 
 function swapTokensBuilder(config) {
   const foreignBridge = new web3Foreign.eth.Contract(config.foreignBridgeAbi, config.foreignBridgeAddress)
@@ -69,6 +70,24 @@ function swapTokensBuilder(config) {
         logger.error(e, errorMsg)
         throw new Error(errorMsg)
       } else {
+        if (halfDuplexTokenContract === null) {
+          logger.debug('Getting half duplex token contract address')
+          const halfDuplexErc20Token = await foreignBridge.methods.halfDuplexErc20token().call()
+          logger.debug({ halfDuplexErc20Token }, 'Half duplex token contract address obtained')
+
+          halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, halfDuplexErc20Token)
+        }
+
+        const balance = web3Foreign.utils.toBN(
+          await halfDuplexTokenContract.methods.balanceOf(config.foreignBridgeAddress).call()
+        )
+        logger.debug({ balance: balance.toString() }, 'Half duplex token bridge balance obtained')
+
+        if (balance.isZero()) {
+          logger.info(`Gas estimate failed because half duplex balance is zero. Token swap is discarded.`)
+          return txToSend
+        }
+
         logger.error(e, 'Unknown error while processing transaction')
         throw e
       }
