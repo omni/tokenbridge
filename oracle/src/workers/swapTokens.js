@@ -84,7 +84,7 @@ function swapTokensBuilder(config) {
         logger.debug({ balance: balance.toString() }, 'Half duplex token bridge balance obtained')
 
         if (balance.isZero()) {
-          logger.info(`Gas estimate failed because half duplex balance is zero. Token swap is discarded.`)
+          logger.info(`Gas estimate failed because half duplex token balance is zero. Tokens swap is discarded.`)
           return txToSend
         }
 
