@@ -1,5 +1,6 @@
 require('../env')
 const Web3 = require('web3')
+const { getTokensState } = require('../src/events/processTransfers/tokenState')
 const {
   ERC677_BRIDGE_TOKEN_ABI,
   FOREIGN_ERC_TO_ERC_ABI,
@@ -9,7 +10,7 @@ const {
 
 async function initialChecks() {
   const { ORACLE_BRIDGE_MODE, COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
-  const result = {}
+  let result = {}
   const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL))
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {
@@ -17,17 +18,7 @@ async function initialChecks() {
     result.bridgeableTokenAddress = await bridge.methods.erc20token().call()
   } else if (ORACLE_BRIDGE_MODE === 'ERC_TO_NATIVE') {
     const bridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
-    result.bridgeableTokenAddress = await bridge.methods.erc20token().call()
-    try {
-      const halfDuplexErc20tokenAddress = await bridge.methods.halfDuplexErc20token().call()
-      if (halfDuplexErc20tokenAddress !== result.bridgeableTokenAddress) {
-        result.halfDuplexTokenAddress = halfDuplexErc20tokenAddress
-      } else {
-        result.idle = true
-      }
-    } catch (e) {
-      result.idle = true
-    }
+    result = await getTokensState(bridge)
   }
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {

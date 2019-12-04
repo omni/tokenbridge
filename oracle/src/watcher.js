@@ -26,12 +26,16 @@ const processAMBSignatureRequests = require('./events/processAMBSignatureRequest
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
 
+const { getTokensState } = require('./events/processTransfers/tokenState')
+
 const ZERO = toBN(0)
 const ONE = toBN(1)
 
 const web3Instance = config.web3
 const bridgeContract = new web3Instance.eth.Contract(config.bridgeAbi, config.bridgeContractAddress)
-const eventContract = new web3Instance.eth.Contract(config.eventAbi, config.eventContractAddress)
+let { eventContractAddress } = config
+let eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+let skipEvents = config.idle
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
 let lastProcessedBlock = BN.max(config.startBlock.sub(ONE), ZERO)
 
@@ -117,6 +121,29 @@ function processEvents(events, blockNumber) {
   }
 }
 
+async function checkConditions() {
+  let state
+  switch (config.id) {
+    case 'erc-native-transfer':
+      state = await getTokensState(bridgeContract)
+      updateEventContract(state.bridgeableTokenAddress)
+      break
+    case 'erc-native-half-duplex-transfer':
+      state = await getTokensState(bridgeContract)
+      skipEvents = state.idle
+      updateEventContract(state.halfDuplexTokenAddress)
+      break
+    default:
+  }
+}
+
+function updateEventContract(address) {
+  if (eventContractAddress !== address) {
+    eventContractAddress = address
+    eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+  }
+}
+
 async function getLastBlockToProcess() {
   const lastBlockNumberPromise = getBlockNumber(web3Instance).then(toBN)
   const requiredBlockConfirmationsPromise = getRequiredBlockConfirmations(bridgeContract).then(toBN)
@@ -130,7 +157,9 @@ async function getLastBlockToProcess() {
 
 async function main({ sendToQueue, sendToWorker }) {
   try {
-    if (config.idle) {
+    await checkConditions()
+
+    if (skipEvents) {
       logger.debug('Watcher in idle mode, skipping getting events')
       return
     }

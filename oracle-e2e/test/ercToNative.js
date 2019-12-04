@@ -33,11 +33,121 @@ describe('erc to native', () => {
   before(async () => {
     halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
     halfDuplexToken = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, halfDuplexTokenAddress)
+  })
+  it('should continue working after migration', async () => {
+    const originalBalanceOnHome = await homeWeb3.eth.getBalance(user.address)
 
-    // set min threshold for swap
+    const transferValue = homeWeb3.utils.toWei('0.01')
+
+    // erc20 token address and half duplex address are the same before migration
+    const tokenAddress = await foreignBridge.methods.erc20token().call()
+
+    const erc20AndhalfDuplexToken = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, tokenAddress)
+
+    // send tokens to foreign bridge
+    await erc20AndhalfDuplexToken.methods
+      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, transferValue)
+      .send({
+        from: user.address,
+        gas: '1000000'
+      })
+      .catch(e => {
+        console.error(e)
+      })
+
+    // Send a trivial transaction to generate a new block since the watcher
+    // is configured to wait 1 confirmation block
+    await generateNewBlock(foreignWeb3, user.address)
+
+    // check that balance increases
+    await promiseRetry(async (retry, number) => {
+      const balance = await homeWeb3.eth.getBalance(user.address)
+      await generateNewBlock(foreignWeb3, user.address)
+      // retry at least 4 times to check transfer is not double processed by the two watchers
+      if (toBN(balance).lte(toBN(originalBalanceOnHome)) || number < 4) {
+        retry()
+      } else {
+        assert(
+          toBN(balance).eq(toBN(originalBalanceOnHome).add(toBN(transferValue))),
+          'User balance should be increased only by second transfer'
+        )
+      }
+    })
+
+    // call migration
+    await foreignBridge.methods.migrateToMCD().send({
+      from: validator.address,
+      gas: '4000000'
+    })
+
+    // update min threshold for swap
     await foreignBridge.methods.setMinHDTokenBalance(foreignWeb3.utils.toWei('1', 'ether')).send({
       from: validator.address,
       gas: '1000000'
+    })
+
+    const AfterMigrateBalance = await homeWeb3.eth.getBalance(user.address)
+
+    // send tokens to foreign bridge
+    await erc20Token.methods
+      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, transferValue)
+      .send({
+        from: user.address,
+        gas: '1000000'
+      })
+      .catch(e => {
+        console.error(e)
+      })
+
+    // Send a trivial transaction to generate a new block since the watcher
+    // is configured to wait 1 confirmation block
+    await generateNewBlock(foreignWeb3, user.address)
+
+    // check that balance increases
+    await promiseRetry(async (retry, number) => {
+      const balance = await homeWeb3.eth.getBalance(user.address)
+      await generateNewBlock(foreignWeb3, user.address)
+      // retry at least 4 times to check transfer is not double processed by the two watchers
+      if (toBN(balance).lte(toBN(AfterMigrateBalance)) || number < 4) {
+        retry()
+      } else {
+        assert(
+          toBN(balance).eq(toBN(AfterMigrateBalance).add(toBN(transferValue))),
+          'User balance should be increased only by second transfer'
+        )
+      }
+    })
+
+    const afterMigrateAndTransferBalance = await homeWeb3.eth.getBalance(user.address)
+
+    // send tokens to foreign bridge
+    await halfDuplexToken.methods
+      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, transferValue)
+      .send({
+        from: user.address,
+        gas: '1000000'
+      })
+      .catch(e => {
+        console.error(e)
+      })
+
+    // Send a trivial transaction to generate a new block since the watcher
+    // is configured to wait 1 confirmation block
+    await generateNewBlock(foreignWeb3, user.address)
+
+    // check that balance increases
+    await promiseRetry(async (retry, number) => {
+      const balance = await homeWeb3.eth.getBalance(user.address)
+      await generateNewBlock(foreignWeb3, user.address)
+      // retry at least 4 times to check transfer is not double processed by the two watchers
+      if (toBN(balance).lte(toBN(afterMigrateAndTransferBalance)) || number < 4) {
+        retry()
+      } else {
+        assert(
+          toBN(balance).eq(toBN(afterMigrateAndTransferBalance).add(toBN(transferValue))),
+          'User balance should be increased only by second transfer'
+        )
+      }
     })
   })
   it('should convert tokens in foreign to coins in home', async () => {
@@ -116,7 +226,6 @@ describe('erc to native', () => {
     const originalBalanceOnHome = await homeWeb3.eth.getBalance(user.address)
     const bridgeErc20TokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
     const bridgeHalfDuplexBalance = await halfDuplexToken.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
-    assert(toBN(bridgeHalfDuplexBalance).isZero(), 'Bridge balance should be zero')
 
     const valueToTransfer = foreignWeb3.utils.toWei('1', 'ether')
 
@@ -176,7 +285,9 @@ describe('erc to native', () => {
         assert(toBN(updatedBalance).isZero(), 'Half duplex bridge balance should be zero')
         assert(
           toBN(updatedBridgeErc20TokenBalance).eq(
-            toBN(bridgeErc20TokenBalance).add(toBN(foreignWeb3.utils.toWei('2', 'ether')))
+            toBN(bridgeErc20TokenBalance)
+              .add(toBN(bridgeHalfDuplexBalance))
+              .add(toBN(foreignWeb3.utils.toWei('2', 'ether')))
           ),
           'Erc20 token balance should be correctly increased by the token swap'
         )
