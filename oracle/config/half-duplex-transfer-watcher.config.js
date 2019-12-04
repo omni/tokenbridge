@@ -34,5 +34,6 @@ module.exports = {
   queue: 'home',
   workerQueue: 'swap-tokens',
   name: `watcher-${id}`,
-  id
+  id,
+  idle: initialChecks.idle
 }

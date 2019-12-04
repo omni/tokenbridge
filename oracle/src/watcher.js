@@ -130,6 +130,11 @@ async function getLastBlockToProcess() {
 
 async function main({ sendToQueue, sendToWorker }) {
   try {
+    if (config.idle) {
+      logger.debug('Watcher in idle mode, skipping getting events')
+      return
+    }
+
     const lastBlockToProcess = await getLastBlockToProcess()
 
     if (lastBlockToProcess.lte(lastProcessedBlock)) {
