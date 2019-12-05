@@ -26,7 +26,7 @@ const processAMBSignatureRequests = require('./events/processAMBSignatureRequest
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
 
-const { getTokensState } = require('./events/processTransfers/tokenState')
+const { getTokensState } = require('./utils/tokenState')
 
 const ZERO = toBN(0)
 const ONE = toBN(1)

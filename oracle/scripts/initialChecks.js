@@ -1,6 +1,6 @@
 require('../env')
 const Web3 = require('web3')
-const { getTokensState } = require('../src/events/processTransfers/tokenState')
+const { getTokensState } = require('../src/utils/tokenState')
 const {
   ERC677_BRIDGE_TOKEN_ABI,
   FOREIGN_ERC_TO_ERC_ABI,
