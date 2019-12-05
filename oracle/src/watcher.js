@@ -21,16 +21,21 @@ const processSignatureRequests = require('./events/processSignatureRequests')(co
 const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
 const processAffirmationRequests = require('./events/processAffirmationRequests')(config)
 const processTransfers = require('./events/processTransfers')(config)
+const processHalfDuplexTransfers = require('./events/processHalfDuplexTransfers')(config)
 const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
+
+const { getTokensState } = require('./utils/tokenState')
 
 const ZERO = toBN(0)
 const ONE = toBN(1)
 
 const web3Instance = config.web3
 const bridgeContract = new web3Instance.eth.Contract(config.bridgeAbi, config.bridgeContractAddress)
-const eventContract = new web3Instance.eth.Contract(config.eventAbi, config.eventContractAddress)
+let { eventContractAddress } = config
+let eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+let skipEvents = config.idle
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
 let lastProcessedBlock = BN.max(config.startBlock.sub(ONE), ZERO)
 
@@ -44,6 +49,7 @@ async function initialize() {
     await getLastProcessedBlock()
     connectWatcherToQueue({
       queueName: config.queue,
+      workerQueue: config.workerQueue,
       cb: runMain
     })
   } catch (e) {
@@ -52,16 +58,16 @@ async function initialize() {
   }
 }
 
-async function runMain({ sendToQueue }) {
+async function runMain({ sendToQueue, sendToWorker }) {
   try {
     if (connection.isConnected() && redis.status === 'ready') {
       if (config.maxProcessingTime) {
-        await watchdog(() => main({ sendToQueue }), config.maxProcessingTime, () => {
+        await watchdog(() => main({ sendToQueue, sendToWorker }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
           process.exit(EXIT_CODES.MAX_TIME_REACHED)
         })
       } else {
-        await main({ sendToQueue })
+        await main({ sendToQueue, sendToWorker })
       }
     }
   } catch (e) {
@@ -69,7 +75,7 @@ async function runMain({ sendToQueue }) {
   }
 
   setTimeout(() => {
-    runMain({ sendToQueue })
+    runMain({ sendToQueue, sendToWorker })
   }, config.pollingInterval)
 }
 
@@ -84,7 +90,7 @@ function updateLastProcessedBlock(lastBlockNumber) {
   return redis.set(lastBlockRedisKey, lastProcessedBlock.toString())
 }
 
-function processEvents(events) {
+function processEvents(events, blockNumber) {
   switch (config.id) {
     case 'native-erc-signature-request':
     case 'erc-erc-signature-request':
@@ -102,6 +108,8 @@ function processEvents(events) {
     case 'erc-erc-transfer':
     case 'erc-native-transfer':
       return processTransfers(events)
+    case 'erc-native-half-duplex-transfer':
+      return processHalfDuplexTransfers(events, blockNumber)
     case 'amb-signature-request':
       return processAMBSignatureRequests(events)
     case 'amb-collected-signatures':
@@ -110,6 +118,29 @@ function processEvents(events) {
       return processAMBAffirmationRequests(events)
     default:
       return []
+  }
+}
+
+async function checkConditions() {
+  let state
+  switch (config.id) {
+    case 'erc-native-transfer':
+      state = await getTokensState(bridgeContract)
+      updateEventContract(state.bridgeableTokenAddress)
+      break
+    case 'erc-native-half-duplex-transfer':
+      state = await getTokensState(bridgeContract)
+      skipEvents = state.idle
+      updateEventContract(state.halfDuplexTokenAddress)
+      break
+    default:
+  }
+}
+
+function updateEventContract(address) {
+  if (eventContractAddress !== address) {
+    eventContractAddress = address
+    eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
   }
 }
 
@@ -124,8 +155,15 @@ async function getLastBlockToProcess() {
   return lastBlockNumber.sub(requiredBlockConfirmations)
 }
 
-async function main({ sendToQueue }) {
+async function main({ sendToQueue, sendToWorker }) {
   try {
+    await checkConditions()
+
+    if (skipEvents) {
+      logger.debug('Watcher in idle mode, skipping getting events')
+      return
+    }
+
     const lastBlockToProcess = await getLastBlockToProcess()
 
     if (lastBlockToProcess.lte(lastProcessedBlock)) {
@@ -146,7 +184,11 @@ async function main({ sendToQueue }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      const job = await processEvents(events)
+      if (sendToWorker) {
+        await sendToWorker({ blockNumber: toBlock.toString() })
+      }
+
+      const job = await processEvents(events, toBlock.toString())
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {
