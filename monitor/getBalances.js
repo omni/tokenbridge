@@ -85,21 +85,19 @@ async function main(bridgeMode) {
     const erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
     let foreignHalfDuplexErc20Balance = 0
     let displayHalfDuplexToken = false
+    let tokenSwapAllowed = false
     try {
-      logger.debug('getting last block numbers')
-      const block = await web3Foreign.eth.getBlock('latest')
+      const halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
+      if (halfDuplexTokenAddress !== erc20Address) {
+        const halfDuplexToken = new web3Foreign.eth.Contract(ERC20_ABI, halfDuplexTokenAddress)
+        logger.debug('calling halfDuplexToken.methods.balanceOf')
+        foreignHalfDuplexErc20Balance = await halfDuplexToken.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+        logger.debug('getting last block numbers')
+        const block = await web3Foreign.eth.getBlock('latest')
 
-      logger.debug(`Checking if SCD Emergency Shutdown has happened`)
-      const tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp).call()
-
-      if (tokenSwapAllowed) {
-        const halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
-        if (halfDuplexTokenAddress !== erc20Address) {
-          const halfDuplexToken = new web3Foreign.eth.Contract(ERC20_ABI, halfDuplexTokenAddress)
-          logger.debug('calling halfDuplexToken.methods.balanceOf')
-          foreignHalfDuplexErc20Balance = await halfDuplexToken.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
-          displayHalfDuplexToken = true
-        }
+        logger.debug(`Checking if SCD Emergency Shutdown has happened`)
+        tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp).call()
+        displayHalfDuplexToken = true
       }
     } catch (e) {
       logger.debug('Methods for half duplex token are not present')
@@ -121,7 +119,8 @@ async function main(bridgeMode) {
     const burntCoinsBN = new BN(burntCoins)
     const totalSupplyBN = mintedCoinsBN.minus(burntCoinsBN)
     const foreignErc20BalanceBN = new BN(foreignErc20Balance)
-    const halfDuplexErc20BalanceBN = new BN(foreignHalfDuplexErc20Balance)
+    const halfDuplexErc20BalanceBN =
+      displayHalfDuplexToken && tokenSwapAllowed ? new BN(foreignHalfDuplexErc20Balance) : new BN(0)
 
     const diff = foreignErc20BalanceBN
       .plus(halfDuplexErc20BalanceBN)
@@ -132,10 +131,15 @@ async function main(bridgeMode) {
       erc20Balance: Web3Utils.fromWei(foreignErc20Balance)
     }
 
-    if (displayHalfDuplexToken) {
+    if (displayHalfDuplexToken && tokenSwapAllowed) {
       foreign = {
         ...foreign,
         halfDuplexErc20Balance: Web3Utils.fromWei(foreignHalfDuplexErc20Balance)
+      }
+    } else if (displayHalfDuplexToken && !tokenSwapAllowed) {
+      foreign = {
+        ...foreign,
+        halfDuplexErc20BalanceAfterES: Web3Utils.fromWei(foreignHalfDuplexErc20Balance)
       }
     }
 
