@@ -13,6 +13,7 @@ const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/Rewardab
 const HOME_AMB_ABI = require('../contracts/build/contracts/HomeAMB').abi
 const FOREIGN_AMB_ABI = require('../contracts/build/contracts/ForeignAMB').abi
 const BOX_ABI = require('../contracts/build/contracts/Box').abi
+const SAI_TOP = require('../contracts/build/contracts/SaiTopMock').abi
 
 const { HOME_V1_ABI, FOREIGN_V1_ABI } = require('./v1Abis')
 const { BRIDGE_MODES } = require('./constants')
@@ -92,5 +93,6 @@ module.exports = {
   ERC20_BYTES32_ABI,
   HOME_AMB_ABI,
   FOREIGN_AMB_ABI,
-  BOX_ABI
+  BOX_ABI,
+  SAI_TOP
 }

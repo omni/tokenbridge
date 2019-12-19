@@ -15,6 +15,7 @@ const {
   ZERO_ADDRESS
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
+const { filterTransferBeforeES } = require('./tokenUtils')
 
 const {
   COMMON_HOME_RPC_URL,
@@ -42,10 +43,11 @@ async function main(mode) {
   const v1Bridge = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1
   let isExternalErc20
   let erc20Contract
+  let erc20Address
   let normalizeEvent = normalizeEventInformation
   if (bridgeMode !== BRIDGE_MODES.ARBITRARY_MESSAGE) {
     const erc20MethodName = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
-    const erc20Address = await foreignBridge.methods[erc20MethodName]().call()
+    erc20Address = await foreignBridge.methods[erc20MethodName]().call()
     const tokenType = await getTokenType(
       new web3Foreign.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, erc20Address),
       COMMON_FOREIGN_BRIDGE_ADDRESS
@@ -113,9 +115,9 @@ async function main(mode) {
       const uniqueTokenAddresses = [...new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))]
       await Promise.all(
         uniqueTokenAddresses.map(async tokenAddress => {
-          const previousERC20 = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
+          const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
 
-          const previousTransferEvents = (await getPastEvents(previousERC20, {
+          const halfDuplexTransferEvents = (await getPastEvents(halfDuplexTokenContract, {
             event: 'Transfer',
             fromBlock: MONITOR_FOREIGN_START_BLOCK,
             toBlock: foreignBlockNumber,
@@ -123,7 +125,15 @@ async function main(mode) {
               filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
             }
           })).map(normalizeEvent)
-          transferEvents = [...previousTransferEvents, ...transferEvents]
+
+          // Remove events after the ES
+          const validHalfDuplexTransfers = await filterTransferBeforeES(
+            halfDuplexTransferEvents,
+            web3Foreign,
+            foreignBridge
+          )
+
+          transferEvents = [...validHalfDuplexTransfers, ...transferEvents]
         })
       )
 

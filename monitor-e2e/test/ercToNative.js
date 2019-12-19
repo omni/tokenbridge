@@ -25,7 +25,7 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
   })
 
   it('should change balanceDiff', async () => {
-    await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
+    await sendTokens(foreignRPC.URL, user, ercToNativeBridge.halfDuplexToken, ercToNativeBridge.foreign)
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))

@@ -11,17 +11,23 @@ connection.on('disconnect', () => {
   logger.error('Disconnected from amqp Broker')
 })
 
-function connectWatcherToQueue({ queueName, cb }) {
+function connectWatcherToQueue({ queueName, workerQueue, cb }) {
+  const queueList = workerQueue ? [queueName, workerQueue] : [queueName]
+
   const channelWrapper = connection.createChannel({
     json: true,
     setup(channel) {
-      return Promise.all([channel.assertQueue(queueName, { durable: true })])
+      return Promise.all(queueList.map(queue => channel.assertQueue(queue, { durable: true })))
     }
   })
 
   const sendToQueue = data => channelWrapper.sendToQueue(queueName, data, { persistent: true })
+  let sendToWorker
+  if (workerQueue) {
+    sendToWorker = data => channelWrapper.sendToQueue(workerQueue, data, { persistent: true })
+  }
 
-  cb({ sendToQueue, channel: channelWrapper })
+  cb({ sendToQueue, sendToWorker, channel: channelWrapper })
 }
 
 function connectSenderToQueue({ queueName, cb }) {
@@ -59,6 +65,43 @@ function connectSenderToQueue({ queueName, cb }) {
   })
 }
 
+function connectWorkerToQueue({ queueName, senderQueue, cb }) {
+  const deadLetterExchange = `${queueName}-retry`
+
+  const channelWrapper = connection.createChannel({
+    json: true
+  })
+
+  channelWrapper.addSetup(channel => {
+    return Promise.all([
+      channel.assertExchange(deadLetterExchange, 'fanout', { durable: true }),
+      channel.assertQueue(queueName, { durable: true }),
+      channel.assertQueue(senderQueue, { durable: true }),
+      channel.bindQueue(queueName, deadLetterExchange),
+      channel.prefetch(1),
+      channel.consume(queueName, msg =>
+        cb({
+          msg,
+          channel: channelWrapper,
+          ackMsg: job => channelWrapper.ack(job),
+          nackMsg: job => channelWrapper.nack(job, false, true),
+          sendToSenderQueue: data => channelWrapper.sendToQueue(senderQueue, data, { persistent: true }),
+          scheduleForRetry: async (data, msgRetries = 0) => {
+            await generateRetry({
+              data,
+              msgRetries,
+              channelWrapper,
+              channel,
+              queueName,
+              deadLetterExchange
+            })
+          }
+        })
+      )
+    ])
+  })
+}
+
 async function generateRetry({ data, msgRetries, channelWrapper, channel, queueName, deadLetterExchange }) {
   const retries = msgRetries + 1
   const delay = getRetrySequence(retries) * 1000
@@ -78,6 +121,7 @@ async function generateRetry({ data, msgRetries, channelWrapper, channel, queueN
 module.exports = {
   connectWatcherToQueue,
   connectSenderToQueue,
+  connectWorkerToQueue,
   connection,
   generateRetry
 }

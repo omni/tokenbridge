@@ -83,6 +83,26 @@ async function main(bridgeMode) {
     const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
     const erc20Address = await foreignBridge.methods.erc20token().call()
     const erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
+    let foreignHalfDuplexErc20Balance = 0
+    let displayHalfDuplexToken = false
+    let tokenSwapAllowed = false
+    try {
+      const halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
+      if (halfDuplexTokenAddress !== erc20Address) {
+        const halfDuplexToken = new web3Foreign.eth.Contract(ERC20_ABI, halfDuplexTokenAddress)
+        logger.debug('calling halfDuplexToken.methods.balanceOf')
+        foreignHalfDuplexErc20Balance = await halfDuplexToken.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+        logger.debug('getting last block numbers')
+        const block = await web3Foreign.eth.getBlock('latest')
+
+        logger.debug(`Checking if SCD Emergency Shutdown has happened`)
+        tokenSwapAllowed = await foreignBridge.methods.isTokenSwapAllowed(block.timestamp).call()
+        displayHalfDuplexToken = true
+      }
+    } catch (e) {
+      logger.debug('Methods for half duplex token are not present')
+    }
+
     logger.debug('calling erc20Contract.methods.balanceOf')
     const foreignErc20Balance = await erc20Contract.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
 
@@ -91,7 +111,7 @@ async function main(bridgeMode) {
     const blockRewardAddress = await homeBridge.methods.blockRewardContract().call()
     const blockRewardContract = new web3Home.eth.Contract(BLOCK_REWARD_ABI, blockRewardAddress)
     logger.debug('calling blockReward.methods.mintedTotally')
-    const mintedCoins = await blockRewardContract.methods.mintedTotally().call()
+    const mintedCoins = await blockRewardContract.methods.mintedTotallyByBridge(COMMON_HOME_BRIDGE_ADDRESS).call()
     logger.debug('calling homeBridge.methods.totalBurntCoins')
     const burntCoins = await homeBridge.methods.totalBurntCoins().call()
 
@@ -99,16 +119,36 @@ async function main(bridgeMode) {
     const burntCoinsBN = new BN(burntCoins)
     const totalSupplyBN = mintedCoinsBN.minus(burntCoinsBN)
     const foreignErc20BalanceBN = new BN(foreignErc20Balance)
+    const halfDuplexErc20BalanceBN =
+      displayHalfDuplexToken && tokenSwapAllowed ? new BN(foreignHalfDuplexErc20Balance) : new BN(0)
 
-    const diff = foreignErc20BalanceBN.minus(totalSupplyBN).toFixed()
+    const diff = foreignErc20BalanceBN
+      .plus(halfDuplexErc20BalanceBN)
+      .minus(totalSupplyBN)
+      .toFixed()
+
+    let foreign = {
+      erc20Balance: Web3Utils.fromWei(foreignErc20Balance)
+    }
+
+    if (displayHalfDuplexToken && tokenSwapAllowed) {
+      foreign = {
+        ...foreign,
+        halfDuplexErc20Balance: Web3Utils.fromWei(foreignHalfDuplexErc20Balance)
+      }
+    } else if (displayHalfDuplexToken && !tokenSwapAllowed) {
+      foreign = {
+        ...foreign,
+        halfDuplexErc20BalanceAfterES: Web3Utils.fromWei(foreignHalfDuplexErc20Balance)
+      }
+    }
+
     logger.debug('Done')
     return {
       home: {
         totalSupply: Web3Utils.fromWei(totalSupplyBN.toFixed())
       },
-      foreign: {
-        erc20Balance: Web3Utils.fromWei(foreignErc20Balance)
-      },
+      foreign,
       balanceDiff: Number(Web3Utils.fromWei(diff)),
       lastChecked: Math.floor(Date.now() / 1000)
     }
