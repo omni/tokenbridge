@@ -5,16 +5,16 @@
 - name: "Set the service"
   template:
     src: tokenbridge-monitor.j2
-    dest: "/etc/init.d/tokenbridge-monitor"
+    dest: "/etc/init.d/{{ service_name }}"
     owner: root
     mode: 755
 
 - name: "Enable the service"
   service:
-    name: "tokenbridge-monitor"
+    name: "{{ service_name }}"
     state: started
     enabled: yes
     use: service
 
 - name: Start the service
-  shell: service tokenbridge-monitor start
+  shell: "service {{ service_name }} start"

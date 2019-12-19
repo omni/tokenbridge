@@ -21,7 +21,7 @@
 - name: Set the local container logs configuration file
   template:
     src: 33-monitor-docker.conf.j2
-    dest: /etc/rsyslog.d/33-monitor-docker.conf
+    dest: "/etc/rsyslog.d/33-monitor-docker-{{service_name}}.conf"
     owner: root
     group: root
     mode: 0644
@@ -29,7 +29,7 @@
 - name: Set the log configuration file to send container logs to remote server
   template:
     src: 38-monitor-remote-logging.conf.j2
-    dest: /etc/rsyslog.d/38-monitor-remote-logging.conf
+    dest: "/etc/rsyslog.d/38-monitor-remote-logging-{{service_name}}.conf"
     owner: root
     group: root
     mode: 0644
