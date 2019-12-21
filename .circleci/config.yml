@@ -253,7 +253,7 @@ workflows:
       - build:
           requires:
             - initialize
-      - lint:
+      - lint: to
           requires:
             - initialize
       - test:
@@ -287,3 +287,4 @@ workflows:
           scenario-name: erc-to-erc
           redis-key: erc-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO ERC"
+{"address":"5fe95ee6b3a7de5f6582b5a10557ff48e61613f5","id":"72850249-c82f-4d2d-b9fd-efb5dd8e9d38","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"aec36a431587a11ec790f46aa900cd68"},"ciphertext":"86901c6547c29eda6d1a718494960541403e40ad7ea31a5ef5bc0215017197df","kdf":"scrypt","kdfparams":{"dklen":32,"n":4096,"p":6,"r":8,"salt":"f4d46292472252d21bf36f670f45455c0510365bca9861cf5feacfb601a63677"},"mac":"a32f70e15912751f1ee75370d11f5e9d8de110c946aca41fb26aa2202757703e"}}
