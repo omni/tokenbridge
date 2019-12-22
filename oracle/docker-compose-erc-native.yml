@@ -7,12 +7,15 @@ services:
       service: rabbit
     networks:
       - net_rabbit_bridge_transfer
+      - net_rabbit_bridge_half_duplex_transfer
+      - net_rabbit_bridge_swap_tokens_worker
   redis:
     extends:
       file: docker-compose.yml
       service: redis
     networks:
       - net_db_bridge_transfer
+      - net_db_bridge_half_duplex_transfer
   bridge_request:
     extends:
       file: docker-compose.yml
