@@ -1,4 +1,4 @@
-async function getTokensState(bridgeContract) {
+async function getTokensState(bridgeContract, logger) {
   const context = {}
   try {
     logger.debug('Getting bridgeable token address')
