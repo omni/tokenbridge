@@ -1,3 +1,4 @@
 ---
 monitor_cron_schedule: "*/4 * * * *"
-service_name: "{{ BRIDGE_NAME | default('') }}"
+service_name: "{{ BRIDGE_NAME | default('tokenbridge-monitor') }}"
+log_file_name: "{{ BRIDGE_NAME | default('') }}"
