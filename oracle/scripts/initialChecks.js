@@ -7,6 +7,7 @@ const {
   FOREIGN_ERC_TO_NATIVE_ABI,
   getTokenType
 } = require('../../commons')
+
 const emptyLogger = {
   debug: () => {},
   info: () => {}
