@@ -125,10 +125,12 @@ async function checkConditions() {
   let state
   switch (config.id) {
     case 'erc-native-transfer':
+      logger.debug('Getting token address to listen Transfer events')
       state = await getTokensState(bridgeContract)
       updateEventContract(state.bridgeableTokenAddress)
       break
     case 'erc-native-half-duplex-transfer':
+      logger.debug('Getting Half Duplex token address to listen Transfer events')
       state = await getTokensState(bridgeContract)
       skipEvents = state.idle
       updateEventContract(state.halfDuplexTokenAddress)
