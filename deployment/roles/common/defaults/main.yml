@@ -4,9 +4,3 @@ compose_service_user: poadocker
 bridge_dir_name: "{{ BRIDGE_NAME | default('bridge') }}"
 alt_bridge_dir_name: "{{ lookup('vars', 'BRIDGE_NAME', default='bridge')}}"
 bridge_path: "/home/{{ compose_service_user }}/{{ bridge_dir_name }}"
-
-- debug:
-    msg: bridge dir name {{ bridge_dir_name }} and path {{ bridge_path }}
-
-- debug:
-    msg: alt dir name {{ alt_bridge_dir_name }}

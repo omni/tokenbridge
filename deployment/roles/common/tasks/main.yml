@@ -1,4 +1,10 @@
 ---
+- debug:
+    msg: bridge dir name {{ bridge_dir_name }} and path {{ bridge_path }}
+
+- debug:
+    msg: alt dir name {{ alt_bridge_dir_name }}
+
 - include_tasks: dependencies.yml
 - include_tasks: repo.yml
 - include_tasks: logging.yml
