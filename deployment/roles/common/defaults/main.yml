@@ -2,5 +2,4 @@
 docker_compose_version: 1.23.2
 compose_service_user: poadocker
 bridge_dir_name: "{{ BRIDGE_NAME | default('bridge') }}"
-alt_bridge_dir_name: "{{ lookup('vars', 'BRIDGE_NAME', default='bridge')}}"
 bridge_path: "/home/{{ compose_service_user }}/{{ bridge_dir_name }}"
