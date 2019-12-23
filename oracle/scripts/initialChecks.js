@@ -7,6 +7,10 @@ const {
   FOREIGN_ERC_TO_NATIVE_ABI,
   getTokenType
 } = require('../../commons')
+const emptyLogger = {
+  debug: () => {},
+  info: () => {}
+}
 
 async function initialChecks() {
   const { ORACLE_BRIDGE_MODE, COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
@@ -18,7 +22,7 @@ async function initialChecks() {
     result.bridgeableTokenAddress = await bridge.methods.erc20token().call()
   } else if (ORACLE_BRIDGE_MODE === 'ERC_TO_NATIVE') {
     const bridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
-    result = await getTokensState(bridge)
+    result = await getTokensState(bridge, emptyLogger)
   }
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {
