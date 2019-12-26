@@ -22,6 +22,10 @@ Please refer to [Deployment-E2E](../deployment-e2e/README.md).
 
 See the [CONTRIBUTING](../CONTRIBUTING.md) document for contribution, testing and pull request protocol.
 
+## Examples
+
+[Deploy multiple bridge monitor on the same host](./MONITOR.md)
+
 ## License
 
 [![License: LGPL v3.0](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
