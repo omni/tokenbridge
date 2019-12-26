@@ -9,7 +9,7 @@
     job: "/bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./checkDocker.sh >cronWorker.out 2>cronWorker.err'"
 - name: Add cron entry
   cron:
-    name: "RUN_MONITOR_CHECKS"
+    name: "RUN_MONITOR_CHECKS_{{ service_name }}"
     minute: "{{ minute }}"
     hour: "{{ hour }}"
     day: "{{ day }}"

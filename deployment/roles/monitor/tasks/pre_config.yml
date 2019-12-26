@@ -3,3 +3,8 @@
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/monitor/.env"
+
+- name: Add script to be called by cron job
+  template:
+    src: checkDocker.j2
+    dest: "{{ bridge_path }}/monitor/scripts/checkDocker.sh"
