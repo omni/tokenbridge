@@ -11,34 +11,35 @@
 ### END INIT INFO
 
 WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridge_path + '/monitor' if bridge_path[:1] != "/" else bridge_path + '/monitor' }}"
+projectnameoverride="{{ '-p ' + 'monitor_' + service_name }}"
 
 start(){
     echo "Starting TokenBridge Monitor.."
     cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  up  --detach
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride down -v
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride rm -fv
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride up  --detach
 }
 
 stop(){
     echo "Stopping TokenBridge Monitor.."
     cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride down -v
     sleep 2
 }
 
 status(){
     echo "TokenBridge Monitor status:"
     cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  ps
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride ps
 }
 
 rebuild(){
     echo "Rebuild TokenBridge Monitor.."
     cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  up  --detach --force-recreate --no-deps --build
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride down -v
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride rm -fv
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $projectnameoverride up  --detach --force-recreate --no-deps --build
 }
 
 

@@ -7,7 +7,7 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 
 @pytest.mark.parametrize("name", [
-    ("monitor_monitor_1")
+    ("monitor_tokenbridge-monitor_monitor_1")
 ])
 def test_docker_containers(host, name):
     container = host.docker(name)
