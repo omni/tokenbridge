@@ -87,9 +87,10 @@ async function main(bridgeMode) {
   const homeVBalances = {}
 
   logger.debug('calling home getGasPrices')
-  const homeGasPrice =
-    (await gasPriceFromSupplier(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasPriceSupplierOpts)) ||
-    Web3Utils.toBN(COMMON_HOME_GAS_PRICE_FALLBACK)
+  const fallbackGasPrice = Web3Utils.toBN(COMMON_HOME_GAS_PRICE_FALLBACK)
+  const homeGasPrice = fallbackGasPrice.isZero()
+    ? fallbackGasPrice
+    : await gasPriceFromSupplier(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasPriceSupplierOpts)
   const homeGasPriceGwei = Web3Utils.fromWei(homeGasPrice.toString(), 'gwei')
   const homeTxCost = homeGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_HOME_TX_LIMIT))
 
