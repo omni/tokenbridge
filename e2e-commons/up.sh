@@ -31,10 +31,8 @@ while [ "$1" != "" ]; do
     docker-compose run -d oracle yarn sender:foreign
 
     # erc20-native Validator 2
-    vaddr2="ORACLE_VALIDATOR_ADDRESS=0xdCC784657C78054aa61FbcFFd2605F32374816A4"
-    vkey2="ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=5a5c3645d0f04e9eb4f27f94ed4c244a225587405b8838e7456f7781ce3a9513"
     oracle2name="-p validator2"
-    $vaddr2 $vkey2 docker-compose $oracle2name up -d redis rabbit oracle-erc20-native
+    ORACLE_VALIDATOR_ADDRESS=0xdCC784657C78054aa61FbcFFd2605F32374816A4 ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=5a5c3645d0f04e9eb4f27f94ed4c244a225587405b8838e7456f7781ce3a9513 docker-compose $oracle2name up -d redis rabbit oracle-erc20-native
     docker-compose $oracle2name run -d oracle-erc20-native yarn watcher:signature-request
     docker-compose $oracle2name run -d oracle-erc20-native yarn watcher:collected-signatures
     docker-compose $oracle2name run -d oracle-erc20-native yarn watcher:affirmation-request
@@ -45,10 +43,8 @@ while [ "$1" != "" ]; do
     docker-compose $oracle2name run -d oracle yarn sender:foreign
 
     # erc20-native Validator 3
-    vaddr3="ORACLE_VALIDATOR_ADDRESS=0xDcef88209a20D52165230104B245803C3269454d"
-    vkey3="ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=f877f62a1c19f852cff1d29f0fb1ecac18821c0080d4cc0520c60c098293dca1"
     oracle3name="-p validator3"
-    $vaddr3 $vkey3 docker-compose $oracle3name up -d redis rabbit oracle-erc20-native
+    ORACLE_VALIDATOR_ADDRESS=0xDcef88209a20D52165230104B245803C3269454d ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=f877f62a1c19f852cff1d29f0fb1ecac18821c0080d4cc0520c60c098293dca1 docker-compose $oracle3name up -d redis rabbit oracle-erc20-native
     docker-compose $oracle3name run -d oracle-erc20-native yarn watcher:signature-request
     docker-compose $oracle3name run -d oracle-erc20-native yarn watcher:collected-signatures
     docker-compose $oracle3name run -d oracle-erc20-native yarn watcher:affirmation-request
