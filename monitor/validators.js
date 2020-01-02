@@ -65,18 +65,18 @@ async function main(bridgeMode) {
   const foreignBridgeValidators = new web3Foreign.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
 
   logger.debug('calling foreignBridgeValidators getValidatorList()')
-  const foreignValidators = await getValidatorList(foreignValidatorsAddress, web3Foreign.eth, {
+  const foreignValidators = (await getValidatorList(foreignValidatorsAddress, web3Foreign.eth, {
     from: MONITOR_FOREIGN_START_BLOCK,
     to: foreignBlockNumber,
     logger
-  })
+  })).map(web3Foreign.utils.toChecksumAddress)
 
   logger.debug('calling homeBridgeValidators getValidatorList()')
-  const homeValidators = await getValidatorList(homeValidatorsAddress, web3Home.eth, {
+  const homeValidators = (await getValidatorList(homeValidatorsAddress, web3Home.eth, {
     from: MONITOR_HOME_START_BLOCK,
     to: homeBlockNumber,
     logger
-  })
+  })).map(web3Home.utils.toChecksumAddress)
 
   const homeBalances = {}
   logger.debug('calling asyncForEach homeValidators homeBalances')
