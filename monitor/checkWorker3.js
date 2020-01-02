@@ -9,6 +9,7 @@ async function checkWorker3() {
     const transfers = await stuckTransfers()
     // console.log(transfers)
     if (!transfers) throw new Error('transfers is empty: ' + JSON.stringify(transfers))
+    transfers.ok = transfers.total.length === 0
     fs.writeFileSync(path.join(__dirname, '/responses/stuckTransfers.json'), JSON.stringify(transfers, null, 4))
     logger.debug('Done')
   } catch (e) {
