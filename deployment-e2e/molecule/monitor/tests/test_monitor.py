@@ -34,14 +34,14 @@ def test_logging(host, filename):
 
 def test_home_exists(host):
     assert host.run_test(
-        'curl -s http://localhost:3003 | '
+        'curl -s http://localhost:3003/bridge | '
         'grep -q -i "home"'
     )
 
 
 def test_foreign_exists(host):
     assert host.run_test(
-        'curl -s http://localhost:3003 | '
+        'curl -s http://localhost:3003/bridge | '
         'grep -q -i "foreign"'
     )
 
@@ -49,6 +49,6 @@ def test_foreign_exists(host):
 def test_no_error(host):
     assert host.run_expect(
         [1],
-        'curl -s http://localhost:3003 | '
+        'curl -s http://localhost:3003/bridge | '
         'grep -i -q "error"'
     )
