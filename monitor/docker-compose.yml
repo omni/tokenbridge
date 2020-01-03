@@ -11,4 +11,4 @@ services:
     environment: 
       - NODE_ENV=production
     restart: unless-stopped
-    entrypoint: "yarn check-and-start"
+    entrypoint: "yarn start"
