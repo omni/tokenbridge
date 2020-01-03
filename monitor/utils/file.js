@@ -20,7 +20,13 @@ function writeFile(filePath, object) {
 }
 
 function createDir(dirPath) {
-  fs.mkdirSync(path.join(process.cwd(), dirPath), { recursive: true })
+  try {
+    fs.mkdirSync(path.join(process.cwd(), dirPath), { recursive: true })
+  } catch (e) {
+    if (!e.message.includes('exists')) {
+      throw e
+    }
+  }
 }
 
 module.exports = {
