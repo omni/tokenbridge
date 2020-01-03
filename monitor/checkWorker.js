@@ -1,13 +1,12 @@
-const fs = require('fs')
-const path = require('path')
 const Web3 = require('web3')
 const logger = require('./logger')('checkWorker')
 const { getBridgeMode } = require('../commons')
 const getBalances = require('./getBalances')
 const getShortEventStats = require('./getShortEventStats')
 const validators = require('./validators')
+const { writeFile, createDir } = require('./utils/file')
 
-const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL } = process.env
+const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL, BRIDGE_NAME } = process.env
 
 const MONITOR_VALIDATOR_HOME_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_HOME_TX_LIMIT) || 0
 const MONITOR_VALIDATOR_FOREIGN_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) || 0
@@ -20,6 +19,7 @@ const { HOME_ERC_TO_ERC_ABI } = require('../commons')
 
 async function checkWorker() {
   try {
+    createDir(`/responses/${BRIDGE_NAME}`)
     const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
     const bridgeMode = await getBridgeMode(homeBridge)
     logger.debug('Bridge mode:', bridgeMode)
@@ -31,7 +31,7 @@ async function checkWorker() {
     const foreign = Object.assign({}, balances.foreign, events.foreign)
     const status = Object.assign({}, balances, events, { home }, { foreign })
     if (!status) throw new Error('status is empty: ' + JSON.stringify(status))
-    fs.writeFileSync(path.join(__dirname, '/responses/getBalances.json'), JSON.stringify(status, null, 4))
+    writeFile(`/responses/${BRIDGE_NAME}/getBalances.json`, status)
 
     logger.debug('calling validators()')
     const vBalances = await validators(bridgeMode)
@@ -59,7 +59,7 @@ async function checkWorker() {
     }
 
     vBalances.ok = vBalances.homeOk && vBalances.foreignOk
-    fs.writeFileSync(path.join(__dirname, '/responses/validators.json'), JSON.stringify(vBalances, null, 4))
+    writeFile(`/responses/${BRIDGE_NAME}/validators.json`, vBalances)
     logger.debug('Done')
   } catch (e) {
     logger.error(e)

@@ -1,26 +1,15 @@
 require('dotenv').config()
 const express = require('express')
-const fs = require('fs')
+const { readFile } = require('./utils/file')
 
 const app = express()
+const bridgeRouter = express.Router({ mergeParams: true })
 
-async function readFile(path) {
-  try {
-    const content = await fs.readFileSync(path)
-    const json = JSON.parse(content)
-    const timeDiff = Math.floor(Date.now() / 1000) - json.lastChecked
-    return Object.assign({}, json, { timeDiff })
-  } catch (e) {
-    console.error(e)
-    return {
-      error: 'please check your worker'
-    }
-  }
-}
+app.use('/:bridgeName', bridgeRouter)
 
-app.get('/', async (req, res, next) => {
+bridgeRouter.get('/', async (req, res, next) => {
   try {
-    const results = await readFile('./responses/getBalances.json')
+    const results = await readFile(`./responses/${req.params.bridgeName}/getBalances.json`)
     res.json(results)
   } catch (e) {
     // this will eventually be handled by your error handling middleware
@@ -28,9 +17,9 @@ app.get('/', async (req, res, next) => {
   }
 })
 
-app.get('/validators', async (req, res, next) => {
+bridgeRouter.get('/validators', async (req, res, next) => {
   try {
-    const results = await readFile('./responses/validators.json')
+    const results = await readFile(`./responses/${req.params.bridgeName}/validators.json`)
     res.json(results)
   } catch (e) {
     // this will eventually be handled by your error handling middleware
@@ -38,9 +27,9 @@ app.get('/validators', async (req, res, next) => {
   }
 })
 
-app.get('/eventsStats', async (req, res, next) => {
+bridgeRouter.get('/eventsStats', async (req, res, next) => {
   try {
-    const results = await readFile('./responses/eventsStats.json')
+    const results = await readFile(`./responses/${req.params.bridgeName}/eventsStats.json`)
     res.json(results)
   } catch (e) {
     // this will eventually be handled by your error handling middleware
@@ -48,18 +37,18 @@ app.get('/eventsStats', async (req, res, next) => {
   }
 })
 
-app.get('/alerts', async (req, res, next) => {
+bridgeRouter.get('/alerts', async (req, res, next) => {
   try {
-    const results = await readFile('./responses/alerts.json')
+    const results = await readFile(`./responses/${req.params.bridgeName}/alerts.json`)
     res.json(results)
   } catch (e) {
     next(e)
   }
 })
 
-app.get('/stuckTransfers', async (req, res, next) => {
+bridgeRouter.get('/stuckTransfers', async (req, res, next) => {
   try {
-    const results = await readFile('./responses/stuckTransfers.json')
+    const results = await readFile(`./responses/${req.params.bridgeName}/stuckTransfers.json`)
     res.json(results)
   } catch (e) {
     next(e)
