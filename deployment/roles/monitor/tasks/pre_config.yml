@@ -3,3 +3,8 @@
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/monitor/.env"
+
+- name: Copy bridge config files names
+  copy:
+    src: ../../../../monitor/configs/
+    dest: "{{ bridge_path }}/monitor/configs"
