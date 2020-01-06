@@ -79,6 +79,18 @@ Example config for installing only UI:
    `cd group_vars`
    2. Note the  <bridge_name> and add it to the hosts.yml configuration. For example, if a bridge file is named sokol-kovan.yml, you would change the <bridge_name> value in hosts.yml to sokol-kovan.
 
+## Monitor Configuration
+To deploy the monitor component there are two configuration steps required:
+1. Create the ansible configuration file `group_vars/<bridge_name>.yml` with the `MONITOR_PORT` variable.
+ 
+2. Create a configuration file `*.env` in `../monitor/configs` with the rest of the environmental variables detailed in the [monitor .env example](../monitor/.env.example). The monitor supports watching several bridges at the same time by creating one `.env` files for each bridge.
+
+In case the monitor component is already deployed in a host, and you want to add new bridges to watch, a new `.env` file should be added in `../monitor/configs` and run the ansible playbooks again. The playbook will detect that the monitor is already deployed and will only update the `config` directory.
+   
+## Examples
+
+[Deploy a monitor for multiple bridges](./MONITOR.md)
+
 ## Administrator Configurations
 
 1. The `group_vars/<bridge_name>.yml` file contains the public bridge parameters. This file is prepared by administrators for each bridge. The validator only needs to add the required bridge name in the hosts.yml file to tell Ansible which file to use.
