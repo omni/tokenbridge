@@ -1,6 +1,18 @@
 ---
 - include_tasks: pre_config.yml
-- include_tasks: logging.yml
-- include_tasks: jumpbox.yml
-- include_tasks: servinstall.yml
-- include_tasks: cron.yml
+
+- name: Include logging tasks
+  include_tasks: logging.yml
+  when: skip_task != true
+
+- name: Include jumpbox tasks
+  include_tasks: jumpbox.yml
+  when: skip_task != true
+
+- name: Include servinstall tasks
+  include_tasks: servinstall.yml
+  when: skip_task != true
+
+- name: Include cron tasks
+  include_tasks: cron.yml
+  when: skip_task != true

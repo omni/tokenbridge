@@ -3,6 +3,7 @@
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/monitor/.env"
+  when: skip_task != true
 
 - name: Copy bridge config files names
   copy:
