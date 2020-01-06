@@ -5,6 +5,8 @@ const { isV1Bridge } = require('./utils/serverUtils')
 
 const app = express()
 
+const MONITOR_VALIDATOR_HOME_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_HOME_TX_LIMIT) || 0
+const MONITOR_VALIDATOR_FOREIGN_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) || 0
 const MONITOR_TX_NUMBER_THRESHOLD = Number(process.env.MONITOR_TX_NUMBER_THRESHOLD) || 100
 console.log('MONITOR_TX_NUMBER_THRESHOLD = ' + MONITOR_TX_NUMBER_THRESHOLD)
 
@@ -52,18 +54,25 @@ app.get('/validators', async (req, res, next) => {
     const results = await readFile('./responses/validators.json')
     results.homeOk = true
     results.foreignOk = true
-    for (const hv in results.home.validators) {
-      if (results.home.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
-        results.homeOk = false
-        break
+
+    if (MONITOR_VALIDATOR_HOME_TX_LIMIT) {
+      for (const hv in results.home.validators) {
+        if (results.home.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
+          results.homeOk = false
+          break
+        }
       }
     }
-    for (const hv in results.foreign.validators) {
-      if (results.foreign.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
-        results.foreignOk = false
-        break
+
+    if (MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) {
+      for (const hv in results.foreign.validators) {
+        if (results.foreign.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
+          results.foreignOk = false
+          break
+        }
       }
     }
+
     results.ok = results.homeOk && results.foreignOk
     res.json(results)
   } catch (e) {

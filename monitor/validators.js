@@ -10,12 +10,10 @@ const {
   COMMON_FOREIGN_RPC_URL,
   COMMON_HOME_BRIDGE_ADDRESS,
   COMMON_FOREIGN_BRIDGE_ADDRESS,
-  MONITOR_VALIDATOR_HOME_TX_LIMIT,
   COMMON_HOME_GAS_PRICE_SUPPLIER_URL,
   COMMON_HOME_GAS_PRICE_SPEED_TYPE,
   COMMON_HOME_GAS_PRICE_FALLBACK,
   COMMON_HOME_GAS_PRICE_FACTOR,
-  MONITOR_VALIDATOR_FOREIGN_TX_LIMIT,
   COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL,
   COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE,
   COMMON_FOREIGN_GAS_PRICE_FALLBACK,
@@ -23,6 +21,8 @@ const {
 } = process.env
 const MONITOR_HOME_START_BLOCK = Number(process.env.MONITOR_HOME_START_BLOCK) || 0
 const MONITOR_FOREIGN_START_BLOCK = Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0
+const MONITOR_VALIDATOR_HOME_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_HOME_TX_LIMIT) || 0
+const MONITOR_VALIDATOR_FOREIGN_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) || 0
 
 const Web3Utils = Web3.utils
 
@@ -65,76 +65,97 @@ async function main(bridgeMode) {
   const foreignBridgeValidators = new web3Foreign.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
 
   logger.debug('calling foreignBridgeValidators getValidatorList()')
-  const foreignValidators = await getValidatorList(foreignValidatorsAddress, web3Foreign.eth, {
+  const foreignValidators = (await getValidatorList(foreignValidatorsAddress, web3Foreign.eth, {
     from: MONITOR_FOREIGN_START_BLOCK,
     to: foreignBlockNumber,
     logger
-  })
+  })).map(web3Foreign.utils.toChecksumAddress)
 
   logger.debug('calling homeBridgeValidators getValidatorList()')
-  const homeValidators = await getValidatorList(homeValidatorsAddress, web3Home.eth, {
+  const homeValidators = (await getValidatorList(homeValidatorsAddress, web3Home.eth, {
     from: MONITOR_HOME_START_BLOCK,
     to: homeBlockNumber,
     logger
-  })
+  })).map(web3Home.utils.toChecksumAddress)
 
-  const homeBalances = {}
-  logger.debug('calling asyncForEach homeValidators homeBalances')
-  await asyncForEach(homeValidators, async v => {
-    homeBalances[v] = Web3Utils.fromWei(await web3Home.eth.getBalance(v))
-  })
   const foreignVBalances = {}
   const homeVBalances = {}
 
-  logger.debug('calling home getGasPrices')
-  const homeGasPrice =
-    (await gasPriceFromSupplier(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasPriceSupplierOpts)) ||
-    Web3Utils.toBN(COMMON_HOME_GAS_PRICE_FALLBACK)
-  const homeGasPriceGwei = Web3Utils.fromWei(homeGasPrice.toString(), 'gwei')
-  const homeTxCost = homeGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_HOME_TX_LIMIT))
+  let homeGasPrice
+  let homeGasPriceGwei
+  let homeTxCost
 
-  logger.debug('calling foreign getGasPrices')
-  const foreignGasPrice =
-    (await gasPriceFromSupplier(() => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL), foreignGasPriceSupplierOpts)) ||
-    Web3Utils.toBN(COMMON_FOREIGN_GAS_PRICE_FALLBACK)
-  const foreignGasPriceGwei = Web3Utils.fromWei(foreignGasPrice.toString(), 'gwei')
-  const foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_FOREIGN_TX_LIMIT))
+  if (MONITOR_VALIDATOR_HOME_TX_LIMIT) {
+    logger.debug('calling home getGasPrices')
+    homeGasPrice =
+      (await gasPriceFromSupplier(() => fetch(COMMON_HOME_GAS_PRICE_SUPPLIER_URL), homeGasPriceSupplierOpts)) ||
+      Web3Utils.toBN(COMMON_HOME_GAS_PRICE_FALLBACK)
+    homeGasPriceGwei = Web3Utils.fromWei(homeGasPrice.toString(), 'gwei')
+    homeTxCost = homeGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_HOME_TX_LIMIT))
+  }
+
+  let foreignGasPrice
+  let foreignGasPriceGwei
+  let foreignTxCost
+
+  if (MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) {
+    logger.debug('calling foreign getGasPrices')
+    foreignGasPrice =
+      (await gasPriceFromSupplier(() => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL), foreignGasPriceSupplierOpts)) ||
+      Web3Utils.toBN(COMMON_FOREIGN_GAS_PRICE_FALLBACK)
+    foreignGasPriceGwei = Web3Utils.fromWei(foreignGasPrice.toString(), 'gwei')
+    foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_FOREIGN_TX_LIMIT))
+  }
 
   let validatorsMatch = true
   logger.debug('calling asyncForEach foreignValidators foreignVBalances')
   await asyncForEach(foreignValidators, async v => {
     const balance = await web3Foreign.eth.getBalance(v)
-    const leftTx = Web3Utils.toBN(balance)
-      .div(foreignTxCost)
-      .toString(10)
-    foreignVBalances[v] = {
-      balance: Web3Utils.fromWei(balance),
-      leftTx: Number(leftTx),
-      gasPrice: Number(foreignGasPriceGwei)
+    if (MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) {
+      const leftTx = Web3Utils.toBN(balance)
+        .div(foreignTxCost)
+        .toString(10)
+      foreignVBalances[v] = {
+        balance: Web3Utils.fromWei(balance),
+        leftTx: Number(leftTx),
+        gasPrice: Number(foreignGasPriceGwei)
+      }
+    } else {
+      foreignVBalances[v] = {
+        balance: Web3Utils.fromWei(balance)
+      }
     }
+
     if (!homeValidators.includes(v)) {
       validatorsMatch = false
       foreignVBalances[v].onlyOnForeign = true
     }
   })
+
   logger.debug('calling asyncForEach homeValidators homeVBalances')
   await asyncForEach(homeValidators, async v => {
     const balance = await web3Home.eth.getBalance(v)
-    const leftTx = homeTxCost.isZero()
-      ? 999999
-      : Web3Utils.toBN(balance)
-          .div(homeTxCost)
-          .toString(10)
-    homeVBalances[v] = {
-      balance: Web3Utils.fromWei(balance),
-      leftTx: Number(leftTx),
-      gasPrice: Number(homeGasPriceGwei)
+    if (MONITOR_VALIDATOR_HOME_TX_LIMIT) {
+      const leftTx = Web3Utils.toBN(balance)
+        .div(homeTxCost)
+        .toString(10)
+      homeVBalances[v] = {
+        balance: Web3Utils.fromWei(balance),
+        leftTx: Number(leftTx),
+        gasPrice: Number(homeGasPriceGwei)
+      }
+    } else {
+      homeVBalances[v] = {
+        balance: Web3Utils.fromWei(balance)
+      }
     }
+
     if (!foreignValidators.includes(v)) {
       validatorsMatch = false
       homeVBalances[v].onlyOnHome = true
     }
   })
+
   logger.debug('calling homeBridgeValidators.methods.requiredSignatures().call()')
   const reqSigHome = await homeBridgeValidators.methods.requiredSignatures().call()
   logger.debug('calling foreignBridgeValidators.methods.requiredSignatures().call()')
