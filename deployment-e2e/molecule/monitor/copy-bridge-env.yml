@@ -1,0 +1,6 @@
+---
+- name: Generate example env locally
+  copy:
+    src: ../../../monitor/configs/example.env.example
+    dest: ../../../monitor/configs/example.env
+    delegate_to: 127.0.0.1
