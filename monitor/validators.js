@@ -136,11 +136,9 @@ async function main(bridgeMode) {
   await asyncForEach(homeValidators, async v => {
     const balance = await web3Home.eth.getBalance(v)
     if (MONITOR_VALIDATOR_HOME_TX_LIMIT) {
-      const leftTx = homeTxCost.isZero()
-        ? 999999
-        : Web3Utils.toBN(balance)
-            .div(homeTxCost)
-            .toString(10)
+      const leftTx = Web3Utils.toBN(balance)
+        .div(homeTxCost)
+        .toString(10)
       homeVBalances[v] = {
         balance: Web3Utils.fromWei(balance),
         leftTx: Number(leftTx),
