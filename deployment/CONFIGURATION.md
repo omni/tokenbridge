@@ -85,7 +85,7 @@ To deploy the monitor component there are two configuration steps required:
  
 2. Create a configuration file `<some-unique-name>.env` in `../monitor/configs` with the rest of the environmental variables detailed in the [monitor .env example](../monitor/.env.example). The monitor supports watching several bridges at the same time by creating one `env`-ended files for each bridge.
 
-In case the monitor component is already deployed in a host, and you want to add new bridges to watch, a new `.env` file should be added in `../monitor/configs` and run the ansible playbooks again. The playbook will detect that the monitor is already deployed and will only update the `config` directory.
+In case the monitor component is already deployed in a host, and you want to add new bridges to watch, a new `<some-unique-name>.env` file should be added in `../monitor/configs` and run the ansible playbooks again. The playbook will detect that the monitor is already deployed and will only update the `config` directory.
    
 ## Examples
 
