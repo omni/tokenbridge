@@ -16,6 +16,3 @@
     month: "{{ month }}"
     weekday: "{{ weekday }}"
     job: "{{ job }}"
-
-- name: Run the job to generate initial data
-  shell: "{{ job }}"
