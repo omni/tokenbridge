@@ -10,7 +10,7 @@ async function readFile(filePath) {
   } catch (e) {
     console.error(e)
     return {
-      error: 'please check your worker'
+      error: 'the bridge statistics are not available'
     }
   }
 }
