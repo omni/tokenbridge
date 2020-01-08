@@ -1,0 +1,7 @@
+---
+- name: Generate initial data for monitor
+  hosts: monitor
+  become: true
+  tasks:
+    - name: Run monitor checks
+      shell: /bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./getBridgeStats.sh >cronWorker.out 2>cronWorker.err'
