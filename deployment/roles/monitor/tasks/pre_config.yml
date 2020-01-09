@@ -5,7 +5,7 @@
     dest: "{{ bridge_path }}/monitor/.env"
   when: skip_task != true
 
-- name: Copy bridge config files names
-  copy:
-    src: ../../../../monitor/configs/
-    dest: "{{ bridge_path }}/monitor/configs"
+- name: Install bridge config env
+  template:
+    src: config.env.j2
+    dest: "{{ bridge_path }}/monitor/configs/{{ MONITOR_BRIDGE_NAME }}.env"
