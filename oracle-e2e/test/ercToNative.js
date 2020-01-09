@@ -9,7 +9,13 @@ const {
   homeRPC,
   foreignRPC
 } = require('../../e2e-commons/constants.json')
-const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, SAI_TOP } = require('../../commons')
+const {
+  ERC677_BRIDGE_TOKEN_ABI,
+  FOREIGN_ERC_TO_NATIVE_ABI,
+  SAI_TOP,
+  HOME_ERC_TO_NATIVE_ABI,
+  BRIDGE_VALIDATORS_ABI
+} = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
@@ -21,11 +27,13 @@ const COMMON_FOREIGN_BRIDGE_ADDRESS = ercToNativeBridge.foreign
 const { toBN } = foreignWeb3.utils
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
+homeWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 
 const erc20Token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToNativeBridge.foreignToken)
 const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
+const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 
 describe('erc to native', () => {
   let halfDuplexTokenAddress
@@ -33,6 +41,22 @@ describe('erc to native', () => {
   before(async () => {
     halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
     halfDuplexToken = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, halfDuplexTokenAddress)
+
+    const homeValidatorAddress = await homeBridge.methods.validatorContract().call()
+    const foreignValidatorAddress = await foreignBridge.methods.validatorContract().call()
+
+    const foreignValidator = new foreignWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorAddress)
+    const homeValidator = new homeWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorAddress)
+
+    await homeValidator.methods.setRequiredSignatures(2).send({
+      from: validator.address,
+      gas: '4000000'
+    })
+
+    await foreignValidator.methods.setRequiredSignatures(2).send({
+      from: validator.address,
+      gas: '4000000'
+    })
   })
   it('should continue working after migration', async () => {
     const originalBalanceOnHome = await homeWeb3.eth.getBalance(user.address)
