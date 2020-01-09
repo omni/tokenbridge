@@ -81,7 +81,7 @@ describe('erc to native', () => {
     })
 
     // update min threshold for swap
-    await foreignBridge.methods.setMinHDTokenBalance(foreignWeb3.utils.toWei('1', 'ether')).send({
+    await foreignBridge.methods.setMinHDTokenBalance(foreignWeb3.utils.toWei('2', 'ether')).send({
       from: validator.address,
       gas: '1000000'
     })
