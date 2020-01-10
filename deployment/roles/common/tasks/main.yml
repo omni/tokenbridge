@@ -1,4 +1,21 @@
 ---
-- include_tasks: dependencies.yml
-- include_tasks: repo.yml
-- include_tasks: logging.yml
+- name: Check if component is already deployed
+  shell: "test -f {{ bridge_path }}/{{ component }}/docker-compose.yml && echo 'true'"
+  ignore_errors: True
+  register: already_deployed
+  when: check_deployed is defined
+
+- name: Set if tasks should be skipped
+  set_fact: skip_task="{{ already_deployed.stdout | default('false') }}"
+
+- name: Include dependencies tasks
+  include_tasks: dependencies.yml
+  when: skip_task != true
+
+- name: Include repo tasks
+  include_tasks: repo.yml
+  when: skip_task != true
+
+- name: Include logging tasks
+  include_tasks: logging.yml
+  when: skip_task != true

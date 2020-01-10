@@ -18,6 +18,7 @@ start(){
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  up  --detach
+    sudo -u "{{ compose_service_user }}" /bin/bash -c 'cd scripts; ./getBridgeStats.sh >cronWorker.out 2>cronWorker.err'
 }
 
 stop(){

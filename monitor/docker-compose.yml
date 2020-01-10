@@ -10,5 +10,7 @@ services:
     env_file: ./.env
     environment: 
       - NODE_ENV=production
+    volumes:
+      - ./responses:/mono/monitor/responses
     restart: unless-stopped
-    entrypoint: "yarn check-and-start"
+    entrypoint: "yarn start"

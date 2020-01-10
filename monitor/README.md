@@ -126,7 +126,7 @@ Using Docker:
 docker-compose up -d
 ```
 
-- The application will run on `http://localhost:PORT`, where `PORT` is specified in your `.env` file.
+- The application will run on `http://localhost:MONITOR_PORT/MONITOR_BRIDGE_NAME`, where `MONITOR_PORT` and `MONITOR_BRIDGE_NAME` are specified in your `.env` file.
 - To enabled debug logging, set `DEBUG=1` variable in `.env`.
 
 ## Check balances of contracts and validators, get unprocessed events

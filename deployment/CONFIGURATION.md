@@ -78,6 +78,10 @@ Example config for installing only UI:
    1. Go to the group_vars folder. 
    `cd group_vars`
    2. Note the  <bridge_name> and add it to the hosts.yml configuration. For example, if a bridge file is named sokol-kovan.yml, you would change the <bridge_name> value in hosts.yml to sokol-kovan.
+   
+## Examples
+
+[Deploy a monitor for multiple bridges](./MONITOR.md)
 
 ## Administrator Configurations
 

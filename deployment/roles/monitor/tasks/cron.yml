@@ -6,7 +6,7 @@
     day: "{{ monitor_cron_schedule.split(' ')[2] }}"
     month: "{{ monitor_cron_schedule.split(' ')[3] }}"
     weekday: "{{ monitor_cron_schedule.split(' ')[4] }}"
-    job: "/bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./checkDocker.sh >cronWorker.out 2>cronWorker.err'"
+    job: "/bin/bash -c 'cd {{ bridge_path }}/monitor/scripts; ./getBridgeStats.sh >cronWorker.out 2>cronWorker.err'"
 - name: Add cron entry
   cron:
     name: "RUN_MONITOR_CHECKS"

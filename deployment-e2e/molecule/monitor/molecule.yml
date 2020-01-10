@@ -29,10 +29,11 @@ provisioner:
       r: ["bug"]
   playbooks:
     prepare: ../prepare.yml
-    converge: ../../../deployment/site.yml
+    converge: ./converge.yml
   inventory:
     host_vars:
       monitor-host:
+        MONITOR_PORT: 3003
         syslog_server_port: "udp://127.0.0.1:514"
 verifier:
   name: testinfra

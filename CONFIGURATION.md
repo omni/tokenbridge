@@ -69,3 +69,4 @@ MONITOR_VALIDATOR_HOME_TX_LIMIT | Average gas usage of a transaction sent by a v
 MONITOR_VALIDATOR_FOREIGN_TX_LIMIT | Average gas usage of a transaction sent by a validator, it is used to estimate the number of transaction that can be paid by the validator. | integer
 MONITOR_TX_NUMBER_THRESHOLD | If estimated number of transaction is equal to or below this value, the monitor will report that the validator has less funds than it is required. | integer
 MONITOR_PORT | The port for the Monitor. | integer
+MONITOR_BRIDGE_NAME | The name to be used in the url path for the bridge | string

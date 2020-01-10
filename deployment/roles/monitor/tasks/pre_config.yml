@@ -3,3 +3,9 @@
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/monitor/.env"
+  when: skip_task != true
+
+- name: Install bridge config env
+  template:
+    src: config.env.j2
+    dest: "{{ bridge_path }}/monitor/configs/{{ MONITOR_BRIDGE_NAME }}.env"

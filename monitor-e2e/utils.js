@@ -1,7 +1,7 @@
 const Web3 = require('web3')
 const { ERC677_BRIDGE_TOKEN_ABI, BRIDGE_VALIDATORS_ABI, FOREIGN_NATIVE_TO_ERC_ABI, BOX_ABI } = require('../commons')
 
-const waitUntil = async (predicate, step = 100, timeout = 10000) => {
+const waitUntil = async (predicate, step = 100, timeout = 20000) => {
   const stopTime = Date.now() + timeout
   while (Date.now() <= stopTime) {
     const result = await predicate()
