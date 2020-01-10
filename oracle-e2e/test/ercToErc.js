@@ -159,6 +159,7 @@ describe('erc to erc', () => {
 
     // check that balance increases
     await promiseRetry(async retry => {
+      await generateNewBlock(homeWeb3, user.address)
       const balance = await erc20Token.methods.balanceOf(user.address).call()
       if (toBN(balance).lte(toBN(originalBalance))) {
         retry()

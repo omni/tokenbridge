@@ -90,6 +90,7 @@ describe('arbitrary message bridging', () => {
 
         // check that value changed and balance decreased
         await promiseRetry(async retry => {
+          await generateNewBlock(homeWeb3, user.address)
           const value = await foreignBox.methods.value().call()
           if (!toBN(value).eq(toBN(newValue))) {
             retry()
