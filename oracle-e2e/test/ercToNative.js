@@ -9,14 +9,9 @@ const {
   homeRPC,
   foreignRPC
 } = require('../../e2e-commons/constants.json')
-const {
-  ERC677_BRIDGE_TOKEN_ABI,
-  FOREIGN_ERC_TO_NATIVE_ABI,
-  SAI_TOP,
-  HOME_ERC_TO_NATIVE_ABI,
-  BRIDGE_VALIDATORS_ABI
-} = require('../../commons')
+const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, SAI_TOP, HOME_ERC_TO_NATIVE_ABI } = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
+const { setRequiredSignatures } = require('./utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
@@ -42,20 +37,26 @@ describe('erc to native', () => {
     halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
     halfDuplexToken = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, halfDuplexTokenAddress)
 
-    const homeValidatorAddress = await homeBridge.methods.validatorContract().call()
-    const foreignValidatorAddress = await foreignBridge.methods.validatorContract().call()
-
-    const foreignValidator = new foreignWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorAddress)
-    const homeValidator = new homeWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorAddress)
-
-    await homeValidator.methods.setRequiredSignatures(2).send({
-      from: validator.address,
-      gas: '4000000'
+    // Set 2 required signatures for home bridge
+    await setRequiredSignatures({
+      bridgeContract: homeBridge,
+      web3: homeWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
     })
 
-    await foreignValidator.methods.setRequiredSignatures(2).send({
-      from: validator.address,
-      gas: '4000000'
+    // Set 2 required signatures for foreign bridge
+    await setRequiredSignatures({
+      bridgeContract: foreignBridge,
+      web3: foreignWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
     })
   })
   it('should continue working after migration', async () => {

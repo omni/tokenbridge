@@ -1,22 +1,53 @@
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, homeRPC, foreignRPC, amb } = require('../../e2e-commons/constants.json')
+const { user, homeRPC, foreignRPC, amb, validator } = require('../../e2e-commons/constants.json')
 const { generateNewBlock } = require('../../e2e-commons/utils')
-const { BOX_ABI } = require('../../commons')
+const { BOX_ABI, HOME_AMB_ABI, FOREIGN_AMB_ABI } = require('../../commons')
+const { setRequiredSignatures } = require('./utils')
 
 const { toBN } = Web3.utils
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
 
+const COMMON_HOME_BRIDGE_ADDRESS = amb.home
+const COMMON_FOREIGN_BRIDGE_ADDRESS = amb.foreign
+
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
+homeWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
+foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 
 const homeBox = new homeWeb3.eth.Contract(BOX_ABI, amb.homeBox)
 const foreignBox = new foreignWeb3.eth.Contract(BOX_ABI, amb.foreignBox)
+const homeBridge = new homeWeb3.eth.Contract(HOME_AMB_ABI, COMMON_HOME_BRIDGE_ADDRESS)
+const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
 
 describe('arbitrary message bridging', () => {
+  before(async () => {
+    // Set 2 required signatures for home bridge
+    await setRequiredSignatures({
+      bridgeContract: homeBridge,
+      web3: homeWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
+
+    // Set 2 required signatures for foreign bridge
+    await setRequiredSignatures({
+      bridgeContract: foreignBridge,
+      web3: foreignWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
+  })
   describe('Home to Foreign', () => {
     describe('Subsidized Mode', () => {
       it('should bridge message', async () => {

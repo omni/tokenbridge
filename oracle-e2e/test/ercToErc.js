@@ -1,9 +1,10 @@
 const Web3 = require('web3')
 const assert = require('assert')
 const promiseRetry = require('promise-retry')
-const { user, secondUser, ercToErcBridge, homeRPC, foreignRPC } = require('../../e2e-commons/constants.json')
-const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI } = require('../../commons')
+const { user, secondUser, ercToErcBridge, homeRPC, foreignRPC, validator } = require('../../e2e-commons/constants.json')
+const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, HOME_ERC_TO_ERC_ABI } = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
+const { setRequiredSignatures } = require('./utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
@@ -14,13 +15,39 @@ const COMMON_FOREIGN_BRIDGE_ADDRESS = ercToErcBridge.foreign
 const { toBN } = foreignWeb3.utils
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
+homeWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
+foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 
 const erc20Token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToErcBridge.foreignToken)
 const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
 const erc677Token = new homeWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToErcBridge.homeToken)
+const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 
 describe('erc to erc', () => {
+  before(async () => {
+    // Set 2 required signatures for home bridge
+    await setRequiredSignatures({
+      bridgeContract: homeBridge,
+      web3: homeWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
+
+    // Set 2 required signatures for foreign bridge
+    await setRequiredSignatures({
+      bridgeContract: foreignBridge,
+      web3: foreignWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
+  })
   it('should convert tokens in foreign to tokens in home', async () => {
     const balance = await erc20Token.methods.balanceOf(user.address).call()
     assert(!toBN(balance).isZero(), 'Account should have tokens')
