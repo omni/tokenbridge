@@ -1,0 +1,3 @@
+---
+- import_playbook: ../../../deployment/site.yml
+- import_playbook: ./run-checks.yml
