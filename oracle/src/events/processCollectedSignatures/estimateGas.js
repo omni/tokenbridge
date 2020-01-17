@@ -9,9 +9,18 @@ const logger = require('../../services/logger').child({
 const web3 = new Web3()
 const { toBN } = Web3.utils
 
-async function estimateGas({ foreignBridge, validatorContract, message, numberOfCollectedSignatures, v, r, s }) {
+async function estimateGas({
+  foreignBridge,
+  validatorContract,
+  message,
+  numberOfCollectedSignatures,
+  v,
+  r,
+  s,
+  signatures
+}) {
   try {
-    const gasEstimate = await foreignBridge.methods.executeSignatures(v, r, s, message).estimateGas()
+    const gasEstimate = await foreignBridge.methods.executeSignatures(message, signatures).estimateGas()
     return gasEstimate
   } catch (e) {
     if (e instanceof HttpListProviderError) {
@@ -35,7 +44,7 @@ async function estimateGas({ foreignBridge, validatorContract, message, numberOf
 
     // check if all the signatures were made by validators
     for (let i = 0; i < v.length; i++) {
-      const address = web3.eth.accounts.recover(message, web3.utils.toHex(v[i]), r[i], s[i])
+      const address = web3.eth.accounts.recover(message, v[i], r[i], s[i])
       logger.debug({ address }, 'Check that signature is from a validator')
       const isValidator = await validatorContract.methods.isValidator(address).call()
 
