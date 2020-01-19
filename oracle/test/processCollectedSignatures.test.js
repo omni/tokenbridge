@@ -2,7 +2,7 @@ const { expect } = require('chai').use(require('chai-as-promised'))
 const sinon = require('sinon')
 const Web3 = require('web3')
 const { HttpListProviderError } = require('http-list-provider')
-const { createMessage } = require('../src/utils/message')
+const { createMessage, signatureToVRS } = require('../src/utils/message')
 const estimateGas = require('../src/events/processCollectedSignatures/estimateGas')
 const errors = require('../src/utils/errors')
 
@@ -116,10 +116,11 @@ describe('processCollectedSignatures', () => {
       }
 
       const message = randomMessage()
-      const { v, r, s } = web3.eth.accounts.sign(
+      const { signature } = web3.eth.accounts.sign(
         message,
         '0xf41510ea3e58c22cbabe881c9c87e60078dac25b23f93319e355c9ae0562987a'
       )
+      const { v, r, s } = signatureToVRS(signature)
 
       // when
       const result = estimateGas({
@@ -155,10 +156,11 @@ describe('processCollectedSignatures', () => {
       }
 
       const message = randomMessage()
-      const { v, r, s } = web3.eth.accounts.sign(
+      const { signature } = web3.eth.accounts.sign(
         message,
         '0xf41510ea3e58c22cbabe881c9c87e60078dac25b23f93319e355c9ae0562987a'
       )
+      const { v, r, s } = signatureToVRS(signature)
 
       // when
       const result = estimateGas({
