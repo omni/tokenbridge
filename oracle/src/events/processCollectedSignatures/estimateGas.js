@@ -44,7 +44,7 @@ async function estimateGas({
 
     // check if all the signatures were made by validators
     for (let i = 0; i < v.length; i++) {
-      const address = web3.eth.accounts.recover(message, v[i], r[i], s[i])
+      const address = web3.eth.accounts.recover(message, `0x${v[i]}`, `0x${r[i]}`, `0x${s[i]}`)
       logger.debug({ address }, 'Check that signature is from a validator')
       const isValidator = await validatorContract.methods.isValidator(address).call()
 
