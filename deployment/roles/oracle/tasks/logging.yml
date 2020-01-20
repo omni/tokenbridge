@@ -4,6 +4,8 @@
     - docker-compose
     - docker-compose-transfer
     - docker-compose-erc-native
+  loop_control:
+    loop_var: file
 
 - name: Set the local container logs configuration file
   template:
