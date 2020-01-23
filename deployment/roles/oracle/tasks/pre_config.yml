@@ -1,5 +1,19 @@
 ---
+- name: Create oracle directory
+  file:
+    path: "{{ bridge_path }}/oracle"
+    state: directory
+
 - name: Install .env config
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/oracle/.env"
+
+- name: Copy docker-compose files
+  copy:
+    src: ../../../../oracle/{{ item }}
+    dest: "{{ bridge_path }}/oracle/"
+  with_items:
+    - docker-compose.yml
+    - docker-compose-transfer.yml
+    - docker-compose-erc-native.yml
