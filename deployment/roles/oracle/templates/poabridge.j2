@@ -52,14 +52,6 @@ status(){
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $composefileoverride  ps
 }
 
-rebuild(){
-    echo "Rebuild bridge.."
-    cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $composefileoverride down -v
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $composefileoverride rm -fv
-    sudo -u "{{ compose_service_user }}" ORACLE_VALIDATOR_ADDRESS=$vaddr ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose $composefileoverride up --detach --force-recreate --no-deps --build
-}
-
 
 case "$1" in
 
@@ -81,12 +73,8 @@ case "$1" in
     start
     ;;
 
-  rebuild)
-    rebuild
-    ;;
-
   *)
-    echo $"Usage: $0 {start|stop|restart|rebuild|status}"
+    echo $"Usage: $0 {start|stop|restart|status}"
     exit 1
     ;;
 
