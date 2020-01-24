@@ -11,6 +11,8 @@
       - docker-compose
       - docker-compose-transfer
       - docker-compose-erc-native
+    loop_control:
+      loop_var: file
 
   - name: start the service
     shell: service poabridge start
