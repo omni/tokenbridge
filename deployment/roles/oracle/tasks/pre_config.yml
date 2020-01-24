@@ -3,6 +3,7 @@
   file:
     path: "{{ bridge_path }}/oracle"
     state: directory
+    mode: '0755'
 
 - name: Install .env config
   template:
@@ -13,6 +14,7 @@
   copy:
     src: ../../../../oracle/{{ item }}
     dest: "{{ bridge_path }}/oracle/"
+    mode: '0755'
   with_items:
     - docker-compose.yml
     - docker-compose-transfer.yml
