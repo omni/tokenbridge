@@ -7,7 +7,7 @@
     shell: service poabridge stop
 
   - name: Build current oracle image
-    shell: docker build -t oracle:ultimate-testing --file oracle/Dockerfile .
+    shell: docker build -t oracle:ultimate-testing --file oracle/Dockerfile --build-arg DOT_ENV_PATH=e2e-commons/components-envs/oracle.env .
     delegate_to: 127.0.0.1
     become: false
     args:
