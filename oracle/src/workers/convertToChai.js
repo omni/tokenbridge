@@ -54,7 +54,7 @@ function convertToChaiBuilder(config) {
       logger.debug({ gasEstimate }, 'Gas estimated')
     } catch (e) {
       if (e instanceof HttpListProviderError) {
-        const errorMsg = 'RPC Connection Error: swapTokens Gas Estimate cannot be obtained.'
+        const errorMsg = 'RPC Connection Error: convertToChai Gas Estimate cannot be obtained.'
         logger.error(e, errorMsg)
         throw new Error(errorMsg)
       } else {
