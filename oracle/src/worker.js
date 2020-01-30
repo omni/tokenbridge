@@ -8,6 +8,7 @@ const { connectWorkerToQueue } = require('./services/amqpClient')
 const config = require(path.join('../config/', process.argv[2]))
 
 const swapTokens = require('./workers/swapTokens')(config)
+const convertToChai = require('./workers/convertToChai')(config)
 
 async function initialize() {
   try {
@@ -39,6 +40,8 @@ async function initialize() {
 async function run(blockNumber) {
   if (config.id === 'erc-native-swap-tokens') {
     return swapTokens(blockNumber)
+  } else if (config.id === 'erc-native-convert-to-chai') {
+    return convertToChai(blockNumber)
   } else {
     return []
   }
