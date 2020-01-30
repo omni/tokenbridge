@@ -36,6 +36,7 @@
     "foreignToken": "0x7cc4b1851c35959d34e635a470f6b5c43ba3c9c9",
     "halfDuplexToken": "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359",
     "saiTop": "0x9b0ccf7C8994E19F39b2B4CF708e0A7DF65fA8a3",
+    "chaiToken": "0x06af07097c9eeb7fd685c692751d5c66db49c215",
     "ui": "http://localhost:3002",
     "monitor": "http://monitor-erc20-native:3012/bridge"
   },
