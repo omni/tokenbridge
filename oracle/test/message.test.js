@@ -259,9 +259,9 @@ describe('message utils', () => {
       const { v, r, s } = signatureToVRS(signature)
 
       // then
-      expect(v).to.equal(27)
-      expect(r).to.equal('0xed157c39b80281741e7d4075655f25b11a9182f12d90878a1ba9bfed111c8996')
-      expect(s).to.equal('0x20b74dc25ba2f581be753e11673413eb90f1f08285c2100d8e16c6799818c77d')
+      expect(v).to.equal('1b')
+      expect(r).to.equal('ed157c39b80281741e7d4075655f25b11a9182f12d90878a1ba9bfed111c8996')
+      expect(s).to.equal('20b74dc25ba2f581be753e11673413eb90f1f08285c2100d8e16c6799818c77d')
     })
 
     it('should fail if signature is too short', () => {

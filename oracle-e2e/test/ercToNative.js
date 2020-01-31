@@ -9,8 +9,9 @@ const {
   homeRPC,
   foreignRPC
 } = require('../../e2e-commons/constants.json')
-const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, SAI_TOP } = require('../../commons')
+const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, SAI_TOP, HOME_ERC_TO_NATIVE_ABI } = require('../../commons')
 const { generateNewBlock } = require('../../e2e-commons/utils')
+const { setRequiredSignatures } = require('./utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
 const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(foreignRPC.URL))
@@ -21,11 +22,13 @@ const COMMON_FOREIGN_BRIDGE_ADDRESS = ercToNativeBridge.foreign
 const { toBN } = foreignWeb3.utils
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
+homeWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 
 const erc20Token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToNativeBridge.foreignToken)
 const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
+const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 
 describe('erc to native', () => {
   let halfDuplexTokenAddress
@@ -33,6 +36,28 @@ describe('erc to native', () => {
   before(async () => {
     halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
     halfDuplexToken = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, halfDuplexTokenAddress)
+
+    // Set 2 required signatures for home bridge
+    await setRequiredSignatures({
+      bridgeContract: homeBridge,
+      web3: homeWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
+
+    // Set 2 required signatures for foreign bridge
+    await setRequiredSignatures({
+      bridgeContract: foreignBridge,
+      web3: foreignWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
   })
   it('should continue working after migration', async () => {
     const originalBalanceOnHome = await homeWeb3.eth.getBalance(user.address)
@@ -81,7 +106,7 @@ describe('erc to native', () => {
     })
 
     // update min threshold for swap
-    await foreignBridge.methods.setMinHDTokenBalance(foreignWeb3.utils.toWei('1', 'ether')).send({
+    await foreignBridge.methods.setMinHDTokenBalance(foreignWeb3.utils.toWei('2', 'ether')).send({
       from: validator.address,
       gas: '1000000'
     })
@@ -494,6 +519,7 @@ describe('erc to native', () => {
 
     // check that balance increases
     await promiseRetry(async retry => {
+      await generateNewBlock(homeWeb3, user.address)
       const balance = await erc20Token.methods.balanceOf(user.address).call()
       if (toBN(balance).lte(toBN(originalBalance))) {
         retry()

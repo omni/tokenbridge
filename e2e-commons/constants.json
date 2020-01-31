@@ -7,9 +7,25 @@
     "address": "0xcca2fb44C8C36E51f743269d6F484Fd027B9F9Aa",
     "privateKey": "0xcf954e07e6a439faf392eb474e95ddb444c2ca444847f2ad6ecc79e1a585e2b8"
   },
+  "thirdUser": {
+    "address": "0x441cc8537aB6cE63d060b63F3A44eE021d62e6cF",
+    "privateKey": "0xd3915199f27691d7784cb01ab0c7220308053b229f95d592e97493326314a8d0"
+  },
+  "fourthUser": {
+    "address": "0x3CC5baAB679eC0732C175760079Bf48F564ad26B",
+    "privateKey": "0xedb53ee050631b7914d5f1a66c2f0d2df3ec85a9ed2a9616b16a7b1b7a10b8d1"
+  },
   "validator": {
     "address": "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b",
     "privateKey": "0x8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
+  },
+  "secondValidator": {
+    "address": "0xdCC784657C78054aa61FbcFFd2605F32374816A4",
+    "privateKey": "0x5a5c3645d0f04e9eb4f27f94ed4c244a225587405b8838e7456f7781ce3a9513"
+  },
+  "thirdValidator": {
+    "address": "0xDcef88209a20D52165230104B245803C3269454d",
+    "privateKey": "0xf877f62a1c19f852cff1d29f0fb1ecac18821c0080d4cc0520c60c098293dca1"
   },
   "blockGenerator": {
     "address": "0xB4579fd5AfEaB60B03Db3F408AAdD315035943f7",

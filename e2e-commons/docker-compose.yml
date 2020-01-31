@@ -24,8 +24,6 @@ services:
       - ultimate
   rabbit:
     image: "rabbitmq:3-management"
-    ports:
-    - "15672:15672"
     networks:
       - ultimate
   oracle:

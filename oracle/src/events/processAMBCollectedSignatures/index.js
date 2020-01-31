@@ -4,7 +4,7 @@ const { HttpListProviderError } = require('http-list-provider')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
-const { signatureToVRS, signatureToVRSAMB, packSignatures } = require('../../utils/message')
+const { signatureToVRS, packSignatures } = require('../../utils/message')
 const { parseAMBMessage } = require('../../../../commons')
 const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
@@ -63,8 +63,7 @@ function processCollectedSignaturesBuilder(config) {
           v.push(vrs.v)
           r.push(vrs.r)
           s.push(vrs.s)
-          const recover = signatureToVRSAMB(signature)
-          signaturesArray.push(recover)
+          signaturesArray.push(vrs)
         })
 
         await Promise.all(signaturePromises)
