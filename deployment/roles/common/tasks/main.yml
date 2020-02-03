@@ -14,7 +14,7 @@
 
 - name: Include repo tasks
   include_tasks: repo.yml
-  when: skip_task != true
+  when: skip_task != true and skip_repo is undefined
 
 - name: Include logging tasks
   include_tasks: logging.yml
