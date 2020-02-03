@@ -5,6 +5,7 @@ const { readFile } = require('./utils/file')
 const app = express()
 const bridgeRouter = express.Router({ mergeParams: true })
 
+app.get('/favicon.ico', (req, res) => res.sendStatus(204))
 app.use('/:bridgeName', bridgeRouter)
 
 bridgeRouter.get('/', async (req, res, next) => {
