@@ -2,7 +2,7 @@ require('dotenv').config()
 const BN = require('bignumber.js')
 const Web3 = require('web3')
 const logger = require('./logger')('getBalances')
-const { BRIDGE_MODES } = require('../commons')
+const { BRIDGE_MODES, ZERO_ADDRESS } = require('../commons')
 
 const Web3Utils = Web3.utils
 
@@ -83,7 +83,9 @@ async function main(bridgeMode) {
     const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
     const erc20Address = await foreignBridge.methods.erc20token().call()
     const erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
+    let investedAmountInDai = 0
     let foreignHalfDuplexErc20Balance = 0
+    let displayChaiToken = false
     let displayHalfDuplexToken = false
     let tokenSwapAllowed = false
     try {
@@ -101,6 +103,18 @@ async function main(bridgeMode) {
       }
     } catch (e) {
       logger.debug('Methods for half duplex token are not present')
+    }
+
+    try {
+      logger.debug('calling foreignBridge.methods.chaiToken')
+      const chaiToken = await foreignBridge.methods.chaiToken().call()
+      if (chaiToken !== ZERO_ADDRESS) {
+        displayChaiToken = true
+        logger.debug('calling foreignBridge.methods.investedAmountInDai')
+        investedAmountInDai = await foreignBridge.methods.investedAmountInDai().call()
+      }
+    } catch (e) {
+      logger.debug('Methods for chai token are not present')
     }
 
     logger.debug('calling erc20Contract.methods.balanceOf')
@@ -141,6 +155,10 @@ async function main(bridgeMode) {
         ...foreign,
         halfDuplexErc20BalanceAfterES: Web3Utils.fromWei(foreignHalfDuplexErc20Balance)
       }
+    }
+
+    if (displayChaiToken) {
+      foreign.investedErc20Balance = Web3Utils.fromWei(investedAmountInDai)
     }
 
     logger.debug('Done')
