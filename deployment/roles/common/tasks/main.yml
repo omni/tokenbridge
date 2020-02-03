@@ -1,6 +1,6 @@
 ---
 - name: Check if component is already deployed
-  shell: "test -f {{ bridge_path }}/{{ component }}/docker-compose.yml && echo 'true'"
+  shell: "test -f {{ bridge_path }}/{{ component }}/.env && echo 'true'"
   ignore_errors: True
   register: already_deployed
   when: check_deployed is defined
