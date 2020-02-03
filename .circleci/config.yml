@@ -11,7 +11,7 @@ orbs:
                 sudo apt-get clean
                 sudo apt-get update
                 sudo apt-get install dpkg
-          - run: 
+          - run:
               name: Install Chrome
               command: |
                 wget -O chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_77.0.3865.120-1_amd64.deb
@@ -89,29 +89,29 @@ jobs:
       - checkout
       - run: git submodule update --init
       - restore_cache:
-           name: Restore Yarn Package Cache
-           keys:
-             - yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-      - run: git submodule status > submodule.status 
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run: git submodule status > submodule.status
       - restore_cache:
-           name: Restore contracts submodule with compiled contracts
-           keys:
-             - contracts-{{ checksum "submodule.status" }}
+          name: Restore contracts submodule with compiled contracts
+          keys:
+            - contracts-{{ checksum "submodule.status" }}
       - run: yarn install --frozen-lockfile
       - save_cache:
-           name: Save Yarn Package Cache
-           key: yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-           paths:
-             - ~/.cache/yarn
+          name: Save Yarn Package Cache
+          key: yarn-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
       - run: touch install_deploy.log; test -d contracts/build/contracts || yarn install:deploy &> install_deploy.log
       - store_artifacts:
           path: install_deploy.log
       - run: test -d contracts/build/contracts || yarn compile:contracts
       - save_cache:
-           name: Save contracts submodule with compiled contracts
-           key: contracts-{{ checksum "submodule.status" }}
-           paths:
-             - contracts
+          name: Save contracts submodule with compiled contracts
+          key: contracts-{{ checksum "submodule.status" }}
+          paths:
+            - contracts
       - save_cache:
           name: Save initialized project for subsequent jobs
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
@@ -143,11 +143,11 @@ jobs:
   oracle-e2e:
     executor: tokenbridge-orb/docker-node
     steps:
-        - checkout
-        - run: git submodule update --init
-        - setup_remote_docker:
-            docker_layer_caching: true
-        - run: yarn run oracle-e2e
+      - checkout
+      - run: git submodule update --init
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: yarn run oracle-e2e
   ui-e2e:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
@@ -161,9 +161,9 @@ jobs:
   monitor-e2e:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
-        - checkout
-        - run: git submodule update --init
-        - run: ./monitor-e2e/run-tests.sh
+      - checkout
+      - run: git submodule update --init
+      - run: ./monitor-e2e/run-tests.sh
   cover:
     executor: tokenbridge-orb/docker-node
     steps:
@@ -194,7 +194,7 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - run: 
+      - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh monitor
           no_output_timeout: 40m
@@ -219,7 +219,6 @@ jobs:
           name: Run the scenario
           command: deployment-e2e/molecule.sh multiple
           no_output_timeout: 40m
-
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
@@ -231,6 +230,11 @@ jobs:
         type: string
       ui-e2e-grep:
         description: "Mocha grep string used to run ui-e2e tests specific to given type of bridge"
+        default: ''
+        type: string
+      oracle-e2e-script:
+        description: "Yarn script string used to run oracle-e2e tests specific to given type of bridge"
+        default: ''
         type: string
     steps:
       - checkout
@@ -245,12 +249,21 @@ jobs:
           no_output_timeout: 50m
       - tokenbridge-orb/wait-for-oracle:
           redis-key: << parameters.redis-key >>
-      - run:
-          name: Run the ui-e2e tests
-          command: |
-            nvm use default;
-            node ./e2e-commons/scripts/blocks.js &
-            cd ui-e2e; yarn mocha -g "<< parameters.ui-e2e-grep >>" -b ./test.js
+      - when:
+          condition: << parameters.ui-e2e-grep >>
+          steps:
+            - run:
+                name: Run the ui-e2e tests
+                command: |
+                  nvm use default;
+                  node ./e2e-commons/scripts/blocks.js &
+                  cd ui-e2e; yarn mocha -g "<< parameters.ui-e2e-grep >>" -b ./test.js
+      - when:
+          condition: << parameters.oracle-e2e-script >>
+          steps:
+            - run:
+                name: Run the oracle-e2e tests
+                command: cd e2e-commons && docker-compose run e2e yarn workspace oracle-e2e run << parameters.oracle-e2e-script >>
 workflows:
   tokenbridge:
     jobs:
@@ -283,17 +296,22 @@ workflows:
       - deployment-repo
       - deployment-multiple
       - ultimate:
-          name: "ultimate: native to erc" 
+          name: "ultimate: native to erc"
           scenario-name: native-to-erc
           redis-key: native-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "NATIVE TO ERC"
       - ultimate:
-          name: "ultimate: erc to native" 
+          name: "ultimate: erc to native"
           scenario-name: erc-to-native
           redis-key: erc-native-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO NATIVE"
       - ultimate:
-          name: "ultimate: erc to erc" 
+          name: "ultimate: erc to erc"
           scenario-name: erc-to-erc
           redis-key: erc-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO ERC"
+      - ultimate:
+          name: "ultimate: amb"
+          scenario-name: amb
+          redis-key: amb-collected-signatures:lastProcessedBlock
+          oracle-e2e-script: "amb"
