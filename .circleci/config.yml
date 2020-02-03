@@ -210,7 +210,7 @@ jobs:
           name: Run the scenario
           command: deployment-e2e/molecule.sh repo
           no_output_timeout: 40m
-deployment-multiple:
+  deployment-multiple:
     executor: tokenbridge-orb/machine-with-docker-caching
     steps:
       - checkout
