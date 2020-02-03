@@ -210,7 +210,16 @@ jobs:
           name: Run the scenario
           command: deployment-e2e/molecule.sh repo
           no_output_timeout: 40m
-      
+  deployment-multiple:
+    executor: tokenbridge-orb/machine-with-docker-caching
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - run:
+          name: Run the scenario
+          command: deployment-e2e/molecule.sh multiple
+          no_output_timeout: 40m
+
   ultimate:
     executor: tokenbridge-orb/machine-with-docker-caching
     parameters:
@@ -272,6 +281,7 @@ workflows:
       - deployment-ui
       - deployment-monitor
       - deployment-repo
+      - deployment-multiple
       - ultimate:
           name: "ultimate: native to erc" 
           scenario-name: native-to-erc
