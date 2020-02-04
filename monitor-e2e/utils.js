@@ -67,6 +67,16 @@ const addValidator = async (rpcUrl, account, bridgeAddress) => {
   })
 }
 
+const migrateToMCD = async (rpcUrl, bridgeAddress) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+  await bridgeContract.methods.migrateToMCD().send({
+    from: validator.address,
+    gas: '4000000'
+  })
+}
+
 const initializeChaiToken = async (rpcUrl, bridgeAddress) => {
   const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
   web3.eth.accounts.wallet.add(validator.privateKey)
@@ -95,6 +105,7 @@ module.exports = {
   sendTokens,
   addValidator,
   sendAMBMessage,
+  migrateToMCD,
   initializeChaiToken,
   convertDaiToChai
 }
