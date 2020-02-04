@@ -1,7 +1,7 @@
 ---
 - name: Get blocks
   become_user: "{{ compose_service_user }}"
-  shell: docker-compose run --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
+  shell: docker-compose run --rm --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: BLOCKS
@@ -18,7 +18,7 @@
 
 - name: Get validator address
   become_user: "{{ compose_service_user }}"
-  shell: docker-compose run -e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="{{ ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
+  shell: docker-compose run --rm -e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="{{ ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: VADDRESS
@@ -29,7 +29,7 @@
 
 - name: Get foreign erc type
   become_user: "{{ compose_service_user }}"
-  shell: docker-compose run --entrypoint "node scripts/initialChecks.js" bridge_affirmation
+  shell: docker-compose run --rm --entrypoint "node scripts/initialChecks.js" bridge_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: ERCTYPE

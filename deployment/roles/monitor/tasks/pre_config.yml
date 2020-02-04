@@ -1,8 +1,44 @@
 ---
+- name: Create configs directory
+  file:
+    path: "{{ bridge_path }}/monitor/configs"
+    state: directory
+    mode: '0755'
+  when: skip_task != true
+
+- name: Create responses directory
+  file:
+    path: "{{ bridge_path }}/monitor/responses"
+    state: directory
+    mode: '0755'
+  when: skip_task != true
+
+- name: Create scripts directory
+  file:
+    path: "{{ bridge_path }}/monitor/scripts"
+    state: directory
+    mode: '0755'
+  when: skip_task != true
+
 - name: Install .env config
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/monitor/.env"
+  when: skip_task != true
+
+- name: Copy docker-compose file
+  copy:
+    src: ../../../../monitor/docker-compose.yml
+    dest: "{{ bridge_path }}/monitor/docker-compose.yml"
+    mode: '0755'
+  when: skip_task != true
+
+- name: Copy script file
+  copy:
+    src: ../../../../monitor/scripts/getBridgeStats.sh
+    dest: "{{ bridge_path }}/monitor/scripts/getBridgeStats.sh"
+    owner: "{{ compose_service_user }}"
+    mode: '0755'
   when: skip_task != true
 
 - name: Install bridge config env

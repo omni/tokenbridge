@@ -6,11 +6,30 @@
   - name: stop the service
     shell: service poabridge stop
 
+  - name: Build current oracle image
+    shell: docker build -t oracle:ultimate-testing --file oracle/Dockerfile .
+    delegate_to: 127.0.0.1
+    become: false
+    args:
+      chdir: "{{ lookup('env', 'PWD') }}/.."
+
+  - name: Replace oracle image
+    replace:
+      path: "/home/poadocker/bridge/oracle/{{ item }}.yml"
+      regexp: 'poanetwork/tokenbridge-oracle:latest'
+      replace: "oracle:ultimate-testing"
+    with_items:
+      - docker-compose
+      - docker-compose-transfer
+      - docker-compose-erc-native
+
   - include_tasks: oracle-add-docker-external-network.yml
     with_items:
       - docker-compose
       - docker-compose-transfer
       - docker-compose-erc-native
+    loop_control:
+      loop_var: file
 
   - name: start the service
     shell: service poabridge start

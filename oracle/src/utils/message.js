@@ -50,17 +50,9 @@ function parseMessage(message) {
   }
 }
 
-function signatureToVRS(signature) {
-  assert.strictEqual(signature.length, 2 + 32 * 2 + 32 * 2 + 2)
-  signature = strip0x(signature)
-  const v = parseInt(signature.substr(64 * 2), 16)
-  const r = `0x${signature.substr(0, 32 * 2)}`
-  const s = `0x${signature.substr(32 * 2, 32 * 2)}`
-  return { v, r, s }
-}
-
-function signatureToVRSAMB(rawSignature) {
+function signatureToVRS(rawSignature) {
   const signature = strip0x(rawSignature)
+  assert.strictEqual(signature.length, 2 + 32 * 2 + 32 * 2)
   const v = signature.substr(64 * 2)
   const r = signature.substr(0, 32 * 2)
   const s = signature.substr(32 * 2, 32 * 2)
@@ -85,6 +77,5 @@ module.exports = {
   createMessage,
   parseMessage,
   signatureToVRS,
-  signatureToVRSAMB,
   packSignatures
 }

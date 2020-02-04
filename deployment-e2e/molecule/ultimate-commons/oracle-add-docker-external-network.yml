@@ -1,7 +1,7 @@
 ---
 - name: Slurp docker compose file
   slurp:
-    src: "/home/poadocker/bridge/oracle/{{ item }}.yml"
+    src: "/home/poadocker/bridge/oracle/{{ file }}.yml"
   register: docker_compose_slurp
 - name: Parse docker compose file
   set_fact:
@@ -23,4 +23,4 @@
 - name: Write updated docker file
   copy:
     content: "{{ docker_compose_parsed | to_yaml }}"
-    dest: "/home/poadocker/bridge/oracle/{{ item }}.yml"
+    dest: "/home/poadocker/bridge/oracle/{{ file }}.yml"
