@@ -17,5 +17,7 @@ COPY ./commons ./commons
 COPY ./monitor ./monitor
 
 WORKDIR /mono/monitor
-CMD echo "To start the monitor run:" \
-  "yarn check-and-start"
+CMD echo "To start the monitor web service run:" \
+  "yarn start" \
+  "To run monitor scripts run:" \
+  "yarn check-all"
