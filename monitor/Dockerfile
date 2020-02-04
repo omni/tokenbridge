@@ -15,8 +15,6 @@ RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./b
 COPY ./commons ./commons
 
 COPY ./monitor ./monitor
-ARG DOT_ENV_PATH=./monitor/.env
-COPY ${DOT_ENV_PATH} ./monitor/.env
 
 WORKDIR /mono/monitor
 CMD echo "To start the monitor run:" \
