@@ -133,11 +133,13 @@ async function main(bridgeMode) {
     const burntCoinsBN = new BN(burntCoins)
     const totalSupplyBN = mintedCoinsBN.minus(burntCoinsBN)
     const foreignErc20BalanceBN = new BN(foreignErc20Balance)
+    const investedAmountInDaiBN = new BN(investedAmountInDai)
     const halfDuplexErc20BalanceBN =
       displayHalfDuplexToken && tokenSwapAllowed ? new BN(foreignHalfDuplexErc20Balance) : new BN(0)
 
     const diff = foreignErc20BalanceBN
       .plus(halfDuplexErc20BalanceBN)
+      .plus(investedAmountInDaiBN)
       .minus(totalSupplyBN)
       .toFixed()
 

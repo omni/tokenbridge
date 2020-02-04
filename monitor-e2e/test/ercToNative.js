@@ -1,7 +1,7 @@
 const assert = require('assert')
 const axios = require('axios')
 const { ercToNativeBridge, user, foreignRPC, validator } = require('../../e2e-commons/constants.json')
-const { waitUntil, sendTokens, addValidator } = require('../utils')
+const { waitUntil, sendTokens, addValidator, initializeChaiToken, convertDaiToChai } = require('../utils')
 
 const baseUrl = ercToNativeBridge.monitor
 
@@ -29,7 +29,7 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      return data.balanceDiff !== 0
+      return data.balanceDiff === 0.01 && data.foreign.halfDuplexErc20Balance === '0.01'
     })
   })
 
@@ -38,6 +38,17 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}/validators`))
       return data.validatorsMatch === false
+    })
+  })
+
+  it('should consider chai token balance', async () => {
+    await initializeChaiToken(foreignRPC.URL, ercToNativeBridge.foreign)
+    await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
+    await convertDaiToChai(foreignRPC.URL, ercToNativeBridge.foreign)
+
+    await waitUntil(async () => {
+      ;({ data } = await axios.get(`${baseUrl}`))
+      return data.balanceDiff === 0.02 && data.foreign.investedErc20Balance === '0.01'
     })
   })
 })
