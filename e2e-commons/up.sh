@@ -81,7 +81,7 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "blocks" ]; then
-    node ./scripts/blocks.js &
+    docker-compose up -d blocks
   fi
 
   if [ "$1" == "monitor" ]; then
