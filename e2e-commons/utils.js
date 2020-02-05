@@ -1,3 +1,5 @@
+const promiseRetry = require('promise-retry')
+
 function generateNewBlock(web3, address) {
   return web3.eth.sendTransaction({
     from: address,
@@ -8,6 +10,20 @@ function generateNewBlock(web3, address) {
   })
 }
 
+async function uniformRetry(f) {
+  return promiseRetry(f, {
+    forever: true,
+    factor: 1,
+    minTimeout: 500
+  })
+}
+
+async function sleep(timeout) {
+  return new Promise(res => setTimeout(res, timeout))
+}
+
 module.exports = {
-  generateNewBlock
+  generateNewBlock,
+  uniformRetry,
+  sleep
 }

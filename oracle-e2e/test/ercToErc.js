@@ -1,9 +1,8 @@
 const Web3 = require('web3')
 const assert = require('assert')
-const promiseRetry = require('promise-retry')
 const { user, secondUser, ercToErcBridge, homeRPC, foreignRPC, validator } = require('../../e2e-commons/constants.json')
 const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, HOME_ERC_TO_ERC_ABI } = require('../../commons')
-const { generateNewBlock } = require('../../e2e-commons/utils')
+const { uniformRetry } = require('../../e2e-commons/utils')
 const { setRequiredSignatures } = require('./utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
@@ -76,12 +75,8 @@ describe('erc to erc', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = await erc677Token.methods.balanceOf(user.address).call()
       const recipientBalance = await erc677Token.methods.balanceOf(secondUser.address).call()
       assert(toBN(balance).isZero(), 'User balance should be the same')
@@ -103,12 +98,8 @@ describe('erc to erc', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = await erc677Token.methods.balanceOf(user.address).call()
       if (toBN(balance).isZero()) {
         retry()
@@ -125,7 +116,7 @@ describe('erc to erc', () => {
     assert(!toBN(balance).isZero(), 'Account should have tokens')
 
     // send transaction to home bridge
-    const depositTx = await erc677Token.methods
+    await erc677Token.methods
       .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, homeWeb3.utils.toWei('0.01'), '0x')
       .send({
         from: user.address,
@@ -135,31 +126,8 @@ describe('erc to erc', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(homeWeb3, user.address)
-
-    // The bridge should create a new transaction with a CollectedSignatures
-    // event so we generate another trivial transaction
-    await promiseRetry(
-      async retry => {
-        const lastBlockNumber = await homeWeb3.eth.getBlockNumber()
-        if (lastBlockNumber >= depositTx.blockNumber + 2) {
-          await generateNewBlock(homeWeb3, user.address)
-        } else {
-          retry()
-        }
-      },
-      {
-        forever: true,
-        factor: 1,
-        minTimeout: 500
-      }
-    )
-
     // check that balance increases
-    await promiseRetry(async retry => {
-      await generateNewBlock(homeWeb3, user.address)
+    await uniformRetry(async retry => {
       const balance = await erc20Token.methods.balanceOf(user.address).call()
       if (toBN(balance).lte(toBN(originalBalance))) {
         retry()
