@@ -232,7 +232,7 @@ jobs:
       - tokenbridge-orb/yarn-install-cached-on-machine
       - run:
           name: Prepare the infrastructure
-          command: e2e-commons/up.sh deploy << parameters.scenario-name >>
+          command: e2e-commons/up.sh deploy << parameters.scenario-name >> blocks
           no_output_timeout: 50m
       - tokenbridge-orb/wait-for-oracle:
           redis-key: << parameters.redis-key >>
@@ -240,7 +240,6 @@ jobs:
           name: Run the ui-e2e tests
           command: |
             nvm use default;
-            node ./e2e-commons/scripts/blocks.js &
             cd ui-e2e; yarn mocha -g "<< parameters.ui-e2e-grep >>" -b ./test.js
 workflows:
   tokenbridge:
