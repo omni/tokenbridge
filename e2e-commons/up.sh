@@ -100,5 +100,9 @@ while [ "$1" != "" ]; do
     ../deployment-e2e/molecule.sh ultimate-erc-to-erc
   fi
 
+  if [ "$1" == "amb" ]; then
+    ../deployment-e2e/molecule.sh ultimate-amb
+  fi
+
   shift # Shift all the parameters down by one
 done

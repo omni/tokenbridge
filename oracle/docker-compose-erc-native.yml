@@ -40,9 +40,7 @@ services:
   bridge_transfer:
     cpus: 0.1
     mem_limit: 500m
-    build:
-      context: ..
-      dockerfile: oracle/Dockerfile
+    image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
     environment:
       - NODE_ENV=production
@@ -55,9 +53,7 @@ services:
   bridge_half_duplex_transfer:
     cpus: 0.1
     mem_limit: 500m
-    build:
-      context: ..
-      dockerfile: oracle/Dockerfile
+    image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
     environment:
       - NODE_ENV=production
@@ -70,9 +66,7 @@ services:
   bridge_swap_tokens_worker:
     cpus: 0.1
     mem_limit: 500m
-    build:
-      context: ..
-      dockerfile: oracle/Dockerfile
+    image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
     environment:
       - NODE_ENV=production
