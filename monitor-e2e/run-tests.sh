@@ -1,6 +1,6 @@
 cd $(dirname $0)
 
-../e2e-commons/up.sh deploy monitor
+../e2e-commons/up.sh deploy blocks monitor
 
 ./wait-for-monitor.sh
 nohup ./periodically-check-all.sh < /dev/null > /dev/null 2>&1 &

@@ -10,7 +10,7 @@ const {
   foreignRPC
 } = require('../../e2e-commons/constants.json')
 const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, SAI_TOP, HOME_ERC_TO_NATIVE_ABI } = require('../../commons')
-const { generateNewBlock } = require('../../e2e-commons/utils')
+const { uniformRetry, sleep } = require('../../e2e-commons/utils')
 const { setRequiredSignatures } = require('./utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
@@ -80,14 +80,9 @@ describe('erc to native', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
     await promiseRetry(async (retry, number) => {
       const balance = await homeWeb3.eth.getBalance(user.address)
-      await generateNewBlock(foreignWeb3, user.address)
       // retry at least 4 times to check transfer is not double processed by the two watchers
       if (toBN(balance).lte(toBN(originalBalanceOnHome)) || number < 4) {
         retry()
@@ -124,14 +119,9 @@ describe('erc to native', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
     await promiseRetry(async (retry, number) => {
       const balance = await homeWeb3.eth.getBalance(user.address)
-      await generateNewBlock(foreignWeb3, user.address)
       // retry at least 4 times to check transfer is not double processed by the two watchers
       if (toBN(balance).lte(toBN(AfterMigrateBalance)) || number < 4) {
         retry()
@@ -156,14 +146,9 @@ describe('erc to native', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
     await promiseRetry(async (retry, number) => {
       const balance = await homeWeb3.eth.getBalance(user.address)
-      await generateNewBlock(foreignWeb3, user.address)
       // retry at least 4 times to check transfer is not double processed by the two watchers
       if (toBN(balance).lte(toBN(afterMigrateAndTransferBalance)) || number < 4) {
         retry()
@@ -203,12 +188,8 @@ describe('erc to native', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = await homeWeb3.eth.getBalance(user.address)
       const secondUserbalance = await homeWeb3.eth.getBalance(secondUser.address)
       assert(toBN(balance).lte(toBN(originalBalanceOnHome)), 'User balance should be the same')
@@ -230,12 +211,8 @@ describe('erc to native', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = await homeWeb3.eth.getBalance(user.address)
       if (toBN(balance).lte(toBN(originalBalanceOnHome))) {
         retry()
@@ -260,12 +237,8 @@ describe('erc to native', () => {
       gas: '1000000'
     })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = await homeWeb3.eth.getBalance(user.address)
       if (toBN(balance).lte(toBN(originalBalanceOnHome))) {
         retry()
@@ -290,9 +263,9 @@ describe('erc to native', () => {
       gas: '1000000'
     })
 
-    await generateNewBlock(foreignWeb3, user.address)
+    await sleep(2000)
 
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const userBalance = await homeWeb3.eth.getBalance(user.address)
       const updatedBridgeErc20TokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
 
@@ -351,12 +324,8 @@ describe('erc to native', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const secondUserbalance = await homeWeb3.eth.getBalance(secondUser.address)
       const updatedBridgeErc20TokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
       const userbalance = await homeWeb3.eth.getBalance(user.address)
@@ -401,17 +370,13 @@ describe('erc to native', () => {
 
     const valueToTransfer = foreignWeb3.utils.toWei('1', 'ether')
 
-    await generateNewBlock(foreignWeb3, user.address)
+    await sleep(2000)
 
     // this transfer won't trigger a call to swap tokens
     await halfDuplexToken.methods.transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, valueToTransfer).send({
       from: user.address,
       gas: '1000000'
     })
-
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
 
     // check that transfer and swap are not processed in the next blocks.
     await promiseRetry(async (retry, number) => {
@@ -427,9 +392,6 @@ describe('erc to native', () => {
         'Half duplex balance should be the value of transfer'
       )
       assert(toBN(currentBridgeErc20TokenBalance).eq(toBN(bridgeErc20TokenBalance)), 'erc20 balance should not change')
-
-      // generate new blocks
-      await generateNewBlock(foreignWeb3, user.address)
 
       // after several retries, the state is corrects
       if (number < 4) {
@@ -450,9 +412,9 @@ describe('erc to native', () => {
       gas: '1000000'
     })
 
-    await generateNewBlock(foreignWeb3, user.address)
+    await sleep(2000)
 
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const userBalance = await homeWeb3.eth.getBalance(user.address)
       const updatedBridgeErc20TokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
 
@@ -487,7 +449,7 @@ describe('erc to native', () => {
     assert(!toBN(balance).isZero(), 'Account should have tokens')
 
     // send transaction to home bridge
-    const depositTx = await homeWeb3.eth.sendTransaction({
+    await homeWeb3.eth.sendTransaction({
       from: user.address,
       to: COMMON_HOME_BRIDGE_ADDRESS,
       gasPrice: '1',
@@ -495,31 +457,8 @@ describe('erc to native', () => {
       value: homeWeb3.utils.toWei('0.01')
     })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(homeWeb3, user.address)
-
-    // The bridge should create a new transaction with a CollectedSignatures
-    // event so we generate another trivial transaction
-    await promiseRetry(
-      async retry => {
-        const lastBlockNumber = await homeWeb3.eth.getBlockNumber()
-        if (lastBlockNumber >= depositTx.blockNumber + 2) {
-          await generateNewBlock(homeWeb3, user.address)
-        } else {
-          retry()
-        }
-      },
-      {
-        forever: true,
-        factor: 1,
-        minTimeout: 500
-      }
-    )
-
     // check that balance increases
-    await promiseRetry(async retry => {
-      await generateNewBlock(homeWeb3, user.address)
+    await uniformRetry(async retry => {
       const balance = await erc20Token.methods.balanceOf(user.address).call()
       if (toBN(balance).lte(toBN(originalBalance))) {
         retry()

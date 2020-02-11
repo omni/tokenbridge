@@ -6,6 +6,9 @@ CONTRACTS_PATH="../../contracts"
 DEPLOY_PATH="$CONTRACTS_PATH/deploy"
 ENVS_PATH="../contracts-envs"
 
+# mock bridge validators contract with the one with deterministic isValidatorDuty
+mv "$CONTRACTS_PATH/build/contracts/BridgeValidatorsDeterministic.json" "$CONTRACTS_PATH/build/contracts/BridgeValidators.json"
+
 echo -e "\n\n############ Deploying native-to-erc ############\n"
 cp "$ENVS_PATH/native-to-erc.env" "$DEPLOY_PATH/.env"
 cd "$DEPLOY_PATH"
