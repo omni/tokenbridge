@@ -561,13 +561,15 @@ describe('erc to native', () => {
     })
   })
   it('should invest dai after enough tokens are collected on bridge account', async () => {
-    const bridgeDaiTokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
-
-    await foreignBridge.methods.initializeChaiToken(ercToNativeBridge.chaiToken).send({
+    await foreignBridge.methods.initializeChaiToken().send({
       from: validator.address,
       gas: '1000000'
     }) // initialize chai token
-    await foreignBridge.methods.convertDaiToChai(bridgeDaiTokenBalance).send({
+    await foreignBridge.methods.setMinDaiTokenBalance('0').send({
+      from: validator.address,
+      gas: '1000000'
+    }) // set investing limit to 0
+    await foreignBridge.methods.convertDaiToChai().send({
       from: validator.address,
       gas: '1000000'
     }) // convert all existing dai tokens on bridge account to chai, in order to start from zero balance
