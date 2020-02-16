@@ -481,10 +481,6 @@ describe('erc to native', () => {
       gas: '1000000'
     })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     await promiseRetry(async (retry, number) => {
       if (number < 4) {
         retry()
@@ -525,10 +521,6 @@ describe('erc to native', () => {
       gas: '1000000'
     })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     await promiseRetry(async (retry, number) => {
       if (number < 4) {
         retry()
@@ -546,8 +538,6 @@ describe('erc to native', () => {
       from: user.address,
       gas: '1000000'
     })
-
-    await generateNewBlock(foreignWeb3, user.address)
 
     await promiseRetry(async retry => {
       const updatedBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
