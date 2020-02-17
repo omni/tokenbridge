@@ -32,7 +32,8 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
     assert((await axios.get(`${baseUrl}/validators`)).data.validatorsMatch === true)
   })
 
-  it('should change balanceDiff', async () => {
+  it('should change balanceDiff', async function() {
+    this.timeout(60000)
     await sendTokens(foreignRPC.URL, user, ercToNativeBridge.halfDuplexToken, ercToNativeBridge.foreign)
 
     await waitUntil(async () => {
@@ -81,7 +82,8 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
     })
   })
 
-  it('should consider chai token balance', async () => {
+  it('should consider chai token balance', async function() {
+    this.timeout(60000)
     await initializeChaiToken(foreignRPC.URL, ercToNativeBridge.foreign)
     await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
 
