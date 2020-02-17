@@ -106,7 +106,6 @@ async function main(bridgeMode) {
       logger.debug('Methods for half duplex token are not present')
     }
 
-    displayChaiToken = false
     try {
       logger.debug('calling foreignBridge.methods.isChaiTokenEnabled')
       if (await foreignBridge.methods.isChaiTokenEnabled().call()) {
