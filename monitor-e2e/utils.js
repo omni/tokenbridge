@@ -6,7 +6,7 @@ const {
   FOREIGN_ERC_TO_NATIVE_ABI,
   BOX_ABI
 } = require('../commons')
-const { validator, ercToNativeBridge } = require('../e2e-commons/constants')
+const { validator } = require('../e2e-commons/constants')
 
 const waitUntil = async (predicate, step = 100, timeout = 20000) => {
   const stopTime = Date.now() + timeout
@@ -82,7 +82,18 @@ const initializeChaiToken = async (rpcUrl, bridgeAddress) => {
   web3.eth.accounts.wallet.add(validator.privateKey)
   const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
 
-  await bridgeContract.methods.initializeChaiToken(ercToNativeBridge.chaiToken).send({
+  await bridgeContract.methods.initializeChaiToken().send({
+    from: validator.address,
+    gas: '1000000'
+  })
+}
+
+const setMinDaiTokenBalance = async (rpcUrl, bridgeAddress, limit) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+
+  await bridgeContract.methods.setMinDaiTokenBalance(web3.utils.toWei(limit)).send({
     from: validator.address,
     gas: '1000000'
   })
@@ -93,7 +104,7 @@ const convertDaiToChai = async (rpcUrl, bridgeAddress) => {
   web3.eth.accounts.wallet.add(validator.privateKey)
   const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
 
-  await bridgeContract.methods.convertDaiToChai(web3.utils.toWei('0.01')).send({
+  await bridgeContract.methods.convertDaiToChai().send({
     from: validator.address,
     gas: '1000000'
   })
@@ -107,5 +118,6 @@ module.exports = {
   sendAMBMessage,
   migrateToMCD,
   initializeChaiToken,
+  setMinDaiTokenBalance,
   convertDaiToChai
 }

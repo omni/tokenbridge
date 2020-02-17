@@ -1,7 +1,15 @@
 const assert = require('assert')
 const axios = require('axios')
 const { ercToNativeBridge, user, foreignRPC, validator } = require('../../e2e-commons/constants.json')
-const { waitUntil, sendTokens, addValidator, initializeChaiToken, convertDaiToChai, migrateToMCD } = require('../utils')
+const {
+  waitUntil,
+  sendTokens,
+  addValidator,
+  initializeChaiToken,
+  convertDaiToChai,
+  setMinDaiTokenBalance,
+  migrateToMCD
+} = require('../utils')
 
 const baseUrl = ercToNativeBridge.monitor
 
@@ -79,25 +87,43 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance } = data.foreign
+      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.03 &&
         erc20Balance === '0.02' &&
         halfDuplexErc20Balance === '0.01' &&
-        investedErc20Balance === '0'
+        investedErc20Balance === '0' &&
+        accumulatedInterest === '0.001' // value of dsrBalance() is initially defined in genesis block as 0.001
       )
     })
 
+    await setMinDaiTokenBalance(foreignRPC.URL, ercToNativeBridge.foreign, '0.01')
     await convertDaiToChai(foreignRPC.URL, ercToNativeBridge.foreign)
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance } = data.foreign
+      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.03 &&
         erc20Balance === '0.01' &&
         halfDuplexErc20Balance === '0.01' &&
-        investedErc20Balance === '0.01'
+        investedErc20Balance === '0.01' &&
+        accumulatedInterest === '0.001'
+      )
+    })
+
+    await setMinDaiTokenBalance(foreignRPC.URL, ercToNativeBridge.foreign, '0.005')
+    await convertDaiToChai(foreignRPC.URL, ercToNativeBridge.foreign)
+
+    await waitUntil(async () => {
+      ;({ data } = await axios.get(`${baseUrl}`))
+      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
+      return (
+        data.balanceDiff === 0.03 &&
+        erc20Balance === '0.005' &&
+        halfDuplexErc20Balance === '0.01' &&
+        investedErc20Balance === '0.015' &&
+        accumulatedInterest === '0.001'
       )
     })
   })

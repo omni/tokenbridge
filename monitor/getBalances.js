@@ -2,7 +2,7 @@ require('dotenv').config()
 const BN = require('bignumber.js')
 const Web3 = require('web3')
 const logger = require('./logger')('getBalances')
-const { BRIDGE_MODES, ZERO_ADDRESS } = require('../commons')
+const { BRIDGE_MODES } = require('../commons')
 
 const Web3Utils = Web3.utils
 
@@ -84,6 +84,7 @@ async function main(bridgeMode) {
     const erc20Address = await foreignBridge.methods.erc20token().call()
     const erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
     let investedAmountInDai = 0
+    let bridgeDsrBalance = 0
     let foreignHalfDuplexErc20Balance = 0
     let displayChaiToken = false
     let displayHalfDuplexToken = false
@@ -105,13 +106,17 @@ async function main(bridgeMode) {
       logger.debug('Methods for half duplex token are not present')
     }
 
+    displayChaiToken = false
     try {
-      logger.debug('calling foreignBridge.methods.chaiToken')
-      const chaiToken = await foreignBridge.methods.chaiToken().call()
-      if (chaiToken !== ZERO_ADDRESS) {
+      logger.debug('calling foreignBridge.methods.isChaiTokenEnabled')
+      if (await foreignBridge.methods.isChaiTokenEnabled().call()) {
         displayChaiToken = true
         logger.debug('calling foreignBridge.methods.investedAmountInDai')
         investedAmountInDai = await foreignBridge.methods.investedAmountInDai().call()
+        logger.debug('calling foreignBridge.methods.dsrBalance')
+        bridgeDsrBalance = await foreignBridge.methods.dsrBalance().call()
+      } else {
+        logger.debug('Chai token is currently disabled')
       }
     } catch (e) {
       logger.debug('Methods for chai token are not present')
@@ -134,6 +139,7 @@ async function main(bridgeMode) {
     const totalSupplyBN = mintedCoinsBN.minus(burntCoinsBN)
     const foreignErc20BalanceBN = new BN(foreignErc20Balance)
     const investedAmountInDaiBN = new BN(investedAmountInDai)
+    const bridgeDsrBalanceBN = new BN(bridgeDsrBalance)
     const halfDuplexErc20BalanceBN =
       displayHalfDuplexToken && tokenSwapAllowed ? new BN(foreignHalfDuplexErc20Balance) : new BN(0)
 
@@ -161,6 +167,7 @@ async function main(bridgeMode) {
 
     if (displayChaiToken) {
       foreign.investedErc20Balance = Web3Utils.fromWei(investedAmountInDai)
+      foreign.accumulatedInterest = Web3Utils.fromWei(bridgeDsrBalanceBN.minus(investedAmountInDaiBN).toString(10))
     }
 
     logger.debug('Done')
