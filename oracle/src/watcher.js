@@ -9,6 +9,7 @@ const rpcUrlsManager = require('./services/getRpcUrlsManager')
 const { getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
 const { EXIT_CODES } = require('./utils/constants')
+const { isChaiTokenEnabled } = require('./utils/chaiUtils')
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -157,6 +158,15 @@ async function getLastBlockToProcess() {
   return lastBlockNumber.sub(requiredBlockConfirmations)
 }
 
+async function isWorkerNeeded() {
+  switch (config.id) {
+    case 'erc-native-transfer':
+      return isChaiTokenEnabled(bridgeContract, logger)
+    default:
+      return true
+  }
+}
+
 async function main({ sendToQueue, sendToWorker }) {
   try {
     await checkConditions()
@@ -186,7 +196,7 @@ async function main({ sendToQueue, sendToWorker }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      if (sendToWorker) {
+      if (sendToWorker && (await isWorkerNeeded())) {
         await sendToWorker({ blockNumber: toBlock.toString() })
       }
 

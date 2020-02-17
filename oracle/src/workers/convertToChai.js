@@ -3,10 +3,9 @@ const { HttpListProviderError } = require('http-list-provider')
 const rootLogger = require('../services/logger')
 const { web3Foreign } = require('../services/web3')
 
-const { BRIDGE_VALIDATORS_ABI, ERC20_ABI } = require('../../../commons')
+const { BRIDGE_VALIDATORS_ABI } = require('../../../commons')
 
 let validatorContract = null
-let chaiContract = null
 
 function convertToChaiBuilder(config) {
   const foreignBridge = new web3Foreign.eth.Contract(config.foreignBridgeAbi, config.foreignBridgeAddress)
@@ -58,14 +57,6 @@ function convertToChaiBuilder(config) {
         logger.error(e, errorMsg)
         throw new Error(errorMsg)
       } else {
-        if (chaiContract === null) {
-          logger.debug('Getting chai token contract address')
-          const chaiToken = await foreignBridge.methods.chaiToken().call()
-          logger.debug({ chaiToken }, 'Chai token contract address obtained')
-
-          chaiContract = new web3Foreign.eth.Contract(ERC20_ABI, chaiToken)
-        }
-
         logger.error(e, 'Unknown error while processing transaction')
         throw e
       }

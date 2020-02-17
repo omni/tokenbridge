@@ -9,7 +9,6 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 def test_repo(host):
     assert host.file('/home/poadocker/bridge').exists
     assert host.file('/home/poadocker/bridge').is_directory
-    assert host.file('/home/poadocker/bridge/package.json').exists
 
 
 def test_docker_group(host):

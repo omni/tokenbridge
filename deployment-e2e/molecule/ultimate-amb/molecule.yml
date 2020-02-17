@@ -1,0 +1,40 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: oracle-amb-host
+    groups:
+      - ultimate
+      - amb
+    children:
+      - oracle
+    image: ubuntu:16.04
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ../prepare.yml
+    converge: ../ultimate-commons/converge.yml
+  inventory:
+    host_vars:
+      oracle-amb-host:
+        COMMON_HOME_RPC_URL: "http://parity1:8545"
+        COMMON_FOREIGN_RPC_URL: "http://parity2:8545"
+        ORACLE_VALIDATOR_ADDRESS: "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b"
+        ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
+scenario:
+  name: ultimate-amb
+  test_sequence:
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge

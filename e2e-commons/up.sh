@@ -83,7 +83,7 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "blocks" ]; then
-    node ./scripts/blocks.js &
+    docker-compose up -d blocks
   fi
 
   if [ "$1" == "monitor" ]; then
@@ -100,6 +100,10 @@ while [ "$1" != "" ]; do
 
   if [ "$1" == "erc-to-erc" ]; then
     ../deployment-e2e/molecule.sh ultimate-erc-to-erc
+  fi
+
+  if [ "$1" == "amb" ]; then
+    ../deployment-e2e/molecule.sh ultimate-amb
   fi
 
   shift # Shift all the parameters down by one

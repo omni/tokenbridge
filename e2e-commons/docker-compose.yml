@@ -30,8 +30,7 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/oracle.env
+    env_file: ../e2e-commons/components-envs/oracle.env
     environment:
     - NODE_ENV=production
     command: "true"
@@ -41,8 +40,7 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/oracle-erc20.env
+    env_file: ../e2e-commons/components-envs/oracle-erc20.env
     environment:
     - NODE_ENV=production
     command: "true"
@@ -52,8 +50,7 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/oracle-erc20-native.env
+    env_file: ../e2e-commons/components-envs/oracle-erc20-native.env
     environment:
     - NODE_ENV=production
     command: "true"
@@ -63,8 +60,7 @@ services:
     build:
       context: ..
       dockerfile: oracle/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/oracle-amb.env
+    env_file: ../e2e-commons/components-envs/oracle-amb.env
     environment:
     - NODE_ENV=production
     command: "true"
@@ -146,5 +142,12 @@ services:
       context: ..
       dockerfile: Dockerfile.e2e
     command: "true"
+    networks:
+      - ultimate
+  blocks:
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
+    entrypoint: node e2e-commons/scripts/blocks.js
     networks:
       - ultimate

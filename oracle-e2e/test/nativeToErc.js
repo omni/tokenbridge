@@ -1,6 +1,5 @@
 const Web3 = require('web3')
 const assert = require('assert')
-const promiseRetry = require('promise-retry')
 const {
   user,
   validator,
@@ -14,7 +13,7 @@ const {
   foreignRPC
 } = require('../../e2e-commons/constants.json')
 const { ERC677_BRIDGE_TOKEN_ABI, HOME_NATIVE_TO_ERC_ABI, FOREIGN_NATIVE_TO_ERC_ABI } = require('../../commons')
-const { generateNewBlock } = require('../../e2e-commons/utils')
+const { uniformRetry, sleep } = require('../../e2e-commons/utils')
 const { setRequiredSignatures } = require('./utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
@@ -23,6 +22,8 @@ const { toBN } = foreignWeb3.utils
 
 const COMMON_HOME_BRIDGE_ADDRESS = nativeToErcBridge.home
 const COMMON_FOREIGN_BRIDGE_ADDRESS = nativeToErcBridge.foreign
+
+const validatorAddresses = [validator.address, secondValidator.address, thirdValidator.address]
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
 homeWeb3.eth.accounts.wallet.add(validator.privateKey)
@@ -42,8 +43,6 @@ foreignWeb3.eth.accounts.wallet.add(fourthUser.privateKey)
 const token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, nativeToErcBridge.foreignToken)
 const homeBridge = new homeWeb3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
-
-const sleep = timeout => new Promise(res => setTimeout(res, timeout))
 
 describe('native to erc', () => {
   before(async () => {
@@ -75,7 +74,7 @@ describe('native to erc', () => {
     assert(toBN(balance).isZero(), 'Account should not have tokens yet')
 
     // send transaction to home chain
-    const depositTx = await homeWeb3.eth.sendTransaction({
+    await homeWeb3.eth.sendTransaction({
       from: user.address,
       to: COMMON_HOME_BRIDGE_ADDRESS,
       gasPrice: '1',
@@ -83,30 +82,8 @@ describe('native to erc', () => {
       value: '1000000000000000000'
     })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(homeWeb3, user.address)
-
-    // The bridge should create a new transaction with a CollectedSignatures
-    // event so we generate another trivial transaction
-    await promiseRetry(
-      async retry => {
-        const lastBlockNumber = await homeWeb3.eth.getBlockNumber()
-        if (lastBlockNumber >= depositTx.blockNumber + 2) {
-          await generateNewBlock(homeWeb3, user.address)
-        } else {
-          retry()
-        }
-      },
-      {
-        forever: true,
-        factor: 1,
-        minTimeout: 500
-      }
-    )
-
     // check that account has tokens in the foreign chain
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = await token.methods.balanceOf(user.address).call()
       if (toBN(balance).isZero()) {
         retry()
@@ -128,12 +105,8 @@ describe('native to erc', () => {
         console.error(e)
       })
 
-    // Send a trivial transaction to generate a new block since the watcher
-    // is configured to wait 1 confirmation block
-    await generateNewBlock(foreignWeb3, user.address)
-
     // check that balance increases
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = await homeWeb3.eth.getBalance(user.address)
       if (toBN(balance).lte(toBN(originalBalance))) {
         retry()
@@ -150,8 +123,9 @@ describe('native to erc', () => {
     await sendAllBalance(homeWeb3, secondValidator.address, thirdUser.address)
     await sendAllBalance(homeWeb3, thirdValidator.address, fourthUser.address)
 
+    const nonces = await Promise.all(validatorAddresses.map(homeWeb3.eth.getTransactionCount))
     // send transaction to home chain
-    const depositTx = await homeWeb3.eth.sendTransaction({
+    await homeWeb3.eth.sendTransaction({
       from: user.address,
       to: COMMON_HOME_BRIDGE_ADDRESS,
       gasPrice: '1',
@@ -159,41 +133,20 @@ describe('native to erc', () => {
       value: '1000000000000000000'
     })
 
-    // Send a Tx to generate a new block
-    await generateNewBlock(homeWeb3, user.address)
-
     // wait two seconds, no new blocks should have been generated
     await sleep(2000)
-    const lastBlockNumber = await homeWeb3.eth.getBlockNumber()
+    const newNonces = await Promise.all(validatorAddresses.map(homeWeb3.eth.getTransactionCount))
     const balance = toBN(await token.methods.balanceOf(user.address).call())
-    assert(lastBlockNumber === depositTx.blockNumber + 1, "Shouldn't have emitted a new block")
+    assert.deepStrictEqual(nonces, newNonces, "Shouldn't sent new tx")
     assert(originalBalance.eq(balance), "Token balance shouldn't have changed")
 
     // send funds back to validator
     await sendAllBalance(homeWeb3, secondUser.address, validator.address)
     await sendAllBalance(homeWeb3, thirdUser.address, secondValidator.address)
-    const sendBalanceBackTx = await sendAllBalance(homeWeb3, fourthUser.address, thirdValidator.address)
-
-    // expect Deposit event to be processed
-    await promiseRetry(
-      async retry => {
-        const lastBlockNumber = await homeWeb3.eth.getBlockNumber()
-        // check that a new block was created since the last transaction
-        if (lastBlockNumber >= sendBalanceBackTx.blockNumber + 1) {
-          await generateNewBlock(homeWeb3, user.address)
-        } else {
-          retry()
-        }
-      },
-      {
-        forever: true,
-        factor: 1,
-        minTimeout: 500
-      }
-    )
+    await sendAllBalance(homeWeb3, fourthUser.address, thirdValidator.address)
 
     // check that token balance was incremented in foreign chain
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = toBN(await token.methods.balanceOf(user.address).call())
       if (!balance.gt(originalBalance)) {
         retry()
@@ -209,7 +162,7 @@ describe('native to erc', () => {
     await sendAllBalance(foreignWeb3, validator.address, secondUser.address)
     await sendAllBalance(foreignWeb3, secondValidator.address, thirdUser.address)
     await sendAllBalance(foreignWeb3, thirdValidator.address, fourthUser.address)
-    const foreignBlockNumber = await foreignWeb3.eth.getBlockNumber()
+    const nonces = await Promise.all(validatorAddresses.map(foreignWeb3.eth.getTransactionCount))
 
     // send transaction to home chain
     await homeWeb3.eth.sendTransaction({
@@ -220,30 +173,10 @@ describe('native to erc', () => {
       value: '1000000000000000000'
     })
 
-    // Send a Tx to generate a new block
-    const lastHomeTx = await generateNewBlock(homeWeb3, user.address)
-
-    // wait for the deposit to be processed
-    await promiseRetry(
-      async retry => {
-        const lastBlockNumber = await homeWeb3.eth.getBlockNumber()
-        if (lastBlockNumber >= lastHomeTx.blockNumber + 1) {
-          await generateNewBlock(homeWeb3, user.address)
-        } else {
-          retry()
-        }
-      },
-      {
-        forever: true,
-        factor: 1,
-        minTimeout: 500
-      }
-    )
-
     // tokens shouldn't be generated in the foreign chain because the validator doesn't have funds
     await sleep(2000)
-    const lastForeignBlockNumber = await foreignWeb3.eth.getBlockNumber()
-    assert(lastForeignBlockNumber === foreignBlockNumber, "Shouldn't have emitted a new block")
+    const newNonces = await Promise.all(validatorAddresses.map(foreignWeb3.eth.getTransactionCount))
+    assert.deepStrictEqual(nonces, newNonces, "Shouldn't sent new tx")
 
     // send funds back to validator
     await sendAllBalance(foreignWeb3, secondUser.address, validator.address)
@@ -251,7 +184,7 @@ describe('native to erc', () => {
     await sendAllBalance(foreignWeb3, fourthUser.address, thirdValidator.address)
 
     // check that account has tokens in the foreign chain
-    await promiseRetry(async retry => {
+    await uniformRetry(async retry => {
       const balance = toBN(await token.methods.balanceOf(user.address).call())
       if (balance.eq(originalBalance)) {
         retry()

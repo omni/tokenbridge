@@ -34,14 +34,6 @@ status(){
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  ps
 }
 
-rebuild(){
-    echo "Rebuild TokenBridge Monitor.."
-    cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  down -v
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  rm -fv
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose  up  --detach --force-recreate --no-deps --build
-}
-
 
 case "$1" in
 
@@ -63,12 +55,8 @@ case "$1" in
     start
     ;;
 
-  rebuild)
-    rebuild
-    ;;
-
   *)
-    echo $"Usage: $0 {start|stop|restart|rebuild|status}"
+    echo $"Usage: $0 {start|stop|restart|status}"
     exit 1
     ;;
 

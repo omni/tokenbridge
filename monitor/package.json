@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "check-all": "timeout -s 9 5m node checkWorker.js && timeout -s 9 5m node checkWorker2.js",
+    "check-all": "timeout -s 9 5m node checkWorker.js && timeout -s 9 5m node checkWorker2.js && timeout -s 9 5m node checkWorker3.js",
     "start": "node index.js",
     "check-and-start": "yarn check-all && yarn start",
     "lint": "eslint . --ignore-path ../.eslintignore",
