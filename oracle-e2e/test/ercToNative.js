@@ -465,4 +465,91 @@ describe('erc to native', () => {
       }
     })
   })
+  it('should not invest dai when chai token is disabled', async () => {
+    const bridgeDaiTokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+
+    await foreignBridge.methods.setMinDaiTokenBalance(foreignWeb3.utils.toWei('2', 'ether')).send({
+      from: validator.address,
+      gas: '1000000'
+    }) // set min limit for automatic investment to 2*2 dai
+
+    const valueToTransfer = foreignWeb3.utils.toWei('5', 'ether')
+
+    // this transfer won't trigger a call to convert to chai
+    await erc20Token.methods.transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, valueToTransfer).send({
+      from: user.address,
+      gas: '1000000'
+    })
+
+    await promiseRetry(async (retry, number) => {
+      if (number < 4) {
+        retry()
+      } else {
+        const updatedBridgeDaiTokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+        assert(
+          toBN(bridgeDaiTokenBalance)
+            .add(toBN(valueToTransfer))
+            .eq(toBN(updatedBridgeDaiTokenBalance)),
+          'Dai tokens should not be when chai is disabled'
+        )
+      }
+    })
+  })
+  it('should invest dai after enough tokens are collected on bridge account', async () => {
+    await foreignBridge.methods.initializeChaiToken().send({
+      from: validator.address,
+      gas: '1000000'
+    }) // initialize chai token
+    await foreignBridge.methods.setMinDaiTokenBalance('0').send({
+      from: validator.address,
+      gas: '1000000'
+    }) // set investing limit to 0
+    await foreignBridge.methods.convertDaiToChai().send({
+      from: validator.address,
+      gas: '1000000'
+    }) // convert all existing dai tokens on bridge account to chai, in order to start from zero balance
+    await foreignBridge.methods.setMinDaiTokenBalance(foreignWeb3.utils.toWei('2', 'ether')).send({
+      from: validator.address,
+      gas: '1000000'
+    }) // set investing limit to 2 dai, automatically invest should happen after 4 dai
+
+    const valueToTransfer = foreignWeb3.utils.toWei('3', 'ether')
+
+    // this transfer won't trigger a call to convert to chai
+    await erc20Token.methods.transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, valueToTransfer).send({
+      from: user.address,
+      gas: '1000000'
+    })
+
+    await promiseRetry(async (retry, number) => {
+      if (number < 4) {
+        retry()
+      } else {
+        const bridgeDaiTokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+        assert(
+          valueToTransfer === bridgeDaiTokenBalance,
+          'Dai tokens should not be invested automatically before twice limit is reached'
+        )
+      }
+    })
+
+    // this transfer will trigger call to convert to chai
+    await erc20Token.methods.transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, valueToTransfer).send({
+      from: user.address,
+      gas: '1000000'
+    })
+
+    await promiseRetry(async retry => {
+      const updatedBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+      if (toBN(updatedBalance).gte(toBN(valueToTransfer).add(toBN(valueToTransfer)))) {
+        retry()
+      } else {
+        const updatedBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+        assert(
+          toBN(updatedBalance).eq(toBN(foreignWeb3.utils.toWei('2', 'ether'))),
+          'Dai bridge balance should be equal to limit'
+        )
+      }
+    })
+  })
 })
