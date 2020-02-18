@@ -1,5 +1,12 @@
 const Web3 = require('web3')
-const { ERC677_BRIDGE_TOKEN_ABI, BRIDGE_VALIDATORS_ABI, FOREIGN_NATIVE_TO_ERC_ABI, BOX_ABI } = require('../commons')
+const {
+  ERC677_BRIDGE_TOKEN_ABI,
+  BRIDGE_VALIDATORS_ABI,
+  FOREIGN_NATIVE_TO_ERC_ABI,
+  FOREIGN_ERC_TO_NATIVE_ABI,
+  BOX_ABI
+} = require('../commons')
+const { validator } = require('../e2e-commons/constants')
 
 const waitUntil = async (predicate, step = 100, timeout = 20000) => {
   const stopTime = Date.now() + timeout
@@ -60,10 +67,57 @@ const addValidator = async (rpcUrl, account, bridgeAddress) => {
   })
 }
 
+const migrateToMCD = async (rpcUrl, bridgeAddress) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+  await bridgeContract.methods.migrateToMCD().send({
+    from: validator.address,
+    gas: '4000000'
+  })
+}
+
+const initializeChaiToken = async (rpcUrl, bridgeAddress) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+
+  await bridgeContract.methods.initializeChaiToken().send({
+    from: validator.address,
+    gas: '1000000'
+  })
+}
+
+const setMinDaiTokenBalance = async (rpcUrl, bridgeAddress, limit) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+
+  await bridgeContract.methods.setMinDaiTokenBalance(web3.utils.toWei(limit)).send({
+    from: validator.address,
+    gas: '1000000'
+  })
+}
+
+const convertDaiToChai = async (rpcUrl, bridgeAddress) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+
+  await bridgeContract.methods.convertDaiToChai().send({
+    from: validator.address,
+    gas: '1000000'
+  })
+}
+
 module.exports = {
   waitUntil,
   sendEther,
   sendTokens,
   addValidator,
-  sendAMBMessage
+  sendAMBMessage,
+  migrateToMCD,
+  initializeChaiToken,
+  setMinDaiTokenBalance,
+  convertDaiToChai
 }
