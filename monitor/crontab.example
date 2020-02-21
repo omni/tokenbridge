@@ -2,4 +2,4 @@
 */4 * * * * cd $HOME/tokenbridge/monitor; yarn check-all >>cronWorker.out 2>>cronWorker.err
 
 # Docker:
-*/4 * * * * cd $HOME/tokenbridge/monitor; docker-compose exec monitor yarn check-all >>cronWorker.out 2>>cronWorker.err
+*/4 * * * * cd $HOME/tokenbridge/monitor; docker run --rm --env-file .env -v $(pwd)/responses:/mono/monitor/responses poanetwork/tokenbridge-monitor:latest /bin/bash -c 'yarn check-all' >>cronWorker.out 2>>cronWorker.err
