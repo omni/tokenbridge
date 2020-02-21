@@ -117,8 +117,18 @@ There are two options to run the TokenBridge processes:
 
 ### Docker 
 
-  - While running the bridge containers for the first time use `ORACLE_VALIDATOR_ADDRESS=<validator address> ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=<validator address private key> docker-compose up -d --build` 
-  - For further launches use `ORACLE_VALIDATOR_ADDRESS=<validator address>  ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=<validator address private key> docker-compose  up  --detach`
+  - While running the bridge containers for the first time use
+    ```
+    env ORACLE_VALIDATOR_ADDRESS=<validator address> \
+      env ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=<validator address private key> \
+      docker-compose -f docker-compose-build.yml -f docker-compose.yml up -d --build
+    ``` 
+  - For further launches (or in case of usage an official docker image) use
+    ```
+    env ORACLE_VALIDATOR_ADDRESS=<validator address> \
+      env ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=<validator address private key> \
+      docker-compose up --d
+    ```
 
 All [watcher](#watcher) & [sender](#sender) services launch when `docker-compose` is called. 
 

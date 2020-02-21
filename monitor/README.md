@@ -4,7 +4,12 @@ Tool for checking balances and unprocessed events in bridged networks.
 ## Overview
 Please refer to the [POA TokenBridge](../README.md) overview first of all.
 
-- Deployed version: https://bridge-monitoring.poa.net/
+- Deployed version serves several monitor configurations:
+  * https://bridge-monitoring.poa.net/poa
+  * https://bridge-monitoring.poa.net/xdai
+  * https://bridge-monitoring.poa.net/wetc
+  * https://bridge-monitoring.poa.net/amb-dai
+  * https://bridge-monitoring.poa.net/amb-poa
 
 This tool allows you to spin up a NODE.JS server to monitor for health of the TokenBridge contracts: check for the balance difference, discover inconsistency in the validators list, catch unhandled transactions.
 
@@ -122,14 +127,19 @@ yarn start
 You can run web interface via [pm2](https://www.npmjs.com/package/pm2) or similar supervisor program.
 
 Using Docker:
-```
-docker-compose up -d
-```
+  * to run it very first time (or after changes related to the monitor code):
+    ```
+    docker-compose -f docker-compose-build.yml -f docker-compose.yml up -d --build
+    ```
+  * next time (or in case of usage of an official docker image)
+    ```
+    docker-compose up -d
+    ```
 
 - The application will run on `http://localhost:MONITOR_PORT/MONITOR_BRIDGE_NAME`, where `MONITOR_PORT` and `MONITOR_BRIDGE_NAME` are specified in your `.env` file.
 - To enabled debug logging, set `DEBUG=1` variable in `.env`.
 
-## Check balances of contracts and validators, get unprocessed events
+## Preparing statistic about balances of bridge contracts and validators, get unprocessed events
 
 Using Yarn:
 ```
@@ -138,12 +148,30 @@ yarn check-all
 
 Using Docker:
 ```
-docker-compose exec monitor yarn check-all
+docker run --rm --env-file .env -v $(pwd)/responses:/mono/monitor/responses poanetwork/tokenbridge-monitor:latest /bin/bash -c 'yarn check-all'
 ```
+
+As soon as the process finishes, use the URL described above to get the statistic.
 
 ### Cron
 
 You can create cron job to run workers (see `crontab.example` for reference):
+
+## Ad-hoc monitoring
+
+There is a possibility to get bridge statistics without running the web interface use the commands provided above. In this case the results will be located in the `responses` directory.
+
+## Build the image without running the monitor
+
+To build the image change the directory:
+```
+cd monitor
+```
+
+And run the docker composer:
+```
+docker-compose -f docker-compose-build.yml build
+``` 
 
 ## Linting
 

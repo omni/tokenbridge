@@ -66,10 +66,12 @@ Clone the repository:
 git clone https://github.com/poanetwork/tokenbridge
 ```
 
-Initialize submodules, install dependencies, compile the Smart Contracts:
+If there is no need to build docker images for the TokenBridge components (oracle, monitor, UI), initialize submodules, install dependencies, compile the Smart Contracts:
 ```
 yarn initialize
 ```
+
+Then refer to the corresponding README files to get information about particular TokenBridge component.
 
 ## Linting
 
