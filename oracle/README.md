@@ -154,7 +154,7 @@ In case you need to reset your bridge or setup a new one (with different configu
 
 See the [UI instructions](../ui/README.md) to configure and use the optional Bridge UI.
 
-### Build the image without running the monitor
+### Build the image without running the oracle
 
 To build the image change the directory:
 ```
