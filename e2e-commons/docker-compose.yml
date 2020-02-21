@@ -144,3 +144,10 @@ services:
     command: "true"
     networks:
       - ultimate
+  blocks:
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
+    entrypoint: node e2e-commons/scripts/blocks.js
+    networks:
+      - ultimate

@@ -23,6 +23,7 @@ startValidator () {
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:transfer
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:half-duplex-transfer
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn worker:swap-tokens
+    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn worker:convert-to-chai
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:signature-request
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:collected-signatures
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:affirmation-request
@@ -47,6 +48,7 @@ while [ "$1" != "" ]; do
     docker-compose run -d oracle-erc20-native yarn watcher:transfer
     docker-compose run -d oracle-erc20-native yarn watcher:half-duplex-transfer
     docker-compose run -d oracle-erc20-native yarn worker:swap-tokens
+    docker-compose run -d oracle-erc20-native yarn worker:convert-to-chai
     docker-compose run -d oracle-amb yarn watcher:signature-request
     docker-compose run -d oracle-amb yarn watcher:collected-signatures
     docker-compose run -d oracle-amb yarn watcher:affirmation-request
@@ -81,7 +83,7 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "blocks" ]; then
-    node ./scripts/blocks.js &
+    docker-compose up -d blocks
   fi
 
   if [ "$1" == "monitor" ]; then
