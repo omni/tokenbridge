@@ -154,6 +154,18 @@ In case you need to reset your bridge or setup a new one (with different configu
 
 See the [UI instructions](../ui/README.md) to configure and use the optional Bridge UI.
 
+### Build the image without running the monitor
+
+To build the image change the directory:
+```
+cd oracle
+```
+
+And run the docker composer:
+```
+docker-compose -f docker-compose-build.yml build
+``` 
+
 ## Rollback the Last Processed Block in Redis
 
 If the bridge does not handle an event properly (i.e. a transaction stalls due to a low gas price), the Redis DB can be rolled back. You must identify which watcher needs to re-run. For example, if the validator signatures were collected but the transaction with signatures was not sent to the Foreign network, the `collected-signatures` watcher must look at the block where the corresponding `CollectedSignatures` event was raised.
