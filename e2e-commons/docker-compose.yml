@@ -97,8 +97,7 @@ services:
     build:
       context: ..
       dockerfile: monitor/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/monitor.env
+    env_file: ../e2e-commons/components-envs/monitor.env
     entrypoint: yarn check-and-start
     ports:
       - "3010:3010"
@@ -108,8 +107,7 @@ services:
     build:
       context: ..
       dockerfile: monitor/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/monitor-erc20.env
+    env_file: ../e2e-commons/components-envs/monitor-erc20.env
     entrypoint: yarn check-and-start
     ports:
       - "3011:3011"
@@ -119,8 +117,7 @@ services:
     build:
       context: ..
       dockerfile: monitor/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/monitor-erc20-native.env
+    env_file: ../e2e-commons/components-envs/monitor-erc20-native.env
     entrypoint: yarn check-and-start
     ports:
       - "3012:3012"
@@ -130,8 +127,7 @@ services:
     build:
       context: ..
       dockerfile: monitor/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/monitor-amb.env
+    env_file: ../e2e-commons/components-envs/monitor-amb.env
     entrypoint: yarn check-and-start
     ports:
       - "3013:3013"
