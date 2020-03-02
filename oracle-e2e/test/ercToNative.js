@@ -552,4 +552,28 @@ describe('erc to native', () => {
       }
     })
   })
+
+  it('should not handle transfer event in paying interest', async () => {
+    await foreignBridge.methods.setInterestReceiver(user.address).send({
+      from: validator.address,
+      gas: '1000000'
+    })
+    const initialNonce = await homeWeb3.eth.getTransactionCount(validator.address)
+    await foreignBridge.methods.payInterest().send({
+      from: user.address,
+      gas: '1000000'
+    })
+
+    await promiseRetry(async (retry, number) => {
+      if (number < 4) {
+        retry()
+      } else {
+        const nonce = await homeWeb3.eth.getTransactionCount(validator.address)
+        assert(
+          nonce === initialNonce,
+          'Validator should not process transfer event originated during converting Chai => Dai'
+        )
+      }
+    })
+  })
 })

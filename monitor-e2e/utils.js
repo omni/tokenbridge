@@ -8,6 +8,8 @@ const {
 } = require('../commons')
 const { validator } = require('../e2e-commons/constants')
 
+const delay = async time => new Promise(res => setTimeout(res, time))
+
 const waitUntil = async (predicate, step = 100, timeout = 20000) => {
   const stopTime = Date.now() + timeout
   while (Date.now() <= stopTime) {
@@ -99,6 +101,28 @@ const setMinDaiTokenBalance = async (rpcUrl, bridgeAddress, limit) => {
   })
 }
 
+const setInterestReceiver = async (rpcUrl, bridgeAddress, receiver) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+
+  await bridgeContract.methods.setInterestReceiver(receiver.address).send({
+    from: validator.address,
+    gas: '1000000'
+  })
+}
+
+const payInterest = async (rpcUrl, bridgeAddress) => {
+  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
+  web3.eth.accounts.wallet.add(validator.privateKey)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
+
+  await bridgeContract.methods.payInterest().send({
+    from: validator.address,
+    gas: '1000000'
+  })
+}
+
 const convertDaiToChai = async (rpcUrl, bridgeAddress) => {
   const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
   web3.eth.accounts.wallet.add(validator.privateKey)
@@ -111,6 +135,7 @@ const convertDaiToChai = async (rpcUrl, bridgeAddress) => {
 }
 
 module.exports = {
+  delay,
   waitUntil,
   sendEther,
   sendTokens,
@@ -119,5 +144,7 @@ module.exports = {
   migrateToMCD,
   initializeChaiToken,
   setMinDaiTokenBalance,
+  setInterestReceiver,
+  payInterest,
   convertDaiToChai
 }

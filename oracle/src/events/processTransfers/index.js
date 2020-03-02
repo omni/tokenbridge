@@ -18,8 +18,10 @@ function processTransfersBuilder(config) {
     e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
   )[0]
   const tokensSwappedAbi = config.foreignBridgeAbi.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
+  const skipTransferAbi = config.foreignBridgeAbi.filter(e => e.type === 'event' && e.name === 'SkipTransfer')[0]
   const userRequestForAffirmationHash = web3Home.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
   const tokensSwappedHash = tokensSwappedAbi ? web3Home.eth.abi.encodeEventSignature(tokensSwappedAbi) : '0x'
+  const skipTransferHash = skipTransferAbi ? web3Home.eth.abi.encodeEventSignature(skipTransferAbi) : '0x'
 
   return async function processTransfers(transfers) {
     const txToSend = []
@@ -65,6 +67,24 @@ function processTransfersBuilder(config) {
         if (from === ZERO_ADDRESS && existsTokensSwappedEvent) {
           logger.info(
             `Transfer event discarded because token swap is detected in transaction ${transfer.transactionHash}`
+          )
+          return
+        }
+
+        const existsSkipTransferEvent = skipTransferAbi
+          ? receipt.logs.some(
+              e =>
+                e.address === config.foreignBridgeAddress &&
+                e.topics[0] === skipTransferHash &&
+                e.data.slice(26) === from.slice(2).toLowerCase()
+            )
+          : false
+
+        if (existsSkipTransferEvent) {
+          logger.info(
+            `Transfer event discarded because transfer skip is detected for the same sender in transaction ${
+              transfer.transactionHash
+            }`
           )
           return
         }

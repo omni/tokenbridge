@@ -146,6 +146,26 @@ async function main(mode) {
       )
     }
 
+    const skipTransferAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'SkipTransfer')[0]
+    if (skipTransferAbiExists) {
+      const skipTransferEvents = await getPastEvents(foreignBridge, {
+        event: 'SkipTransfer',
+        fromBlock: MONITOR_FOREIGN_START_BLOCK,
+        toBlock: foreignBlockNumber
+      })
+
+      // Get token swap events emitted by foreign bridge
+      const bridgeSkipTransferEvents = skipTransferEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
+
+      // filter transfer that is part of paying interest operation
+      directTransfers = directTransfers.filter(
+        e =>
+          bridgeSkipTransferEvents.findIndex(
+            t => t.transactionHash === e.referenceTx && e.recipient.toLowerCase() === t.returnValues.from.toLowerCase()
+          ) === -1
+      )
+    }
+
     // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
     directTransfers = directTransfers.filter(
       e => foreignToHomeRequests.findIndex(t => t.referenceTx === e.referenceTx) === -1
