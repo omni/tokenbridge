@@ -84,8 +84,6 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
   it('should consider chai token balance', async function() {
     this.timeout(60000)
-    ;({ data } = await axios.get(`${baseUrl}/eventsStats`))
-    const initialWithdrawals = data.onlyInForeignWithdrawals.length
     await initializeChaiToken(foreignRPC.URL, ercToNativeBridge.foreign)
     await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
 
@@ -130,7 +128,5 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
         accumulatedInterest === '0.001'
       )
     })
-    ;({ data } = await axios.get(`${baseUrl}/eventsStats`))
-    assert(initialWithdrawals + 1 === data.onlyInForeignWithdrawals.length)
   })
 })
