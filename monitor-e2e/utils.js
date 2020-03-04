@@ -8,8 +8,6 @@ const {
 } = require('../commons')
 const { validator } = require('../e2e-commons/constants')
 
-const delay = async time => new Promise(res => setTimeout(res, time))
-
 const waitUntil = async (predicate, step = 100, timeout = 20000) => {
   const stopTime = Date.now() + timeout
   while (Date.now() <= stopTime) {
@@ -135,7 +133,6 @@ const convertDaiToChai = async (rpcUrl, bridgeAddress) => {
 }
 
 module.exports = {
-  delay,
   waitUntil,
   sendEther,
   sendTokens,

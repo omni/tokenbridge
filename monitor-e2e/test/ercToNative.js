@@ -2,15 +2,12 @@ const assert = require('assert')
 const axios = require('axios')
 const { ercToNativeBridge, user, foreignRPC, validator } = require('../../e2e-commons/constants.json')
 const {
-  delay,
   waitUntil,
   sendTokens,
   addValidator,
   initializeChaiToken,
   convertDaiToChai,
   setMinDaiTokenBalance,
-  setInterestReceiver,
-  payInterest,
   migrateToMCD
 } = require('../utils')
 
@@ -87,6 +84,8 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
   it('should consider chai token balance', async function() {
     this.timeout(60000)
+    ;({ data } = await axios.get(`${baseUrl}/eventsStats`))
+    const initialWithdrawals = data.onlyInForeignWithdrawals.length
     await initializeChaiToken(foreignRPC.URL, ercToNativeBridge.foreign)
     await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
 
@@ -131,18 +130,7 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
         accumulatedInterest === '0.001'
       )
     })
-  })
-
-  it('should skip transfer event when paying interest', async () => {
     ;({ data } = await axios.get(`${baseUrl}/eventsStats`))
-    const initialWithdrawals = data.onlyInForeignWithdrawals.length
-
-    await setInterestReceiver(foreignRPC.URL, ercToNativeBridge.foreign, user)
-    await payInterest(foreignRPC.URL, ercToNativeBridge.foreign)
-
-    await delay(5000)
-    ;({ data } = await axios.get(`${baseUrl}/eventsStats`))
-
-    assert(initialWithdrawals === data.onlyInForeignWithdrawals.length)
+    assert(initialWithdrawals + 1 === data.onlyInForeignWithdrawals.length)
   })
 })

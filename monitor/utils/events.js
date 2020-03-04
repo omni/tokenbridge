@@ -112,7 +112,26 @@ async function main(mode) {
       const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
 
       // Get transfer events for each previous erc20
-      const uniqueTokenAddresses = [...new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))]
+      const uniqueTokenAddressesSet = new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))
+
+      // Exclude chai token from previous erc20
+      try {
+        logger.debug('calling foreignBridge.chaiToken()')
+        const chaiToken = await foreignBridge.methods.chaiToken().call()
+        uniqueTokenAddressesSet.delete(chaiToken)
+      } catch (e) {
+        logger.debug('call to foreignBridge.chaiToken() failed')
+      }
+      // Exclude dai token from previous erc20
+      try {
+        logger.debug('calling foreignBridge.erc20token()')
+        const daiToken = await foreignBridge.methods.erc20token().call()
+        uniqueTokenAddressesSet.delete(daiToken)
+      } catch (e) {
+        logger.debug('call to foreignBridge.erc20token() failed')
+      }
+
+      const uniqueTokenAddresses = [...uniqueTokenAddressesSet]
       await Promise.all(
         uniqueTokenAddresses.map(async tokenAddress => {
           const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
@@ -142,26 +161,6 @@ async function main(mode) {
         e =>
           bridgeTokensSwappedEvents.findIndex(
             t => t.transactionHash === e.referenceTx && e.recipient === ZERO_ADDRESS
-          ) === -1
-      )
-    }
-
-    const skipTransferAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'SkipTransfer')[0]
-    if (skipTransferAbiExists) {
-      const skipTransferEvents = await getPastEvents(foreignBridge, {
-        event: 'SkipTransfer',
-        fromBlock: MONITOR_FOREIGN_START_BLOCK,
-        toBlock: foreignBlockNumber
-      })
-
-      // Get token swap events emitted by foreign bridge
-      const bridgeSkipTransferEvents = skipTransferEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
-
-      // filter transfer that is part of paying interest operation
-      directTransfers = directTransfers.filter(
-        e =>
-          bridgeSkipTransferEvents.findIndex(
-            t => t.transactionHash === e.referenceTx && e.recipient.toLowerCase() === t.returnValues.from.toLowerCase()
           ) === -1
       )
     }
