@@ -112,7 +112,26 @@ async function main(mode) {
       const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
 
       // Get transfer events for each previous erc20
-      const uniqueTokenAddresses = [...new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))]
+      const uniqueTokenAddressesSet = new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))
+
+      // Exclude chai token from previous erc20
+      try {
+        logger.debug('calling foreignBridge.chaiToken()')
+        const chaiToken = await foreignBridge.methods.chaiToken().call()
+        uniqueTokenAddressesSet.delete(chaiToken)
+      } catch (e) {
+        logger.debug('call to foreignBridge.chaiToken() failed')
+      }
+      // Exclude dai token from previous erc20
+      try {
+        logger.debug('calling foreignBridge.erc20token()')
+        const daiToken = await foreignBridge.methods.erc20token().call()
+        uniqueTokenAddressesSet.delete(daiToken)
+      } catch (e) {
+        logger.debug('call to foreignBridge.erc20token() failed')
+      }
+
+      const uniqueTokenAddresses = [...uniqueTokenAddressesSet]
       await Promise.all(
         uniqueTokenAddresses.map(async tokenAddress => {
           const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
