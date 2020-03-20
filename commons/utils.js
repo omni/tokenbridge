@@ -39,8 +39,8 @@ async function getBridgeMode(contract) {
 
 const getTokenType = async (bridgeTokenContract, bridgeAddress) => {
   try {
-    const resultBridgeAddress = await bridgeTokenContract.methods.bridgeContract().call()
-    if (resultBridgeAddress === bridgeAddress) {
+    const resultBridgeAddresses = await bridgeTokenContract.methods.bridgeContracts().call()
+    if (resultBridgeAddresses[0].toLowerCase() === bridgeAddress.toLowerCase()) {
       return ERC_TYPES.ERC677
     } else {
       return ERC_TYPES.ERC20
