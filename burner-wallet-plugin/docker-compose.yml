@@ -1,0 +1,9 @@
+---
+version: '2.4'
+services:
+  burner-wallet-plugin:
+    build:
+      context: ..
+      dockerfile: burner-wallet-plugin/Dockerfile
+    environment:
+      - NODE_ENV=production

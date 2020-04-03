@@ -1,18 +1,32 @@
 FROM node:12
 
-WORKDIR /plugin
-
+WORKDIR /mono
 COPY package.json .
-COPY lerna.json .
+COPY contracts/package.json ./contracts/
+COPY commons/package.json ./commons/
+
+COPY burner-wallet-plugin/package.json ./burner-wallet-plugin/
+COPY burner-wallet-plugin/lerna.json ./burner-wallet-plugin/
+COPY burner-wallet-plugin/yarn.lock ./burner-wallet-plugin/
+COPY burner-wallet-plugin/tsconfig.json ./burner-wallet-plugin/
+COPY burner-wallet-plugin/tokenbridge-plugin/package.json ./burner-wallet-plugin/tokenbridge-plugin/
+COPY burner-wallet-plugin/basic-wallet/package.json ./burner-wallet-plugin/basic-wallet/
+COPY burner-wallet-plugin/local-wallet/package.json ./burner-wallet-plugin/local-wallet/
 COPY yarn.lock .
-COPY tsconfig.json .
-COPY tokenbridge-plugin/package.json ./tokenbridge-plugin/
-COPY basic-wallet/package.json ./basic-wallet/
-COPY local-wallet/package.json ./local-wallet/
-RUN yarn install
+RUN yarn install --production --frozen-lockfile
 
-COPY ./tokenbridge-plugin ./tokenbridge-plugin
-RUN yarn build
+COPY ./contracts ./contracts
+RUN yarn run compile:contracts
+RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./build ./contracts/
 
-COPY ./basic-wallet ./basic-wallet
-COPY ./local-wallet ./local-wallet
+COPY ./commons ./commons
+
+
+
+COPY ./burner-wallet-plugin/tokenbridge-plugin ./burner-wallet-plugin/tokenbridge-plugin
+RUN yarn dist
+
+COPY ./burner-wallet-plugin/basic-wallet ./burner-wallet-plugin/basic-wallet
+COPY ./burner-wallet-plugin/local-wallet ./burner-wallet-plugin/local-wallet
+
+WORKDIR /mono/burner-wallet-plugin
