@@ -20,7 +20,6 @@
     "web3": "1.0.0-beta.55"
   },
   "scripts": {
-    "start": "node ./scripts/run-local.js",
     "start-local": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
