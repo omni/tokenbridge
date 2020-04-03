@@ -36,9 +36,9 @@ const exchange = new Exchange({
   pairs: [
     new Bridge({
       assetA: 'spoa',
-      assetABridge: '0x670d132aFa5bFd46177024a748E0CB4f963357dD',
-      assetB: 'spoa20',
-      assetBBridge: '0xA194F66d8c9DEE80424f8662C88E339Bce8BfCeA'
+      assetABridge: '0x867949C3F2f66D827Ed40847FaA7B3a369370e13',
+      assetB: 'kspoa',
+      assetBBridge: '0x99FB1a25caeB9c3a5Bf132686E2fe5e27BC0e2dd'
     })
   ]
 })
