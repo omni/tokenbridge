@@ -1,8 +1,8 @@
 import { ERC20Asset } from '@burner-wallet/assets'
-import IERC677abi from './abi/IERC677.json'
+import { ERC677_ABI } from '../../../../commons'
 
 export default class ERC677Asset extends ERC20Asset {
-  constructor({ abi = IERC677abi, ...params }) {
+  constructor({ abi = ERC677_ABI, ...params }) {
     // @ts-ignore
     super({ abi, type: 'erc677', ...params })
   }

@@ -14,6 +14,7 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "noImplicitAny": false,
     "lib": [
       "es6",
       "dom"
