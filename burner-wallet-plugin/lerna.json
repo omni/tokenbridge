@@ -1,0 +1,10 @@
+{
+  "packages": [
+    "basic-wallet",
+    "local-wallet",
+    "tokenbridge-plugin"
+  ],
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "independent"
+}

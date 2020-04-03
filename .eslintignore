@@ -2,3 +2,4 @@ node_modules
 submodules
 coverage
 lib
+dist

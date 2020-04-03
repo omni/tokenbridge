@@ -1,0 +1,21 @@
+{
+  "name": "tokenbridge-plugin",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start-basic": "tsc -w",
+    "start-local": "tsc -w"
+  },
+  "dependencies": {
+    "@burner-wallet/assets": "^1.0.0",
+    "@burner-wallet/exchange": "^1.0.0",
+    "@burner-wallet/types": "^1.0.6",
+    "@types/react": "*"
+  },
+  "devDependencies": {
+    "typescript": "^3.5.2"
+  }
+}
