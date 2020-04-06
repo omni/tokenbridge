@@ -21,10 +21,8 @@ RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./b
 
 COPY ./commons ./commons
 
-
-
 COPY ./burner-wallet-plugin/tokenbridge-plugin ./burner-wallet-plugin/tokenbridge-plugin
-RUN yarn dist
+RUN yarn build:plugin
 
 COPY ./burner-wallet-plugin/basic-wallet ./burner-wallet-plugin/basic-wallet
 COPY ./burner-wallet-plugin/local-wallet ./burner-wallet-plugin/local-wallet

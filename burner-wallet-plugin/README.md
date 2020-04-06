@@ -23,10 +23,8 @@ const exchange = new Exchange({
 
 
 ### Setup
-1. Clone the repo
-2. Run `yarn install`. This repo uses Lerna and Yarn Workspaces, so `yarn install` will install
-  all dependencies and link modules in the repo
-3. Run `yarn build`
+1. [Initialize](../README.md#initializing-the-monorepository) the monorepository.
+2. Run `yarn build` or from the monorepository root `yarn build:plugin`
 
 ### Run Burner Wallet with the plugin in Mainnet & Classic
 1. Create `.env` file in `basic-wallet` folder and set `REACT_APP_INFURA_KEY=<your key from infura.com>`
