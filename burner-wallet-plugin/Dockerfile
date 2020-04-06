@@ -28,3 +28,5 @@ COPY ./burner-wallet-plugin/basic-wallet ./burner-wallet-plugin/basic-wallet
 COPY ./burner-wallet-plugin/local-wallet ./burner-wallet-plugin/local-wallet
 
 WORKDIR /mono/burner-wallet-plugin
+
+CMD ["yarn", "start-local"]
