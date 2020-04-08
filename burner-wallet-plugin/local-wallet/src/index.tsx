@@ -1,21 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { NativeAsset } from '@burner-wallet/assets'
 import BurnerCore from '@burner-wallet/core'
 import { InjectedSigner, LocalSigner } from '@burner-wallet/core/signers'
 import { InfuraGateway, InjectedGateway } from '@burner-wallet/core/gateways'
 import ModernUI from '@burner-wallet/modern-ui'
 import Exchange from '@burner-wallet/exchange'
-import { Bridge, ERC677Asset, TokenBridgeGateway } from 'tokenbridge-plugin'
+import { Bridge, sPOA, ERC677Asset, TokenBridgeGateway } from 'tokenbridge-plugin'
 import MetamaskPlugin from '@burner-wallet/metamask-plugin'
 
 // amb Native-to-erc677
-const spoa = new NativeAsset({
-  id: 'spoa',
-  name: 'sPoa',
-  network: '77'
-})
-
 const kspoa = new ERC677Asset({
   id: 'kspoa',
   name: 'KsPoa',
@@ -56,7 +49,7 @@ const ambStakeErc677ToErc677 = new Bridge({
 const core = new BurnerCore({
   signers: [new InjectedSigner(), new LocalSigner({ privateKey: process.env.REACT_APP_PK, saveKey: false })],
   gateways: [new InjectedGateway(), new TokenBridgeGateway(), new InfuraGateway(process.env.REACT_APP_INFURA_KEY)],
-  assets: [spoa, kspoa, sStake, kStake]
+  assets: [sPOA, kspoa, sStake, kStake]
 })
 
 // Exchange component
