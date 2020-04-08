@@ -1,4 +1,4 @@
-import Bridge from './Bridge'
+import Bridge from '../burner-wallet/pairs/Bridge'
 
 export default class WETCBridge extends Bridge {
   constructor() {

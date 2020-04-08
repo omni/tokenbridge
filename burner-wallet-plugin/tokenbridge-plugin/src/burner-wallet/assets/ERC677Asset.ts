@@ -1,5 +1,5 @@
 import { ERC20Asset } from '@burner-wallet/assets'
-import { ERC677_ABI } from '../../../../commons'
+import { ERC677_ABI } from '../../../../../commons'
 
 export default class ERC677Asset extends ERC20Asset {
   constructor({ abi = ERC677_ABI, ...params }) {
