@@ -6,14 +6,14 @@
   "private": true,
   "scripts": {
     "install": "lerna bootstrap",
-    "build": "lerna run --ignore local-wallet --ignore basic-wallet build",
+    "build": "lerna run --ignore testing --ignore staging build",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --ignore-path ../.eslintignore",
-    "start-basic": "lerna run --parallel start-basic",
-    "start-local": "lerna run --parallel start-local"
+    "start-staging": "lerna run --scope staging start",
+    "start-testing": "lerna run --scope testing start"
   },
   "workspaces": [
-    "basic-wallet",
-    "local-wallet",
+    "staging",
+    "testing",
     "tokenbridge-plugin"
   ],
   "dependencies": {
