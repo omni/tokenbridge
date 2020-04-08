@@ -6,10 +6,10 @@
   "private": true,
   "scripts": {
     "install": "lerna bootstrap",
-    "build": "lerna run --ignore testing --ignore staging build",
+    "build": "lerna run --ignore testing --ignore staging build --stream",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --ignore-path ../.eslintignore",
-    "start-staging": "lerna run --scope staging start",
-    "start-testing": "lerna run --scope testing start"
+    "start-staging": "lerna run --scope staging start --stream",
+    "start-testing": "lerna run --scope testing start --stream"
   },
   "workspaces": [
     "staging",
