@@ -28,8 +28,8 @@ export default class Bridge extends Pair {
 
   exchangeAtoB({ account, value, ether }: ExchangeParams) {
     const _value = this._getValue({ value, ether })
-    const etc = this.getExchange().getAsset(this.assetA)
-    return etc.send({
+    const asset = this.getExchange().getAsset(this.assetA)
+    return asset.send({
       from: account,
       value: _value,
       to: this.assetABridge
@@ -39,8 +39,8 @@ export default class Bridge extends Pair {
   exchangeBtoA({ account, value, ether }: ExchangeParams) {
     const _value = this._getValue({ value, ether })
 
-    const wetc = this.getExchange().getAsset(this.assetB)
-    return wetc.send({
+    const asset = this.getExchange().getAsset(this.assetB)
+    return asset.send({
       from: account,
       value: _value,
       to: this.assetBBridge
