@@ -57,6 +57,6 @@ const exchange = new Exchange({
   pairs: [ambNativeToErc677, ambStakeErc677ToErc677]
 })
 
-const BurnerWallet = () => <ModernUI title="Local Wallet" core={core} plugins={[exchange, new MetamaskPlugin()]} />
+const BurnerWallet = () => <ModernUI title="Testing Wallet" core={core} plugins={[exchange, new MetamaskPlugin()]} />
 
 ReactDOM.render(<BurnerWallet />, document.getElementById('root'))

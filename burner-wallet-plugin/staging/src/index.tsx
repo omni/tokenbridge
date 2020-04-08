@@ -18,6 +18,6 @@ const exchange = new Exchange({
   pairs: [new WETCBridge()]
 })
 
-const BurnerWallet = () => <ModernUI title="Basic Wallet" core={core} plugins={[exchange, new MetamaskPlugin()]} />
+const BurnerWallet = () => <ModernUI title="Staging Wallet" core={core} plugins={[exchange, new MetamaskPlugin()]} />
 
 ReactDOM.render(<BurnerWallet />, document.getElementById('root'))
