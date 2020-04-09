@@ -9,7 +9,8 @@
     "build": "lerna run --ignore testing --ignore staging build --stream",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --ignore-path ../.eslintignore",
     "start-staging": "lerna run --scope staging start --stream",
-    "start-testing": "lerna run --scope testing start --stream"
+    "start-testing": "lerna run --scope testing start --stream",
+    "test": "lerna run --ignore testing --ignore staging test --stream"
   },
   "workspaces": [
     "staging",

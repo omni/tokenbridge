@@ -1,13 +1,15 @@
 import { ERC20Asset } from '@burner-wallet/assets'
 import { ERC677_ABI } from '../../../../../commons'
 
+const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+const BLOCK_LOOKBACK = 250
+
 export default class ERC677Asset extends ERC20Asset {
   constructor({ abi = ERC677_ABI, ...params }) {
     // @ts-ignore
     super({ abi, type: 'erc677', ...params })
   }
 
-  // @ts-ignore
   async _send({ from, to, value }) {
     // @ts-ignore
     const receipt = await this.getContract()
@@ -18,5 +20,49 @@ export default class ERC677Asset extends ERC20Asset {
       txHash: receipt.transactionHash,
       id: `${receipt.transactionHash}-${receipt.events.Transfer.logIndex}`
     }
+  }
+
+  /**
+   * Overrides ERC20Asset `startWatchingAddress` to get the `Transfer` events by topic instead of
+   * the event name because ERC677 abi has two events definitions named `Transfer` and
+   * `getPastEvents` method does not provide a way to choose the correct one to use.
+   * @param address
+   */
+  startWatchingAddress(address) {
+    let block = 0
+    // @ts-ignore
+    return this.poll(async () => {
+      const currentBlock = await this.getWeb3().eth.getBlockNumber()
+      if (block === 0) {
+        block = Math.max(currentBlock - BLOCK_LOOKBACK, 0)
+      }
+
+      // @ts-ignore
+      const allTransferEvents = await this.getContract().getPastEvents('allEvents', {
+        fromBlock: block,
+        toBlock: currentBlock,
+        topics: [TRANSFER_TOPIC]
+      })
+      // Manually filter `to` parameter because `filter` option does not work with allEvents
+      const events = allTransferEvents.filter(e => e.returnValues.to.toLowerCase() === address.toLowerCase())
+
+      await events.map(async event =>
+        // @ts-ignore
+        this.core.addHistoryEvent({
+          id: `${event.transactionHash}-${event.logIndex}`,
+          asset: this.id,
+          type: 'send',
+          value: event.returnValues.value.toString(),
+          from: event.returnValues.from,
+          to: event.returnValues.to,
+          tx: event.transactionHash,
+          // @ts-ignore
+          timestamp: await this._getBlockTimestamp(event.blockNumber)
+        })
+      )
+
+      block = currentBlock
+      // @ts-ignore
+    }, this._pollInterval)
   }
 }
