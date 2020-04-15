@@ -14,9 +14,7 @@ const core = new BurnerCore({
   assets: [Wetc, Etc]
 })
 
-const exchange = new Exchange({
-  pairs: [new WETCBridge()]
-})
+const exchange = new Exchange([new WETCBridge()])
 
 const BurnerWallet = () => <ModernUI title="Staging Wallet" core={core} plugins={[exchange, new MetamaskPlugin()]} />
 

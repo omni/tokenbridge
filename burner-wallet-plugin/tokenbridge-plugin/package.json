@@ -11,8 +11,8 @@
     "test": "TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha -r ts-node/register test/**/*.spec.ts"
   },
   "dependencies": {
-    "@burner-wallet/assets": "^1.1.0",
-    "@burner-wallet/exchange": "^1.1.0",
+    "@burner-wallet/assets": "^1.1.10",
+    "@burner-wallet/exchange": "^1.1.1",
     "@burner-wallet/types": "^1.0.6",
     "@types/react": "*"
   },

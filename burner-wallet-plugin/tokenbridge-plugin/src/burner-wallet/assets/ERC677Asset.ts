@@ -4,14 +4,20 @@ import { ERC677_ABI } from '../../../../../commons'
 const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 const BLOCK_LOOKBACK = 250
 
+interface ERC677Constructor {
+  abi?: object
+  address: string
+  id: string
+  name: string
+  network: string
+}
+
 export default class ERC677Asset extends ERC20Asset {
-  constructor({ abi = ERC677_ABI, ...params }) {
-    // @ts-ignore
+  constructor({ abi = ERC677_ABI, ...params }: ERC677Constructor) {
     super({ abi, type: 'erc677', ...params })
   }
 
   async _send({ from, to, value }) {
-    // @ts-ignore
     const receipt = await this.getContract()
       .methods.transferAndCall(to, value, '0x')
       .send({ from })
@@ -30,14 +36,12 @@ export default class ERC677Asset extends ERC20Asset {
    */
   startWatchingAddress(address) {
     let block = 0
-    // @ts-ignore
     return this.poll(async () => {
       const currentBlock = await this.getWeb3().eth.getBlockNumber()
       if (block === 0) {
         block = Math.max(currentBlock - BLOCK_LOOKBACK, 0)
       }
 
-      // @ts-ignore
       const allTransferEvents = await this.getContract().getPastEvents('allEvents', {
         fromBlock: block,
         toBlock: currentBlock,
@@ -47,7 +51,6 @@ export default class ERC677Asset extends ERC20Asset {
       const events = allTransferEvents.filter(e => e.returnValues.to.toLowerCase() === address.toLowerCase())
 
       await events.map(async event =>
-        // @ts-ignore
         this.core.addHistoryEvent({
           id: `${event.transactionHash}-${event.logIndex}`,
           asset: this.id,
@@ -56,13 +59,11 @@ export default class ERC677Asset extends ERC20Asset {
           from: event.returnValues.from,
           to: event.returnValues.to,
           tx: event.transactionHash,
-          // @ts-ignore
           timestamp: await this._getBlockTimestamp(event.blockNumber)
         })
       )
 
       block = currentBlock
-      // @ts-ignore
     }, this._pollInterval)
   }
 }
