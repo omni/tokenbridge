@@ -66,9 +66,7 @@ function processSignatureRequestsBuilder(config) {
             logger.info(`Already signed signatureRequest ${messageId}`)
             return
           } else if (e instanceof AlreadyProcessedError) {
-            logger.info(
-              `signatureRequest ${messageId} was already processed by other validators`
-            )
+            logger.info(`signatureRequest ${messageId} was already processed by other validators`)
             return
           } else {
             logger.error(e, 'Unknown error while processing transaction')

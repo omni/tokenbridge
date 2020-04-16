@@ -34,7 +34,7 @@ function processAffirmationRequestsBuilder(config) {
 
         const logger = rootLogger.child({
           eventTransactionHash: affirmationRequest.transactionHash,
-          eventMessageId: messageId 
+          eventMessageId: messageId
         })
 
         const { sender, executor } = parseAMBMessage(message)
@@ -62,9 +62,7 @@ function processAffirmationRequestsBuilder(config) {
             logger.info(`Already signed affirmationRequest ${messageId}`)
             return
           } else if (e instanceof AlreadyProcessedError) {
-            logger.info(
-              `affirmationRequest ${messageId} was already processed by other validators`
-            )
+            logger.info(`affirmationRequest ${messageId} was already processed by other validators`)
             return
           } else {
             logger.error(e, 'Unknown error while processing transaction')
