@@ -146,11 +146,7 @@ async function main(mode) {
           })).map(normalizeEvent)
 
           // Remove events after the ES
-          const validHalfDuplexTransfers = await filterTransferBeforeES(
-            halfDuplexTransferEvents,
-            web3Foreign,
-            foreignBridge
-          )
+          const validHalfDuplexTransfers = await filterTransferBeforeES(halfDuplexTransferEvents)
 
           transferEvents = [...validHalfDuplexTransfers, ...transferEvents]
         })
