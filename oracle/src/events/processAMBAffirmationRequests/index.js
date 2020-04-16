@@ -6,7 +6,7 @@ const { web3Home } = require('../../services/web3')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
-const { addTxHashToData, parseAMBMessage } = require('../../../../commons')
+const { parseAMBMessage } = require('../../../../commons')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
@@ -30,20 +30,16 @@ function processAffirmationRequestsBuilder(config) {
     rootLogger.debug(`Processing ${affirmationRequests.length} AffirmationRequest events`)
     const callbacks = affirmationRequests
       .map(affirmationRequest => async () => {
-        const { encodedData } = affirmationRequest.returnValues
+        const { messageId, encodedData: message } = affirmationRequest.returnValues
 
         const logger = rootLogger.child({
-          eventTransactionHash: affirmationRequest.transactionHash
-        })
-
-        const message = addTxHashToData({
-          encodedData,
-          transactionHash: affirmationRequest.transactionHash
+          eventTransactionHash: affirmationRequest.transactionHash,
+          eventMessageId: messageId 
         })
 
         const { sender, executor } = parseAMBMessage(message)
 
-        logger.info({ sender, executor }, `Processing affirmationRequest ${affirmationRequest.transactionHash}`)
+        logger.info({ sender, executor }, `Processing affirmationRequest ${messageId}`)
 
         let gasEstimate
         try {
@@ -63,11 +59,11 @@ function processAffirmationRequestsBuilder(config) {
             logger.fatal({ address: config.validatorAddress }, 'Invalid validator')
             process.exit(EXIT_CODES.INCOMPATIBILITY)
           } else if (e instanceof AlreadySignedError) {
-            logger.info(`Already signed affirmationRequest ${affirmationRequest.transactionHash}`)
+            logger.info(`Already signed affirmationRequest ${messageId}`)
             return
           } else if (e instanceof AlreadyProcessedError) {
             logger.info(
-              `affirmationRequest ${affirmationRequest.transactionHash} was already processed by other validators`
+              `affirmationRequest ${messageId} was already processed by other validators`
             )
             return
           } else {
