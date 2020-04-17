@@ -74,6 +74,32 @@ function getBridgeABIs(bridgeMode) {
   return { HOME_ABI, FOREIGN_ABI }
 }
 
+// After contracts is updated to include mediators with the events we should remove this
+const MEDIATOR_EVENT_ABI = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'recipient',
+        type: 'address'
+      },
+      {
+        indexed: false,
+        name: 'value',
+        type: 'uint256'
+      },
+      {
+        indexed: true,
+        name: 'messageId',
+        type: 'bytes32'
+      }
+    ],
+    name: 'TokensBridged',
+    type: 'event'
+  }
+]
+
 module.exports = {
   getBridgeABIs,
   HOME_NATIVE_TO_ERC_ABI,
@@ -94,5 +120,6 @@ module.exports = {
   HOME_AMB_ABI,
   FOREIGN_AMB_ABI,
   BOX_ABI,
-  SAI_TOP
+  SAI_TOP,
+  MEDIATOR_EVENT_ABI
 }

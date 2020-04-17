@@ -1,6 +1,6 @@
-import { NativeAsset } from '@burner-wallet/assets'
+import NativeMediatorAsset from './NativeMediatorAsset'
 
-export default new NativeAsset({
+export default new NativeMediatorAsset({
   id: 'spoa',
   name: 'sPOA',
   network: '77'

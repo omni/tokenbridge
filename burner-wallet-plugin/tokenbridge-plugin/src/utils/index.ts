@@ -1,1 +1,1 @@
-export { constants, wait } from './utils'
+export { constants, wait, waitForEvent, isBridgeContract } from './utils'

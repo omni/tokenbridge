@@ -1,46 +1,39 @@
-import { NativeAsset } from '@burner-wallet/assets'
 import { HOME_NATIVE_TO_ERC_ABI } from '../../../../../commons'
+import NativeMediatorAsset from './NativeMediatorAsset'
+import { isBridgeContract } from '../../utils'
 
-class EtcNativeAsset extends NativeAsset {
-  protected bridgeAddress: string
-
+class EtcNativeAsset extends NativeMediatorAsset {
   constructor(props) {
-    super(props)
-    this.bridgeAddress = '0x073081832B4Ecdce79d4D6753565c85Ba4b3BeA9'
+    super({ mediatorAddress: '0x073081832B4Ecdce79d4D6753565c85Ba4b3BeA9', ...props })
   }
 
-  async scanBlocks(address, fromBlock, toBlock) {
-    await super.scanBlocks(address, fromBlock, toBlock)
-
+  async scanMediatorEvents(address, fromBlock, toBlock) {
     const web3 = this.getWeb3()
-    const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.bridgeAddress)
-    const events = await contract.getPastEvents('AffirmationCompleted', {
-      fromBlock,
-      toBlock
-    })
-    const filteredEvents = events.filter(event => event.returnValues.recipient.toLowerCase() === address.toLowerCase())
-
-    for (const event of filteredEvents) {
-      this.core.addHistoryEvent({
-        id: `${event.transactionHash}-${event.logIndex}`,
-        asset: this.id,
-        type: 'send',
-        value: event.returnValues.value.toString(),
-        from: this.bridgeAddress,
-        to: event.returnValues.recipient,
-        tx: event.transactionHash,
-        timestamp: await this._getBlockTimestamp(event.blockNumber)
+    const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.mediatorAddress)
+    const listenToBridgeEvent = await isBridgeContract(contract)
+    if (listenToBridgeEvent && this.mediatorAddress != '') {
+      const events = await contract.getPastEvents('AffirmationCompleted', {
+        fromBlock,
+        toBlock
       })
-    }
-  }
+      const filteredEvents = events.filter(
+        event => event.returnValues.recipient.toLowerCase() === address.toLowerCase()
+      )
 
-  async getTx(txHash) {
-    const historyEvents = this.core.getHistoryEvents({ asset: this.id, account: this.bridgeAddress })
-    const eventMatch = historyEvents.filter(e => e.tx === txHash)
-    if (eventMatch.length > 0) {
-      return eventMatch[0]
+      for (const event of filteredEvents) {
+        this.core.addHistoryEvent({
+          id: `${event.transactionHash}-${event.logIndex}`,
+          asset: this.id,
+          type: 'send',
+          value: event.returnValues.value.toString(),
+          from: this.mediatorAddress,
+          to: event.returnValues.recipient,
+          tx: event.transactionHash,
+          timestamp: await this._getBlockTimestamp(event.blockNumber)
+        })
+      }
     } else {
-      return super.getTx(txHash)
+      await super.scanMediatorEvents(address, fromBlock, toBlock)
     }
   }
 }

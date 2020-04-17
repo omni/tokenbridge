@@ -1,9 +1,8 @@
-import { Bridge } from '@burner-wallet/exchange'
-import { EventData } from 'web3-eth-contract'
-import { wait, constants } from '../utils'
+import { Mediator } from '../burner-wallet'
 import { HOME_NATIVE_TO_ERC_ABI, FOREIGN_NATIVE_TO_ERC_ABI } from '../../../../commons'
+import { waitForEvent, isBridgeContract } from '../utils'
 
-export default class WETCBridge extends Bridge {
+export default class WETCBridge extends Mediator {
   constructor() {
     super({
       assetA: 'etc',
@@ -17,7 +16,12 @@ export default class WETCBridge extends Bridge {
     const asset = this.getExchange().getAsset(this.assetA)
     const web3 = asset.getWeb3()
     const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.assetABridge)
-    await this.waitForBridgeEvent(web3, contract, 'AffirmationCompleted', sendResult.txHash)
+    const listenToBridgeEvent = await isBridgeContract(contract)
+    if (listenToBridgeEvent) {
+      await waitForEvent(web3, contract, 'AffirmationCompleted', this.processBridgeEvents(sendResult.txHash))
+    } else {
+      await super.detectExchangeBToAFinished(account, value, sendResult)
+    }
   }
 
   async detectExchangeAToBFinished(account, value, sendResult) {
@@ -25,26 +29,18 @@ export default class WETCBridge extends Bridge {
       .getAsset(this.assetB)
       .getWeb3()
     const contract = new web3.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, this.assetBBridge)
-    await this.waitForBridgeEvent(web3, contract, 'RelayedMessage', sendResult.txHash)
+    const listenToBridgeEvent = await isBridgeContract(contract)
+    if (listenToBridgeEvent) {
+      await waitForEvent(web3, contract, 'RelayedMessage', this.processBridgeEvents(sendResult.txHash))
+    } else {
+      await super.detectExchangeAToBFinished(account, value, sendResult)
+    }
   }
 
-  async waitForBridgeEvent(web3, contract, event, txHash) {
-    let fromBlock = await web3.eth.getBlockNumber()
-
-    const stopTime = Date.now() + constants.EXCHANGE_TIMEOUT
-    while (Date.now() <= stopTime) {
-      const currentBlock = await web3.eth.getBlockNumber()
-      const events: EventData[] = await contract.getPastEvents(event, {
-        fromBlock,
-        toBlock: currentBlock
-      })
+  processBridgeEvents(txHash) {
+    return events => {
       const confirmationEvent = events.filter(event => event.returnValues.transactionHash === txHash)
-
-      if (confirmationEvent.length > 0) {
-        return
-      }
-      fromBlock = currentBlock
-      await wait(10000)
+      return confirmationEvent.length > 0
     }
   }
 }

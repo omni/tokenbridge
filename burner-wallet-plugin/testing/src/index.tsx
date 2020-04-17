@@ -15,6 +15,7 @@ let assetAtHome: Asset
 let assetAtForeign: Asset
 
 if (process.env.REACT_APP_MODE === 'AMB_NATIVE_TO_ERC677') {
+  sPOA.setMediatorAddress(process.env.REACT_APP_HOME_MEDIATOR_ADDRESS)
   assetAtHome = sPOA
   assetIdAtHome = sPOA.id
 

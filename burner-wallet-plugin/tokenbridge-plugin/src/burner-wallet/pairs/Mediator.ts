@@ -1,4 +1,6 @@
 import { Bridge } from '@burner-wallet/exchange'
+import { waitForEvent } from '../../utils'
+import { MEDIATOR_EVENT_ABI } from '../../../../../commons'
 
 interface MediatorConstructor {
   assetA: string
@@ -12,11 +14,29 @@ export default class Mediator extends Bridge {
     super({ assetA, assetABridge, assetB, assetBBridge })
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async detectExchangeBToAFinished(account, value, sendResult) {
-    console.log('Detecting exchange finalization is not implemented in Mediator yet')
+    const asset = this.getExchange().getAsset(this.assetA)
+    const web3 = asset.getWeb3()
+    const contract = new web3.eth.Contract(MEDIATOR_EVENT_ABI, this.assetABridge)
+    await waitForEvent(web3, contract, 'TokensBridged', this.processMediatorEvents(account))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async detectExchangeAToBFinished(account, value, sendResult) {
-    console.log('Detecting exchange finalization is not implemented in Mediator yet')
+    const web3 = this.getExchange()
+      .getAsset(this.assetB)
+      .getWeb3()
+    const contract = new web3.eth.Contract(MEDIATOR_EVENT_ABI, this.assetBBridge)
+    await waitForEvent(web3, contract, 'TokensBridged', this.processMediatorEvents(account))
+  }
+
+  processMediatorEvents(account) {
+    return events => {
+      const confirmationEvent = events.filter(
+        event => event.returnValues.recipient.toLowerCase() === account.toLowerCase()
+      )
+      return confirmationEvent.length > 0
+    }
   }
 }
