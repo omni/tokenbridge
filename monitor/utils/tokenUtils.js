@@ -22,5 +22,6 @@ async function filterTransferBeforeES(array) {
 }
 
 module.exports = {
-  filterTransferBeforeES
+  filterTransferBeforeES,
+  blockNumberHalfDuplexDisabled
 }
