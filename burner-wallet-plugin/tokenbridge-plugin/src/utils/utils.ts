@@ -1,9 +1,11 @@
 import { EventData, Contract } from 'web3-eth-contract'
+import { toWei } from 'web3-utils'
 
 export const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
 
 export const constants = {
-  EXCHANGE_TIMEOUT: 300000
+  EXCHANGE_TIMEOUT: 300000,
+  MAX_FEE: toWei('1', 'ether')
 }
 
 export const waitForEvent = async (web3, contract: Contract, event: string, callback: Function) => {

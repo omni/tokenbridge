@@ -75,7 +75,7 @@ function getBridgeABIs(bridgeMode) {
 }
 
 // After contracts is updated to include mediators with the events we should remove this
-const MEDIATOR_EVENT_ABI = [
+const MEDIATOR_ABI = [
   {
     anonymous: false,
     inputs: [
@@ -97,6 +97,42 @@ const MEDIATOR_EVENT_ABI = [
     ],
     name: 'TokensBridged',
     type: 'event'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'feeManagerContract',
+    outputs: [
+      {
+        name: '',
+        type: 'address'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  }
+]
+
+const MEDIATOR_FEE_MANAGER_ABI = [
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    name: 'calculateFee',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
   }
 ]
 
@@ -121,5 +157,6 @@ module.exports = {
   FOREIGN_AMB_ABI,
   BOX_ABI,
   SAI_TOP,
-  MEDIATOR_EVENT_ABI
+  MEDIATOR_ABI,
+  MEDIATOR_FEE_MANAGER_ABI
 }

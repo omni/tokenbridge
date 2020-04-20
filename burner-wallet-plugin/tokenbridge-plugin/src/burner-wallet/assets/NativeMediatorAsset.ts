@@ -1,6 +1,6 @@
 import { NativeAsset } from '@burner-wallet/assets'
 import { Contract, EventData } from 'web3-eth-contract'
-import { MEDIATOR_EVENT_ABI } from '../../../../../commons'
+import { MEDIATOR_ABI } from '../../../../../commons'
 
 interface NativeMediatorConstructor {
   mediatorAddress?: string
@@ -35,7 +35,7 @@ export default class NativeMediatorAsset extends NativeAsset {
   async scanMediatorEvents(address, fromBlock, toBlock) {
     if (this.mediatorAddress != '') {
       const web3 = this.getWeb3()
-      const contract: Contract = new web3.eth.Contract(MEDIATOR_EVENT_ABI, this.mediatorAddress)
+      const contract: Contract = new web3.eth.Contract(MEDIATOR_ABI, this.mediatorAddress)
       const events: EventData[] = await contract.getPastEvents('TokensBridged', {
         fromBlock,
         toBlock,

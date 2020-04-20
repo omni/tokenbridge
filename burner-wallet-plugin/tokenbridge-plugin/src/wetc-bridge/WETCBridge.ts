@@ -1,6 +1,8 @@
 import { Mediator } from '../burner-wallet'
 import { HOME_NATIVE_TO_ERC_ABI, FOREIGN_NATIVE_TO_ERC_ABI } from '../../../../commons'
-import { waitForEvent, isBridgeContract } from '../utils'
+import { waitForEvent, isBridgeContract, constants } from '../utils'
+import { ValueTypes } from '@burner-wallet/exchange'
+import { toBN } from 'web3-utils'
 
 export default class WETCBridge extends Mediator {
   constructor() {
@@ -13,8 +15,9 @@ export default class WETCBridge extends Mediator {
   }
 
   async detectExchangeBToAFinished(account, value, sendResult) {
-    const asset = this.getExchange().getAsset(this.assetA)
-    const web3 = asset.getWeb3()
+    const web3 = this.getExchange()
+      .getAsset(this.assetA)
+      .getWeb3()
     const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.assetABridge)
     const listenToBridgeEvent = await isBridgeContract(contract)
     if (listenToBridgeEvent) {
@@ -41,6 +44,48 @@ export default class WETCBridge extends Mediator {
     return events => {
       const confirmationEvent = events.filter(event => event.returnValues.transactionHash === txHash)
       return confirmationEvent.length > 0
+    }
+  }
+
+  async estimateAtoB(value: ValueTypes) {
+    const web3 = this.getExchange()
+      .getAsset(this.assetB)
+      .getWeb3()
+    const contract = new web3.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, this.assetBBridge)
+
+    const useBridgeContract = await isBridgeContract(contract)
+
+    if (useBridgeContract) {
+      const fee = toBN(await contract.methods.getHomeFee().call())
+      const feeAmount = toBN(this._getValue(value))
+        .mul(fee)
+        .div(toBN(constants.MAX_FEE))
+      const finalAmount = toBN(this._getValue(value)).sub(feeAmount)
+
+      return finalAmount.toString()
+    } else {
+      return await super.estimateAtoB(value)
+    }
+  }
+
+  async estimateBtoA(value: ValueTypes) {
+    const web3 = this.getExchange()
+      .getAsset(this.assetA)
+      .getWeb3()
+    const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.assetABridge)
+
+    const useBridgeContract = await isBridgeContract(contract)
+
+    if (useBridgeContract) {
+      const fee = toBN(await contract.methods.getForeignFee().call())
+      const feeAmount = toBN(this._getValue(value))
+        .mul(fee)
+        .div(toBN(constants.MAX_FEE))
+      const finalAmount = toBN(this._getValue(value)).sub(feeAmount)
+
+      return finalAmount.toString()
+    } else {
+      return await super.estimateBtoA(value)
     }
   }
 }
