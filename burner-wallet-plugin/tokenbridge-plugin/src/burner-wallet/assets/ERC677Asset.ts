@@ -66,4 +66,14 @@ export default class ERC677Asset extends ERC20Asset {
       block = currentBlock
     }, this._pollInterval)
   }
+
+  async getTx(txHash) {
+    const historyEvents = this.core.getHistoryEvents({ asset: this.id })
+    const eventMatch = historyEvents.filter(e => e.tx === txHash)
+    if (eventMatch.length > 0) {
+      return eventMatch[0]
+    } else {
+      return super.getTx(txHash)
+    }
+  }
 }
