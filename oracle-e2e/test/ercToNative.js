@@ -75,11 +75,11 @@ describe('erc to native', () => {
         console.error(e)
       })
 
-    // check that balance is not increases
+    // check that balance does not increases
     await promiseRetry(async (retry, number) => {
       const balance = await homeWeb3.eth.getBalance(user.address)
-      // retry at least 4 times to check transfer is not double processed by the two watchers
-      if (toBN(balance).eq(toBN(originalBalanceOnHome)) || number < 4) {
+      // retry at least 4 times to check transfer is not processed
+      if (toBN(balance).eq(toBN(originalBalanceOnHome)) && number < 4) {
         retry()
       } else {
         assert(toBN(balance).eq(toBN(originalBalanceOnHome)), 'User balance should not be increased')
