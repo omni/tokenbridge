@@ -7,8 +7,7 @@ const {
   addValidator,
   initializeChaiToken,
   convertDaiToChai,
-  setMinDaiTokenBalance,
-  migrateToMCD
+  setMinDaiTokenBalance
 } = require('../utils')
 
 const baseUrl = ercToNativeBridge.monitor
@@ -34,43 +33,20 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
   it('should change balanceDiff', async function() {
     this.timeout(60000)
-    await sendTokens(foreignRPC.URL, user, ercToNativeBridge.halfDuplexToken, ercToNativeBridge.foreign)
+    await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance } = data.foreign
-      return (
-        data.balanceDiff === 0.01 &&
-        erc20Balance === '0.01' &&
-        halfDuplexErc20Balance === undefined &&
-        investedErc20Balance === undefined
-      )
+      const { erc20Balance, investedErc20Balance } = data.foreign
+      return data.balanceDiff === 0.01 && erc20Balance === '0.01' && investedErc20Balance === undefined
     })
 
-    await migrateToMCD(foreignRPC.URL, ercToNativeBridge.foreign)
+    await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance } = data.foreign
-      return (
-        data.balanceDiff === 0.01 &&
-        erc20Balance === '0.01' &&
-        halfDuplexErc20Balance === '0' &&
-        investedErc20Balance === undefined
-      )
-    })
-
-    await sendTokens(foreignRPC.URL, user, ercToNativeBridge.halfDuplexToken, ercToNativeBridge.foreign)
-
-    await waitUntil(async () => {
-      ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance } = data.foreign
-      return (
-        data.balanceDiff === 0.02 &&
-        erc20Balance === '0.01' &&
-        halfDuplexErc20Balance === '0.01' &&
-        investedErc20Balance === undefined
-      )
+      const { erc20Balance, investedErc20Balance } = data.foreign
+      return data.balanceDiff === 0.02 && erc20Balance === '0.02' && investedErc20Balance === undefined
     })
   })
 
@@ -89,11 +65,10 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
+      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.03 &&
         erc20Balance === '0.02' &&
-        halfDuplexErc20Balance === '0.01' &&
         investedErc20Balance === '0' &&
         accumulatedInterest === '0.001' // value of dsrBalance() is initially defined in genesis block as 0.001
       )
@@ -104,11 +79,10 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
+      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.03 &&
         erc20Balance === '0.01' &&
-        halfDuplexErc20Balance === '0.01' &&
         investedErc20Balance === '0.01' &&
         accumulatedInterest === '0.001'
       )
@@ -119,11 +93,10 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, halfDuplexErc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
+      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.03 &&
         erc20Balance === '0.005' &&
-        halfDuplexErc20Balance === '0.01' &&
         investedErc20Balance === '0.015' &&
         accumulatedInterest === '0.001'
       )
