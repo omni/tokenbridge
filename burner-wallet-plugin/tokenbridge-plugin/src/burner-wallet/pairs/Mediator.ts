@@ -71,12 +71,20 @@ export default class Mediator extends Bridge {
   }
 
   async getFeeAmount(web3, contract, value): Promise<BN> {
-    const feeManagerAddress = await contract.methods.feeManagerContract().call()
+    const feeManagerAddress = await this.getFeeManagerContract(contract)
     if (feeManagerAddress != ZERO_ADDRESS) {
       const feeManagerContract = new web3.eth.Contract(MEDIATOR_FEE_MANAGER_ABI, feeManagerAddress)
       return toBN(await feeManagerContract.methods.calculateFee(value).call())
     } else {
       return toBN(0)
+    }
+  }
+
+  async getFeeManagerContract(contract) {
+    try {
+      return await contract.methods.feeManagerContract().call()
+    } catch (e) {
+      return ZERO_ADDRESS
     }
   }
 }
