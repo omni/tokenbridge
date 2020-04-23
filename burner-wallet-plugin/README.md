@@ -36,3 +36,7 @@ Also, a private key can be set to start the wallet with the specified account `R
 2. Run `yarn start-testing` to start the wallet connected to Sokol & Kovan and interact with a test bridge
 that works on top of the AMB bridge.
 
+### Publish to npm
+In order to make this plugin accessible, it should be available as a npm package. Follow the [instructions](publish.md) to publish 
+the package to npm registry. 
+
