@@ -2,9 +2,15 @@
 
 This plugin defines a Bridge trading pair to be used in the Exchange Plugin.
 
-Bridge trading pairs supported:
+Bridge trading pairs and assets supported:
 * ETC - WETC Bridge
 
+It also provides some generic resources that can be used and extended:
+* **ERC677Asset** - A representation of an Erc677 token
+* **NativeMediatorAsset** - Represents a native token that interacts with a Mediator extension.
+* **Mediator Pair** - Represents an Exchange Pair that interacts with mediators extensions.
+* **TokenBridgeGateway** - A gateway to operate with ETC, POA Sokol and POA Core networks. 
+ 
 ### Usage
 
 ```javascript
