@@ -30,7 +30,7 @@ generate the `dist` folder.
 
 4. Update `version` in `tokenbridge/burner-wallet-plugin/tokenbridge-plugin/package.json`
 
-5. Run `yarn publish` and fill login information if required.
+5. Run `yarn publish --access public` and fill login information if required.
 The prompt will ask for the new version, complete it with the version from `package.json`
 
 More information in https://classic.yarnpkg.com/en/docs/publishing-a-package/
