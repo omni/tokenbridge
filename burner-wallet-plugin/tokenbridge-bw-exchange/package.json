@@ -30,5 +30,10 @@
     "type": "git",
     "url": "https://github.com/poanetwork/tokenbridge.git",
     "directory": "burner-wallet-plugin/tokenbridge-bw-exchange"
-  }
+  },
+  "homepage": "https://github.com/poanetwork/tokenbridge/burner-wallet-plugin/tokenbridge-bw-exchange",
+  "keywords": [
+    "tokenbridge",
+    "burner-wallet"
+  ]
 }
