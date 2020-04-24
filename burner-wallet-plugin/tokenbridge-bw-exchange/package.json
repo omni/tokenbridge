@@ -1,6 +1,6 @@
 {
-  "name": "tokenbridge-plugin",
-  "version": "1.0.0",
+  "name": "@poanet/tokenbridge-bw-exchange",
+  "version": "0.0.1",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,6 +29,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/poanetwork/tokenbridge.git",
-    "directory": "burner-wallet-plugin/tokenbridge-plugin"
+    "directory": "burner-wallet-plugin/tokenbridge-bw-exchange"
   }
 }

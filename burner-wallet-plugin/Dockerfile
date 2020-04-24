@@ -9,7 +9,7 @@ COPY burner-wallet-plugin/package.json ./burner-wallet-plugin/
 COPY burner-wallet-plugin/lerna.json ./burner-wallet-plugin/
 COPY burner-wallet-plugin/yarn.lock ./burner-wallet-plugin/
 COPY burner-wallet-plugin/tsconfig.json ./burner-wallet-plugin/
-COPY burner-wallet-plugin/tokenbridge-plugin/package.json ./burner-wallet-plugin/tokenbridge-plugin/
+COPY burner-wallet-plugin/tokenbridge-bw-exchange/package.json ./burner-wallet-plugin/tokenbridge-bw-exchange/
 COPY burner-wallet-plugin/staging/package.json ./burner-wallet-plugin/staging/
 COPY burner-wallet-plugin/testing/package.json ./burner-wallet-plugin/testing/
 COPY yarn.lock .
@@ -21,7 +21,7 @@ RUN mv ./contracts/build ./ && rm -rf ./contracts/* ./contracts/.[!.]* && mv ./b
 
 COPY ./commons ./commons
 
-COPY ./burner-wallet-plugin/tokenbridge-plugin ./burner-wallet-plugin/tokenbridge-plugin
+COPY ./burner-wallet-plugin/tokenbridge-bw-exchange ./burner-wallet-plugin/tokenbridge-bw-exchange
 RUN yarn build:plugin
 
 

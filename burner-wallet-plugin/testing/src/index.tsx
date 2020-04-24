@@ -6,7 +6,7 @@ import { InjectedSigner, LocalSigner } from '@burner-wallet/core/signers'
 import { InfuraGateway, InjectedGateway } from '@burner-wallet/core/gateways'
 import ModernUI from '@burner-wallet/modern-ui'
 import Exchange from '@burner-wallet/exchange'
-import { Mediator, sPOA, ERC677Asset, TokenBridgeGateway } from 'tokenbridge-plugin'
+import { Mediator, sPOA, ERC677Asset, TokenBridgeGateway } from '@poanet/tokenbridge-bw-exchange'
 import MetamaskPlugin from '@burner-wallet/metamask-plugin'
 
 let assetIdAtHome = 'assetAtHome'

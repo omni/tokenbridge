@@ -1,10 +1,10 @@
 ## Plugin Package Information
 
-The package to be published gets its configuration from `tokenbridge/burner-wallet-plugin/tokenbridge-plugin/package.json`
+The package to be published gets its configuration from `tokenbridge/burner-wallet-plugin/tokenbridge-bw-exchange/package.json`
 
 ```json
 {
-  "name": "tokenbridge-plugin",
+  "name": "tokenbridge-bw-exchange",
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,11 +24,11 @@ generate the `dist` folder.
 
 1. Create account in https://www.npmjs.com/
 
-2. Go to `tokenbridge/burner-wallet-plugin/tokenbridge-plugin/`
+2. Go to `tokenbridge/burner-wallet-plugin/tokenbridge-bw-exchange/`
 
 3. Run `yarn build`. Make sure it generates the `dist` folder
 
-4. Update `version` in `tokenbridge/burner-wallet-plugin/tokenbridge-plugin/package.json`
+4. Update `version` in `tokenbridge/burner-wallet-plugin/tokenbridge-bw-exchange/package.json`
 
 5. Run `yarn publish --access public` and fill login information if required.
 The prompt will ask for the new version, complete it with the version from `package.json`

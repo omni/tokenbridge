@@ -14,7 +14,7 @@ It also provides some generic resources that can be used and extended:
 ### Usage
 
 ```javascript
-import { Etc, Wetc, EtcGateway, WETCBridge } from 'tokenbridge-plugin'
+import { Etc, Wetc, EtcGateway, WETCBridge } from 'burner-wallet-plugin/tokenbridge-bw-exchange'
 
 const core = new BurnerCore({
   ...

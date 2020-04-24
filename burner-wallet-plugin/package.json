@@ -15,7 +15,7 @@
   "workspaces": [
     "staging",
     "testing",
-    "tokenbridge-plugin"
+    "tokenbridge-bw-exchange"
   ],
   "dependencies": {
     "@types/color": "3.0.0",
