@@ -1164,10 +1164,10 @@
     web3 "^1.2.2"
     web3-provider-engine "15.0.3"
 
-"@burner-wallet/exchange@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@burner-wallet/exchange/-/exchange-1.1.1.tgz#76e5663eb3be8ea6e753a40fc723c39b0539853d"
-  integrity sha512-VPuN31CcvWo3URvnadp7b8Lnm4+04lXRwuJoj0JqpPzURpR/pK/Tt6alc+BLehtKK2uzY+SRBEEDRlr20Tbs+A==
+"@burner-wallet/exchange@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@burner-wallet/exchange/-/exchange-1.1.3.tgz#18a3d6ad74e6b755318a390aa7936416aa614f05"
+  integrity sha512-8eWVhT5/Om0JmilsaaIRo4jDbsiTxMH+wwLOjJfZ868i0qIQmdwyvdKqk7PBNz+vwjt+tkpE5XTqRafGcZtyAg==
   dependencies:
     "@burner-wallet/types" "^1.0.0"
     "@types/react" "*"
@@ -1183,10 +1183,10 @@
     "@types/react" "*"
     styled-components "^4.4.0"
 
-"@burner-wallet/modern-ui@^1.0.5":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@burner-wallet/modern-ui/-/modern-ui-1.0.6.tgz#04db0b4e2c9f5eb330f320d1d04e631035e119f3"
-  integrity sha512-SpuudaNxVijSx3pooDQs/MA8krJk2oYdPtyOlKjk0yLU00KTT3MNecFNJBGZL4XqEJaBXh8glR1FzWwSrv096w==
+"@burner-wallet/modern-ui@^1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@burner-wallet/modern-ui/-/modern-ui-1.0.7.tgz#5ba6630844419e130c1ad8ea4f550a05685b58e8"
+  integrity sha512-yHI4O0cmZfqgB/82uS3BM0FtqNq7GUZgpyBNz0wMd6p/VrjzuaUGYA6lWndtoikaSBOVjE1dLUfwqV0Co+xO0Q==
   dependencies:
     "@burner-wallet/types" "^1.0.2"
     "@burner-wallet/ui-core" "^1.0.2"
@@ -1203,7 +1203,7 @@
     ethereumjs-util "^6.1.0"
     qrcode.react "^0.9.3"
     react-qr-reader "^2.2.1"
-    styled-components "^4.4.0"
+    styled-components "^5.0.1"
 
 "@burner-wallet/types@^1.0.0", "@burner-wallet/types@^1.0.2", "@burner-wallet/types@^1.0.6":
   version "1.0.6"
