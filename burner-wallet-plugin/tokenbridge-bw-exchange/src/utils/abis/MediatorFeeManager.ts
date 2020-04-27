@@ -17,5 +17,19 @@ export default [
     payable: false,
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'fee',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
   }
 ]

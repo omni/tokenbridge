@@ -2,7 +2,7 @@ import BN from 'bn.js'
 import { Bridge, EstimateReturn, ValueTypes } from '@burner-wallet/exchange'
 import { waitForEvent, constants } from '../../utils'
 import { MEDIATOR_ABI, MEDIATOR_FEE_MANAGER_ABI } from '../../utils'
-import { toBN } from 'web3-utils'
+import { fromWei, toBN } from 'web3-utils'
 
 interface MediatorConstructor {
   assetA: string
@@ -51,12 +51,13 @@ export default class Mediator extends Bridge {
     const userAmount = this._getValue(value)
 
     const contract = new web3.eth.Contract(MEDIATOR_ABI, this.assetBBridge)
-    const feeAmount = await this.getFeeAmount(web3, contract, userAmount)
+    const { feeAmount, feePercentage } = await this.getFee(web3, contract, userAmount)
     const finalAmount = toBN(userAmount).sub(feeAmount)
+    const estimateInfo = feeAmount.isZero() ? null : `${constants.ESTIMATE_FEE_MESSAGE} Fee: ${feePercentage}%`
 
     return {
       estimate: finalAmount.toString(),
-      estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+      estimateInfo
     }
   }
 
@@ -69,22 +70,32 @@ export default class Mediator extends Bridge {
     const userAmount = this._getValue(value)
 
     const contract = new web3.eth.Contract(MEDIATOR_ABI, this.assetABridge)
-    const feeAmount = await this.getFeeAmount(web3, contract, userAmount)
+    const { feeAmount, feePercentage } = await this.getFee(web3, contract, userAmount)
     const finalAmount = toBN(userAmount).sub(feeAmount)
+    const estimateInfo = feeAmount.isZero() ? null : `${constants.ESTIMATE_FEE_MESSAGE} Fee: ${feePercentage}%`
 
     return {
       estimate: finalAmount.toString(),
-      estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+      estimateInfo
     }
   }
 
-  async getFeeAmount(web3, contract, value): Promise<BN> {
+  async getFee(web3, contract, value): Promise<{ feeAmount: BN; feePercentage: number }> {
     const feeManagerAddress = await this.getFeeManagerContract(contract)
     if (feeManagerAddress != constants.ZERO_ADDRESS) {
       const feeManagerContract = new web3.eth.Contract(MEDIATOR_FEE_MANAGER_ABI, feeManagerAddress)
-      return toBN(await feeManagerContract.methods.calculateFee(value).call())
+      const fee = toBN(await feeManagerContract.methods.fee().call())
+      const feePercentage = Number(fromWei(fee, 'ether')) * 100
+      const feeAmount = toBN(await feeManagerContract.methods.calculateFee(value).call())
+      return {
+        feeAmount,
+        feePercentage
+      }
     } else {
-      return toBN(0)
+      return {
+        feeAmount: toBN(0),
+        feePercentage: 0
+      }
     }
   }
 

@@ -2,7 +2,7 @@ import { Mediator } from '../burner-wallet'
 import { HOME_NATIVE_TO_ERC_ABI, FOREIGN_NATIVE_TO_ERC_ABI } from '../utils'
 import { waitForEvent, isBridgeContract, constants } from '../utils'
 import { ValueTypes } from '@burner-wallet/exchange'
-import { toBN } from 'web3-utils'
+import { toBN, fromWei } from 'web3-utils'
 
 export default class WETCBridge extends Mediator {
   constructor() {
@@ -61,10 +61,12 @@ export default class WETCBridge extends Mediator {
         .mul(fee)
         .div(toBN(constants.MAX_FEE))
       const finalAmount = toBN(this._getValue(value)).sub(feeAmount)
+      const feePercentage = Number(fromWei(fee, 'ether')) * 100
+      const estimateInfo = feeAmount.isZero() ? null : `${constants.ESTIMATE_FEE_MESSAGE} Fee: ${feePercentage}%`
 
       return {
         estimate: finalAmount.toString(),
-        estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+        estimateInfo
       }
     } else {
       return await super.estimateAtoB(value)
@@ -85,10 +87,11 @@ export default class WETCBridge extends Mediator {
         .mul(fee)
         .div(toBN(constants.MAX_FEE))
       const finalAmount = toBN(this._getValue(value)).sub(feeAmount)
-
+      const feePercentage = Number(fromWei(fee, 'ether')) * 100
+      const estimateInfo = feeAmount.isZero() ? null : `${constants.ESTIMATE_FEE_MESSAGE} Fee: ${feePercentage}%`
       return {
         estimate: finalAmount.toString(),
-        estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+        estimateInfo
       }
     } else {
       return await super.estimateBtoA(value)
