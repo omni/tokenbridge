@@ -1,6 +1,5 @@
-import { HOME_NATIVE_TO_ERC_ABI } from '../../../../../commons'
 import NativeMediatorAsset from './NativeMediatorAsset'
-import { isBridgeContract } from '../../utils'
+import { isBridgeContract, HOME_NATIVE_TO_ERC_ABI } from '../../utils'
 
 class EtcNativeAsset extends NativeMediatorAsset {
   constructor(props) {

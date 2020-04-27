@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import { Bridge, EstimateReturn, ValueTypes } from '@burner-wallet/exchange'
 import { waitForEvent, constants } from '../../utils'
-import { MEDIATOR_ABI, MEDIATOR_FEE_MANAGER_ABI, ZERO_ADDRESS } from '../../../../../commons'
+import { MEDIATOR_ABI, MEDIATOR_FEE_MANAGER_ABI } from '../../utils'
 import { toBN } from 'web3-utils'
 
 interface MediatorConstructor {
@@ -80,7 +80,7 @@ export default class Mediator extends Bridge {
 
   async getFeeAmount(web3, contract, value): Promise<BN> {
     const feeManagerAddress = await this.getFeeManagerContract(contract)
-    if (feeManagerAddress != ZERO_ADDRESS) {
+    if (feeManagerAddress != constants.ZERO_ADDRESS) {
       const feeManagerContract = new web3.eth.Contract(MEDIATOR_FEE_MANAGER_ABI, feeManagerAddress)
       return toBN(await feeManagerContract.methods.calculateFee(value).call())
     } else {
@@ -92,7 +92,7 @@ export default class Mediator extends Bridge {
     try {
       return await contract.methods.feeManagerContract().call()
     } catch (e) {
-      return ZERO_ADDRESS
+      return constants.ZERO_ADDRESS
     }
   }
 }

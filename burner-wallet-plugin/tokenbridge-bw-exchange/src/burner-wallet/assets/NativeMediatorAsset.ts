@@ -1,6 +1,6 @@
 import { NativeAsset } from '@burner-wallet/assets'
 import { Contract, EventData } from 'web3-eth-contract'
-import { MEDIATOR_ABI } from '../../../../../commons'
+import { MEDIATOR_ABI } from '../../utils'
 
 interface NativeMediatorConstructor {
   mediatorAddress?: string
