@@ -3,6 +3,7 @@ const BN = require('bignumber.js')
 const Web3 = require('web3')
 const logger = require('./logger')('getBalances')
 const { BRIDGE_MODES } = require('../commons')
+const { blockNumberHalfDuplexDisabled } = require('./utils/tokenUtils')
 
 const Web3Utils = Web3.utils
 
@@ -94,7 +95,9 @@ async function main(bridgeMode) {
       if (halfDuplexTokenAddress !== erc20Address) {
         const halfDuplexToken = new web3Foreign.eth.Contract(ERC20_ABI, halfDuplexTokenAddress)
         logger.debug('calling halfDuplexToken.methods.balanceOf')
-        foreignHalfDuplexErc20Balance = await halfDuplexToken.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
+        foreignHalfDuplexErc20Balance = await halfDuplexToken.methods
+          .balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS)
+          .call(null, blockNumberHalfDuplexDisabled)
         logger.debug('getting last block numbers')
         const block = await web3Foreign.eth.getBlock('latest')
 
@@ -139,8 +142,7 @@ async function main(bridgeMode) {
     const foreignErc20BalanceBN = new BN(foreignErc20Balance)
     const investedAmountInDaiBN = new BN(investedAmountInDai)
     const bridgeDsrBalanceBN = new BN(bridgeDsrBalance)
-    const halfDuplexErc20BalanceBN =
-      displayHalfDuplexToken && tokenSwapAllowed ? new BN(foreignHalfDuplexErc20Balance) : new BN(0)
+    const halfDuplexErc20BalanceBN = displayHalfDuplexToken ? new BN(foreignHalfDuplexErc20Balance) : new BN(0)
 
     const diff = foreignErc20BalanceBN
       .plus(halfDuplexErc20BalanceBN)
