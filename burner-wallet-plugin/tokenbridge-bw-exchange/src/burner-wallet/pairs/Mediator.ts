@@ -1,6 +1,6 @@
 import BN from 'bn.js'
-import { Bridge, ValueTypes } from '@burner-wallet/exchange'
-import { waitForEvent } from '../../utils'
+import { Bridge, EstimateReturn, ValueTypes } from '@burner-wallet/exchange'
+import { waitForEvent, constants } from '../../utils'
 import { MEDIATOR_ABI, MEDIATOR_FEE_MANAGER_ABI, ZERO_ADDRESS } from '../../../../../commons'
 import { toBN } from 'web3-utils'
 
@@ -42,7 +42,8 @@ export default class Mediator extends Bridge {
     }
   }
 
-  async estimateAtoB(value: ValueTypes) {
+  // @ts-ignore
+  async estimateAtoB(value: ValueTypes): Promise<EstimateReturn> {
     const web3 = this.getExchange()
       .getAsset(this.assetB)
       .getWeb3()
@@ -53,10 +54,14 @@ export default class Mediator extends Bridge {
     const feeAmount = await this.getFeeAmount(web3, contract, userAmount)
     const finalAmount = toBN(userAmount).sub(feeAmount)
 
-    return finalAmount.toString()
+    return {
+      estimate: finalAmount.toString(),
+      estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+    }
   }
 
-  async estimateBtoA(value: ValueTypes) {
+  // @ts-ignore
+  async estimateBtoA(value: ValueTypes): Promise<EstimateReturn> {
     const web3 = this.getExchange()
       .getAsset(this.assetA)
       .getWeb3()
@@ -67,7 +72,10 @@ export default class Mediator extends Bridge {
     const feeAmount = await this.getFeeAmount(web3, contract, userAmount)
     const finalAmount = toBN(userAmount).sub(feeAmount)
 
-    return finalAmount.toString()
+    return {
+      estimate: finalAmount.toString(),
+      estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+    }
   }
 
   async getFeeAmount(web3, contract, value): Promise<BN> {

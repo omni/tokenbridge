@@ -5,7 +5,8 @@ export const wait = (time: number) => new Promise(resolve => setTimeout(resolve,
 
 export const constants = {
   EXCHANGE_TIMEOUT: 300000,
-  MAX_FEE: toWei('1', 'ether')
+  MAX_FEE: toWei('1', 'ether'),
+  ESTIMATE_FEE_MESSAGE: 'Estimation takes fee charges into consideration.'
 }
 
 export const waitForEvent = async (web3, contract: Contract, event: string, callback: Function) => {

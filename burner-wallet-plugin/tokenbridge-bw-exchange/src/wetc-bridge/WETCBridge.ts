@@ -62,7 +62,10 @@ export default class WETCBridge extends Mediator {
         .div(toBN(constants.MAX_FEE))
       const finalAmount = toBN(this._getValue(value)).sub(feeAmount)
 
-      return finalAmount.toString()
+      return {
+        estimate: finalAmount.toString(),
+        estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+      }
     } else {
       return await super.estimateAtoB(value)
     }
@@ -83,7 +86,10 @@ export default class WETCBridge extends Mediator {
         .div(toBN(constants.MAX_FEE))
       const finalAmount = toBN(this._getValue(value)).sub(feeAmount)
 
-      return finalAmount.toString()
+      return {
+        estimate: finalAmount.toString(),
+        estimateInfo: feeAmount.isZero() ? null : constants.ESTIMATE_FEE_MESSAGE
+      }
     } else {
       return await super.estimateBtoA(value)
     }
