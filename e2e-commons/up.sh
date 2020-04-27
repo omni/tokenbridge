@@ -8,6 +8,9 @@ docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
 
 startValidator () {
+    # make sure that old image tags are not cached
+    docker-compose $1 build
+
     docker-compose $1 run -d --name $4 redis
     docker-compose $1 run -d --name $5 rabbit
     docker-compose $1 run $2 $3 -d oracle yarn watcher:signature-request
