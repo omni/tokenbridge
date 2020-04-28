@@ -1144,7 +1144,7 @@
     isomorphic-fetch "^2.2.1"
     web3-utils "^1.2.2"
 
-"@burner-wallet/core@^1.0.0", "@burner-wallet/core@^1.1.0":
+"@burner-wallet/core@^1.0.0", "@burner-wallet/core@^1.1.0", "@burner-wallet/core@^1.1.9":
   version "1.1.9"
   resolved "https://registry.yarnpkg.com/@burner-wallet/core/-/core-1.1.9.tgz#2543755a60bf61715bd20b8e12019ace88b8f9a6"
   integrity sha512-KTuoPZL2Z5xg7E4iVY3/YIllO6QJLX1qYi+CaGRiEQcvcRMNT8hZFsFMQASPx6qZszPZUb6CxbhdQVJkPkWIbA==
