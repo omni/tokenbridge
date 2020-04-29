@@ -17,8 +17,7 @@
     "@burner-wallet/assets": "^1.1.10",
     "@burner-wallet/core": "^1.1.9",
     "@burner-wallet/exchange": "^1.1.4",
-    "@burner-wallet/types": "^1.0.6",
-    "@types/react": "*"
+    "@burner-wallet/types": "^1.0.6"
   },
   "devDependencies": {
     "@types/mocha": "^7.0.2",
