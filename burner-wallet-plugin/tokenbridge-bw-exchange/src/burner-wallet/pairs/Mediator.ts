@@ -42,7 +42,6 @@ export default class Mediator extends Bridge {
     }
   }
 
-  // @ts-ignore
   async estimateAtoB(value: ValueTypes): Promise<EstimateReturn> {
     const web3 = this.getExchange()
       .getAsset(this.assetB)
@@ -61,7 +60,6 @@ export default class Mediator extends Bridge {
     }
   }
 
-  // @ts-ignore
   async estimateBtoA(value: ValueTypes): Promise<EstimateReturn> {
     const web3 = this.getExchange()
       .getAsset(this.assetA)
