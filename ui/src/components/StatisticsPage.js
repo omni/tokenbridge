@@ -13,8 +13,8 @@ export class StatisticsPage extends React.Component {
   render() {
     const { homeStore, foreignStore, bridgeMode, web3Store } = this.props.RootStore
     const isNativeToErc = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC
-    const leftTitle = isNativeToErc ? 'Deposits' : 'Withdraws'
-    const rightTitle = isNativeToErc ? 'Withdraws' : 'Deposits'
+    const leftTitle = isNativeToErc ? 'Deposits' : 'Withdrawals'
+    const rightTitle = isNativeToErc ? 'Withdrawals' : 'Deposits'
     const { REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME, REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
     const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
 
@@ -56,9 +56,9 @@ export class StatisticsPage extends React.Component {
             <div className="statistics-withdraw-container">
               <span className="statistics-withdraw-title statistics-title">Tokens {rightTitle}</span>
               <TransactionsStatistics
-                txNumber={homeStore.statistics.finished ? homeStore.statistics.withdraws : ''}
+                txNumber={homeStore.statistics.finished ? homeStore.statistics.withdrawals : ''}
                 type={foreignStore.symbol}
-                value={homeStore.statistics.finished ? homeStore.statistics.withdrawsValue : ''}
+                value={homeStore.statistics.finished ? homeStore.statistics.withdrawalsValue : ''}
               />
             </div>
           </div>

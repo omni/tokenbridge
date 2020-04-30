@@ -113,8 +113,8 @@ class HomeStore {
   statistics = {
     deposits: 0,
     depositsValue: BN(0),
-    withdraws: 0,
-    withdrawsValue: BN(0),
+    withdrawals: 0,
+    withdrawalsValue: BN(0),
     totalBridged: BN(0),
     users: new Set(),
     finished: false
@@ -430,7 +430,7 @@ class HomeStore {
       const events = await getPastEvents(contract, deployedAtBlock, 'latest')
       processLargeArrayAsync(events, this.processEvent, () => {
         this.statistics.finished = true
-        this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawsValue)
+        this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawalsValue)
       })
     } catch (e) {
       console.error(e)
@@ -448,8 +448,8 @@ class HomeStore {
         BN(fromDecimals(event.returnValues.value, this.tokenDecimals))
       )
     } else if (event.event === 'AffirmationCompleted' || event.event === 'Withdraw') {
-      this.statistics.withdraws++
-      this.statistics.withdrawsValue = this.statistics.withdrawsValue.plus(
+      this.statistics.withdrawals++
+      this.statistics.withdrawalsValue = this.statistics.withdrawalsValue.plus(
         BN(fromDecimals(event.returnValues.value, this.tokenDecimals))
       )
     } else if (event.event === 'FeeDistributedFromSignatures') {
