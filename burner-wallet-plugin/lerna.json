@@ -1,0 +1,10 @@
+{
+  "packages": [
+    "basic-wallet",
+    "local-wallet",
+    "tokenbridge-bw-exchange"
+  ],
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "independent"
+}
