@@ -1,11 +1,12 @@
 {
   "name": "@poanet/tokenbridge-bw-exchange",
   "version": "0.0.3",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "/dist"
+    "/dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -31,7 +32,7 @@
     "url": "https://github.com/poanetwork/tokenbridge.git",
     "directory": "burner-wallet-plugin/tokenbridge-bw-exchange"
   },
-  "homepage": "https://github.com/poanetwork/tokenbridge/burner-wallet-plugin/tokenbridge-bw-exchange",
+  "homepage": "https://tokenbridge.net/",
   "keywords": [
     "tokenbridge",
     "burner-wallet"

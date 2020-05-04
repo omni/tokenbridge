@@ -1,37 +1,6 @@
 # TokenBridge Burner Wallet 2 Plugin
 
-This plugin defines a Bridge trading pair to be used in the Exchange Plugin.
-
-Bridge trading pairs and assets supported:
-* ETC - WETC Bridge
-
-It also provides some generic resources that can be used and extended:
-* **ERC677Asset** - A representation of an Erc677 token
-* **NativeMediatorAsset** - Represents a native token that interacts with a Mediator extension.
-* **Mediator Pair** - Represents an Exchange Pair that interacts with mediators extensions.
-* **TokenBridgeGateway** - A gateway to operate with ETC, POA Sokol and POA Core networks. 
-
-### Install package
-```
-yarn add @poanet/tokenbridge-bw-exchange
-```
- 
-### Usage
-
-```javascript
-import { Etc, Wetc, EtcGateway, WETCBridge } from '@poanet/tokenbridge-bw-exchange'
-
-const core = new BurnerCore({
-  ...
-  gateways: [new EtcGateway(), new InfuraGateway(process.env.REACT_APP_INFURA_KEY)],
-  assets: [Etc, Wetc]
-})
-
-const exchange = new Exchange({
-  pairs: [new WETCBridge()]
-})
-```
-
+Please refer to the [Plugin README](./tokenrbdige-bw-exchange/README.md) for resources provided, instructions to install and use the plugin.
 
 ### Setup
 1. [Initialize](../README.md#initializing-the-monorepository) the monorepository.
@@ -47,6 +16,25 @@ Also, a private key can be set to start the wallet with the specified account `R
 2. Run `yarn start-testing` to start the wallet connected to Sokol & Kovan and interact with a test bridge
 that works on top of the AMB bridge.
 
+### Docker Setup
+Docker can be used to build the services and run the testing and staging wallets.
+
+First you may want to create the `.env` files for testing and staging as mentioned before. This is optional before building the containers, variables can be passes later using `--env-file` or `--env` parameters in `docker run`.
+
+Build the services with docker-compose:
+```bash
+docker-compose build
+```
+
+### Run Burner Wallet with the plugin in Mainnet & Classic using Docker 
+```bash
+docker run -ti -p 8080:8080 -e PORT=8080 --rm burner-wallet-plugin_staging
+```
+
+### Run Burner Wallet with the plugin in Sokol & Kovan using Docker
+```bash
+docker run -ti -p 8080:8080 -e PORT=8080 --rm burner-wallet-plugin_testing
+```
 ### Publish to npm
 In order to make this plugin accessible, it should be available as a npm package. Follow the [instructions](publish.md) to publish 
 the package to npm registry. 
