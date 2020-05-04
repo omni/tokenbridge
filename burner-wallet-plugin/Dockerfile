@@ -2,7 +2,7 @@ FROM node:12 as plugin-base
 
 WORKDIR /mono
 COPY package.json .
-COPY contracts/package.json ./contracts/
+RUN mkdir -p contracts/node_modules
 
 COPY burner-wallet-plugin/package.json ./burner-wallet-plugin/
 COPY burner-wallet-plugin/lerna.json ./burner-wallet-plugin/
