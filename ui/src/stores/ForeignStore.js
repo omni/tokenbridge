@@ -239,58 +239,62 @@ class ForeignStore {
 
   @action
   async getEvents(fromBlock, toBlock) {
-    try {
-      fromBlock = fromBlock || this.filteredBlockNumber || this.latestBlockNumber - 50
-      toBlock = toBlock || this.filteredBlockNumber || 'latest'
+    fromBlock = fromBlock || this.filteredBlockNumber || this.latestBlockNumber - 50
+    toBlock = toBlock || this.filteredBlockNumber || 'latest'
 
-      if (fromBlock < 0) {
-        fromBlock = 0
-      }
+    if (fromBlock < 0) {
+      fromBlock = 0
+    }
 
-      let foreignEvents = await getPastEvents(this.foreignBridge, fromBlock, toBlock).catch(e => {
-        console.error("Couldn't get events", e)
-        return []
-      })
-
-      if (!this.filter) {
-        this.events = foreignEvents
-      }
-
-      if (this.waitingForConfirmation.size) {
-        const confirmationEvents = foreignEvents.filter(
-          event =>
-            event.event === 'RelayedMessage' && this.waitingForConfirmation.has(event.returnValues.transactionHash)
-        )
-        confirmationEvents.forEach(async event => {
-          const TxReceipt = await this.getTxReceipt(event.transactionHash)
-          if (TxReceipt && TxReceipt.logs && TxReceipt.logs.length > 1 && this.waitingForConfirmation.size) {
-            this.alertStore.setLoadingStepIndex(3)
-            const urlExplorer = this.getExplorerTxUrl(event.transactionHash)
-            const unitReceived = getUnit(this.rootStore.bridgeMode).unitForeign
-            setTimeout(() => {
-              this.alertStore.pushSuccess(
-                `${unitReceived} received on ${this.networkName} on Tx
-            <a href='${urlExplorer}' target='blank' style="overflow-wrap: break-word;word-wrap: break-word;">
-            ${event.transactionHash}</a>`,
-                this.alertStore.FOREIGN_TRANSFER_SUCCESS
-              )
-            }, 2000)
-            this.waitingForConfirmation.delete(event.returnValues.transactionHash)
-          }
+    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+      try {
+        let foreignEvents = await getPastEvents(this.foreignBridge, fromBlock, toBlock).catch(e => {
+          console.error("Couldn't get events", e)
+          return []
         })
 
-        if (confirmationEvents.length) {
-          removePendingTransaction()
+        if (!this.filter) {
+          this.events = foreignEvents
         }
-      }
 
-      return foreignEvents
-    } catch (e) {
-      this.alertStore.pushError(
-        `Cannot establish connection to Foreign Network.\n
+        if (this.waitingForConfirmation.size) {
+          const confirmationEvents = foreignEvents.filter(
+            event =>
+              event.event === 'RelayedMessage' && this.waitingForConfirmation.has(event.returnValues.transactionHash)
+          )
+          confirmationEvents.forEach(async event => {
+            const TxReceipt = await this.getTxReceipt(event.transactionHash)
+            if (TxReceipt && TxReceipt.logs && TxReceipt.logs.length > 1 && this.waitingForConfirmation.size) {
+              this.alertStore.setLoadingStepIndex(3)
+              const urlExplorer = this.getExplorerTxUrl(event.transactionHash)
+              const unitReceived = getUnit(this.rootStore.bridgeMode).unitForeign
+              setTimeout(() => {
+                this.alertStore.pushSuccess(
+                  `${unitReceived} received on ${this.networkName} on Tx
+            <a href='${urlExplorer}' target='blank' style="overflow-wrap: break-word;word-wrap: break-word;">
+            ${event.transactionHash}</a>`,
+                  this.alertStore.FOREIGN_TRANSFER_SUCCESS
+                )
+              }, 2000)
+              this.waitingForConfirmation.delete(event.returnValues.transactionHash)
+            }
+          })
+
+          if (confirmationEvents.length) {
+            removePendingTransaction()
+          }
+        }
+
+        return foreignEvents
+      } catch (e) {
+        this.alertStore.pushError(
+          `Cannot establish connection to Foreign Network.\n
                  Please make sure you have set it up in env variables`,
-        this.alertStore.FOREIGN_CONNECTION_ERROR
-      )
+          this.alertStore.FOREIGN_CONNECTION_ERROR
+        )
+      }
+    } else {
+      this.detectMediatorTransferFinished(fromBlock, toBlock)
     }
   }
 
@@ -379,30 +383,39 @@ class ForeignStore {
 
   @action
   async getValidators() {
-    try {
-      const foreignValidatorsAddress = await getValidatorContract(this.foreignBridge)
-      this.foreignBridgeValidators = new this.foreignWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
+    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+      try {
+        const foreignValidatorsAddress = await getValidatorContract(this.foreignBridge)
+        this.foreignBridgeValidators = new this.foreignWeb3.eth.Contract(
+          BRIDGE_VALIDATORS_ABI,
+          foreignValidatorsAddress
+        )
 
-      this.requiredSignatures = await getRequiredSignatures(this.foreignBridgeValidators)
-      this.validatorsCount = await getValidatorCount(this.foreignBridgeValidators)
+        this.requiredSignatures = await getRequiredSignatures(this.foreignBridgeValidators)
+        this.validatorsCount = await getValidatorCount(this.foreignBridgeValidators)
 
-      this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth)
-    } catch (e) {
-      console.error(e)
+        this.validators = await getValidatorList(foreignValidatorsAddress, this.foreignWeb3.eth)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 
   async getFeeEvents() {
-    try {
-      const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
-      const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
+    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+      try {
+        const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
+        const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
 
-      processLargeArrayAsync(events, this.processEvent, () => {
-        this.feeEventsFinished = true
-      })
-    } catch (e) {
-      console.error(e)
-      this.getFeeEvents()
+        processLargeArrayAsync(events, this.processEvent, () => {
+          this.feeEventsFinished = true
+        })
+      } catch (e) {
+        console.error(e)
+        this.getFeeEvents()
+      }
+    } else {
+      this.feeEventsFinished = true
     }
   }
 
@@ -415,6 +428,33 @@ class ForeignStore {
       this.feeManager.totalFeeDistributedFromAffirmation = this.feeManager.totalFeeDistributedFromAffirmation.plus(
         BN(fromDecimals(event.returnValues.feeAmount, this.tokenDecimals))
       )
+    }
+  }
+
+  async detectMediatorTransferFinished(fromBlock, toBlock) {
+    if (this.waitingForConfirmation.size > 0) {
+      try {
+        const events = await getPastEvents(this.foreignBridge, fromBlock, toBlock, 'TokensBridged')
+        const confirmationEvents = events.filter(event => this.waitingForConfirmation.has(event.returnValues.messageId))
+        if (confirmationEvents.length > 0) {
+          const event = confirmationEvents[0]
+          this.alertStore.setLoadingStepIndex(3)
+          const urlExplorer = this.getExplorerTxUrl(event.transactionHash)
+          const unitReceived = getUnit(this.rootStore.bridgeMode).unitForeign
+          this.waitingForConfirmation.delete(event.returnValues.messageId)
+          removePendingTransaction()
+          setTimeout(() => {
+            this.alertStore.pushSuccess(
+              `${unitReceived} received on ${this.networkName} on Tx
+            <a href='${urlExplorer}' target='blank' style="overflow-wrap: break-word;word-wrap: break-word;">
+            ${event.transactionHash}</a>`,
+              this.alertStore.FOREIGN_TRANSFER_SUCCESS
+            )
+          }, 2000)
+        }
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 }

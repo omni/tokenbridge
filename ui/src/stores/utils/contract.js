@@ -86,6 +86,15 @@ export const getForeignFee = async contract => {
   return new BN(fromWei(feeInWei.toString()))
 }
 
+export const getFee = async contract => {
+  try {
+    const feeInWei = await contract.methods.getFee().call()
+    return new BN(fromWei(feeInWei.toString()))
+  } catch (e) {
+    return new BN(0)
+  }
+}
+
 export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()
 
 export const getValidatorContract = contract => contract.methods.validatorContract().call()

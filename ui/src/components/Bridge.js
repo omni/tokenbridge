@@ -63,7 +63,7 @@ export class Bridge extends React.Component {
 
   async _sendToHome(amount) {
     const { web3Store, homeStore, alertStore, txStore, bridgeMode } = this.props.RootStore
-    const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC
+    const isErc677Token = bridgeMode === BRIDGE_MODES.ERC_TO_ERC || bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
     const { isLessThan, isGreaterThan } = this
     if (web3Store.metamaskNet.id.toString() !== web3Store.homeNet.id.toString()) {
       swal('Error', `Please switch wallet to ${web3Store.homeNet.name} network`, 'error')
@@ -98,7 +98,7 @@ export class Bridge extends React.Component {
     } else {
       try {
         alertStore.setLoading(true)
-        if (isErcToErcMode) {
+        if (isErc677Token) {
           return txStore.erc677transferAndCall({
             to: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
             from: web3Store.defaultAccount.address,
@@ -123,8 +123,9 @@ export class Bridge extends React.Component {
   }
 
   async _sendToForeign(amount) {
-    const { web3Store, foreignStore, alertStore, txStore } = this.props.RootStore
-    const isExternalErc20 = foreignStore.tokenType === ERC_TYPES.ERC20
+    const { web3Store, foreignStore, alertStore, txStore, bridgeMode } = this.props.RootStore
+    const isExternalErc20 =
+      foreignStore.tokenType === ERC_TYPES.ERC20 && bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
     const { isLessThan, isGreaterThan } = this
     if (web3Store.metamaskNet.id.toString() !== web3Store.foreignNet.id.toString()) {
       swal('Error', `Please switch wallet to ${web3Store.foreignNet.name} network`, 'error')
@@ -259,7 +260,7 @@ export class Bridge extends React.Component {
 
   loadHomeDetails = () => {
     const { web3Store, homeStore, bridgeMode } = this.props.RootStore
-    const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC
+    const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC || bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
     const isExternalErc20 = bridgeMode === BRIDGE_MODES.ERC_TO_ERC || bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
 
     const modalData = {
