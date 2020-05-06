@@ -1,0 +1,28 @@
+{
+  "name": "burner-wallet-plugin",
+  "description": "Burner Wallet 2 plugin",
+  "version": "1.0.0",
+  "license": "GPL-3.0-only",
+  "private": true,
+  "scripts": {
+    "install": "lerna bootstrap",
+    "build": "lerna run --ignore testing --ignore staging build --stream",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --ignore-path ../.eslintignore",
+    "start-staging": "lerna run --scope staging start --stream",
+    "start-testing": "lerna run --scope testing start --stream",
+    "test": "lerna run --ignore testing --ignore staging test --stream"
+  },
+  "workspaces": [
+    "staging",
+    "testing",
+    "tokenbridge-bw-exchange"
+  ],
+  "dependencies": {
+    "@types/color": "3.0.0",
+    "@typescript-eslint/eslint-plugin": "1.13.0",
+    "@typescript-eslint/parser": "1.13.0",
+    "eslint-plugin-react": "7.19.0",
+    "lerna": "3.16.4",
+    "typescript": "3.5.3"
+  }
+}

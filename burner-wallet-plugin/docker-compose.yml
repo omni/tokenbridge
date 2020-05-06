@@ -1,0 +1,17 @@
+---
+version: '2.4'
+services:
+  staging:
+    build:
+      context: ..
+      dockerfile: burner-wallet-plugin/Dockerfile
+      target: staging
+    environment:
+      - NODE_ENV=production
+  testing:
+    build:
+      context: ..
+      dockerfile: burner-wallet-plugin/Dockerfile
+      target: testing
+    environment:
+      - NODE_ENV=production
