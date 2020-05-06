@@ -29,8 +29,17 @@ function createDir(dirPath) {
   }
 }
 
+function readCacheFile(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath))
+  } catch (_) {
+    return false
+  }
+}
+
 module.exports = {
   readFile,
   writeFile,
-  createDir
+  createDir,
+  readCacheFile
 }
