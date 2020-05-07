@@ -21,6 +21,7 @@ In `group_vars/xdai.yml`
 ---
 MONITOR_BRIDGE_NAME: "xdai"
 MONITOR_PORT: 3003
+MONITOR_CACHE_EVENTS: "true"
 
 COMMON_HOME_RPC_URL: "https://dai.poa.network"
 COMMON_HOME_BRIDGE_ADDRESS: "0x7301CFA0e1756B71869E93d4e4Dca5c7d0eb0AA6"
@@ -64,6 +65,7 @@ In `group_vars/wetc.yml`
 ```
 ---
 MONITOR_BRIDGE_NAME: "wetc"
+MONITOR_CACHE_EVENTS: "true"
 
 COMMON_HOME_RPC_URL: "https://ethereumclassic.network"
 COMMON_HOME_BRIDGE_ADDRESS: "0x073081832B4Ecdce79d4D6753565c85Ba4b3BeA9"

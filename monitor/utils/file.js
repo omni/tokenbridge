@@ -15,8 +15,9 @@ async function readFile(filePath) {
   }
 }
 
-function writeFile(filePath, object) {
-  fs.writeFileSync(path.join(process.cwd(), filePath), JSON.stringify(object, null, 4))
+function writeFile(filePath, object, useCwd = true) {
+  const fullPath = useCwd ? path.join(process.cwd(), filePath) : filePath
+  fs.writeFileSync(fullPath, JSON.stringify(object, null, 4))
 }
 
 function createDir(dirPath) {
@@ -29,8 +30,17 @@ function createDir(dirPath) {
   }
 }
 
+function readCacheFile(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath))
+  } catch (_) {
+    return false
+  }
+}
+
 module.exports = {
   readFile,
   writeFile,
-  createDir
+  createDir,
+  readCacheFile
 }
