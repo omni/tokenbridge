@@ -10,7 +10,8 @@ import {
   getBridgeABIs,
   getTokenType,
   ERC20_BYTES32_ABI,
-  getDeployedAtBlock
+  getDeployedAtBlock,
+  isMediatorMode
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -246,7 +247,7 @@ class ForeignStore {
       fromBlock = 0
     }
 
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         let foreignEvents = await getPastEvents(this.foreignBridge, fromBlock, toBlock).catch(e => {
           console.error("Couldn't get events", e)
@@ -383,7 +384,7 @@ class ForeignStore {
 
   @action
   async getValidators() {
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         const foreignValidatorsAddress = await getValidatorContract(this.foreignBridge)
         this.foreignBridgeValidators = new this.foreignWeb3.eth.Contract(
@@ -402,7 +403,7 @@ class ForeignStore {
   }
 
   async getFeeEvents() {
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
         const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')

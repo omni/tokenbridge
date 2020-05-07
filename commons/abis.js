@@ -14,6 +14,8 @@ const HOME_AMB_ABI = require('../contracts/build/contracts/HomeAMB').abi
 const FOREIGN_AMB_ABI = require('../contracts/build/contracts/ForeignAMB').abi
 const BOX_ABI = require('../contracts/build/contracts/Box').abi
 const SAI_TOP = require('../contracts/build/contracts/SaiTopMock').abi
+const HOME_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeAMBErc677ToErc677').abi
+const FOREIGN_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignAMBErc677ToErc677').abi
 const HOME_STAKE_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeStakeTokenMediator').abi
 const FOREIGN_STAKE_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignStakeTokenMediator').abi
 
@@ -69,6 +71,9 @@ function getBridgeABIs(bridgeMode) {
   } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     HOME_ABI = HOME_AMB_ABI
     FOREIGN_ABI = FOREIGN_AMB_ABI
+  } else if (bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC) {
+    HOME_ABI = HOME_AMB_ERC_TO_ERC_ABI
+    FOREIGN_ABI = FOREIGN_AMB_ERC_TO_ERC_ABI
   } else if (bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
     HOME_ABI = HOME_STAKE_ERC_TO_ERC_ABI
     FOREIGN_ABI = FOREIGN_STAKE_ERC_TO_ERC_ABI

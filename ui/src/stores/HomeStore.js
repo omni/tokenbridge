@@ -12,7 +12,9 @@ import {
   getBridgeABIs,
   HOME_V1_ABI,
   ERC20_BYTES32_ABI,
-  getDeployedAtBlock
+  getDeployedAtBlock,
+  isErcToErcMode,
+  isMediatorMode
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -167,10 +169,7 @@ class HomeStore {
     }
     const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
     this.homeBridge = new this.homeWeb3.eth.Contract(HOME_ABI, this.COMMON_HOME_BRIDGE_ADDRESS)
-    if (
-      this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC ||
-      this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
-    ) {
+    if (isErcToErcMode(this.rootStore.bridgeMode)) {
       await this.getTokenInfo()
     } else if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
       await this.getBlockRewardContract()
@@ -245,10 +244,7 @@ class HomeStore {
   @action
   async getBalance() {
     try {
-      if (
-        this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC ||
-        this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
-      ) {
+      if (isErcToErcMode(this.rootStore.bridgeMode)) {
         this.balance = await getTotalSupply(this.tokenContract)
         this.web3Store.getWeb3Promise.then(async () => {
           this.userBalance = await getBalanceOf(this.tokenContract, this.web3Store.defaultAccount.address)
@@ -269,7 +265,7 @@ class HomeStore {
 
   @action
   async getFee() {
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       const feeManager = await getFeeManager(this.homeBridge)
       if (feeManager !== ZERO_ADDRESS) {
         const feeManagerModeHash = await getFeeManagerMode(this.homeBridge)
@@ -287,9 +283,13 @@ class HomeStore {
         this.feeManager.homeFee = new BN(0)
         this.feeManager.foreignFee = new BN(0)
       }
-    } else {
+    } else if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
       this.feeManager.feeManagerMode = FEE_MANAGER_MODE.ONE_DIRECTION_STAKE
       this.feeManager.homeFee = await getFee(this.homeBridge)
+      this.feeManager.foreignFee = new BN(0)
+    } else {
+      this.feeManager.feeManagerMode = FEE_MANAGER_MODE.UNDEFINED
+      this.feeManager.homeFee = new BN(0)
       this.feeManager.foreignFee = new BN(0)
     }
   }
@@ -303,7 +303,7 @@ class HomeStore {
       fromBlock = 0
     }
 
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         let events = await getPastEvents(this.homeBridge, fromBlock, toBlock).catch(e => {
           console.error("Couldn't get events", e)
@@ -423,7 +423,7 @@ class HomeStore {
 
   @action
   async getValidators() {
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         const homeValidatorsAddress = await getValidatorContract(this.homeBridge)
         this.homeBridgeValidators = new this.homeWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorsAddress)
@@ -439,7 +439,7 @@ class HomeStore {
   }
 
   async getStatistics() {
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
         const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
@@ -483,7 +483,7 @@ class HomeStore {
   }
 
   calculateCollectedFees() {
-    if (this.rootStore.bridgeMode !== BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
       if (
         !this.statistics.finished ||
         !this.rootStore.foreignStore.feeEventsFinished ||
@@ -515,7 +515,7 @@ class HomeStore {
 
       this.depositFeeCollected.finished = true
       this.withdrawFeeCollected.finished = true
-    } else {
+    } else if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
       // Calculate historic collected fees for Stake Token
     }
   }
@@ -525,10 +525,7 @@ class HomeStore {
   }
 
   getDisplayedBalance() {
-    return this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC ||
-      this.rootStore.bridgeMode == BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
-      ? this.userBalance
-      : this.web3Store.defaultAccount.homeBalance
+    return isErcToErcMode(this.rootStore.bridgeMode) ? this.userBalance : this.web3Store.defaultAccount.homeBalance
   }
 
   async getBlockRewardContract() {

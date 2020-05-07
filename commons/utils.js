@@ -14,6 +14,8 @@ function decodeBridgeMode(bridgeModeHash) {
       return BRIDGE_MODES.ARBITRARY_MESSAGE
     case '0x16ea01e9':
       return BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
+    case '0x76595b56':
+      return BRIDGE_MODES.AMB_ERC_TO_ERC
     default:
       throw new Error(`Unrecognized bridge mode hash: '${bridgeModeHash}'`)
   }
@@ -59,6 +61,18 @@ const getTokenType = async (bridgeTokenContract, bridgeAddress) => {
       return ERC_TYPES.ERC20
     }
   }
+}
+
+const isErcToErcMode = bridgeMode => {
+  return (
+    bridgeMode === BRIDGE_MODES.ERC_TO_ERC ||
+    bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC ||
+    bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
+  )
+}
+
+const isMediatorMode = bridgeMode => {
+  return bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC || bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
 }
 
 const getUnit = bridgeMode => {
@@ -274,5 +288,7 @@ module.exports = {
   normalizeGasPrice,
   gasPriceFromSupplier,
   gasPriceFromContract,
-  gasPriceWithinLimits
+  gasPriceWithinLimits,
+  isErcToErcMode,
+  isMediatorMode
 }
