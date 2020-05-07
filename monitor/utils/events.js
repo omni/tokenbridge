@@ -36,7 +36,7 @@ const web3Foreign = new Web3(foreignProvider)
 
 const { getBlockNumber } = require('./contract')
 
-const cacheFilePath = './cachedEvents.json'
+const cacheFilePath = '/tmp/cachedEvents.json'
 async function main(mode) {
   if (MONITOR_CACHE_EVENTS === 'true') {
     logger.debug('checking existing events cache')
