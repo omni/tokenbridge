@@ -27,8 +27,8 @@ export const getCurrentLimit = async (contract, decimals) => {
   }
 }
 
-export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents') =>
-  commonGetPastEvents(contract, { fromBlock, toBlock, event })
+export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents', options = {}) =>
+  commonGetPastEvents(contract, { fromBlock, toBlock, event, options })
 
 export const getErc677TokenAddress = contract => contract.methods.erc677token().call()
 

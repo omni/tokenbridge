@@ -12,6 +12,7 @@ import { FeeStatistics } from './FeeStatistics'
 export class StatisticsPage extends React.Component {
   render() {
     const { homeStore, foreignStore, bridgeMode, web3Store } = this.props.RootStore
+    const statisticsReady = homeStore.statistics.finished && foreignStore.statistics.finished
     const isNativeToErc = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC
     const leftTitle = isNativeToErc ? 'Deposits' : 'Withdrawals'
     const rightTitle = isNativeToErc ? 'Withdrawals' : 'Deposits'
@@ -27,8 +28,8 @@ export class StatisticsPage extends React.Component {
           <div className="statistics-bridge-container">
             <span className="statistics-bridge-title statistics-title">Bridge Statistics</span>
             <BridgeStatistics
-              users={homeStore.statistics.finished ? homeStore.statistics.users.size : ''}
-              totalBridged={homeStore.statistics.finished ? homeStore.statistics.totalBridged.toString() : ''}
+              users={statisticsReady ? homeStore.statistics.users.size : ''}
+              totalBridged={statisticsReady ? homeStore.statistics.totalBridged.toString() : ''}
               homeBalance={homeStore.balance}
               homeSymbol={homeStore.symbol}
               homeNativeSupplyTitle={isNativeToErc}
@@ -48,17 +49,17 @@ export class StatisticsPage extends React.Component {
             <div className="statistics-deposit-container">
               <span className="statistics-deposit-title statistics-title">Tokens {leftTitle}</span>
               <TransactionsStatistics
-                txNumber={homeStore.statistics.finished ? homeStore.statistics.deposits : ''}
+                txNumber={statisticsReady ? homeStore.statistics.deposits : ''}
                 type={foreignStore.symbol}
-                value={homeStore.statistics.finished ? homeStore.statistics.depositsValue : ''}
+                value={statisticsReady ? homeStore.statistics.depositsValue : ''}
               />
             </div>
             <div className="statistics-withdraw-container">
               <span className="statistics-withdraw-title statistics-title">Tokens {rightTitle}</span>
               <TransactionsStatistics
-                txNumber={homeStore.statistics.finished ? homeStore.statistics.withdrawals : ''}
+                txNumber={statisticsReady ? homeStore.statistics.withdrawals : ''}
                 type={foreignStore.symbol}
-                value={homeStore.statistics.finished ? homeStore.statistics.withdrawalsValue : ''}
+                value={statisticsReady ? homeStore.statistics.withdrawalsValue : ''}
               />
             </div>
           </div>

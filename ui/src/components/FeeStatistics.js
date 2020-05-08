@@ -10,7 +10,7 @@ export const FeeStatistics = ({ depositFeeCollected, withdrawFeeCollected }) => 
     <div className="statistics-fee-data" data-testid="fee-statistics-data">
       {depositFeeCollected.shouldDisplay && (
         <DataBlock
-          description="Deposit Fees"
+          description={depositFeeCollected.title ? depositFeeCollected.title : 'Deposit Fees'}
           value={numeral(depositFeeCollected.value).format('0,0.00 a', Math.floor)}
           type={depositFeeCollected.type}
           dataTestid="deposit-fees-block"
@@ -19,7 +19,7 @@ export const FeeStatistics = ({ depositFeeCollected, withdrawFeeCollected }) => 
       {depositFeeCollected.shouldDisplay && withdrawFeeCollected.shouldDisplay && <div className="separator" />}
       {withdrawFeeCollected.shouldDisplay && (
         <DataBlock
-          description="Withdrawal Fees"
+          description={withdrawFeeCollected.title ? withdrawFeeCollected.title : 'Withdrawal Fees'}
           value={numeral(withdrawFeeCollected.value).format('0,0.00 a', Math.floor)}
           type={withdrawFeeCollected.type}
           dataTestid="withdrawal-fees-block"

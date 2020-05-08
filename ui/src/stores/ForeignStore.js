@@ -11,7 +11,8 @@ import {
   getTokenType,
   ERC20_BYTES32_ABI,
   getDeployedAtBlock,
-  isMediatorMode
+  isMediatorMode,
+  HOME_V1_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -104,6 +105,11 @@ class ForeignStore {
   @observable
   tokenType = ''
 
+  @observable
+  statistics = {
+    finished: false
+  }
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
@@ -143,6 +149,7 @@ class ForeignStore {
     this.getCurrentLimit()
     this.getFee()
     this.getValidators()
+    this.getStatistics()
     this.getFeeEvents()
     setInterval(() => {
       this.getBlockNumber()
@@ -400,6 +407,35 @@ class ForeignStore {
         console.error(e)
       }
     }
+  }
+
+  async getStatistics() {
+    try {
+      if (isMediatorMode(this.rootStore.bridgeMode)) {
+        const events = await getPastEvents(this.foreignBridge, 0, 'latest', 'TokensBridged')
+        processLargeArrayAsync(events, this.processMediatorEvent, () => {
+          this.statistics.finished = true
+          this.rootStore.homeStore.statistics.totalBridged = this.rootStore.homeStore.statistics.totalBridged.plus(
+            this.rootStore.homeStore.statistics.withdrawalsValue
+          )
+        })
+      } else {
+        this.statistics.finished = true
+      }
+    } catch (e) {
+      console.error(e)
+      this.getStatistics()
+    }
+  }
+
+  processMediatorEvent = event => {
+    if (event.returnValues && event.returnValues.recipient) {
+      this.rootStore.homeStore.statistics.users.add(event.returnValues.recipient)
+    }
+    this.rootStore.homeStore.statistics.withdrawals++
+    this.rootStore.homeStore.statistics.withdrawalsValue = this.rootStore.homeStore.statistics.withdrawalsValue.plus(
+      BN(fromDecimals(event.returnValues.value, this.tokenDecimals))
+    )
   }
 
   async getFeeEvents() {

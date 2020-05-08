@@ -124,11 +124,15 @@ class HomeStore {
   }
 
   @observable
+  feeEventsFinished = false
+
+  @observable
   depositFeeCollected = {
     value: BN(0),
     type: '',
     shouldDisplay: false,
-    finished: false
+    finished: false,
+    title: ''
   }
 
   @observable
@@ -136,7 +140,8 @@ class HomeStore {
     value: BN(0),
     type: '',
     shouldDisplay: false,
-    finished: false
+    finished: false,
+    title: ''
   }
 
   feeManager = {
@@ -183,6 +188,7 @@ class HomeStore {
     this.getFee()
     this.getValidators()
     this.getStatistics()
+    this.getFeeEvents()
     this.calculateCollectedFees()
     setInterval(() => {
       this.getEvents()
@@ -439,8 +445,8 @@ class HomeStore {
   }
 
   async getStatistics() {
-    if (!isMediatorMode(this.rootStore.bridgeMode)) {
-      try {
+    try {
+      if (!isMediatorMode(this.rootStore.bridgeMode)) {
         const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
         const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
         const abi = [...HOME_V1_ABI, ...HOME_ABI]
@@ -448,12 +454,18 @@ class HomeStore {
         const events = await getPastEvents(contract, deployedAtBlock, 'latest')
         processLargeArrayAsync(events, this.processEvent, () => {
           this.statistics.finished = true
+          this.statistics.totalBridged = this.statistics.totalBridged.plus(this.statistics.depositsValue)
+        })
+      } else {
+        const events = await getPastEvents(this.homeBridge, 0, 'latest', 'TokensBridged')
+        processLargeArrayAsync(events, this.processMediatorEvent, () => {
+          this.statistics.finished = true
           this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawalsValue)
         })
-      } catch (e) {
-        console.error(e)
-        this.getStatistics()
       }
+    } catch (e) {
+      console.error(e)
+      this.getStatistics()
     }
   }
 
@@ -482,42 +494,82 @@ class HomeStore {
     }
   }
 
-  calculateCollectedFees() {
-    if (!isMediatorMode(this.rootStore.bridgeMode)) {
-      if (
-        !this.statistics.finished ||
-        !this.rootStore.foreignStore.feeEventsFinished ||
-        !this.feeManager.feeManagerMode ||
-        !this.rootStore.foreignStore.feeManager.feeManagerMode
-      ) {
-        setTimeout(() => {
-          this.calculateCollectedFees()
-        }, 1000)
-        return
-      }
-
-      const data = getRewardableData(this.feeManager, this.rootStore.foreignStore.feeManager)
-
-      this.depositFeeCollected.type = data.depositSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
-      this.withdrawFeeCollected.type = data.withdrawSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
-      this.depositFeeCollected.shouldDisplay = data.displayDeposit
-      this.withdrawFeeCollected.shouldDisplay = data.displayWithdraw
-
-      this.depositFeeCollected.value =
-        data.depositSymbol === 'home'
-          ? this.feeManager.totalFeeDistributedFromSignatures
-          : this.rootStore.foreignStore.feeManager.totalFeeDistributedFromSignatures
-
-      this.withdrawFeeCollected.value =
-        data.withdrawSymbol === 'home'
-          ? this.feeManager.totalFeeDistributedFromAffirmation
-          : this.rootStore.foreignStore.feeManager.totalFeeDistributedFromAffirmation
-
-      this.depositFeeCollected.finished = true
-      this.withdrawFeeCollected.finished = true
-    } else if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
-      // Calculate historic collected fees for Stake Token
+  processMediatorEvent = event => {
+    if (event.returnValues && event.returnValues.recipient) {
+      this.statistics.users.add(event.returnValues.recipient)
     }
+    this.statistics.deposits++
+    this.statistics.depositsValue = this.statistics.depositsValue.plus(
+      BN(fromDecimals(event.returnValues.value, this.tokenDecimals))
+    )
+  }
+
+  async getFeeEvents() {
+    try {
+      if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+        const blockRewardAddress = await getBlockRewardContract(this.homeBridge)
+        const blockRewardContract = new this.homeWeb3.eth.Contract(BLOCK_REWARD_ABI, blockRewardAddress)
+        const events = await getPastEvents(blockRewardContract, 0, 'latest', 'BridgeTokenRewardAdded', {
+          filter: {
+            bridge: this.COMMON_HOME_BRIDGE_ADDRESS
+          }
+        })
+
+        processLargeArrayAsync(events, this.processFeeEvents, () => {
+          this.feeEventsFinished = true
+        })
+      } else {
+        this.feeEventsFinished = true
+      }
+    } catch (e) {
+      console.error(e)
+      this.getFeeEvents()
+    }
+  }
+
+  processFeeEvents = event => {
+    this.feeManager.totalFeeDistributedFromSignatures = this.feeManager.totalFeeDistributedFromSignatures.plus(
+      BN(fromDecimals(event.returnValues.amount, this.tokenDecimals))
+    )
+  }
+
+  calculateCollectedFees() {
+    if (
+      !this.statistics.finished ||
+      !this.feeEventsFinished ||
+      !this.rootStore.foreignStore.feeEventsFinished ||
+      !this.feeManager.feeManagerMode ||
+      !this.rootStore.foreignStore.feeManager.feeManagerMode
+    ) {
+      setTimeout(() => {
+        this.calculateCollectedFees()
+      }, 1000)
+      return
+    }
+
+    const data = getRewardableData(this.feeManager, this.rootStore.foreignStore.feeManager)
+
+    this.depositFeeCollected.type = data.depositSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
+    this.withdrawFeeCollected.type = data.withdrawSymbol === 'home' ? this.symbol : this.rootStore.foreignStore.symbol
+    this.depositFeeCollected.shouldDisplay = data.displayDeposit
+    this.withdrawFeeCollected.shouldDisplay = data.displayWithdraw
+
+    this.depositFeeCollected.value =
+      data.depositSymbol === 'home'
+        ? this.feeManager.totalFeeDistributedFromSignatures
+        : this.rootStore.foreignStore.feeManager.totalFeeDistributedFromSignatures
+
+    this.withdrawFeeCollected.value =
+      data.withdrawSymbol === 'home'
+        ? this.feeManager.totalFeeDistributedFromAffirmation
+        : this.rootStore.foreignStore.feeManager.totalFeeDistributedFromAffirmation
+
+    if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+      this.depositFeeCollected.title = 'Withdrawal Fees'
+    }
+
+    this.depositFeeCollected.finished = true
+    this.withdrawFeeCollected.finished = true
   }
 
   getDailyQuotaCompleted() {
