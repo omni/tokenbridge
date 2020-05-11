@@ -69,10 +69,31 @@ async function getEvents({ contract, event, fromBlock, toBlock, filter }) {
   }
 }
 
+async function getEventsFromTx({ web3, contract, event, txHash, filter }) {
+  try {
+    const contractAddress = contract.options.address
+    logger.info({ contractAddress, event, txHash }, 'Getting past events for specific transaction')
+    const { logs } = await web3.eth.getTransactionReceipt(txHash)
+    const eventAbi = contract.options.jsonInterface.find(abi => abi.name === event)
+    const decodeAbi = contract._decodeEventABI.bind(eventAbi)
+    const pastEvents = logs.map(decodeAbi).filter(event =>
+      eventAbi.inputs.every(arg => {
+        const encodeParam = param => web3.eth.abi.encodeParameter(arg.type, param)
+        return !filter[arg.name] || encodeParam(filter[arg.name]) === encodeParam(event.returnValues[arg.name])
+      })
+    )
+    logger.debug({ contractAddress, event, count: pastEvents.length }, 'Past events obtained')
+    return pastEvents
+  } catch (e) {
+    throw new Error(`${event} events cannot be obtained`)
+  }
+}
+
 module.exports = {
   getNonce,
   getBlockNumber,
   getChainId,
   getRequiredBlockConfirmations,
-  getEvents
+  getEvents,
+  getEventsFromTx
 }
