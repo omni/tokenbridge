@@ -9,7 +9,8 @@ export const BridgeStatistics = ({
   homeNativeSupplyTitle,
   foreignSupply,
   homeSymbol,
-  foreignSymbol
+  foreignSymbol,
+  displayNetworkTokenSupply
 }) => (
   <div className="statistics-bridge-data">
     <DataBlock description="Users" value={numeral(users).format('0,0')} type="" />
@@ -21,7 +22,13 @@ export const BridgeStatistics = ({
     />
     <div className="separator" />
     <DataBlock
-      description={homeNativeSupplyTitle ? `Native Coins Amount` : `Totally minted by the bridge`}
+      description={
+        displayNetworkTokenSupply
+          ? `${homeSymbol} Tokens Amount`
+          : homeNativeSupplyTitle
+            ? `Native Coins Amount`
+            : `Totally minted by the bridge`
+      }
       value={numeral(homeBalance).format('0.00 a', Math.floor)}
       type={homeSymbol}
     />

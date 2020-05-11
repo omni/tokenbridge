@@ -1,6 +1,6 @@
 import React from 'react'
 import yn from './utils/yn'
-import { BRIDGE_MODES } from '../../../commons'
+import { BRIDGE_MODES, isErcToErcMode } from '../../../commons'
 import { BridgeStatistics } from './index'
 import { Redirect } from 'react-router'
 import { TransactionsStatistics } from './TransactionsStatistics'
@@ -35,6 +35,7 @@ export class StatisticsPage extends React.Component {
               homeNativeSupplyTitle={isNativeToErc}
               foreignSymbol={foreignStore.symbol}
               foreignSupply={foreignStore.totalSupply}
+              displayNetworkTokenSupply={isErcToErcMode(bridgeMode)}
             />
           </div>
           {homeStore.depositFeeCollected.finished &&
