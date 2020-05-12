@@ -126,7 +126,7 @@ async function main(bridgeMode) {
       .minus(totalSupplyBN)
       .toFixed()
 
-    let foreign = {
+    const foreign = {
       erc20Balance: Web3Utils.fromWei(foreignErc20Balance)
     }
 
