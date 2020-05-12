@@ -140,59 +140,7 @@
     cursor: default;
     pointer-events: none;
   }
-/*
-  &#{ & }-core {
-    color: #fff;
 
-    &:active,
-    &.active {
-      background-color: darken($poa-purple-darker, 10%);
-
-      @media (min-width: $tablet-width) {
-        background-color: transparent;
-      }
-    }
-  }
-
-  &#{ & }-sokol {
-    color: #fff;
-
-    &:active,
-    &.active {
-      background-color: darken($sokol-cyan-darker, 10%);
-
-      @media (min-width: $tablet-width) {
-        background-color: transparent;
-      }
-    }
-  }
-
-  &#{ & }-dai {
-    color: #fff;
-
-    &:active,
-    &.active {
-      background-color: darken($xdai-gray-darker, 10%);
-
-      @media (min-width: $tablet-width) {
-        background-color: transparent;
-      }
-    }
-  }
-
-  &#{ & }-kovan {
-    color: #fff;
-
-    &:active,
-    &.active {
-      background-color: darken(#fff, 10%);
-
-      @media (min-width: $tablet-width) {
-        background-color: transparent;
-      }
-    }
-  }
-*/
   .hd-MobileMenuLinks & {
     display: flex;
     flex-grow: 1;
