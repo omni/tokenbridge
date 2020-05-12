@@ -30,7 +30,7 @@ export class DailyQuotaModal extends React.Component {
     const { web3Store, homeStore, foreignStore } = this.props.RootStore
     const { left, top } = this.state
 
-    const isHome = web3Store.metamaskNet.id.toString() === web3Store.homeNet.id.toString()
+    const isHome = web3Store.isSelectedNetwork(web3Store.homeNet.id)
     const value = isHome ? homeStore.maxCurrentDeposit : foreignStore.maxCurrentDeposit
     const limit = isHome ? homeStore.maxPerTx : foreignStore.maxPerTx
     const from = isHome ? homeStore.symbol : foreignStore.symbol

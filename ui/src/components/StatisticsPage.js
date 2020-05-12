@@ -16,7 +16,7 @@ export class StatisticsPage extends React.Component {
     const leftTitle = isNativeToErc ? 'Deposits' : 'Withdraws'
     const rightTitle = isNativeToErc ? 'Withdraws' : 'Deposits'
     const { REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME, REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
-    const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
+    const withoutEvents = web3Store.isSelectedNetwork(web3Store.homeNet.id) ? yn(HOME) : yn(FOREIGN)
 
     return withoutEvents ? (
       <Redirect to="/" />

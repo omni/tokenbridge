@@ -60,11 +60,11 @@ const networks = {
   4: 'Rinkeby',
   30: 'RSK Mainnet',
   31: 'RSK Testnet',
-  42: 'Kovan',
+  42: 'Kovan Testnet',
   61: 'Ethereum Classic',
-  77: 'Sokol',
+  77: 'Sokol Testnet',
   99: 'POA Network',
-  100: 'Dai Chain'
+  100: 'xDai Chain'
 }
 
 export const getNetworkName = id => networks[id] || 'Unknown'
