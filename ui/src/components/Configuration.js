@@ -20,7 +20,7 @@ export const Configuration = ({ requiredSignatures, authorities, symbol, maxSing
           type={symbol}
         />
       )}
-    {maxSingleDeposit && maxSingleDeposit !== '0' && <div className="separator" />}
+    {maxSingleDeposit && maxSingleDeposit !== '0' && authorities.toString() !== '0' && <div className="separator" />}
     {maxSingleDeposit &&
       maxSingleDeposit !== '0' && (
         <DataBlock

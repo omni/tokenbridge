@@ -32,7 +32,7 @@
 
       .status-configuration-data {
         display: flex;
-        justify-content: space-evenly;
+        justify-content: space-around;
 
         @media screen and (max-width: $tablet-width) {
           column-gap: 30px;

@@ -71,7 +71,6 @@ export class StatusPage extends React.Component {
               <span className="status-configuration-title status-title">Latest Operations</span>
               <div className="status-configuration-data">
                 <DataBlock description={fromHomeToForeignText} value={lastEventOnForeign} type="" />
-                <div className="separator" />
                 <DataBlock description={fromForeignToHomeText} value={lastEventOnHome} type="" />
               </div>
             </div>
