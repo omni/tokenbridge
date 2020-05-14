@@ -1,93 +1,93 @@
-$theme-name: 'ethereum-classic';
+$theme-name: 'stake';
 
 // base colors
-$primary-color: #31f896;
-$primary-color-dark: #352d59;
-$primary-color-darker: #17132b;
-$secondary-color: #2be187;
+$primary-color: #5c34a2;
+$primary-color-dark: #F5F7F9;
+$primary-color-darker: #45277a;
+$secondary-color: #60db97;
 $secondary-color-dark: #64a231;
 $tertiary-color: #ffaa07;
 $danger-color: #f13662;
 $blue-color: #3ab9fe;
 
-$text-color: #fff;
-$link-color: $secondary-color;
+$text-color: #333;
+$link-color: $primary-color;
 
-$gradient-color-1: #352d59;
-$gradient-color-2: #352d59;
+$gradient-color-1: $primary-color;
+$gradient-color-2: #7b5ab2;
 
 // main
-$main-background-color: #17132b;
+$main-background-color: #F5F7F9;
 $main-font-family: 'Nunito', sans-serif;
 
 // header
-$header-background-color: #221c3f;
-$header-logo-width: 224px;
-$header-logo-height: 41px;
+$header-background-color: #fff;
+$header-logo-width: 180px;
+$header-logo-height: 26px;
 
 // header menu
-$header-menu-icon-color: $primary-color;
-$header-menu-text-color: #fff;
+$header-menu-icon-color: #9EAAB6;
+$header-menu-text-color: #242A31;
 
 // daily quota
-$wallet-text: #fff;
-$daily-quota-background: rgba(255, 255, 255, 0.2);
-$daily-quota-progress: $primary-color;
+$wallet-text: #3C454E;
+$daily-quota-background: #DBE0E5;
+$daily-quota-progress: #9EAAB6;
 
 // footer
-$footer-background-color: #221c3f;
-$footer-logo-width: 158px;
-$footer-logo-height: 29px;
+$footer-background-color: $primary-color;
+$footer-logo-width: 130px;
+$footer-logo-height: 18px;
 $footer-text-color: #fff;
 
 // separator
-$separator-color: #333;
+$separator-color: #e4e4e4;
 
 // background
 $pattern-background-image: $base-images-path + '/themes/' + $theme-name + '/background/bg-pattern.svg';
 
 // social icons
-$social-icons-background-color: #343053;
-$social-icons-icon-color: #b9b0e1;
+$social-icons-background-color: #fff;
+$social-icons-icon-color: $primary-color;
 
 // logo
 $logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo.svg';
 
 // home logo
-$home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.svg';
-$home-logo-image-modal: $home-logo-image;
-$home-logo-width: 25px;
-$home-logo-height: 39px;
+$home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.png';
+$home-logo-image-modal: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home-modal.png';
+$home-logo-width: 52px;
+$home-logo-height: 16px;
 
 // foreign logo
 $foreign-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-foreign.svg';
-$foreign-logo-image-modal: $foreign-logo-image;
-$foreign-logo-width: 24px;
-$foreign-logo-height: 38px;
+$foreign-logo-image-modal: $base-images-path + '/themes/' + $theme-name + '/logos/logo-foreign-modal.svg';
+$foreign-logo-width: 54px;
+$foreign-logo-height: 11px;
 
 // buttons
 $button-background-color: $secondary-color;
 $button-text-color: #fff;
 
-$button-background-color-2: $secondary-color;
+$button-background-color-2: $tertiary-color;
 $button-text-color-2: #fff;
 
 $button-background-color-3: $secondary-color-dark;
 $button-text-color-3: #fff;
 
-$button-background-color-4: $primary-color-dark;
+$button-background-color-4: $primary-color;
 $button-text-color-4: #fff;
 
 $button-bordered-background-color: #fff;
-$button-bordered-text-color: $primary-color-dark;
-$button-bordered-border-color: $primary-color-dark;
+$button-bordered-text-color: $primary-color;
+$button-bordered-border-color: $primary-color;
 
 // modals
 $modal-background-color: #fff;
-$modal-overlay-background-color: rgba($primary-color-darker, 0.9);
-$modal-title-color: $primary-color-dark;
-$modal-text-color: #352d59;
-$modal-link-color: $secondary-color;
+$modal-overlay-background-color: rgba($primary-color-dark, 0.8);
+$modal-title-color: $primary-color;
+$modal-text-color: $text-color;
+$modal-link-color: $primary-color;
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-darker;
@@ -99,26 +99,26 @@ $loading-item-text-color: #fff;
 $loading-logo: $base-images-path + '/themes/' + $theme-name + '/logos/logo-loading.svg';
 
 // bridge section
-$bridge-gradient-start: #fff;
-$bridge-gradient-end: #fff;
-$bridge-logo-background-color: #fff;
+$bridge-gradient-start: $gradient-color-1;
+$bridge-gradient-end: $gradient-color-2;
+$bridge-logo-background-color: $primary-color;
 $bridge-link-color: $secondary-color;
-$bridge-balance-color: #352d59;
+$bridge-balance-color: $secondary-color;
 $bridge-button-background-color: $button-background-color;
 $bridge-button-text-color: $button-text-color;
-$bridge-textfield-background: #f7f6ff;
-$bridge-input-label-color: rgba(53, 45, 89, 0.5);
-$bridge-label-color: $primary-color-dark;
-$bridge-textfield-color: $primary-color-dark;
-$bridge-textfield-placeholder-color: #666;
+$bridge-textfield-background: rgba(251, 251, 252, 0.2);
+$bridge-input-label-color: #fff;
+$bridge-label-color: #fff;
+$bridge-textfield-color: #fff;
+$bridge-textfield-placeholder-color: rgba(255, 255, 255, 0.7);
 $bridge-side-image-width: 272px;
 $bridge-side-image-height: 276px;
-$bridge-image-center-pointing-left: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
-$bridge-image-center-pointing-right: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
-$bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
+$bridge-image-center-pointing-left: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-left.svg';
+$bridge-image-center-pointing-right: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-right.svg';
+$bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-down@2x.png';
 $bridge-image-left: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-1.png';
 $bridge-image-right: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-2.png';
-$bridge-transfer-title-color: $modal-text-color;
+$bridge-transfer-title-color: $primary-color;
 
 // bridge alert
 $alert-logo-box-background-color: $primary-color;
@@ -128,8 +128,8 @@ $copy-icon-color: $primary-color;
 
 // status section
 $status-text-color: $text-color;
-$status-authority-number-color: $text-color;
-$status-authority-address-color: $primary-color;
+$status-authority-number-color: $primary-color;
+$status-authority-address-color: $text-color;
 
 $status-authority-logo-0: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-0.svg';
 $status-authority-logo-1: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-1.svg';
@@ -145,8 +145,8 @@ $statistics-title-color: $text-color;
 
 // events
 $events-title-color: $text-color;
-$events-filter-color: #333;
-$events-select-color: #333;
+$events-filter-color: $text-color;
+$events-select-color: $text-color;
 $events-column-title-color: $text-color;
 $events-recipient-label-color: $text-color;
 $events-value-color: $text-color;

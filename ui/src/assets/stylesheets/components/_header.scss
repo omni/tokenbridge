@@ -6,6 +6,10 @@
   width: 100%;
   z-index: 9999;
 
+  &-stake {
+    box-shadow: 0 1px 1px #D4DADF;
+  }
+
   .container {
     align-items: center;
     display: flex;
@@ -30,5 +34,4 @@
     height: $header-logo-height;
     width: $header-logo-width;
   }
-
 }
