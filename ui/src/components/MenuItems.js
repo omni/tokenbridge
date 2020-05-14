@@ -1,5 +1,5 @@
 import React from 'react'
-import { EventsIcon, StatusIcon, StatisticsIcon } from './menu-icons'
+import { EventsIcon, StatusIcon, StatisticsIcon, AlternativeStatusIcon } from './menu-icons'
 import { Link } from 'react-router-dom'
 
 export const MenuItems = ({ onMenuToggle = null, withoutEvents, displayEventsTab }) => {
@@ -12,7 +12,7 @@ export const MenuItems = ({ onMenuToggle = null, withoutEvents, displayEventsTab
     },
     {
       hide: false,
-      icon: <StatusIcon />,
+      icon: displayEventsTab ? <StatusIcon /> : <AlternativeStatusIcon />,
       link: '/status',
       text: 'Status'
     },

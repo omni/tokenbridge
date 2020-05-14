@@ -7,6 +7,7 @@ import { WalletIcon } from './menu-icons/WalletIcon'
 export class Wallet extends React.Component {
   render() {
     const { web3Store, homeStore, foreignStore, alertStore } = this.props.RootStore
+    const { REACT_APP_UI_STYLES } = process.env
     const isHome = web3Store.isSelectedNetwork(web3Store.homeNet.id)
     const address = web3Store.defaultAccount.address
     const explorerAddressUrl = isHome
@@ -17,7 +18,12 @@ export class Wallet extends React.Component {
 
     const wallet =
       web3Store.defaultAccount.address !== '' && web3Store.defaultAccount.address !== undefined ? (
-        <a href={explorerAddressUrl} target="_blank" className="wallet-text wallet-link">
+        <a
+          href={explorerAddressUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`wallet-text wallet-link wallet-text-${REACT_APP_UI_STYLES}`}
+        >
           {web3Store.defaultAccount.address.slice(0, 17).concat('...')}
         </a>
       ) : (

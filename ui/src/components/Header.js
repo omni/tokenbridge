@@ -17,7 +17,11 @@ export class Header extends React.Component {
       onMenuToggle,
       RootStore: { alertStore, web3Store, bridgeMode }
     } = this.props
-    const { REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME, REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN, REACT_APP_UI_STYLES } = process.env
+    const {
+      REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME,
+      REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN,
+      REACT_APP_UI_STYLES
+    } = process.env
     const withoutEvents = web3Store.isSelectedNetwork(web3Store.homeNet.id) ? yn(HOME) : yn(FOREIGN)
     const displayEventsTab = !isMediatorMode(bridgeMode)
 
