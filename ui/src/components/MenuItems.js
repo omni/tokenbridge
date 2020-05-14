@@ -2,10 +2,10 @@ import React from 'react'
 import { EventsIcon, StatusIcon, StatisticsIcon } from './menu-icons'
 import { Link } from 'react-router-dom'
 
-export const MenuItems = ({ onMenuToggle = null, withoutEvents }) => {
+export const MenuItems = ({ onMenuToggle = null, withoutEvents, displayEventsTab }) => {
   const menuItems = [
     {
-      hide: withoutEvents,
+      hide: withoutEvents || !displayEventsTab,
       icon: <EventsIcon />,
       link: '/events',
       text: 'Events'
@@ -25,7 +25,7 @@ export const MenuItems = ({ onMenuToggle = null, withoutEvents }) => {
   ]
 
   return menuItems.map((item, index) => {
-    return (
+    return item.hide ? null : (
       <Link key={index} to={item.link} className="menu-items" onClick={onMenuToggle}>
         <span className="menu-items-icon">{item.icon}</span>
         <span className="menu-items-text">{item.text}</span>
