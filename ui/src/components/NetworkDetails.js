@@ -49,7 +49,12 @@ export const NetworkDetails = ({
         <p className="details-data-container">
           <span className="details-label">{networkTitle} Address</span>
           <span className="details-description details-copy">
-            <a className="details-description" href={getExplorerAddressUrl(address)} target="_blank">
+            <a
+              className="details-description"
+              href={getExplorerAddressUrl(address)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {address.slice(0, 27).concat('...')}
             </a>
             <CopyToClipboard text={address}>
@@ -87,7 +92,12 @@ export const NetworkDetails = ({
           <p className="details-data-container">
             <span className="details-label">Token Address</span>
             <span className="details-description details-copy">
-              <a className="details-description" href={getExplorerAddressUrl(tokenAddress)} target="_blank">
+              <a
+                className="details-description"
+                href={getExplorerAddressUrl(tokenAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {tokenAddress.slice(0, 27).concat('...')}
               </a>
               <CopyToClipboard text={tokenAddress}>

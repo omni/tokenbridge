@@ -25,7 +25,7 @@ export const SocialIcons = () => {
     <div className="social-icons">
       {socialItems.map((item, index) => {
         return (
-          <a key={index} href={item.link} target="_blank" className="social-icons-item">
+          <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="social-icons-item">
             {item.icon}
           </a>
         )
