@@ -1,7 +1,7 @@
 $theme-name: 'stake';
 
 // base colors
-$primary-color: #5c34a2;
+$primary-color: #E6ECF1;
 $primary-color-dark: #F5F7F9;
 $primary-color-darker: #45277a;
 $secondary-color: #60db97;
@@ -36,8 +36,8 @@ $daily-quota-progress: #9EAAB6;
 
 // footer
 $footer-background-color: $primary-color;
-$footer-logo-width: 130px;
-$footer-logo-height: 18px;
+$footer-logo-width: 128.54px;
+$footer-logo-height: 30px;
 $footer-text-color: #fff;
 
 // separator
@@ -52,6 +52,7 @@ $social-icons-icon-color: $primary-color;
 
 // logo
 $logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo.svg';
+$footer-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/footer-logo.svg';
 
 // home logo
 $home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.png';
@@ -88,6 +89,7 @@ $modal-overlay-background-color: rgba($primary-color-dark, 0.8);
 $modal-title-color: $primary-color;
 $modal-text-color: $text-color;
 $modal-link-color: $primary-color;
+$daily-quota-modal-title: $text-color;
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-dark;

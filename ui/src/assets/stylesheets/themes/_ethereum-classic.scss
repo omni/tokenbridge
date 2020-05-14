@@ -52,6 +52,7 @@ $social-icons-icon-color: #b9b0e1;
 
 // logo
 $logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo.svg';
+$footer-logo-image: $logo-image;
 
 // home logo
 $home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.svg';
@@ -88,6 +89,7 @@ $modal-overlay-background-color: rgba($primary-color-darker, 0.9);
 $modal-title-color: $primary-color-dark;
 $modal-text-color: #352d59;
 $modal-link-color: $secondary-color;
+$daily-quota-modal-title: $primary-color;
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-darker;
