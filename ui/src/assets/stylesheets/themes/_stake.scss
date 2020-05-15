@@ -102,18 +102,18 @@ $loading-item-text-color: #fff;
 $loading-logo: $base-images-path + '/themes/' + $theme-name + '/logos/logo-loading.svg';
 
 // bridge section
-$bridge-gradient-start: $gradient-color-1;
-$bridge-gradient-end: $gradient-color-2;
+$bridge-gradient-start: #fff;
+$bridge-gradient-end: #fff;
 $bridge-logo-background-color: $primary-color;
-$bridge-link-color: $secondary-color;
-$bridge-balance-color: $secondary-color;
-$bridge-button-background-color: $button-background-color;
-$bridge-button-text-color: $button-text-color;
-$bridge-textfield-background: rgba(251, 251, 252, 0.2);
-$bridge-input-label-color: #fff;
-$bridge-label-color: #fff;
-$bridge-textfield-color: #fff;
-$bridge-textfield-placeholder-color: rgba(255, 255, 255, 0.7);
+$bridge-link-color: #4DA9A6;
+$bridge-balance-color: #4DA9A6;
+$bridge-button-background-color: #4DA9A6;
+$bridge-button-text-color: #fff;
+$bridge-textfield-background: #F5F7F9;
+$bridge-input-label-color: #75818D;
+$bridge-label-color: #242A31;
+$bridge-textfield-color: #242A31;
+$bridge-textfield-placeholder-color: #75818D;
 $bridge-side-image-width: 272px;
 $bridge-side-image-height: 276px;
 $bridge-image-center-pointing-left: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-left.svg';
@@ -122,6 +122,21 @@ $bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name
 $bridge-image-left: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-1.png';
 $bridge-image-right: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-2.png';
 $bridge-transfer-title-color: $primary-color;
+$bridge-transfer-width: 960px;
+$bridge-transfer-button-height: 42px;
+$bridge-transfer-button-width: 100px;
+$bridge-transfer-button-border-radius: 2px;
+$form-container-height: 200px;
+$form-container-max-width: 380px;
+$network-container-height: 73px;
+$network-container-padding: 63.5px 1% 63.5px 5%;
+$network-basic-label-font-size: 12px;
+$info-icon-display: none;
+$network-show-more-font-weight: normal;
+$network-container-justify-content: space-between;
+$bridge-input-label-font-size: 20px;
+$bridge-input-label-line-height: 42px;
+$bridge-input-label-margin: 0 20px 0 0;
 
 // bridge alert
 $alert-logo-box-background-color: $primary-color;

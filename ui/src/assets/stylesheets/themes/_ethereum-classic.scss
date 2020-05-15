@@ -122,6 +122,21 @@ $bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name
 $bridge-image-left: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-1.png';
 $bridge-image-right: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-2.png';
 $bridge-transfer-title-color: $modal-text-color;
+$bridge-transfer-width: 880px;
+$bridge-transfer-button-height: 48px;
+$bridge-transfer-button-width: 92px;
+$bridge-transfer-button-border-radius: 3px;
+$form-container-height: 276px;
+$form-container-max-width: 384px;
+$network-container-height: 136px;
+$network-container-padding: 70px 1% 70px 5%;
+$network-basic-label-font-size: 13px;
+$info-icon-display: flex;
+$network-show-more-font-weight: 700;
+$network-container-justify-content: space-evenly;
+$bridge-input-label-font-size: 24px;
+$bridge-input-label-line-height: 48px;
+$bridge-input-label-margin: 0 10px;
 
 // bridge alert
 $alert-logo-box-background-color: $primary-color;

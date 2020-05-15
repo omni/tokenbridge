@@ -26,6 +26,10 @@
         height: 80px;
         width: 960px;
 
+        &-stake {
+          display: none
+        }
+
         @media screen and (max-width: $tablet-width) {
             display: none
         }
@@ -65,6 +69,10 @@
         display: flex;
         height: 80px;
         width: 960px;
+
+        &-stake {
+          display: none
+        }
 
         @media screen and (max-width: $tablet-width) {
             display: none
@@ -116,7 +124,7 @@
         }
     }
     .bridge-transfer {
-        height: 276px;
+        height: $form-container-height;
         display: flex;
         justify-content: center;
 
@@ -125,6 +133,11 @@
         }
         .left-image-wrapper {
             background-color: $bridge-gradient-start;
+
+            &-stake {
+              display: none
+            }
+
             .left-image {
                 background-color: $main-background-color;
                 background-image: url('#{ $bridge-image-left }');
@@ -144,6 +157,11 @@
 
         .right-image-wrapper {
             background-color: $bridge-gradient-end;
+
+            &-stake {
+              display: none
+            }
+
             .right-image {
               background-color: $main-background-color;
               background-image: url('#{ $bridge-image-right }');
@@ -168,7 +186,13 @@
             display: flex;
             flex-shrink: 0;
             flex-wrap: wrap;
-            width: 880px;
+            width: $bridge-transfer-width;
+
+            &-stake {
+              border: 1px solid #E6ECF1;
+              box-sizing: border-box;
+              border-radius: 10px;
+            }
 
             @media screen and (max-width: $tablet-width) {
                 border-radius: 8px;
@@ -180,7 +204,7 @@
                 display: flex;
                 flex-shrink: 0;
                 flex-wrap: wrap;
-                width: 880px;
+                width: $bridge-transfer-width;
 
                 @media screen and (max-width: $tablet-width) {
                     background-image: url('#{ $bridge-image-center-pointing-down }');
@@ -196,9 +220,9 @@
                 align-items: flex-start;
                 display: flex;
                 flex-direction: column;
-                height: 136px;
-                justify-content: space-evenly;
-                padding: 70px 1% 70px 5%;
+                height: $network-container-height;
+                justify-content: $network-container-justify-content;
+                padding: $network-container-padding;
                 width: 22%;
 
                 @media screen and (max-width: $tablet-width) {
@@ -213,9 +237,9 @@
                 align-items: flex-end;
                 display: flex;
                 flex-direction: column;
-                height: 136px;
-                justify-content: space-evenly;
-                padding: 70px 5% 70px 1%;
+                height: $network-container-height;
+                justify-content: $network-container-justify-content;
+                padding: $network-container-padding;
                 width: 22%;
 
                 @media screen and (max-width: $tablet-width) {
@@ -232,7 +256,7 @@
                 display: flex;
             }
             .network-basic-label {
-                font-size: 13px;
+                font-size: $network-basic-label-font-size;
                 color: $bridge-label-color;
             }
             .network-title {
@@ -240,6 +264,12 @@
                 display: block;
                 font-size: 24px;
                 font-weight: 700;
+                &-stake {
+                  font-style: normal;
+                  font-weight: bold;
+                  font-size: 20px;
+                  line-height: 23px;
+                }
             }
             .network-name {
                 color: $bridge-label-color;
@@ -277,17 +307,17 @@
             }
             .network-balance {
                 color: $bridge-balance-color;
-                font-size: 13px;
+                font-size: $network-basic-label-font-size;
                 font-weight: 700;
             }
             .network-show-more {
                 color: $bridge-link-color;
                 font-size: 14px;
-                font-weight: 700;
+                font-weight: $network-show-more-font-weight;
             }
             .info-icon {
               align-items: center;
-              display: flex;
+              display: $info-icon-display;
               justify-content: center;
               path {
                 fill: $bridge-link-color;
@@ -318,8 +348,8 @@
                 }
             }
             .form-container {
-                height: 276px;
-                max-width: 384px;
+                height: $form-container-height;
+                max-width: $form-container-max-width;
                 width: 44%;
                 @media screen and (max-width: $tablet-width) {
                     align-self: center;
@@ -329,7 +359,7 @@
                 .bridge-form {
                     display: flex;
                     flex-direction: column;
-                    height: 276px;
+                    height: $form-container-height;
                     justify-content: space-evenly;
                     @media screen and (max-width: $tablet-width) {
                         height: auto;
@@ -345,6 +375,13 @@
                             background-color: unset;
                             flex-direction: column;
                             padding: 8px 8px 8px 8px;
+                        }
+
+                        &-stake {
+                          border: 1px solid #E6ECF1;
+                          box-sizing: border-box;
+                          border-radius: 4px;
+                          height: 60px;
                         }
                     }
                     .bridge-form-input-container {
@@ -363,7 +400,7 @@
                         color: $bridge-textfield-color;
                         font-size: 24px;
                         font-weight: 700;
-                        height: 48px;
+                        height: $bridge-input-label-line-height;
                         padding-left: 16px;
                         width: 165px;
 
@@ -386,10 +423,10 @@
                     }
                     &-label {
                         color: $bridge-input-label-color;
-                        font-size: 24px;
+                        font-size: $bridge-input-label-font-size;
                         font-weight: 700;
-                        line-height: 48px;
-                        margin: 0 10px;
+                        line-height: $bridge-input-label-line-height;
+                        margin: $bridge-input-label-margin;
                         text-transform: uppercase;
 
                         @media screen and (max-width: $tablet-width) {
@@ -398,14 +435,14 @@
                     }
                     &-button {
                         background-color: $bridge-button-background-color;
-                        border-radius: 3px;
+                        border-radius: $bridge-transfer-button-border-radius;
                         color: $bridge-button-text-color;
                         display: block;
                         flex-shrink: 0;
                         font-weight: 700;
-                        height: 48px;
+                        height: $bridge-transfer-button-height;
                         text-decoration: none;
-                        width: 92px;
+                        width: $bridge-transfer-button-width;
 
                         @media screen and (max-width: $tablet-width) {
                             border-radius: 0 0 3px 3px;

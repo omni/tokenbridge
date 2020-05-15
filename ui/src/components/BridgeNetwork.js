@@ -3,6 +3,7 @@ import numeral from 'numeral'
 import { InfoIcon } from './icons/InfoIcon'
 
 export const BridgeNetwork = ({ balance, currency, isHome, networkSubtitle, networkTitle, showModal, side }) => {
+  const { REACT_APP_UI_STYLES } = process.env
   const containerName = isHome ? 'home' : 'foreign'
   const formattedBalance = isNaN(numeral(balance).format('0.00', Math.floor))
     ? numeral(0).format('0,0.00', Math.floor)
@@ -28,7 +29,7 @@ export const BridgeNetwork = ({ balance, currency, isHome, networkSubtitle, netw
   return (
     <div className={`network-container-${containerName}`}>
       <p className={`${side ? `text-${side}` : ''}`}>
-        <span className="network-title">{networkTitle}</span>
+        <span className={`network-title network-title-${REACT_APP_UI_STYLES}`}>{networkTitle}</span>
         {networkSubtitle ? <span className="network-name">{networkSubtitle}</span> : null}
       </p>
       <p>

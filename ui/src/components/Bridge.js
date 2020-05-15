@@ -292,6 +292,11 @@ export class Bridge extends React.Component {
   }
 
   getNetworkTitle = networkName => {
+    const { REACT_APP_UI_STYLES } = process.env
+    if (REACT_APP_UI_STYLES === 'stake') {
+      return networkName
+    }
+
     const index = networkName.indexOf(' ')
 
     if (index === -1) {
@@ -302,6 +307,11 @@ export class Bridge extends React.Component {
   }
 
   getNetworkSubTitle = networkName => {
+    const { REACT_APP_UI_STYLES } = process.env
+    if (REACT_APP_UI_STYLES === 'stake') {
+      return false
+    }
+
     const index = networkName.indexOf(' ')
 
     if (index === -1) {
@@ -312,6 +322,7 @@ export class Bridge extends React.Component {
   }
 
   render() {
+    const { REACT_APP_UI_STYLES } = process.env
     const { web3Store, foreignStore, homeStore } = this.props.RootStore
     const { showModal, modalData, showConfirmation, confirmationData } = this.state
     const { reverse } = web3Store
@@ -335,10 +346,10 @@ export class Bridge extends React.Component {
         <div className="bridge">
           <BridgeAddress isHome={true} reverse={reverse} />
           <div className="bridge-transfer">
-            <div className="left-image-wrapper">
+            <div className={`left-image-wrapper left-image-wrapper-${REACT_APP_UI_STYLES}`}>
               <div className="left-image" />
             </div>
-            <div className="bridge-transfer-content">
+            <div className={`bridge-transfer-content bridge-transfer-content-${REACT_APP_UI_STYLES}`}>
               <div className="bridge-transfer-content-background">
                 <BridgeNetwork
                   balance={reverse ? foreignStore.balance : homeStore.getDisplayedBalance()}
@@ -367,7 +378,7 @@ export class Bridge extends React.Component {
                 />
               </div>
             </div>
-            <div className="right-image-wrapper">
+            <div className={`right-image-wrapper right-image-wrapper-${REACT_APP_UI_STYLES}`}>
               <div className="right-image" />
             </div>
           </div>
