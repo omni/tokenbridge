@@ -3,6 +3,7 @@ import { EventsIcon, StatusIcon, StatisticsIcon, AlternativeStatusIcon } from '.
 import { Link } from 'react-router-dom'
 
 export const MenuItems = ({ onMenuToggle = null, withoutEvents, displayEventsTab }) => {
+  const { REACT_APP_UI_STYLES } = process.env
   const menuItems = [
     {
       hide: withoutEvents || !displayEventsTab,
@@ -26,7 +27,12 @@ export const MenuItems = ({ onMenuToggle = null, withoutEvents, displayEventsTab
 
   return menuItems.map((item, index) => {
     return item.hide ? null : (
-      <Link key={index} to={item.link} className="menu-items" onClick={onMenuToggle}>
+      <Link
+        key={index}
+        to={item.link}
+        className={`menu-items menu-items-${REACT_APP_UI_STYLES}`}
+        onClick={onMenuToggle}
+      >
         <span className="menu-items-icon">{item.icon}</span>
         <span className="menu-items-text">{item.text}</span>
       </Link>
