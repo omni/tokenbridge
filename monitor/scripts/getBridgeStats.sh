@@ -6,7 +6,7 @@ IMAGETAG="latest"
 
 cd $(dirname $0)/..
 
-# if /usr/local/bin/docker-compose ps | grep -q -i 'monitor'; then
+if /usr/local/bin/docker-compose ps | grep -q -i 'monitor'; then
   tstart=`date +"%s"`
   
   for file in ${CONFIGDIR}/*.env
@@ -43,6 +43,6 @@ cd $(dirname $0)/..
   tdiff=`expr ${tend} - ${tstart}`
   echo "Total time to run: ${tdiff}"
 
-# else
-#   echo "Monitor is not running, skipping checks."
-# fi
+else
+  echo "Monitor is not running, skipping checks."
+fi
