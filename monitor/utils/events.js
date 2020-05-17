@@ -114,7 +114,7 @@ async function main(mode) {
     let directTransfers = transferEvents
     const tokensSwappedAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
     if (tokensSwappedAbiExists) {
-      logger.debug("collecting half duplex tokens participated in the bridge balance")
+      logger.debug('collecting half duplex tokens participated in the bridge balance')
       logger.debug("calling foreignBridge.getPastEvents('TokensSwapped')")
       const tokensSwappedEvents = await getPastEvents(foreignBridge, {
         event: 'TokensSwapped',
@@ -150,7 +150,7 @@ async function main(mode) {
         uniqueTokenAddresses.map(async tokenAddress => {
           const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
 
-          logger.debug("Half duplex token:", tokenAddress)
+          logger.debug('Half duplex token:', tokenAddress)
           logger.debug("calling halfDuplexTokenContract.getPastEvents('Transfer')")
           const halfDuplexTransferEvents = (await getPastEvents(halfDuplexTokenContract, {
             event: 'Transfer',
@@ -162,7 +162,7 @@ async function main(mode) {
           })).map(normalizeEvent)
 
           // Remove events after the ES
-          logger.debug("filtering half duplex transfers happened before ES")
+          logger.debug('filtering half duplex transfers happened before ES')
           const validHalfDuplexTransfers = await filterTransferBeforeES(halfDuplexTransferEvents)
 
           transferEvents = [...validHalfDuplexTransfers, ...transferEvents]
