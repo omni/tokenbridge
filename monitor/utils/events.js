@@ -15,6 +15,7 @@ const {
   ZERO_ADDRESS
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
+const { filterTransferBeforeES } = require('./tokenUtils')
 const { writeFile, readCacheFile } = require('./file')
 
 const {
@@ -110,9 +111,9 @@ async function main(mode) {
       }
     })).map(normalizeEvent)
 
+    let directTransfers = transferEvents
     const tokensSwappedAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
     if (tokensSwappedAbiExists) {
-      logger.debug("calling foreignBridge.getPastEvents('TokensSwapped')")
       const tokensSwappedEvents = await getPastEvents(foreignBridge, {
         event: 'TokensSwapped',
         fromBlock: MONITOR_FOREIGN_START_BLOCK,
@@ -122,20 +123,62 @@ async function main(mode) {
       // Get token swap events emitted by foreign bridge
       const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
 
+      // Get transfer events for each previous erc20
+      const uniqueTokenAddressesSet = new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))
+
+      // Exclude chai token from previous erc20
+      try {
+        logger.debug('calling foreignBridge.chaiToken()')
+        const chaiToken = await foreignBridge.methods.chaiToken().call()
+        uniqueTokenAddressesSet.delete(chaiToken)
+      } catch (e) {
+        logger.debug('call to foreignBridge.chaiToken() failed')
+      }
+      // Exclude dai token from previous erc20
+      try {
+        logger.debug('calling foreignBridge.erc20token()')
+        const daiToken = await foreignBridge.methods.erc20token().call()
+        uniqueTokenAddressesSet.delete(daiToken)
+      } catch (e) {
+        logger.debug('call to foreignBridge.erc20token() failed')
+      }
+
+      const uniqueTokenAddresses = [...uniqueTokenAddressesSet]
+      await Promise.all(
+        uniqueTokenAddresses.map(async tokenAddress => {
+          const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
+
+          const halfDuplexTransferEvents = (await getPastEvents(halfDuplexTokenContract, {
+            event: 'Transfer',
+            fromBlock: MONITOR_FOREIGN_START_BLOCK,
+            toBlock: foreignBlockNumber,
+            options: {
+              filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
+            }
+          })).map(normalizeEvent)
+
+          // Remove events after the ES
+          const validHalfDuplexTransfers = await filterTransferBeforeES(halfDuplexTransferEvents)
+
+          transferEvents = [...validHalfDuplexTransfers, ...transferEvents]
+        })
+      )
+
       // filter transfer that is part of a token swap
-      transferEvents = transferEvents.filter(
+      directTransfers = transferEvents.filter(
         e =>
-          e.recipient !== ZERO_ADDRESS ||
-          bridgeTokensSwappedEvents.findIndex(t => t.transactionHash === e.referenceTx) === -1
+          bridgeTokensSwappedEvents.findIndex(
+            t => t.transactionHash === e.referenceTx && e.recipient === ZERO_ADDRESS
+          ) === -1
       )
     }
 
     // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
-    transferEvents = transferEvents.filter(
+    directTransfers = directTransfers.filter(
       e => foreignToHomeRequests.findIndex(t => t.referenceTx === e.referenceTx) === -1
     )
 
-    foreignToHomeRequests = [...foreignToHomeRequests, ...transferEvents]
+    foreignToHomeRequests = [...foreignToHomeRequests, ...directTransfers]
   }
 
   logger.debug('Done')
