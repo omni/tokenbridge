@@ -11,7 +11,8 @@ const {
   ERC20_ABI,
   ERC677_BRIDGE_TOKEN_ABI,
   getTokenType,
-  getPastEvents
+  getPastEvents,
+  ZERO_ADDRESS
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
 const { writeFile, readCacheFile } = require('./file')
@@ -108,6 +109,26 @@ async function main(mode) {
         filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
       }
     })).map(normalizeEvent)
+
+    const tokensSwappedAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
+    if (tokensSwappedAbiExists) {
+      logger.debug("calling foreignBridge.getPastEvents('TokensSwapped')")
+      const tokensSwappedEvents = await getPastEvents(foreignBridge, {
+        event: 'TokensSwapped',
+        fromBlock: MONITOR_FOREIGN_START_BLOCK,
+        toBlock: foreignBlockNumber
+      })
+
+      // Get token swap events emitted by foreign bridge
+      const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
+
+      // filter transfer that is part of a token swap
+      transferEvents = transferEvents.filter(
+        e =>
+          e.recipient !== ZERO_ADDRESS ||
+          bridgeTokensSwappedEvents.findIndex(t => t.transactionHash === e.referenceTx) === -1
+      )
+    }
 
     // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
     transferEvents = transferEvents.filter(
