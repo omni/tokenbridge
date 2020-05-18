@@ -18,13 +18,13 @@ if /usr/local/bin/docker-compose ps | grep -q -i 'monitor'; then
     if [ ! -d ${reportdir} ]; then
       mkdir -p ${reportdir}
     fi
-    for json in alerts.json eventsStats.json getBalances.json validators.json; do
-      echo '{"health": false, "lastChecked": '`date +"%s"`'}' > ${reportdir}/${json}
+    checksumfile=${bridgename}".shasum"
+    rm -f ${checksumfile}
+    for json in alerts.json eventsStats.json getBalances.json validators.json stuckTransfers.json; do
+      if [ -f ${reportdir}/${json} ]; then
+        shasum -a 256 ${reportdir}/${json} >> ${checksumfile}
+      fi
     done
-    # this file exists only for some bridges so it will handle it separately
-    if [ -f ${reportdir}/stuckTransfers.json ]; then
-      echo '{"health": false, "lastChecked": '`date +"%s"`'}' > ${reportdir}/stuckTransfers.json
-    fi
 
     containername=${bridgename}"-checker"
     docker container stats --no-stream ${containername} 2>/dev/null 1>&2
@@ -32,10 +32,22 @@ if /usr/local/bin/docker-compose ps | grep -q -i 'monitor'; then
       docker run --rm --env-file $file -v $(pwd)/${RESPONSESDIR}:/mono/monitor/responses \
         --name ${containername} poanetwork/tokenbridge-monitor:${IMAGETAG} \
         /bin/bash -c 'yarn check-all'
+      shasum -a 256 -s -c ${checksumfile}
+      if [ "$?" == "0" ]; then
+        echo "JSON files have not been updated - the monitor is not healthy"
+        for json in alerts.json eventsStats.json getBalances.json validators.json stuckTransfers.json; do
+          if [ -f ${reportdir}/${json} ]; then
+            echo '{"health": false, "lastChecked": '`date +"%s"`'}' > ${reportdir}/${json}
+          fi
+        done
+      else
+        echo "JSON files have been updated - new metrics collected"
+      fi
     else
       echo "${containername} have not finished yet" >&2
     fi
     
+    rm ${checksumfile}
     echo "========================================"
   done
   
