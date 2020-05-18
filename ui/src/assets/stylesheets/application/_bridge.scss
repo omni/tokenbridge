@@ -556,7 +556,7 @@
                 height: 300px;
             }
             @media screen and (max-width: 600px) {
-                height: 250px;
+                height: $network-details-body-mobile-height;
             }
 
             .details-data-container {

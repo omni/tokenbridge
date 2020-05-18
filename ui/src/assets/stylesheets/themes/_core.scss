@@ -95,6 +95,7 @@ $modal-close-button: "../images/modal/close.svg";
 $modal-close-button-padding: 15px;
 $modal-close-button-right: -40px;
 $modal-close-button-top: 40px;
+$modal-close-button-right-mobile: 0px;
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-darker;
@@ -145,6 +146,7 @@ $bridge-transfer-button-border-radius: 0 0 3px 3px;
 
 // Network details
 $network-details-body-border-radius: 0 10px 10px 10px;
+$network-details-body-mobile-height: 250px;
 
 // bridge alert
 $alert-logo-box-background-color: $primary-color;

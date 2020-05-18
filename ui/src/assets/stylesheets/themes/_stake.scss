@@ -95,6 +95,7 @@ $modal-close-button: "../images/themes/stake/bridge/close.svg";
 $modal-close-button-padding: 0;
 $modal-close-button-right: -30px;
 $modal-close-button-top: -30px;
+$modal-close-button-right-mobile: 10px;
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-dark;
@@ -145,6 +146,7 @@ $bridge-transfer-button-border-radius: 2px 2px 2px 2px;
 
 // Network details
 $network-details-body-border-radius: 10px;
+$network-details-body-mobile-height: 400px;
 
 
 // bridge alert

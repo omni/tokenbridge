@@ -61,8 +61,8 @@
       }
 
       @media screen and (max-width: $mobile-width) {
-        top: -40px;
-        right: 0;
+        top: $modal-close-button-top;
+        right: $modal-close-button-right-mobile;
       }
     }
 
