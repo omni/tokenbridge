@@ -16,12 +16,14 @@ const {
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
 const { filterTransferBeforeES } = require('./tokenUtils')
+const { writeFile, readCacheFile } = require('./file')
 
 const {
   COMMON_HOME_RPC_URL,
   COMMON_FOREIGN_RPC_URL,
   COMMON_HOME_BRIDGE_ADDRESS,
-  COMMON_FOREIGN_BRIDGE_ADDRESS
+  COMMON_FOREIGN_BRIDGE_ADDRESS,
+  MONITOR_CACHE_EVENTS
 } = process.env
 const MONITOR_HOME_START_BLOCK = toBN(Number(process.env.MONITOR_HOME_START_BLOCK) || 0)
 const MONITOR_FOREIGN_START_BLOCK = toBN(Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0)
@@ -34,7 +36,17 @@ const web3Foreign = new Web3(foreignProvider)
 
 const { getBlockNumber } = require('./contract')
 
+const cacheFilePath = '/tmp/cachedEvents.json'
 async function main(mode) {
+  if (MONITOR_CACHE_EVENTS === 'true') {
+    logger.debug('checking existing events cache')
+    const cachedEvents = readCacheFile(cacheFilePath)
+    if (cachedEvents !== false) {
+      logger.debug('returning events stored in cache')
+      return cachedEvents
+    }
+  }
+
   const homeErcBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
   const bridgeMode = mode || (await getBridgeMode(homeErcBridge))
   const { HOME_ABI, FOREIGN_ABI } = getBridgeABIs(bridgeMode)
@@ -102,6 +114,8 @@ async function main(mode) {
     let directTransfers = transferEvents
     const tokensSwappedAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
     if (tokensSwappedAbiExists) {
+      logger.debug('collecting half duplex tokens participated in the bridge balance')
+      logger.debug("calling foreignBridge.getPastEvents('TokensSwapped')")
       const tokensSwappedEvents = await getPastEvents(foreignBridge, {
         event: 'TokensSwapped',
         fromBlock: MONITOR_FOREIGN_START_BLOCK,
@@ -116,7 +130,7 @@ async function main(mode) {
 
       // Exclude chai token from previous erc20
       try {
-        logger.debug('calling foreignBridge.chaiToken()')
+        logger.debug('calling foreignBridge.chaiToken() to remove it from half duplex tokens list')
         const chaiToken = await foreignBridge.methods.chaiToken().call()
         uniqueTokenAddressesSet.delete(chaiToken)
       } catch (e) {
@@ -124,7 +138,7 @@ async function main(mode) {
       }
       // Exclude dai token from previous erc20
       try {
-        logger.debug('calling foreignBridge.erc20token()')
+        logger.debug('calling foreignBridge.erc20token()  to remove it from half duplex tokens list')
         const daiToken = await foreignBridge.methods.erc20token().call()
         uniqueTokenAddressesSet.delete(daiToken)
       } catch (e) {
@@ -136,6 +150,8 @@ async function main(mode) {
         uniqueTokenAddresses.map(async tokenAddress => {
           const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
 
+          logger.debug('Half duplex token:', tokenAddress)
+          logger.debug("calling halfDuplexTokenContract.getPastEvents('Transfer')")
           const halfDuplexTransferEvents = (await getPastEvents(halfDuplexTokenContract, {
             event: 'Transfer',
             fromBlock: MONITOR_FOREIGN_START_BLOCK,
@@ -146,6 +162,7 @@ async function main(mode) {
           })).map(normalizeEvent)
 
           // Remove events after the ES
+          logger.debug('filtering half duplex transfers happened before ES')
           const validHalfDuplexTransfers = await filterTransferBeforeES(halfDuplexTransferEvents)
 
           transferEvents = [...validHalfDuplexTransfers, ...transferEvents]
@@ -170,7 +187,7 @@ async function main(mode) {
   }
 
   logger.debug('Done')
-  return {
+  const result = {
     homeToForeignRequests,
     homeToForeignConfirmations,
     foreignToHomeConfirmations,
@@ -178,6 +195,12 @@ async function main(mode) {
     isExternalErc20,
     bridgeMode
   }
+
+  if (MONITOR_CACHE_EVENTS === 'true') {
+    logger.debug('saving obtained events into cache file')
+    writeFile(cacheFilePath, result, false)
+  }
+  return result
 }
 
 module.exports = main

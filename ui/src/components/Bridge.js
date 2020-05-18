@@ -19,7 +19,6 @@ import { toDecimals } from '../stores/utils/decimals'
 @observer
 export class Bridge extends React.Component {
   state = {
-    reverse: false,
     amount: '',
     modalData: {},
     confirmationData: {},
@@ -38,25 +37,6 @@ export class Bridge extends React.Component {
     web3Store.getWeb3Promise.then(() => {
       if (!web3Store.metamaskNet.id || !web3Store.foreignNet.id) {
         this.forceUpdate()
-      } else {
-        const reverse = web3Store.metamaskNet.id.toString() === web3Store.foreignNet.id.toString()
-        if (reverse) {
-          this.setState({
-            reverse
-          })
-        }
-      }
-    })
-  }
-
-  componentDidUpdate() {
-    const { web3Store } = this.props.RootStore
-    web3Store.getWeb3Promise.then(() => {
-      const reverse = web3Store.metamaskNet.id.toString() === web3Store.foreignNet.id.toString()
-      if (reverse !== this.state.reverse) {
-        this.setState({
-          reverse
-        })
       }
     })
   }
@@ -202,7 +182,7 @@ export class Bridge extends React.Component {
       return
     }
 
-    const { reverse } = this.state
+    const { reverse } = web3Store
     const homeDisplayName = homeStore.networkName
     const foreignDisplayName = foreignStore.networkName
 
@@ -230,8 +210,8 @@ export class Bridge extends React.Component {
   }
 
   onTransferConfirmation = async () => {
-    const { alertStore } = this.props.RootStore
-    const { reverse } = this.state
+    const { alertStore, web3Store } = this.props.RootStore
+    const { reverse } = web3Store
 
     this.setState({ showConfirmation: false, confirmationData: {} })
     const amount = this.state.amount.trim()
@@ -333,7 +313,8 @@ export class Bridge extends React.Component {
 
   render() {
     const { web3Store, foreignStore, homeStore } = this.props.RootStore
-    const { reverse, showModal, modalData, showConfirmation, confirmationData } = this.state
+    const { showModal, modalData, showConfirmation, confirmationData } = this.state
+    const { reverse } = web3Store
     const formCurrency = reverse ? foreignStore.symbol : homeStore.symbol
 
     if (showModal && Object.keys(modalData).length !== 0) {
