@@ -12,6 +12,10 @@ function decodeBridgeMode(bridgeModeHash) {
       return BRIDGE_MODES.ERC_TO_NATIVE
     case '0x2544fbb9':
       return BRIDGE_MODES.ARBITRARY_MESSAGE
+    case '0x16ea01e9':
+      return BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
+    case '0x76595b56':
+      return BRIDGE_MODES.AMB_ERC_TO_ERC
     default:
       throw new Error(`Unrecognized bridge mode hash: '${bridgeModeHash}'`)
   }
@@ -46,8 +50,29 @@ const getTokenType = async (bridgeTokenContract, bridgeAddress) => {
       return ERC_TYPES.ERC20
     }
   } catch (e) {
-    return ERC_TYPES.ERC20
+    try {
+      const isBridge = await bridgeTokenContract.methods.isBridge(bridgeAddress).call()
+      if (isBridge) {
+        return ERC_TYPES.ERC677
+      } else {
+        return ERC_TYPES.ERC20
+      }
+    } catch (e) {
+      return ERC_TYPES.ERC20
+    }
   }
+}
+
+const isErcToErcMode = bridgeMode => {
+  return (
+    bridgeMode === BRIDGE_MODES.ERC_TO_ERC ||
+    bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC ||
+    bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
+  )
+}
+
+const isMediatorMode = bridgeMode => {
+  return bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC || bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
 }
 
 const getUnit = bridgeMode => {
@@ -61,6 +86,9 @@ const getUnit = bridgeMode => {
     unitForeign = 'Tokens'
   } else if (bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
     unitHome = 'Native coins'
+    unitForeign = 'Tokens'
+  } else if (bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    unitHome = 'Tokens'
     unitForeign = 'Tokens'
   } else {
     throw new Error(`Unrecognized bridge mode: ${bridgeMode}`)
@@ -260,5 +288,7 @@ module.exports = {
   normalizeGasPrice,
   gasPriceFromSupplier,
   gasPriceFromContract,
-  gasPriceWithinLimits
+  gasPriceWithinLimits,
+  isErcToErcMode,
+  isMediatorMode
 }

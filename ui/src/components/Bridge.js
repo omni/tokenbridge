@@ -4,7 +4,7 @@ import { toHex } from 'web3-utils'
 import foreignLogoPurple from '../assets/images/logos/logo-poa-20-purple@2x.png'
 import homeLogoPurple from '../assets/images/logos/logo-poa-sokol-purple@2x.png'
 import swal from 'sweetalert'
-import { BRIDGE_MODES, ERC_TYPES } from '../../../commons'
+import { BRIDGE_MODES, ERC_TYPES, isErcToErcMode } from '../../../commons'
 import { BridgeAddress } from './index'
 import { BridgeForm } from './index'
 import { BridgeNetwork } from './index'
@@ -63,7 +63,6 @@ export class Bridge extends React.Component {
 
   async _sendToHome(amount) {
     const { web3Store, homeStore, alertStore, txStore, bridgeMode } = this.props.RootStore
-    const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC
     const { isLessThan, isGreaterThan } = this
     if (web3Store.metamaskNet.id.toString() !== web3Store.homeNet.id.toString()) {
       swal('Error', `Please switch wallet to ${web3Store.homeNet.name} network`, 'error')
@@ -98,7 +97,7 @@ export class Bridge extends React.Component {
     } else {
       try {
         alertStore.setLoading(true)
-        if (isErcToErcMode) {
+        if (isErcToErcMode(bridgeMode)) {
           return txStore.erc677transferAndCall({
             to: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
             from: web3Store.defaultAccount.address,
@@ -259,7 +258,6 @@ export class Bridge extends React.Component {
 
   loadHomeDetails = () => {
     const { web3Store, homeStore, bridgeMode } = this.props.RootStore
-    const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC
     const isExternalErc20 = bridgeMode === BRIDGE_MODES.ERC_TO_ERC || bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
 
     const modalData = {
@@ -274,7 +272,7 @@ export class Bridge extends React.Component {
       minPerTx: homeStore.minPerTx,
       totalBalance: homeStore.balance,
       balance: homeStore.getDisplayedBalance(),
-      displayTokenAddress: isErcToErcMode,
+      displayTokenAddress: isErcToErcMode(bridgeMode),
       tokenAddress: homeStore.tokenAddress,
       tokenName: homeStore.tokenName,
       displayBridgeLimits: true,

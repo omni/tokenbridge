@@ -65,6 +65,15 @@ export const getRewardableData = (homeFeeManager, foreignFeeManager) => {
       displayDeposit: true,
       displayWithdraw: false
     }
+  } else if (homeFeeManager.feeManagerMode === FEE_MANAGER_MODE.ONE_DIRECTION_STAKE) {
+    return {
+      homeFee: homeFeeManager.homeFee,
+      foreignFee: new BN(0),
+      depositSymbol: 'home',
+      withdrawSymbol: '',
+      displayDeposit: true,
+      displayWithdraw: false
+    }
   } else {
     return {
       homeFee: new BN(0),

@@ -7,13 +7,17 @@ const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignB
 const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
 const ERC677_ABI = require('../contracts/build/contracts/ERC677').abi
 const ERC677_BRIDGE_TOKEN_ABI = require('../contracts/build/contracts/ERC677BridgeToken').abi
-const BLOCK_REWARD_ABI = require('../contracts/build/contracts/IBlockReward').abi
+const BLOCK_REWARD_ABI = require('../contracts/build/contracts/BlockReward').abi
 const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi
 const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/RewardableValidators').abi
 const HOME_AMB_ABI = require('../contracts/build/contracts/HomeAMB').abi
 const FOREIGN_AMB_ABI = require('../contracts/build/contracts/ForeignAMB').abi
 const BOX_ABI = require('../contracts/build/contracts/Box').abi
 const SAI_TOP = require('../contracts/build/contracts/SaiTopMock').abi
+const HOME_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeAMBErc677ToErc677').abi
+const FOREIGN_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignAMBErc677ToErc677').abi
+const HOME_STAKE_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeStakeTokenMediator').abi
+const FOREIGN_STAKE_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignStakeTokenMediator').abi
 
 const { HOME_V1_ABI, FOREIGN_V1_ABI } = require('./v1Abis')
 const { BRIDGE_MODES } = require('./constants')
@@ -67,6 +71,12 @@ function getBridgeABIs(bridgeMode) {
   } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     HOME_ABI = HOME_AMB_ABI
     FOREIGN_ABI = FOREIGN_AMB_ABI
+  } else if (bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC) {
+    HOME_ABI = HOME_AMB_ERC_TO_ERC_ABI
+    FOREIGN_ABI = FOREIGN_AMB_ERC_TO_ERC_ABI
+  } else if (bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+    HOME_ABI = HOME_STAKE_ERC_TO_ERC_ABI
+    FOREIGN_ABI = FOREIGN_STAKE_ERC_TO_ERC_ABI
   } else {
     throw new Error(`Unrecognized bridge mode: ${bridgeMode}`)
   }
@@ -94,5 +104,7 @@ module.exports = {
   HOME_AMB_ABI,
   FOREIGN_AMB_ABI,
   BOX_ABI,
-  SAI_TOP
+  SAI_TOP,
+  HOME_STAKE_ERC_TO_ERC_ABI,
+  FOREIGN_STAKE_ERC_TO_ERC_ABI
 }
