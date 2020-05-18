@@ -49,4 +49,5 @@ __pycache__
 
 #monitor
 monitor/responses/*
+monitor/configs/*.env
 !monitor/.gitkeep
