@@ -86,15 +86,19 @@ $button-bordered-border-color: $primary-color;
 
 // modals
 $modal-background-color: #fff;
-$modal-overlay-background-color: rgba($primary-color-dark, 0.8);
+$modal-overlay-background-color: rgba(#9EAAB6, 0.8);
 $modal-title-color: $primary-color;
-$modal-text-color: $text-color;
-$modal-link-color: $primary-color;
+$modal-text-color: #242A31;
+$modal-link-color: #4DA9A6;
 $daily-quota-modal-title: $text-color;
+$modal-close-button: "../images/themes/stake/bridge/close.svg";
+$modal-close-button-padding: 0;
+$modal-close-button-right: -30px;
+$modal-close-button-top: -30px;
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-dark;
-$mobile-menu-overlay-color: rgba($primary-color-dark, 0.9);
+$mobile-menu-overlay-color: rgba(#9EAAB6, 0.8);
 
 // loading
 $loading-item-background-color: $secondary-color;
@@ -138,6 +142,10 @@ $bridge-input-label-font-size: 20px;
 $bridge-input-label-line-height: 42px;
 $bridge-input-label-margin: 0 20px 0 0;
 $bridge-transfer-button-border-radius: 2px 2px 2px 2px;
+
+// Network details
+$network-details-body-border-radius: 10px;
+
 
 // bridge alert
 $alert-logo-box-background-color: $primary-color;

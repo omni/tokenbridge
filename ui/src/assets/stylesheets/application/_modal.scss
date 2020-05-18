@@ -38,16 +38,16 @@
     }
 
     .close-button {
-      padding: 15px;
+      padding: $modal-close-button-padding;
       position: absolute;
-      right: -40px;
-      top: 40px;
+      right: $modal-close-button-right;
+      top: $modal-close-button-top;
       z-index: 400000;
 
       i {
         &.icon {
           &:before {
-            content: url("../images/modal/close.svg");
+            content: url($modal-close-button);
           }
         }
       }

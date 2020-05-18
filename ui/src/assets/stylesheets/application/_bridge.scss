@@ -501,6 +501,10 @@
             @media screen and (max-width: $tablet-width) {
                 display: none;
             }
+
+            &-stake {
+              display: none;
+            }
         }
 
         .details-logo-container:after {
@@ -527,13 +531,19 @@
         .details-body {
             align-self: flex-end;
             background-color: $modal-background-color;
-            border-radius: 0 10px 10px 10px;
+            border-radius: $network-details-body-border-radius;
             display: flex;
             flex-direction: column;
             height: 254px;
             justify-content: space-between;
             padding: 38px;
             width: 440px;
+
+            &-stake {
+              padding: 26px 30px 26px 30px;
+              width: 480px;
+              height: 380px;
+            }
 
             @media screen and (max-width: $tablet-width) {
                 align-self: center;
@@ -564,14 +574,39 @@
                 .details-description {
                     color: $modal-link-color;
                     font-size: 14px;
+
+                  &-currency {
+                    &-stake {
+                      font-weight: normal;
+                    }
+                  }
                 }
                 .details-description-black {
                     color: $modal-text-color;
                     font-size: 14px;
                     font-weight: 700;
+
+                    &-stake {
+                      font-weight: normal;
+                    }
                 }
                 .details-copy {
                     cursor: pointer;
+                }
+
+                .details-title {
+                  font-size: 20px;
+                  line-height: 23px;
+                  font-weight: bold;
+                  color: $modal-text-color;
+                }
+
+                &-core {
+                  display: none;
+                }
+
+                &-classic {
+                  display: none;
                 }
             }
         }
@@ -593,6 +628,10 @@
             @media screen and (max-width: $tablet-width) {
                 display: none;
             }
+        }
+
+        .details-body-stake:before {
+            display: none;
         }
     }
     .transfer-alert {
