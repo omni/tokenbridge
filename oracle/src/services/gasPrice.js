@@ -78,7 +78,7 @@ async function start(chainId, fetchOnce) {
     return getPrice()
   }
 
-  fetchGasPriceInterval = setIntervalAndRun(
+  return fetchGasPriceInterval = setIntervalAndRun(
     () => fetchGasPrice(speedType, factor, bridgeContract, () => fetch(gasPriceSupplierUrl)),
     updateInterval
   )
