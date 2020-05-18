@@ -45,7 +45,7 @@ const fetchGasPrice = async (speedType, factor, bridgeContract, gasPriceSupplier
   return cachedGasPrice
 }
 
-async function start(chainId) {
+async function start(chainId, fetchOnce) {
   clearInterval(fetchGasPriceInterval)
 
   let bridgeContract = null
@@ -71,6 +71,11 @@ async function start(chainId) {
     cachedGasPrice = COMMON_FOREIGN_GAS_PRICE_FALLBACK
   } else {
     throw new Error(`Unrecognized chainId '${chainId}'`)
+  }
+
+  if (fetchOnce) {
+    await fetchGasPrice(speedType, factor, bridgeContract, () => fetch(gasPriceSupplierUrl))
+    return getPrice()
   }
 
   fetchGasPriceInterval = setIntervalAndRun(

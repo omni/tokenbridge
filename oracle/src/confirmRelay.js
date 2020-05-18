@@ -1,11 +1,14 @@
 require('../env')
 const path = require('path')
-const { connectWatcherToQueue, connection } = require('./services/amqpClient')
+const { isAttached, connectWatcherToQueue, connection } = require('./services/amqpClient')
 const logger = require('./services/logger')
+const GasPrice = require('./services/gasPrice')
 const rpcUrlsManager = require('./services/getRpcUrlsManager')
-const { getEventsFromTx } = require('./tx/web3')
-const { checkHTTPS, watchdog } = require('./utils/utils')
-const { EXIT_CODES } = require('./utils/constants')
+const { getNonce, getChainId, getEventsFromTx } = require('./tx/web3')
+const { sendTx } = require('./tx/sendTx')
+const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
+const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
+const { ORACLE_VALIDATOR_ADDRESS, ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_ALLOW_HTTP_FOR_RPC } = process.env
 
 if (process.argv.length < 5) {
   logger.error('Please check the number of arguments, transaction hash is not present')
@@ -23,19 +26,25 @@ const processAMBSignatureRequests = require('./events/processAMBSignatureRequest
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
 
-const { getTokensState } = require('./utils/tokenState')
-
 const web3Instance = config.web3
-const bridgeContract = new web3Instance.eth.Contract(config.bridgeAbi, config.bridgeContractAddress)
-let { eventContractAddress } = config
-let eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+const { eventContractAddress } = config
+const eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+
+let attached
 
 async function initialize() {
   try {
-    const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
+    const checkHttps = checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
     rpcUrlsManager.homeUrls.forEach(checkHttps('home'))
     rpcUrlsManager.foreignUrls.forEach(checkHttps('foreign'))
+
+    attached = await isAttached()
+    if (attached) {
+      logger.info('RabbitMQ container is available, using oracle sender')
+    } else {
+      logger.info('RabbitMQ container is not available, using internal sender')
+    }
 
     connectWatcherToQueue({
       queueName: config.queue,
@@ -48,20 +57,21 @@ async function initialize() {
   }
 }
 
-async function runMain({ sendToQueue, sendToWorker }) {
+async function runMain({ sendToQueue }) {
   try {
-    if (connection.isConnected()) {
+    const sendJob = attached ? sendToQueue : sendJobTx
+    if (!attached || connection.isConnected()) {
       if (config.maxProcessingTime) {
-        await watchdog(() => main({ sendToQueue, sendToWorker, txHash }), config.maxProcessingTime, () => {
+        await watchdog(() => main({ sendJob, txHash }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
           process.exit(EXIT_CODES.MAX_TIME_REACHED)
         })
       } else {
-        await main({ sendToQueue, sendToWorker, txHash })
+        await main({ sendJob, txHash })
       }
     } else {
       setTimeout(() => {
-        runMain({ sendToQueue, sendToWorker })
+        runMain({ sendToQueue })
       }, config.pollingInterval)
     }
   } catch (e) {
@@ -98,34 +108,8 @@ function processEvents(events) {
   }
 }
 
-async function checkConditions() {
-  let state
-  switch (config.id) {
-    case 'erc-native-transfer':
-      logger.debug('Getting token address to listen Transfer events')
-      state = await getTokensState(bridgeContract, logger)
-      updateEventContract(state.bridgeableTokenAddress)
-      break
-    case 'erc-native-half-duplex-transfer':
-      logger.debug('Getting Half Duplex token address to listen Transfer events')
-      state = await getTokensState(bridgeContract, logger)
-      updateEventContract(state.halfDuplexTokenAddress)
-      break
-    default:
-  }
-}
-
-function updateEventContract(address) {
-  if (eventContractAddress !== address) {
-    eventContractAddress = address
-    eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
-  }
-}
-
-async function main({ sendToQueue, txHash }) {
+async function main({ sendJob, txHash }) {
   try {
-    await checkConditions()
-
     const events = await getEventsFromTx({
       web3: web3Instance,
       contract: eventContract,
@@ -140,7 +124,7 @@ async function main({ sendToQueue, txHash }) {
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {
-        await sendToQueue(job)
+        await sendJob(job)
       }
     }
   } catch (e) {
@@ -150,6 +134,52 @@ async function main({ sendToQueue, txHash }) {
   await connection.close()
 
   logger.debug('Finished')
+}
+
+async function sendJobTx(jobs) {
+  const gasPrice = await GasPrice.start(config.queue, true)
+  const chainId = await getChainId(config.queue)
+  let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
+
+  await syncForEach(jobs, async job => {
+    const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE)
+
+    try {
+      logger.info(`Sending transaction with nonce ${nonce}`)
+      const txHash = await sendTx({
+        chain: config.queue,
+        data: job.data,
+        nonce,
+        gasPrice: gasPrice.toString(10),
+        amount: '0',
+        gasLimit,
+        privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
+        to: job.to,
+        chainId,
+        web3: web3Instance
+      })
+
+      nonce++
+      logger.info(
+        { eventTransactionHash: job.transactionReference, generatedTransactionHash: txHash },
+        `Tx generated ${txHash} for event Tx ${job.transactionReference}`
+      )
+    } catch (e) {
+      logger.error(
+        { eventTransactionHash: job.transactionReference, error: e.message },
+        `Tx Failed for event Tx ${job.transactionReference}.`,
+        e.message
+      )
+
+      if (e.message.includes('Insufficient funds')) {
+        const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
+        const minimumBalance = gasLimit.multipliedBy(gasPrice)
+        logger.error(
+          `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
+        )
+      }
+    }
+  })
 }
 
 initialize()
