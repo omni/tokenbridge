@@ -110,6 +110,9 @@ class ForeignStore {
     finished: false
   }
 
+  @observable
+  lastEventRelayedOnForeign = 0
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
@@ -419,6 +422,12 @@ class ForeignStore {
             this.rootStore.homeStore.statistics.withdrawalsValue
           )
         })
+        const lastEventRelayedOnForeign = events.length ? events[events.length - 1] : null
+        if (lastEventRelayedOnForeign) {
+          const blockNumber = lastEventRelayedOnForeign.blockNumber
+          const block = await this.foreignWeb3.eth.getBlock(blockNumber)
+          this.lastEventRelayedOnForeign = block.timestamp
+        }
       } else {
         this.statistics.finished = true
       }

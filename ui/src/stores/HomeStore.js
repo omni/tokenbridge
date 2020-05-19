@@ -127,6 +127,9 @@ class HomeStore {
   feeEventsFinished = false
 
   @observable
+  lastEventRelayedOnHome = 0
+
+  @observable
   depositFeeCollected = {
     value: BN(0),
     type: '',
@@ -462,6 +465,12 @@ class HomeStore {
           this.statistics.finished = true
           this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawalsValue)
         })
+        const lastEventRelayedOnHome = events.length ? events[events.length - 1] : null
+        if (lastEventRelayedOnHome) {
+          const blockNumber = lastEventRelayedOnHome.blockNumber
+          const block = await this.homeWeb3.eth.getBlock(blockNumber)
+          this.lastEventRelayedOnHome = block.timestamp
+        }
       }
     } catch (e) {
       console.error(e)
