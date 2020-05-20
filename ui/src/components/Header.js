@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom'
 import { MobileMenu } from './MobileMenu'
 import { MobileMenuButton } from './MobileMenuButton'
 import { inject, observer } from 'mobx-react/index'
-import { isMediatorMode } from 'commons'
 
 @inject('RootStore')
 @observer
@@ -15,7 +14,7 @@ export class Header extends React.Component {
     const {
       showMobileMenu,
       onMenuToggle,
-      RootStore: { alertStore, web3Store, bridgeMode }
+      RootStore: { alertStore, web3Store }
     } = this.props
     const {
       REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME,
@@ -23,7 +22,7 @@ export class Header extends React.Component {
       REACT_APP_UI_STYLES
     } = process.env
     const withoutEvents = web3Store.isSelectedNetwork(web3Store.homeNet.id) ? yn(HOME) : yn(FOREIGN)
-    const displayEventsTab = !isMediatorMode(bridgeMode)
+    const displayEventsTab = REACT_APP_UI_STYLES !== 'stake'
 
     return (
       <header className={`header header-${REACT_APP_UI_STYLES}`}>
