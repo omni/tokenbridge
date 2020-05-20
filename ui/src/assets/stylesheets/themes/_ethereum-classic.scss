@@ -83,6 +83,17 @@ $button-text-color-4: #fff;
 $button-bordered-background-color: #fff;
 $button-bordered-text-color: $primary-color-dark;
 $button-bordered-border-color: $primary-color-dark;
+$button-transfer-cancel-border-radius: 3px;
+$button-transfer-cancel-border: solid 1px $button-bordered-border-color;
+$button-transfer-cancel-font-size: 15px;
+$button-transfer-cancel-hover-opacity: 0.7;
+$button-transfer-cancel-height: 40px;
+$button-transfer-cancel-max-width: 49%;
+$button-transfer-confirm-border-radius: 3px;
+$button-transfer-confirm-font-size: 15px;
+$button-transfer-confirm-hover-background-color: darken($button-background-color, 10%);
+$button-transfer-confirm-height: 40px;
+$button-transfer-confirm-max-width: 49%;
 
 // modals
 $modal-background-color: #fff;
@@ -95,7 +106,10 @@ $modal-close-button: "../images/modal/close.svg";
 $modal-close-button-padding: 15px;
 $modal-close-button-right: -40px;
 $modal-close-button-top: 40px;
+$modal-close-button-top-mobile: -40px;
 $modal-close-button-right-mobile: 0px;
+$modal-min-width: 558px;
+$modal-min-height: 410px;
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-darker;
@@ -135,6 +149,7 @@ $form-container-height: 276px;
 $form-container-max-width: 384px;
 $network-container-height: 136px;
 $network-container-padding: 70px 1% 70px 5%;
+$network-container-padding-foreign: 70px 5% 70px 1%;
 $network-basic-label-font-size: 13px;
 $info-icon-display: flex;
 $network-show-more-font-weight: 700;
@@ -150,6 +165,20 @@ $network-details-body-mobile-height: 250px;
 
 // bridge alert
 $alert-logo-box-background-color: $primary-color;
+
+// bridge transfer alert
+$transfer-alert-height: 265px;
+$transfer-alert-width: 600px;
+$transfer-alert-border-radius: 8px;
+$transfer-alert-container-width: 374px;
+$transfer-alert-container-padding: 40px 60px 40px 0;
+$transfer-alert-confirm-button-order: 0;
+$transfer-alert-container-justify-content: space-around;
+$transfer-description-padding: 10px 0 10px 0;
+$transfer-buttons-padding: 20px 0 0;
+$transfer-operation-arrow-line-image: '';
+$transfer-operation-arrow-ellipse-image: '';
+$transfer-operation-arrow-image: '';
 
 // copy icon
 $copy-icon-color: $primary-color;
