@@ -9,6 +9,7 @@ $secondary-color-dark: #64a231;
 $tertiary-color: #ffaa07;
 $danger-color: #f13662;
 $blue-color: #3ab9fe;
+$base-button-bg-color: #08b3f2;
 
 $text-color: #333;
 $link-color: $primary-color;
@@ -119,6 +120,13 @@ $mobile-menu-overlay-color: rgba($primary-color-darker, 0.9);
 $loading-item-background-color: $secondary-color;
 $loading-item-text-color: #fff;
 $loading-logo: $base-images-path + '/themes/' + $theme-name + '/logos/logo-loading.svg';
+$loading-logo-height: 50px;
+$loading-logo-width: 234px;
+$loading-logo-i-display: block;
+$loading-text-font-size: 24px;
+$loading-text-line-height: 3;
+$loading-text-width: 500px;
+$loading-container-justify-content: center;
 
 // bridge section
 $bridge-gradient-start: $gradient-color-1;

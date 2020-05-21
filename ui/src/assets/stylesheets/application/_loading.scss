@@ -17,8 +17,8 @@
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: contain;
-    height: 50px;
-    width: 234px;
+    height: $loading-logo-height;
+    width: $loading-logo-width;
 }
 
 .loading {
@@ -27,12 +27,26 @@
         background-color: $modal-overlay-background-color;
         bottom: 0;
         display: flex;
-        justify-content: center;
+        justify-content: $loading-container-justify-content;
         left: 0;
         position: fixed;
         right: 0;
         top: 0;
         z-index: 1000000;
+
+        &-content {
+          display: flex;
+          justify-content: $loading-container-justify-content;
+          position: absolute;
+          align-items: center;
+
+          &-stake {
+            width: 320px;
+            height: 100px;
+            background: #fff;
+            border-radius: 10px;
+          }
+        }
     }
 
     &-i {
@@ -46,6 +60,7 @@
         height: 50px;
         opacity: .2;
         width: 2px;
+        display: $loading-logo-i-display;
 
         &:nth-child(2) {
             animation-delay: .1s;
@@ -54,14 +69,14 @@
 
     &-text {
         color: $loading-item-text-color;
-        font-size: 24px;
+        font-size: $loading-text-font-size;
         font-stretch: normal;
         font-style: normal;
         font-weight: normal;
         letter-spacing: normal;
-        line-height: 3;
+        line-height: $loading-text-line-height;
         text-align: center;
-        width: 500px;
+        width: $loading-text-width;
 
         @media screen and (max-width: $mobile-width) {
             font-size: 18px;
