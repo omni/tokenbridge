@@ -50,20 +50,20 @@ describe('parseAMBMessage', () => {
   it('should parse data type 00', () => {
     const msgSender = '0x003667154bb32e42bb9e1e6532f19d187fa0082e'
     const msgExecutor = '0xf4bef13f9f4f2b203faf0c3cbbaabe1afe056955'
-    const msgTxHash = '0xbdceda9d8c94838aca10c687da1411a07b1390e88239c0638cb9cc264219cc10'
+    const msgId = '0xbdceda9d8c94838aca10c687da1411a07b1390e88239c0638cb9cc264219cc10'
     const msgGasLimit = '000000000000000000000000000000000000000000000000000000005b877705'
     const msgDataType = '00'
     const msgData = '0xb1591967aed668a4b27645ff40c444892d91bf5951b382995d4d4f6ee3a2ce03'
-    const message = `0x${strip0x(msgTxHash)}${strip0x(msgSender)}${strip0x(
+    const message = `0x${strip0x(msgId)}${strip0x(msgSender)}${strip0x(
       msgExecutor
     )}${msgGasLimit}${msgDataType}${strip0x(msgData)}`
 
     // when
-    const { sender, executor, txHash } = parseAMBMessage(message)
+    const { sender, executor, messageId } = parseAMBMessage(message)
 
     // then
     expect(sender).to.be.equal(msgSender)
     expect(executor).to.be.equal(msgExecutor)
-    expect(txHash).to.be.equal(msgTxHash)
+    expect(messageId).to.be.equal(msgId)
   })
 })

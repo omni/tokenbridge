@@ -1,14 +1,9 @@
 const web3Utils = require('web3').utils
-const { addTxHashToData, parseAMBMessage } = require('../../commons')
+const { parseAMBMessage } = require('../../commons')
 
 function deliveredMsgNotProcessed(processedList) {
   return deliveredMsg => {
-    const msg = parseAMBMessage(
-      addTxHashToData({
-        encodedData: deliveredMsg.returnValues.encodedData,
-        transactionHash: deliveredMsg.transactionHash
-      })
-    )
+    const msg = parseAMBMessage(deliveredMsg.returnValues.encodedData)
     return (
       processedList.filter(processedMsg => {
         return messageEqualsEvent(msg, processedMsg.returnValues)
@@ -21,12 +16,7 @@ function processedMsgNotDelivered(deliveredList) {
   return processedMsg => {
     return (
       deliveredList.filter(deliveredMsg => {
-        const msg = parseAMBMessage(
-          addTxHashToData({
-            encodedData: deliveredMsg.returnValues.encodedData,
-            transactionHash: deliveredMsg.transactionHash
-          })
-        )
+        const msg = parseAMBMessage(deliveredMsg.returnValues.encodedData)
         return messageEqualsEvent(msg, processedMsg.returnValues)
       }).length === 0
     )
@@ -37,7 +27,7 @@ function messageEqualsEvent(parsedMsg, event) {
   return (
     web3Utils.toChecksumAddress(parsedMsg.sender) === event.sender &&
     web3Utils.toChecksumAddress(parsedMsg.executor) === event.executor &&
-    parsedMsg.txHash === event.transactionHash
+    parsedMsg.messageId === event.messageId
   )
 }
 

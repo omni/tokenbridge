@@ -69,7 +69,8 @@ function processCollectedSignaturesBuilder(config) {
         await Promise.all(signaturePromises)
         const signatures = packSignatures(signaturesArray)
 
-        const { txHash } = parseAMBMessage(message)
+        const { messageId } = parseAMBMessage(message)
+        logger.info(`Processing messageId: ${messageId}`)
 
         let gasEstimate
         try {
@@ -83,7 +84,7 @@ function processCollectedSignaturesBuilder(config) {
             signatures,
             message,
             numberOfCollectedSignatures: NumberOfCollectedSignatures,
-            txHash,
+            messageId,
             address: config.validatorAddress
           })
           logger.debug({ gasEstimate }, 'Gas estimated')
