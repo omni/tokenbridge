@@ -4,7 +4,7 @@ import { toHex } from 'web3-utils'
 import foreignLogoPurple from '../assets/images/logos/logo-poa-20-purple@2x.png'
 import homeLogoPurple from '../assets/images/logos/logo-poa-sokol-purple@2x.png'
 import swal from 'sweetalert'
-import { BRIDGE_MODES, ERC_TYPES } from '../../../commons'
+import { BRIDGE_MODES, ERC_TYPES, isErcToErcMode } from '../../../commons'
 import { BridgeAddress } from './index'
 import { BridgeForm } from './index'
 import { BridgeNetwork } from './index'
@@ -19,7 +19,6 @@ import { toDecimals } from '../stores/utils/decimals'
 @observer
 export class Bridge extends React.Component {
   state = {
-    reverse: false,
     amount: '',
     modalData: {},
     confirmationData: {},
@@ -38,32 +37,12 @@ export class Bridge extends React.Component {
     web3Store.getWeb3Promise.then(() => {
       if (!web3Store.metamaskNet.id || !web3Store.foreignNet.id) {
         this.forceUpdate()
-      } else {
-        const reverse = web3Store.metamaskNet.id.toString() === web3Store.foreignNet.id.toString()
-        if (reverse) {
-          this.setState({
-            reverse
-          })
-        }
-      }
-    })
-  }
-
-  componentDidUpdate() {
-    const { web3Store } = this.props.RootStore
-    web3Store.getWeb3Promise.then(() => {
-      const reverse = web3Store.metamaskNet.id.toString() === web3Store.foreignNet.id.toString()
-      if (reverse !== this.state.reverse) {
-        this.setState({
-          reverse
-        })
       }
     })
   }
 
   async _sendToHome(amount) {
     const { web3Store, homeStore, alertStore, txStore, bridgeMode } = this.props.RootStore
-    const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC
     const { isLessThan, isGreaterThan } = this
     if (web3Store.metamaskNet.id.toString() !== web3Store.homeNet.id.toString()) {
       swal('Error', `Please switch wallet to ${web3Store.homeNet.name} network`, 'error')
@@ -98,7 +77,7 @@ export class Bridge extends React.Component {
     } else {
       try {
         alertStore.setLoading(true)
-        if (isErcToErcMode) {
+        if (isErcToErcMode(bridgeMode)) {
           return txStore.erc677transferAndCall({
             to: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
             from: web3Store.defaultAccount.address,
@@ -203,7 +182,7 @@ export class Bridge extends React.Component {
       return
     }
 
-    const { reverse } = this.state
+    const { reverse } = web3Store
     const homeDisplayName = homeStore.networkName
     const foreignDisplayName = foreignStore.networkName
 
@@ -231,8 +210,8 @@ export class Bridge extends React.Component {
   }
 
   onTransferConfirmation = async () => {
-    const { alertStore } = this.props.RootStore
-    const { reverse } = this.state
+    const { alertStore, web3Store } = this.props.RootStore
+    const { reverse } = web3Store
 
     this.setState({ showConfirmation: false, confirmationData: {} })
     const amount = this.state.amount.trim()
@@ -259,7 +238,6 @@ export class Bridge extends React.Component {
 
   loadHomeDetails = () => {
     const { web3Store, homeStore, bridgeMode } = this.props.RootStore
-    const isErcToErcMode = bridgeMode === BRIDGE_MODES.ERC_TO_ERC
     const isExternalErc20 = bridgeMode === BRIDGE_MODES.ERC_TO_ERC || bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE
 
     const modalData = {
@@ -274,7 +252,7 @@ export class Bridge extends React.Component {
       minPerTx: homeStore.minPerTx,
       totalBalance: homeStore.balance,
       balance: homeStore.getDisplayedBalance(),
-      displayTokenAddress: isErcToErcMode,
+      displayTokenAddress: isErcToErcMode(bridgeMode),
       tokenAddress: homeStore.tokenAddress,
       tokenName: homeStore.tokenName,
       displayBridgeLimits: true,
@@ -335,7 +313,8 @@ export class Bridge extends React.Component {
 
   render() {
     const { web3Store, foreignStore, homeStore } = this.props.RootStore
-    const { reverse, showModal, modalData, showConfirmation, confirmationData } = this.state
+    const { showModal, modalData, showConfirmation, confirmationData } = this.state
+    const { reverse } = web3Store
     const formCurrency = reverse ? foreignStore.symbol : homeStore.symbol
 
     if (showModal && Object.keys(modalData).length !== 0) {

@@ -25,11 +25,12 @@ export const NetworkDetails = ({
 }) => {
   const networkTitle = isHome ? 'Bridge Home' : 'Bridge Foreign'
   const logoClass = isHome ? 'home-logo home-logo-modal' : 'foreign-logo foreign-logo-modal'
-  const totalTitle = isHome
-    ? nativeSupplyTitle
-      ? `Native Coins Amount`
-      : `Totally minted by the bridge`
-    : `${currency} Tokens Amount`
+  const totalTitle =
+    isHome && !displayTokenAddress
+      ? nativeSupplyTitle
+        ? `Native Coins Amount`
+        : `Totally minted by the bridge`
+      : `${currency} Tokens Amount`
   const totalAmount = isHome ? totalBalance : totalSupply
   const formattedBalance = isNaN(numeral(balance).format('0.00', Math.floor))
     ? numeral(0).format('0,0.00', Math.floor)

@@ -1,4 +1,6 @@
 require('../../env')
+const url = require('url')
+const dns = require('dns')
 const connection = require('amqp-connection-manager').connect(process.env.ORACLE_QUEUE_URL)
 const logger = require('./logger')
 const { getRetrySequence } = require('../utils/utils')
@@ -10,6 +12,14 @@ connection.on('connect', () => {
 connection.on('disconnect', () => {
   logger.error('Disconnected from amqp Broker')
 })
+
+async function isAttached() {
+  if (!process.env.ORACLE_QUEUE_URL) {
+    return false
+  }
+  const amqpHost = new url.URL(process.env.ORACLE_QUEUE_URL).hostname
+  return new Promise(res => dns.lookup(amqpHost, err => res(err === null)))
+}
 
 function connectWatcherToQueue({ queueName, workerQueue, cb }) {
   const queueList = workerQueue ? [queueName, workerQueue] : [queueName]
@@ -119,6 +129,7 @@ async function generateRetry({ data, msgRetries, channelWrapper, channel, queueN
 }
 
 module.exports = {
+  isAttached,
   connectWatcherToQueue,
   connectSenderToQueue,
   connectWorkerToQueue,

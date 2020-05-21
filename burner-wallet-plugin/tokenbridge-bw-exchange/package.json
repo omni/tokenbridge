@@ -1,0 +1,40 @@
+{
+  "name": "@poanet/tokenbridge-bw-exchange",
+  "version": "1.0.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start-basic": "tsc -w",
+    "start-local": "tsc -w",
+    "test": "TS_NODE_PROJECT=\"tsconfig.testing.json\" mocha -r ts-node/register test/**/*.spec.ts"
+  },
+  "dependencies": {
+    "@burner-wallet/assets": "^1.1.10",
+    "@burner-wallet/core": "^1.1.9",
+    "@burner-wallet/exchange": "^1.1.4",
+    "@burner-wallet/types": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/mocha": "^7.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "ts-node": "^8.8.2",
+    "typescript": "^3.5.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/poanetwork/tokenbridge.git",
+    "directory": "burner-wallet-plugin/tokenbridge-bw-exchange"
+  },
+  "homepage": "https://tokenbridge.net/",
+  "keywords": [
+    "tokenbridge",
+    "burner-wallet"
+  ]
+}

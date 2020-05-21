@@ -27,8 +27,8 @@ export const getCurrentLimit = async (contract, decimals) => {
   }
 }
 
-export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents') =>
-  commonGetPastEvents(contract, { fromBlock, toBlock, event })
+export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents', options = {}) =>
+  commonGetPastEvents(contract, { fromBlock, toBlock, event, options })
 
 export const getErc677TokenAddress = contract => contract.methods.erc677token().call()
 
@@ -84,6 +84,15 @@ export const getHomeFee = async contract => {
 export const getForeignFee = async contract => {
   const feeInWei = await contract.methods.getForeignFee().call()
   return new BN(fromWei(feeInWei.toString()))
+}
+
+export const getFee = async contract => {
+  try {
+    const feeInWei = await contract.methods.getFee().call()
+    return new BN(fromWei(feeInWei.toString()))
+  } catch (e) {
+    return new BN(0)
+  }
 }
 
 export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()

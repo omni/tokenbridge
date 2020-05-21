@@ -6,6 +6,7 @@ coverage
 
 # production
 build
+dist
 
 # misc
 .DS_Store
@@ -48,4 +49,5 @@ __pycache__
 
 #monitor
 monitor/responses/*
+monitor/configs/*.env
 !monitor/.gitkeep

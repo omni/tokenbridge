@@ -7,7 +7,7 @@ import { WalletIcon } from './menu-icons/WalletIcon'
 export class Wallet extends React.Component {
   render() {
     const { web3Store, homeStore, foreignStore, alertStore } = this.props.RootStore
-    const isHome = web3Store.metamaskNet.id.toString() === web3Store.homeNet.id.toString()
+    const isHome = web3Store.isSelectedNetwork(web3Store.homeNet.id)
     const address = web3Store.defaultAccount.address
     const explorerAddressUrl = isHome
       ? homeStore.getExplorerAddressUrl(address)

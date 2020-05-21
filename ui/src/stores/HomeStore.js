@@ -12,7 +12,9 @@ import {
   getBridgeABIs,
   HOME_V1_ABI,
   ERC20_BYTES32_ABI,
-  getDeployedAtBlock
+  getDeployedAtBlock,
+  isErcToErcMode,
+  isMediatorMode
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -37,7 +39,8 @@ import {
   getBlockRewardContract,
   getValidatorContract,
   getRequiredSignatures,
-  getValidatorCount
+  getValidatorCount,
+  getFee
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
@@ -113,19 +116,26 @@ class HomeStore {
   statistics = {
     deposits: 0,
     depositsValue: BN(0),
-    withdraws: 0,
-    withdrawsValue: BN(0),
+    withdrawals: 0,
+    withdrawalsValue: BN(0),
     totalBridged: BN(0),
     users: new Set(),
     finished: false
   }
 
   @observable
+  feeEventsFinished = false
+
+  @observable
+  lastEventRelayedOnHome = 0
+
+  @observable
   depositFeeCollected = {
     value: BN(0),
     type: '',
     shouldDisplay: false,
-    finished: false
+    finished: false,
+    title: ''
   }
 
   @observable
@@ -133,7 +143,8 @@ class HomeStore {
     value: BN(0),
     type: '',
     shouldDisplay: false,
-    finished: false
+    finished: false,
+    title: ''
   }
 
   feeManager = {
@@ -166,7 +177,7 @@ class HomeStore {
     }
     const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
     this.homeBridge = new this.homeWeb3.eth.Contract(HOME_ABI, this.COMMON_HOME_BRIDGE_ADDRESS)
-    if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {
+    if (isErcToErcMode(this.rootStore.bridgeMode)) {
       await this.getTokenInfo()
     } else if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
       await this.getBlockRewardContract()
@@ -180,6 +191,7 @@ class HomeStore {
     this.getFee()
     this.getValidators()
     this.getStatistics()
+    this.getFeeEvents()
     this.calculateCollectedFees()
     setInterval(() => {
       this.getEvents()
@@ -194,8 +206,6 @@ class HomeStore {
     try {
       this.tokenAddress = await getErc677TokenAddress(this.homeBridge)
       this.tokenContract = new this.homeWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, this.tokenAddress)
-      this.symbol = await getSymbol(this.tokenContract)
-      this.tokenName = await getName(this.tokenContract)
       const alternativeContract = new this.homeWeb3.eth.Contract(ERC20_BYTES32_ABI, this.tokenAddress)
       try {
         this.symbol = await getSymbol(this.tokenContract)
@@ -243,7 +253,7 @@ class HomeStore {
   @action
   async getBalance() {
     try {
-      if (this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {
+      if (isErcToErcMode(this.rootStore.bridgeMode)) {
         this.balance = await getTotalSupply(this.tokenContract)
         this.web3Store.getWeb3Promise.then(async () => {
           this.userBalance = await getBalanceOf(this.tokenContract, this.web3Store.defaultAccount.address)
@@ -264,18 +274,28 @@ class HomeStore {
 
   @action
   async getFee() {
-    const feeManager = await getFeeManager(this.homeBridge)
-    if (feeManager !== ZERO_ADDRESS) {
-      const feeManagerModeHash = await getFeeManagerMode(this.homeBridge)
-      this.feeManager.feeManagerMode = decodeFeeManagerMode(feeManagerModeHash)
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
+      const feeManager = await getFeeManager(this.homeBridge)
+      if (feeManager !== ZERO_ADDRESS) {
+        const feeManagerModeHash = await getFeeManagerMode(this.homeBridge)
+        this.feeManager.feeManagerMode = decodeFeeManagerMode(feeManagerModeHash)
 
-      if (this.feeManager.feeManagerMode === FEE_MANAGER_MODE.BOTH_DIRECTIONS) {
-        this.feeManager.homeFee = await getHomeFee(this.homeBridge)
-        this.feeManager.foreignFee = await getForeignFee(this.homeBridge)
+        if (this.feeManager.feeManagerMode === FEE_MANAGER_MODE.BOTH_DIRECTIONS) {
+          this.feeManager.homeFee = await getHomeFee(this.homeBridge)
+          this.feeManager.foreignFee = await getForeignFee(this.homeBridge)
+        } else {
+          this.feeManager.homeFee = new BN(0)
+          this.feeManager.foreignFee = await getForeignFee(this.homeBridge)
+        }
       } else {
+        this.feeManager.feeManagerMode = FEE_MANAGER_MODE.UNDEFINED
         this.feeManager.homeFee = new BN(0)
-        this.feeManager.foreignFee = await getForeignFee(this.homeBridge)
+        this.feeManager.foreignFee = new BN(0)
       }
+    } else if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+      this.feeManager.feeManagerMode = FEE_MANAGER_MODE.ONE_DIRECTION_STAKE
+      this.feeManager.homeFee = await getFee(this.homeBridge)
+      this.feeManager.foreignFee = new BN(0)
     } else {
       this.feeManager.feeManagerMode = FEE_MANAGER_MODE.UNDEFINED
       this.feeManager.homeFee = new BN(0)
@@ -285,64 +305,68 @@ class HomeStore {
 
   @action
   async getEvents(fromBlock, toBlock) {
-    try {
-      fromBlock = fromBlock || this.filteredBlockNumber || this.latestBlockNumber - 50
-      toBlock = toBlock || this.filteredBlockNumber || 'latest'
+    fromBlock = fromBlock || this.filteredBlockNumber || this.latestBlockNumber - 50
+    toBlock = toBlock || this.filteredBlockNumber || 'latest'
 
-      if (fromBlock < 0) {
-        fromBlock = 0
-      }
+    if (fromBlock < 0) {
+      fromBlock = 0
+    }
 
-      let events = await getPastEvents(this.homeBridge, fromBlock, toBlock).catch(e => {
-        console.error("Couldn't get events", e)
-        return []
-      })
-
-      let homeEvents = []
-      await asyncForEach(events, async event => {
-        if (event.event === 'SignedForUserRequest' || event.event === 'CollectedSignatures') {
-          event.signedTxHash = await this.getSignedTx(event.returnValues.messageHash)
-        }
-        homeEvents.push(event)
-      })
-
-      if (!this.filter) {
-        this.events = homeEvents
-      }
-
-      if (this.waitingForConfirmation.size) {
-        const confirmationEvents = homeEvents.filter(
-          event =>
-            event.event === 'AffirmationCompleted' &&
-            this.waitingForConfirmation.has(event.returnValues.transactionHash)
-        )
-        confirmationEvents.forEach(event => {
-          this.alertStore.setLoadingStepIndex(3)
-          const urlExplorer = this.getExplorerTxUrl(event.transactionHash)
-          const unitReceived = getUnit(this.rootStore.bridgeMode).unitHome
-          setTimeout(() => {
-            this.alertStore.pushSuccess(
-              `${unitReceived} received on ${this.networkName} on Tx
-              <a href='${urlExplorer}' target='blank' style="overflow-wrap: break-word;word-wrap: break-word;">
-              ${event.transactionHash}</a>`,
-              this.alertStore.HOME_TRANSFER_SUCCESS
-            )
-          }, 2000)
-          this.waitingForConfirmation.delete(event.returnValues.transactionHash)
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
+      try {
+        let events = await getPastEvents(this.homeBridge, fromBlock, toBlock).catch(e => {
+          console.error("Couldn't get events", e)
+          return []
         })
 
-        if (confirmationEvents.length) {
-          removePendingTransaction()
-        }
-      }
+        let homeEvents = []
+        await asyncForEach(events, async event => {
+          if (event.event === 'SignedForUserRequest' || event.event === 'CollectedSignatures') {
+            event.signedTxHash = await this.getSignedTx(event.returnValues.messageHash)
+          }
+          homeEvents.push(event)
+        })
 
-      return homeEvents
-    } catch (e) {
-      this.alertStore.pushError(
-        `Cannot establish connection to Home Network.\n
+        if (!this.filter) {
+          this.events = homeEvents
+        }
+
+        if (this.waitingForConfirmation.size) {
+          const confirmationEvents = homeEvents.filter(
+            event =>
+              event.event === 'AffirmationCompleted' &&
+              this.waitingForConfirmation.has(event.returnValues.transactionHash)
+          )
+          confirmationEvents.forEach(event => {
+            this.alertStore.setLoadingStepIndex(3)
+            const urlExplorer = this.getExplorerTxUrl(event.transactionHash)
+            const unitReceived = getUnit(this.rootStore.bridgeMode).unitHome
+            setTimeout(() => {
+              this.alertStore.pushSuccess(
+                `${unitReceived} received on ${this.networkName} on Tx
+              <a href='${urlExplorer}' target='blank' style="overflow-wrap: break-word;word-wrap: break-word;">
+              ${event.transactionHash}</a>`,
+                this.alertStore.HOME_TRANSFER_SUCCESS
+              )
+            }, 2000)
+            this.waitingForConfirmation.delete(event.returnValues.transactionHash)
+          })
+
+          if (confirmationEvents.length) {
+            removePendingTransaction()
+          }
+        }
+
+        return homeEvents
+      } catch (e) {
+        this.alertStore.pushError(
+          `Cannot establish connection to Home Network.\n
                  Please make sure you have set it up in env variables`,
-        this.alertStore.HOME_CONNECTION_ERROR
-      )
+          this.alertStore.HOME_CONNECTION_ERROR
+        )
+      }
+    } else {
+      this.detectMediatorTransferFinished(fromBlock, toBlock)
     }
   }
 
@@ -408,30 +432,46 @@ class HomeStore {
 
   @action
   async getValidators() {
-    try {
-      const homeValidatorsAddress = await getValidatorContract(this.homeBridge)
-      this.homeBridgeValidators = new this.homeWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorsAddress)
+    if (!isMediatorMode(this.rootStore.bridgeMode)) {
+      try {
+        const homeValidatorsAddress = await getValidatorContract(this.homeBridge)
+        this.homeBridgeValidators = new this.homeWeb3.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorsAddress)
 
-      this.requiredSignatures = await getRequiredSignatures(this.homeBridgeValidators)
-      this.validatorsCount = await getValidatorCount(this.homeBridgeValidators)
+        this.requiredSignatures = await getRequiredSignatures(this.homeBridgeValidators)
+        this.validatorsCount = await getValidatorCount(this.homeBridgeValidators)
 
-      this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth)
-    } catch (e) {
-      console.error(e)
+        this.validators = await getValidatorList(homeValidatorsAddress, this.homeWeb3.eth)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 
   async getStatistics() {
     try {
-      const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
-      const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
-      const abi = [...HOME_V1_ABI, ...HOME_ABI]
-      const contract = new this.homeWeb3.eth.Contract(abi, this.COMMON_HOME_BRIDGE_ADDRESS)
-      const events = await getPastEvents(contract, deployedAtBlock, 'latest')
-      processLargeArrayAsync(events, this.processEvent, () => {
-        this.statistics.finished = true
-        this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawsValue)
-      })
+      if (!isMediatorMode(this.rootStore.bridgeMode)) {
+        const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
+        const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
+        const abi = [...HOME_V1_ABI, ...HOME_ABI]
+        const contract = new this.homeWeb3.eth.Contract(abi, this.COMMON_HOME_BRIDGE_ADDRESS)
+        const events = await getPastEvents(contract, deployedAtBlock, 'latest')
+        processLargeArrayAsync(events, this.processEvent, () => {
+          this.statistics.finished = true
+          this.statistics.totalBridged = this.statistics.totalBridged.plus(this.statistics.depositsValue)
+        })
+      } else {
+        const events = await getPastEvents(this.homeBridge, 0, 'latest', 'TokensBridged')
+        processLargeArrayAsync(events, this.processMediatorEvent, () => {
+          this.statistics.finished = true
+          this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawalsValue)
+        })
+        const lastEventRelayedOnHome = events.length ? events[events.length - 1] : null
+        if (lastEventRelayedOnHome) {
+          const blockNumber = lastEventRelayedOnHome.blockNumber
+          const block = await this.homeWeb3.eth.getBlock(blockNumber)
+          this.lastEventRelayedOnHome = block.timestamp
+        }
+      }
     } catch (e) {
       console.error(e)
       this.getStatistics()
@@ -448,8 +488,8 @@ class HomeStore {
         BN(fromDecimals(event.returnValues.value, this.tokenDecimals))
       )
     } else if (event.event === 'AffirmationCompleted' || event.event === 'Withdraw') {
-      this.statistics.withdraws++
-      this.statistics.withdrawsValue = this.statistics.withdrawsValue.plus(
+      this.statistics.withdrawals++
+      this.statistics.withdrawalsValue = this.statistics.withdrawalsValue.plus(
         BN(fromDecimals(event.returnValues.value, this.tokenDecimals))
       )
     } else if (event.event === 'FeeDistributedFromSignatures') {
@@ -463,9 +503,49 @@ class HomeStore {
     }
   }
 
+  processMediatorEvent = event => {
+    if (event.returnValues && event.returnValues.recipient) {
+      this.statistics.users.add(event.returnValues.recipient)
+    }
+    this.statistics.deposits++
+    this.statistics.depositsValue = this.statistics.depositsValue.plus(
+      BN(fromDecimals(event.returnValues.value, this.tokenDecimals))
+    )
+  }
+
+  async getFeeEvents() {
+    try {
+      if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+        const blockRewardAddress = await getBlockRewardContract(this.homeBridge)
+        const blockRewardContract = new this.homeWeb3.eth.Contract(BLOCK_REWARD_ABI, blockRewardAddress)
+        const events = await getPastEvents(blockRewardContract, 0, 'latest', 'BridgeTokenRewardAdded', {
+          filter: {
+            bridge: this.COMMON_HOME_BRIDGE_ADDRESS
+          }
+        })
+
+        processLargeArrayAsync(events, this.processFeeEvents, () => {
+          this.feeEventsFinished = true
+        })
+      } else {
+        this.feeEventsFinished = true
+      }
+    } catch (e) {
+      console.error(e)
+      this.getFeeEvents()
+    }
+  }
+
+  processFeeEvents = event => {
+    this.feeManager.totalFeeDistributedFromSignatures = this.feeManager.totalFeeDistributedFromSignatures.plus(
+      BN(fromDecimals(event.returnValues.amount, this.tokenDecimals))
+    )
+  }
+
   calculateCollectedFees() {
     if (
       !this.statistics.finished ||
+      !this.feeEventsFinished ||
       !this.rootStore.foreignStore.feeEventsFinished ||
       !this.feeManager.feeManagerMode ||
       !this.rootStore.foreignStore.feeManager.feeManagerMode
@@ -493,6 +573,10 @@ class HomeStore {
         ? this.feeManager.totalFeeDistributedFromAffirmation
         : this.rootStore.foreignStore.feeManager.totalFeeDistributedFromAffirmation
 
+    if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
+      this.depositFeeCollected.title = 'Withdrawal Fees'
+    }
+
     this.depositFeeCollected.finished = true
     this.withdrawFeeCollected.finished = true
   }
@@ -502,9 +586,7 @@ class HomeStore {
   }
 
   getDisplayedBalance() {
-    return this.rootStore.bridgeMode === BRIDGE_MODES.ERC_TO_ERC
-      ? this.userBalance
-      : this.web3Store.defaultAccount.homeBalance
+    return isErcToErcMode(this.rootStore.bridgeMode) ? this.userBalance : this.web3Store.defaultAccount.homeBalance
   }
 
   async getBlockRewardContract() {
@@ -525,6 +607,33 @@ class HomeStore {
       return Promise.resolve()
     } else {
       return sleep(5000).then(() => this.waitUntilProcessed(txHash, value))
+    }
+  }
+
+  async detectMediatorTransferFinished(fromBlock, toBlock) {
+    if (this.waitingForConfirmation.size > 0) {
+      try {
+        const events = await getPastEvents(this.homeBridge, fromBlock, toBlock, 'TokensBridged')
+        const confirmationEvents = events.filter(event => this.waitingForConfirmation.has(event.returnValues.messageId))
+        if (confirmationEvents.length > 0) {
+          const event = events[0]
+          this.alertStore.setLoadingStepIndex(3)
+          const urlExplorer = this.getExplorerTxUrl(event.transactionHash)
+          const unitReceived = getUnit(this.rootStore.bridgeMode).unitHome
+          this.waitingForConfirmation.delete(event.returnValues.messageId)
+          removePendingTransaction()
+          setTimeout(() => {
+            this.alertStore.pushSuccess(
+              `${unitReceived} received on ${this.networkName} on Tx
+            <a href='${urlExplorer}' target='blank' style="overflow-wrap: break-word;word-wrap: break-word;">
+            ${event.transactionHash}</a>`,
+              this.alertStore.HOME_TRANSFER_SUCCESS
+            )
+          }, 2000)
+        }
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 }

@@ -1,0 +1,40 @@
+{
+  "name": "staging",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@burner-wallet/assets": "^1.1.10",
+    "@burner-wallet/core": "^1.1.0",
+    "@burner-wallet/exchange": "^1.1.4",
+    "@burner-wallet/metamask-plugin": "^1.0.0",
+    "@burner-wallet/modern-ui": "^1.0.7",
+    "@poanet/tokenbridge-bw-exchange": "^1.0.0",
+    "@types/node": "12.0.4",
+    "@types/react": "*",
+    "@types/react-dom": "16.8.4",
+    "@types/react-router-dom": "^4.3.3",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "3.0.1",
+    "typescript": "3.5.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {}
+}
