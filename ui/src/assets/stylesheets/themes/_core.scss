@@ -195,6 +195,19 @@ $copy-icon-color: $primary-color;
 $status-text-color: $text-color;
 $status-authority-number-color: $primary-color;
 $status-authority-address-color: $text-color;
+$status-title-font-size: 24px;
+$status-title-line-height: 3;
+$status-title-font-weight: normal;
+$status-title-letter-spacing: normal;
+$status-title-text-transform: none;
+$status-container-flex-direction: column;
+$status-container-mobile-flex-direction: $status-container-flex-direction;
+$status-container-justify-content: unset;
+$status-container-padding: 30px 0 25px 0;
+$status-title-padding: 0 0 0 0;
+$status-page-container-mobile-width: 100%;
+$status-configuration-data-display: grid;
+$status-configuration-container-padding: 0 0 0 0;
 
 $status-authority-logo-0: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-0.svg';
 $status-authority-logo-1: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-1.svg';
@@ -202,8 +215,25 @@ $status-authority-logo-2: $base-images-path + '/themes/' + $theme-name + '/statu
 
 // datablock
 $datablock-value-color: $primary-color;
+$datablock-value-font-size: 30px;
+$datablock-value-line-height: 35px;
+$datablock-type-font-size: 18px;
+$datablock-type-line-height: 21px;
+$datablock-type-font-weight: normal;
+$datablock-type-margin-left: 10px;
 $datablock-type-color: $primary-color;
 $datablock-text-color: $text-color;
+$datablock-container-width: auto;
+$datablock-container-height: auto;
+$datablock-container-background: transparent;
+$datablock-container-border: none;
+$datablock-container-box-sizing: unset;
+$datablock-container-border-radius: 0;
+$datablock-container-margin: 0 0 0 0;
+$datablock-container-mobile-align-items: normal;
+$datablock-container-mobile-justify-content: flex-start;
+$datablock-description-font-size: 14px;
+$datablock-description-line-height: 16px;
 
 // statistics
 $statistics-title-color: $text-color;
