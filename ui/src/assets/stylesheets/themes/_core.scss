@@ -184,9 +184,9 @@ $transfer-alert-confirm-button-order: 0;
 $transfer-alert-container-justify-content: space-around;
 $transfer-description-padding: 10px 0 10px 0;
 $transfer-buttons-padding: 20px 0 0;
-$transfer-operation-arrow-line-image: '';
-$transfer-operation-arrow-ellipse-image: '';
-$transfer-operation-arrow-image: '';
+$transfer-operation-arrow-line-image: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
+$transfer-operation-arrow-ellipse-image: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
+$transfer-operation-arrow-image: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
 
 // copy icon
 $copy-icon-color: $primary-color;
@@ -237,6 +237,18 @@ $datablock-description-line-height: 16px;
 
 // statistics
 $statistics-title-color: $text-color;
+$statistics-title-font-size: $status-title-font-size;
+$statistics-title-line-height: 1.5;
+$statistics-title-font-weight: normal;
+$statistics-title-letter-spacing: normal;
+$statistics-title-text-transform: none;
+$statistics-title-padding: 0 0 20px 0;
+$statistics-fee-container-order: 0;
+$statistics-fee-container-padding: 90px 0 0 0;
+$statistics-fee-data-justify-content: space-evenly;
+$statistics-fee-container-width: 50%;
+$statistics-deposit-container-width: 40%;
+$statistics-bridge-data-mobile-margin: 0 0 0 0;
 
 // events
 $events-title-color: $text-color;

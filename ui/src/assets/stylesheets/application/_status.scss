@@ -48,6 +48,12 @@
           display: $status-configuration-data-display;
           grid-template-columns: 1fr 1fr;
           row-gap: 20px;
+          flex-wrap: wrap;
+          justify-content: $statistics-fee-data-justify-content;
+
+          .datablock-container {
+            margin: $statistics-bridge-data-mobile-margin;
+          }
         }
       }
     }

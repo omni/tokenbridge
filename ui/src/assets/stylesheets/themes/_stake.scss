@@ -46,7 +46,7 @@ $footer-text-color: #fff;
 $separator-color: #e4e4e4;
 
 // background
-$pattern-background-image: '';
+$pattern-background-image: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
 
 // social icons
 $social-icons-background-color: #fff;
@@ -201,11 +201,11 @@ $status-title-line-height: 14px;
 $status-title-font-weight: bold;
 $status-title-letter-spacing: 0.2em;
 $status-title-text-transform: uppercase;
+$status-title-padding: 0 0 17px 0;
 $status-container-flex-direction: row;
 $status-container-mobile-flex-direction: column;
 $status-container-justify-content: space-between;
 $status-container-padding: 37px 0 0 0;
-$status-title-padding: 0 0 17px 0;
 $status-page-container-mobile-width: 95%;
 $status-configuration-data-display: flex;
 $status-configuration-container-padding: 0 0 30px 0;
@@ -237,7 +237,19 @@ $datablock-description-font-size: 12px;
 $datablock-description-line-height: 14px;
 
 // statistics
-$statistics-title-color: $text-color;
+$statistics-title-color: $status-text-color;
+$statistics-title-font-size: $status-title-font-size;
+$statistics-title-line-height: $status-title-line-height;
+$statistics-title-font-weight: $status-title-font-weight;
+$statistics-title-letter-spacing: $status-title-letter-spacing;
+$statistics-title-text-transform: $status-title-text-transform;
+$statistics-title-padding: $status-title-padding;
+$statistics-fee-container-order: 1;
+$statistics-fee-container-padding: 38px 0 0 0;
+$statistics-fee-data-justify-content: flex-start;
+$statistics-fee-container-width: auto;
+$statistics-deposit-container-width: auto;
+$statistics-bridge-data-mobile-margin: 0 0 10px 0;
 
 // events
 $events-title-color: $text-color;

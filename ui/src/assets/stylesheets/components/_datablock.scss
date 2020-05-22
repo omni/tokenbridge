@@ -4,6 +4,7 @@
     flex-direction: column;
     justify-content: space-evenly;
     width: $datablock-container-width;
+    min-width: $datablock-container-width;
     height: $datablock-container-height;
     background-color: $datablock-container-background;
     border: $datablock-container-border;
@@ -14,6 +15,7 @@
     @media screen and (max-width: $tablet-width) {
       align-items: $datablock-container-mobile-align-items;
       justify-content: $datablock-container-mobile-justify-content;
+      min-width: auto;
     }
 
     .datablock-value {
