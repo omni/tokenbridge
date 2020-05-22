@@ -20,11 +20,21 @@
 .menu-items-text {
   color: $header-menu-text-color;
   margin-left: 10px;
+
+  &-selected {
+    color: $header-menu-text-color-selected;
+  }
 }
 
 .menu-items-icon {
   float: left;
   path {
     fill: $header-menu-icon-color;
+  }
+
+  &-selected {
+    path {
+      fill: $header-menu-icon-color-selected;
+    }
   }
 }

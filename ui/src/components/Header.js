@@ -10,12 +10,33 @@ import { inject, observer } from 'mobx-react/index'
 @inject('RootStore')
 @observer
 export class Header extends React.Component {
+  state = {
+    selected: '/'
+  }
+
+  componentDidMount() {
+    this.setState({ selected: window.location.pathname })
+  }
+
+  changeSelectedMenuMobile = newSelected => {
+    const { onMenuToggle } = this.props
+    this.changeSelectedMenu(newSelected)
+    onMenuToggle()
+  }
+
+  changeSelectedMenu = newSelected => {
+    if (newSelected !== this.state.selected) {
+      this.setState({ selected: newSelected })
+    }
+  }
+
   render() {
     const {
       showMobileMenu,
       onMenuToggle,
       RootStore: { alertStore, web3Store }
     } = this.props
+    const { selected } = this.state
     const {
       REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME,
       REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN,
@@ -26,10 +47,21 @@ export class Header extends React.Component {
 
     return (
       <header className={`header header-${REACT_APP_UI_STYLES}`}>
-        {showMobileMenu ? <MobileMenu withoutEvents={withoutEvents} onMenuToggle={onMenuToggle} /> : null}
+        {showMobileMenu ? (
+          <MobileMenu selected={selected} withoutEvents={withoutEvents} onMenuToggle={this.changeSelectedMenuMobile} />
+        ) : null}
         <div className="container">
-          <Link to="/" onClick={showMobileMenu ? onMenuToggle : null} className="header-logo" />
-          <HeaderMenu withoutEvents={withoutEvents} onMenuToggle={onMenuToggle} displayEventsTab={displayEventsTab} />
+          <Link
+            to="/"
+            onClick={showMobileMenu ? onMenuToggle : () => this.changeSelectedMenu('/')}
+            className="header-logo"
+          />
+          <HeaderMenu
+            selected={selected}
+            withoutEvents={withoutEvents}
+            onMenuToggle={this.changeSelectedMenu}
+            displayEventsTab={displayEventsTab}
+          />
           <MobileMenuButton onMenuToggle={onMenuToggle} showMobileMenu={showMobileMenu} />
         </div>
         {alertStore && alertStore.showDailyQuotaInfo && <DailyQuotaModal />}
