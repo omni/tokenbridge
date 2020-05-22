@@ -23,6 +23,18 @@
       font-size: $datablock-value-font-size;
       line-height: $datablock-value-line-height;
       font-weight: bold;
+
+      &-green {
+        color: #4DA9A6;
+      }
+
+      &-yellow {
+        color: #FFA800;
+      }
+
+      &-red {
+        color: #FF002E;
+      }
     }
 
     .datablock-type {
