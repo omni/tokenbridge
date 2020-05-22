@@ -80,6 +80,7 @@ strong {
 }
 
 .separator {
+  display: $separator-display;
   background-color: $separator-color;
   height: 51px;
   width: 1px;
