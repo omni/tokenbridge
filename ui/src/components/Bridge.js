@@ -1,8 +1,6 @@
 import BN from 'bignumber.js'
 import React from 'react'
 import { toHex } from 'web3-utils'
-import foreignLogoPurple from '../assets/images/logos/logo-poa-20-purple@2x.png'
-import homeLogoPurple from '../assets/images/logos/logo-poa-sokol-purple@2x.png'
 import swal from 'sweetalert'
 import { BRIDGE_MODES, ERC_TYPES, isErcToErcMode } from '../../../commons'
 import { BridgeAddress } from './index'
@@ -242,9 +240,8 @@ export class Bridge extends React.Component {
 
     const modalData = {
       isHome: true,
-      networkData: web3Store.homeNet,
+      networkName: homeStore.networkName,
       url: web3Store.COMMON_HOME_RPC_URL,
-      logo: homeLogoPurple,
       address: homeStore.COMMON_HOME_BRIDGE_ADDRESS,
       currency: homeStore.symbol,
       maxCurrentLimit: homeStore.maxCurrentDeposit,
@@ -271,9 +268,8 @@ export class Bridge extends React.Component {
 
     const modalData = {
       isHome: false,
-      networkData: web3Store.foreignNet,
+      networkName: foreignStore.networkName,
       url: foreignDisplayUrl,
-      logo: foreignLogoPurple,
       address: foreignStore.COMMON_FOREIGN_BRIDGE_ADDRESS,
       currency: foreignStore.symbol,
       maxCurrentLimit: foreignStore.maxCurrentDeposit,
@@ -292,6 +288,11 @@ export class Bridge extends React.Component {
   }
 
   getNetworkTitle = networkName => {
+    const { REACT_APP_UI_STYLES } = process.env
+    if (REACT_APP_UI_STYLES === 'stake') {
+      return networkName
+    }
+
     const index = networkName.indexOf(' ')
 
     if (index === -1) {
@@ -302,6 +303,11 @@ export class Bridge extends React.Component {
   }
 
   getNetworkSubTitle = networkName => {
+    const { REACT_APP_UI_STYLES } = process.env
+    if (REACT_APP_UI_STYLES === 'stake') {
+      return false
+    }
+
     const index = networkName.indexOf(' ')
 
     if (index === -1) {
@@ -312,6 +318,7 @@ export class Bridge extends React.Component {
   }
 
   render() {
+    const { REACT_APP_UI_STYLES } = process.env
     const { web3Store, foreignStore, homeStore } = this.props.RootStore
     const { showModal, modalData, showConfirmation, confirmationData } = this.state
     const { reverse } = web3Store
@@ -335,10 +342,10 @@ export class Bridge extends React.Component {
         <div className="bridge">
           <BridgeAddress isHome={true} reverse={reverse} />
           <div className="bridge-transfer">
-            <div className="left-image-wrapper">
+            <div className={`left-image-wrapper left-image-wrapper-${REACT_APP_UI_STYLES}`}>
               <div className="left-image" />
             </div>
-            <div className="bridge-transfer-content">
+            <div className={`bridge-transfer-content bridge-transfer-content-${REACT_APP_UI_STYLES}`}>
               <div className="bridge-transfer-content-background">
                 <BridgeNetwork
                   balance={reverse ? foreignStore.balance : homeStore.getDisplayedBalance()}
@@ -367,7 +374,7 @@ export class Bridge extends React.Component {
                 />
               </div>
             </div>
-            <div className="right-image-wrapper">
+            <div className={`right-image-wrapper right-image-wrapper-${REACT_APP_UI_STYLES}`}>
               <div className="right-image" />
             </div>
           </div>

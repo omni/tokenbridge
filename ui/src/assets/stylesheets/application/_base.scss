@@ -80,6 +80,7 @@ strong {
 }
 
 .separator {
+  display: $separator-display;
   background-color: $separator-color;
   height: 51px;
   width: 1px;
@@ -101,4 +102,8 @@ strong {
   @media screen and (max-width: $tablet-width) {
     display: inherit;
   }
+}
+
+.swal-button {
+  background-color: $base-button-bg-color;
 }

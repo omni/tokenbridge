@@ -52,8 +52,7 @@
   margin-left: 10px;
   transition: .15s ease-in;
   path {
-    fill: #fff;
-    opacity: .52;
+    fill: $header-menu-text-color;
   }
 }
 
@@ -86,7 +85,7 @@
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: #fff;
+    color: $header-menu-text-color;
     transition: .15s ease-in;
     height: 50px;
     background-color: transparent;
@@ -120,7 +119,7 @@
   -webkit-user-select: none;
   user-select: none;
   align-items: center;
-  color: #fff;
+  color: $header-menu-text-color;
   display: flex;
   font-weight: bold;
   height: 18px;
@@ -160,5 +159,5 @@
 }
 
 .nl-IconNetwork_Path {
-  fill: #60db97;
+  fill: $header-menu-icon-color;
 }

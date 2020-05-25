@@ -2,7 +2,6 @@ import { action, computed, observable } from 'mobx'
 import getWeb3, { getBalance, getWeb3Instance, getNetwork } from './utils/web3'
 import { balanceLoaded } from './utils/testUtils'
 import { BRIDGE_MODES } from '../../../commons'
-import { toHex } from 'web3-utils'
 
 class Web3Store {
   @observable
