@@ -3,11 +3,6 @@
   @media (min-width: $tablet-width) {
     position: relative;
     margin-left: 10px;
-    &:hover {
-      .NetworkSelect_List {
-        display: block;
-      }
-    }
   }
 }
 
@@ -160,4 +155,10 @@
 
 .nl-IconNetwork_Path {
   fill: $header-menu-icon-color;
+}
+
+.Show-NetworkSelect_List {
+  @media (min-width: $tablet-width) {
+    display: block;
+  }
 }
