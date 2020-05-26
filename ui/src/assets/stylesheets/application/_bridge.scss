@@ -460,7 +460,7 @@
                         }
 
                         &:hover {
-                            background-color: darken($bridge-button-background-color, 10%);
+                            background-color: $button-bridge-form-hover-background-color;
                         }
                     }
                     .bridge-transfer-direction {
@@ -814,6 +814,8 @@
 
                     &:hover {
                         opacity: $button-transfer-cancel-hover-opacity;
+                        background-color: $button-transfer-cancel-hover-background-color;
+                        color: $button-transfer-cancel-hover-text-color;
                     }
                 }
             }

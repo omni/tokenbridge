@@ -10,6 +10,7 @@ $tertiary-color: #ffaa07;
 $danger-color: #f13662;
 $blue-color: #3ab9fe;
 $base-button-bg-color: #4DA9A6;
+$base-button-bg-color-darker: #408684;
 
 $text-color: #333;
 $link-color: #4DA9A6;
@@ -95,9 +96,11 @@ $button-transfer-cancel-height: 42px;
 $button-transfer-cancel-max-width: 150px;
 $button-transfer-confirm-border-radius: 2px;
 $button-transfer-confirm-font-size: 14px;
-$button-transfer-confirm-hover-background-color: $button-background-color;
+$button-transfer-confirm-hover-background-color: $base-button-bg-color-darker;
 $button-transfer-confirm-height: 42px;
 $button-transfer-confirm-max-width: 150px;
+$button-transfer-cancel-hover-background-color: #75818D;
+$button-transfer-cancel-hover-text-color: #E6ECF1;
 
 // modals
 $modal-background-color: #fff;
@@ -169,6 +172,7 @@ $bridge-input-label-font-size: 20px;
 $bridge-input-label-line-height: 42px;
 $bridge-input-label-margin: 0 20px 0 0;
 $bridge-transfer-button-border-radius: 2px 2px 2px 2px;
+$button-bridge-form-hover-background-color: $base-button-bg-color-darker;
 
 // Network details
 $network-details-body-border-radius: 10px;

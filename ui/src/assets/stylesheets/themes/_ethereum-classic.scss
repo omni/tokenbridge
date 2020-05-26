@@ -169,6 +169,9 @@ $bridge-input-label-font-size: 24px;
 $bridge-input-label-line-height: 48px;
 $bridge-input-label-margin: 0 10px;
 $bridge-transfer-button-border-radius: 0 0 3px 3px;
+$button-bridge-form-hover-background-color: darken($bridge-button-background-color, 10%);
+$button-transfer-cancel-hover-background-color: $button-bordered-background-color;
+$button-transfer-cancel-hover-text-color: $button-bordered-text-color;
 
 // Network details
 $network-details-body-border-radius: 0 10px 10px 10px;
