@@ -32,4 +32,14 @@
 
 .social-alternative-icons-item {
   margin-left: 10px;
+
+  &:hover {
+    circle {
+      fill: #9EAAB6;
+    }
+
+    path {
+      fill: #DBE0E5;
+    }
+  }
 }
