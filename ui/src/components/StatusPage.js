@@ -6,6 +6,7 @@ import { inject, observer } from 'mobx-react'
 import { isMediatorMode } from 'commons'
 import { formatDistanceStrict } from 'date-fns'
 import { DataBlock } from './DataBlock'
+import { getDateColor } from './utils/date'
 
 @inject('RootStore')
 @observer
@@ -28,6 +29,8 @@ export class StatusPage extends React.Component {
     let fromForeignToHomeText
     let lastEventOnHome
     let lastEventOnForeign
+    let lastEventOnHomeColor
+    let lastEventOnForeignColor
     if (displayLatestOperations) {
       fromHomeToForeignText = `From ${homeStore.networkName} To ${foreignStore.networkName}`
       fromForeignToHomeText = `From ${foreignStore.networkName} To ${homeStore.networkName}`
@@ -36,11 +39,13 @@ export class StatusPage extends React.Component {
       lastEventOnHome = formatDistanceStrict(lastDateOnHome, new Date(), {
         addSuffix: true
       })
+      lastEventOnHomeColor = getDateColor(lastDateOnHome)
 
       const lastDateOnForeign = new Date(0).setUTCSeconds(foreignStore.lastEventRelayedOnForeign)
       lastEventOnForeign = formatDistanceStrict(lastDateOnForeign, new Date(), {
         addSuffix: true
       })
+      lastEventOnForeignColor = getDateColor(lastDateOnForeign)
     }
     return (
       <div className="status-page">
@@ -70,8 +75,18 @@ export class StatusPage extends React.Component {
             <div className="status-configuration-container">
               <span className="status-configuration-title status-title">Latest Operations</span>
               <div className="status-configuration-data">
-                <DataBlock description={fromHomeToForeignText} value={lastEventOnForeign} type="" />
-                <DataBlock description={fromForeignToHomeText} value={lastEventOnHome} type="" />
+                <DataBlock
+                  description={fromHomeToForeignText}
+                  value={lastEventOnForeign}
+                  type=""
+                  valueClass={lastEventOnHomeColor}
+                />
+                <DataBlock
+                  description={fromForeignToHomeText}
+                  value={lastEventOnHome}
+                  type=""
+                  valueClass={lastEventOnForeignColor}
+                />
               </div>
             </div>
           )}

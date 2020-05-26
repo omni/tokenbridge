@@ -21,13 +21,17 @@
             }
         }
         .wallet-text {
-            color: #fff;
+            color: $wallet-text;
             font-size: 14px;
             font-weight: bold;
             line-height: 18px;
             &:hover {
                 text-decoration: none;
             }
+
+          &-stake {
+            font-weight: normal;
+          }
         }
         .wallet-link {
             cursor: pointer;

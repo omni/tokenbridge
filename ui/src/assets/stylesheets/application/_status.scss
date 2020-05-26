@@ -4,13 +4,15 @@
 
   .status-page-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: $status-container-flex-direction;
+    justify-content: $status-container-justify-content;
     max-width: $container-width;
     width: 70%;
-    padding-bottom: 25px;
+    padding: $status-container-padding;
 
     @media screen and (max-width: $tablet-width-landscape) {
-      width: 100%;
+      width: $status-page-container-mobile-width;
+      flex-direction: $status-container-mobile-flex-direction;
     }
 
     @media screen and (max-width: $tablet-width) {
@@ -20,15 +22,22 @@
 
     .status-title {
       color: $status-text-color;
-      font-size: 24px;
-      line-height: 3;
+      font-size: $status-title-font-size;
+      line-height: $status-title-line-height;
       text-align: left;
+      font-weight: $status-title-font-weight;
+      letter-spacing: $status-title-letter-spacing;
+      text-transform: $status-title-text-transform;
+      padding: $status-title-padding;
     }
 
     .status-configuration-container {
       display: flex;
       flex-direction: column;
-      padding-top: 30px;
+
+      @media screen and (max-width: $tablet-width) {
+        padding: $status-configuration-container-padding;
+      }
 
       .status-configuration-data {
         display: flex;
@@ -36,9 +45,15 @@
 
         @media screen and (max-width: $tablet-width) {
           column-gap: 30px;
-          display: grid;
+          display: $status-configuration-data-display;
           grid-template-columns: 1fr 1fr;
           row-gap: 20px;
+          flex-wrap: wrap;
+          justify-content: $statistics-fee-data-justify-content;
+
+          .datablock-container {
+            margin: $statistics-bridge-data-mobile-margin;
+          }
         }
       }
     }

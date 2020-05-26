@@ -11,8 +11,7 @@ import {
   getTokenType,
   ERC20_BYTES32_ABI,
   getDeployedAtBlock,
-  isMediatorMode,
-  HOME_V1_ABI
+  isMediatorMode
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -203,11 +202,13 @@ class ForeignStore {
       try {
         this.symbol = await getSymbol(this.tokenContract)
       } catch (e) {
+        // eslint-disable-next-line no-control-regex
         this.symbol = this.foreignWeb3.utils.hexToAscii(await getSymbol(alternativeContract)).replace(/\u0000*$/, '')
       }
       try {
         this.tokenName = await getName(this.tokenContract)
       } catch (e) {
+        // eslint-disable-next-line no-control-regex
         this.tokenName = this.foreignWeb3.utils.hexToAscii(await getName(alternativeContract)).replace(/\u0000*$/, '')
       }
 

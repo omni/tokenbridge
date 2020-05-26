@@ -27,7 +27,7 @@
   }
 
   &-logo {
-    background-image: url('#{ $logo-image }');
+    background-image: url('#{ $footer-logo-image }');
     background-repeat: no-repeat;
     background-size: contain;
     display: block;

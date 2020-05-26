@@ -210,11 +210,13 @@ class HomeStore {
       try {
         this.symbol = await getSymbol(this.tokenContract)
       } catch (e) {
+        // eslint-disable-next-line no-control-regex
         this.symbol = this.homeWeb3.utils.hexToAscii(await getSymbol(alternativeContract)).replace(/\u0000*$/, '')
       }
       try {
         this.tokenName = await getName(this.tokenContract)
       } catch (e) {
+        // eslint-disable-next-line no-control-regex
         this.tokenName = this.homeWeb3.utils.hexToAscii(await getName(alternativeContract)).replace(/\u0000*$/, '')
       }
       this.tokenDecimals = await getDecimals(this.tokenContract)
