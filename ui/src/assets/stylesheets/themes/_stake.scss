@@ -33,6 +33,7 @@ $header-menu-icon-color: #9EAAB6;
 $header-menu-text-color: #242A31;
 $header-menu-icon-color-selected: #4DA9A6;
 $header-menu-text-color-selected: #4DA9A6;
+$header-font-size: 14px;
 
 // daily quota
 $wallet-text: #3C454E;
@@ -118,6 +119,7 @@ $modal-close-button-right-mobile: 10px;
 $modal-min-width: 500px;
 $modal-min-height: 300px;
 $daily-quota-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/daily-quota-modal.svg';
+$network-select-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/network-select-modal.svg';
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-dark;
