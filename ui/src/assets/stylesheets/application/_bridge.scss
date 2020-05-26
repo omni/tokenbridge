@@ -206,6 +206,10 @@
                 flex-wrap: wrap;
                 width: $bridge-transfer-width;
 
+                &-stake {
+                  justify-content: space-between;
+                }
+
                 @media screen and (max-width: $tablet-width) {
                     background-image: url('#{ $bridge-image-center-pointing-down }');
                     background-position: center;
@@ -225,6 +229,10 @@
                 padding: $network-container-padding;
                 width: 22%;
 
+                &-stake {
+                  width: 260px;
+                }
+
                 @media screen and (max-width: $tablet-width) {
                     align-items: center;
                     align-self: center;
@@ -232,6 +240,10 @@
                     padding: 5px 0 5px 0;
                     width: auto;
                     justify-content: space-around;
+
+                  &-stake {
+                    width: auto;
+                  }
                 }
             }
             .network-container-foreign {
@@ -243,6 +255,10 @@
                 padding: $network-container-padding-foreign;
                 width: 22%;
 
+                &-stake {
+                  width: 260px;
+                }
+
                 @media screen and (max-width: $tablet-width) {
                     align-items: center;
                     align-self: center;
@@ -250,6 +266,10 @@
                     padding: 5px 0 5px 0;
                     width: auto;
                     justify-content: space-around;
+
+                    &-stake {
+                      width: auto;
+                    }
                 }
             }
             .bridge-network-data {

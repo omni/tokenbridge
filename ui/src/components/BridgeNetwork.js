@@ -27,7 +27,7 @@ export const BridgeNetwork = ({ balance, currency, isHome, networkSubtitle, netw
     )
 
   return (
-    <div className={`network-container-${containerName}`}>
+    <div className={`network-container-${containerName} network-container-${containerName}-${REACT_APP_UI_STYLES}`}>
       <p className={`${side ? `text-${side}` : ''}`}>
         <span className={`network-title network-title-${REACT_APP_UI_STYLES}`}>{networkTitle}</span>
         {networkSubtitle ? <span className="network-name">{networkSubtitle}</span> : null}
