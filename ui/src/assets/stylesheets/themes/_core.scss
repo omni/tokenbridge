@@ -199,6 +199,7 @@ $transfer-operation-arrow-image: $base-images-path + '/themes/' + $theme-name + 
 
 // copy icon
 $copy-icon-color: $primary-color;
+$copy-icon-hover-color: $copy-icon-color;
 
 // status section
 $status-text-color: $text-color;

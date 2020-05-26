@@ -200,7 +200,8 @@ $transfer-operation-arrow-ellipse-image: $base-images-path + '/themes/' + $theme
 $transfer-operation-arrow-image: $base-images-path + '/themes/' + $theme-name + '/bridge/arrow.svg';
 
 // copy icon
-$copy-icon-color: $primary-color;
+$copy-icon-color: #4DA9A6;
+$copy-icon-hover-color: #408684;
 
 // status section
 $status-text-color: #9EAAB6;
