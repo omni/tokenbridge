@@ -211,6 +211,8 @@ $status-title-padding: 0 0 0 0;
 $status-page-container-mobile-width: 100%;
 $status-configuration-data-display: grid;
 $status-configuration-container-padding: 0 0 0 0;
+$status-page-container-width: 70%;
+$status-left-container: initial;
 
 $status-authority-logo-0: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-0.svg';
 $status-authority-logo-1: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-1.svg';
@@ -252,6 +254,9 @@ $statistics-fee-data-justify-content: space-evenly;
 $statistics-fee-container-width: 50%;
 $statistics-deposit-container-width: 40%;
 $statistics-bridge-data-mobile-margin: 0 0 0 0;
+$statistics-page-container-width: 70%;
+$statistics-left-container-display: initial;
+$pattern-background-display: initial;
 
 // events
 $events-title-color: $text-color;
