@@ -32,6 +32,12 @@ const getWeb3 = () => {
           // Request account access
           await ethereum.enable()
           await processWeb3(web3, resolve, reject)
+
+          // In the next metamask version it will stop reloading the page on network change.
+          // Instead this new event will be triggered.
+          ethereum.on('chainChanged', function() {
+            window.location.reload()
+          })
         } catch (error) {
           console.log(error)
           const errorMsg = `Wallet account rejected by user. You need to unlock your wallet.
