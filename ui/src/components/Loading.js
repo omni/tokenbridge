@@ -9,9 +9,9 @@ export class Loading extends React.Component {
   render() {
     const { REACT_APP_UI_STYLES } = process.env
     const { alertStore } = this.props.RootStore
-    const { loadingStepIndex, loadingSteps, blockConfirmations } = alertStore
+    const { loadingStepIndex, loadingSteps, blockConfirmations, requiredBlockConfirmations } = alertStore
     const style = alertStore.showLoading ? { display: 'flex' } : { display: 'none' }
-    const progress = loadingStepIndex === 3 ? 100 : loadingStepIndex * 25 + blockConfirmations * 4
+    const progress = loadingStepIndex === 3 ? 100 : 25 + (blockConfirmations / requiredBlockConfirmations) * 50
     const radius = REACT_APP_UI_STYLES === 'stake' ? 33 : 40
 
     return (
@@ -25,6 +25,7 @@ export class Loading extends React.Component {
           {loadingStepIndex > 0 && (
             <ProgressRing
               confirmationNumber={blockConfirmations}
+              requiredBlockConfirmations={requiredBlockConfirmations}
               hideConfirmationNumber={loadingStepIndex > 1}
               progress={progress}
               radius={radius}

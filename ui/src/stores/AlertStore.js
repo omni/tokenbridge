@@ -14,6 +14,9 @@ class AlertStore {
   blockConfirmations = 0
 
   @observable
+  requiredBlockConfirmations = 8
+
+  @observable
   showDailyQuotaInfo = false
 
   homeConnectionErrorSended = false
@@ -95,6 +98,11 @@ class AlertStore {
   @action
   setBlockConfirmations(blocks) {
     this.blockConfirmations = blocks
+  }
+
+  @action
+  setRequiredBlockConfirmations(blocks) {
+    this.requiredBlockConfirmations = blocks
   }
 
   @action

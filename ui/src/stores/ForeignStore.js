@@ -11,7 +11,8 @@ import {
   getTokenType,
   ERC20_BYTES32_ABI,
   getDeployedAtBlock,
-  isMediatorMode
+  isMediatorMode,
+  FOREIGN_AMB_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -32,7 +33,9 @@ import {
   getValidatorList,
   getValidatorContract,
   getRequiredSignatures,
-  getValidatorCount
+  getValidatorCount,
+  getRequiredBlockConfirmations,
+  getBridgeContract
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
@@ -112,6 +115,9 @@ class ForeignStore {
   @observable
   lastEventRelayedOnForeign = 0
 
+  @observable
+  requiredBlockConfirmations = 8
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
@@ -124,6 +130,7 @@ class ForeignStore {
   COMMON_FOREIGN_BRIDGE_ADDRESS = process.env.REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS
   explorerTxTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_TX_TEMPLATE || ''
   explorerAddressTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE || ''
+  ambBridgeContract = {}
 
   constructor(rootStore) {
     this.web3Store = rootStore.web3Store
@@ -150,6 +157,7 @@ class ForeignStore {
     this.getTokenBalance()
     this.getCurrentLimit()
     this.getFee()
+    this.getRequiredBlockConfirmations()
     this.getValidators()
     this.getStatistics()
     this.getFeeEvents()
@@ -502,6 +510,16 @@ class ForeignStore {
       } catch (e) {
         console.log(e)
       }
+    }
+  }
+
+  async getRequiredBlockConfirmations() {
+    if (isMediatorMode(this.rootStore.bridgeMode)) {
+      const foreignAMBBridgeContract = await getBridgeContract(this.foreignBridge)
+      this.ambBridgeContract = new this.foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, foreignAMBBridgeContract)
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.ambBridgeContract)
+    } else {
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.foreignBridge)
     }
   }
 }
