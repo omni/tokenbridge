@@ -42,6 +42,7 @@ UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address
 UI_HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
 UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 UI_STYLES: "core"
+UI_PUBLIC_URL: "https://dai-bridge.poa.network"
 
 ## Monitor
 MONITOR_BRIDGE_NAME: "xdai"

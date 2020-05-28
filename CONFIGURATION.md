@@ -58,6 +58,7 @@ UI_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the 
 UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | integer
 UI_PORT | The port for the UI app. | integer
 UI_STYLES | The set of styles to render the bridge UI page. | core/classic/stake
+UI_PUBLIC_URL | The public url for the deployed bridge page | string
 
 
 ## Monitor configuration
