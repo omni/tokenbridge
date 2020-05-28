@@ -33,6 +33,7 @@ COMMON_FOREIGN_GAS_PRICE_FACTOR: 1
 
 ## UI
 UI_TITLE: "TokenBridge UI app - %c"
+UI_OG_TITLE: "POA Bridge UI"
 UI_DESCRIPTION: "The TokenBridge serves as a method of transferring native tokens from the Ethereum Classic Network to the Ethereum network in a quick and cost-efficient manner."
 UI_PORT: 3001
 UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/etc/mainnet/tx/%s
@@ -41,6 +42,7 @@ UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/etc/mainnet/address/%s
 UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
 UI_HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
 UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
+UI_STYLES: "classic"
 
 ## Monitor
 MONITOR_BRIDGE_NAME: "wetc"

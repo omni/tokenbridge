@@ -43,6 +43,7 @@ ORACLE_VALIDATOR_ADDRESS | The public address of the bridge validator | hexideci
 name | description | value
 --- | --- | ---
 UI_TITLE | The title for the bridge UI page. `%c` will be replaced by the name of the network. | string
+UI_OG_TITLE | The meta title for the deployed bridge page. | string
 UI_DESCRIPTION | The meta description for the deployed bridge page. | string
 UI_NATIVE_TOKEN_DISPLAY_NAME | name of the home native coin | string
 UI_HOME_NETWORK_DISPLAY_NAME | name to be displayed for home network | string
@@ -56,7 +57,7 @@ UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE | template link to address on foreign explo
 UI_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract. | integer
 UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | integer
 UI_PORT | The port for the UI app. | integer
-UI_STYLES | The set of styles to render the bridge UI page. Currently only `classic` is implemented | classic
+UI_STYLES | The set of styles to render the bridge UI page. | core/classic/stake
 
 
 ## Monitor configuration
