@@ -309,7 +309,7 @@ test.describe('e2e-test for bridge.poa, version 1.5.0', async function() {
     })
   })
 
-  test.describe('STAKE AMB ERC TO ERC', async () => {
+  test.describe('AMB-STAKE-ERC-TO-ERC', async () => {
     test.it('User is able to open main page of bridge-ui ', async () => {
       startURL = await Utils.getAMBStakeStartURL()
       const result = await mainPage.open(startURL)

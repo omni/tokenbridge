@@ -318,4 +318,4 @@ workflows:
           name: "ultimate: amb stake erc to erc"
           scenario-name: ultimate-amb-stake-erc-to-erc
           redis-key: amb-collected-signatures:lastProcessedBlock
-          ui-e2e-grep: "STAKE AMB ERC TO ERC"
+          ui-e2e-grep: "AMB-STAKE-ERC-TO-ERC"
