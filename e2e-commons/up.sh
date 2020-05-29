@@ -110,5 +110,9 @@ while [ "$1" != "" ]; do
     ../deployment-e2e/molecule.sh ultimate-amb
   fi
 
+  if [ "$1" == "ultimate-amb-stake-erc-to-erc" ]; then
+    ../deployment-e2e/molecule.sh ultimate-amb-stake-erc-to-erc
+  fi
+
   shift # Shift all the parameters down by one
 done
