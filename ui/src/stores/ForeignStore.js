@@ -383,7 +383,7 @@ class ForeignStore {
       // Get event in amb bridge
       const ambRawEvent = txReceipt.logs.filter(
         e =>
-          e.address === this.rootStore.foreignStore.ambBridgeContract.options.address &&
+          e.address === this.rootStore.homeStore.ambBridgeContract.options.address &&
           e.topics[0] === UserRequestForSignatureHash
       )[0]
 
