@@ -74,11 +74,12 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "ui" ]; then
-    docker-compose up -d ui ui-erc20 ui-erc20-native
+    docker-compose up -d ui ui-erc20 ui-erc20-native ui-amb-stake-erc20-erc20
 
     docker-compose run -d -p 3000:3000 ui yarn start
     docker-compose run -d -p 3001:3000 ui-erc20 yarn start
     docker-compose run -d -p 3002:3000 ui-erc20-native yarn start
+    docker-compose run -d -p 3003:3000 ui-amb-stake-erc20-erc20 yarn start
   fi
 
   if [ "$1" == "deploy" ]; then
@@ -107,6 +108,10 @@ while [ "$1" != "" ]; do
 
   if [ "$1" == "amb" ]; then
     ../deployment-e2e/molecule.sh ultimate-amb
+  fi
+
+  if [ "$1" == "ultimate-amb-stake-erc-to-erc" ]; then
+    ../deployment-e2e/molecule.sh ultimate-amb-stake-erc-to-erc
   fi
 
   shift # Shift all the parameters down by one

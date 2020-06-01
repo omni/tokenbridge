@@ -93,6 +93,15 @@ services:
     command: "true"
     networks:
       - ultimate
+  ui-amb-stake-erc20-erc20:
+    build:
+      context: ..
+      dockerfile: ui/Dockerfile
+      args:
+        DOT_ENV_PATH: e2e-commons/components-envs/ui-amb-stake-erc20-erc20.env
+    command: "true"
+    networks:
+      - ultimate
   monitor:
     build:
       context: ..

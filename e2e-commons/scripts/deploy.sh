@@ -43,3 +43,13 @@ echo -e "\n\n############ Deploying test contract for amb ############\n"
 cd "$DEPLOY_PATH"
 node src/utils/deployTestBox.js
 cd - > /dev/null
+
+echo -e "\n\n############ Deploying amb stake erc to erc ############\n"
+cp "$ENVS_PATH/amb-stake-erc-to-erc.env" "$DEPLOY_PATH/.env"
+node deployMultiBridgeToken.js
+node deployBridgeTokenRewardable.js
+cd "$DEPLOY_PATH"
+node deploy.js
+cd - > /dev/null
+node setupStakeTokens.js
+cd - > /dev/null

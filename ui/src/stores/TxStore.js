@@ -142,7 +142,7 @@ class TxStore {
                   removePendingTransaction()
                 })
               } else {
-                this.foreignStore.addWaitingForConfirmation(hash)
+                this.foreignStore.addWaitingForConfirmation(hash, res)
               }
             } else {
               if (blockConfirmations > 0) {
@@ -169,7 +169,7 @@ class TxStore {
                   removePendingTransaction()
                 })
               } else {
-                this.homeStore.addWaitingForConfirmation(hash)
+                this.homeStore.addWaitingForConfirmation(hash, res)
               }
             } else {
               if (blockConfirmations > 0) {
