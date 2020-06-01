@@ -6,7 +6,7 @@ import { getValidatorList as commonGetValidatorList, getPastEvents as commonGetP
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const AMB_MULTIPLE_REQUESTS_PER_TX_VERSION = {
-  major: 4,
+  major: 5,
   minor: 0,
   patch: 0
 }
