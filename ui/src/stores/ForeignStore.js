@@ -11,7 +11,9 @@ import {
   getTokenType,
   ERC20_BYTES32_ABI,
   getDeployedAtBlock,
-  isMediatorMode
+  isMediatorMode,
+  FOREIGN_AMB_ABI,
+  HOME_AMB_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -32,7 +34,11 @@ import {
   getValidatorList,
   getValidatorContract,
   getRequiredSignatures,
-  getValidatorCount
+  getValidatorCount,
+  getRequiredBlockConfirmations,
+  getBridgeContract,
+  getBridgeInterfacesVersion,
+  AMB_MULTIPLE_REQUESTS_PER_TX_VERSION
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
@@ -112,6 +118,9 @@ class ForeignStore {
   @observable
   lastEventRelayedOnForeign = 0
 
+  @observable
+  requiredBlockConfirmations = 8
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
@@ -124,6 +133,8 @@ class ForeignStore {
   COMMON_FOREIGN_BRIDGE_ADDRESS = process.env.REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS
   explorerTxTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_TX_TEMPLATE || ''
   explorerAddressTemplate = process.env.REACT_APP_UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE || ''
+  ambBridgeContract = {}
+  ambBridgeInterfaceVersion = {}
 
   constructor(rootStore) {
     this.web3Store = rootStore.web3Store
@@ -150,6 +161,7 @@ class ForeignStore {
     this.getTokenBalance()
     this.getCurrentLimit()
     this.getFee()
+    this.getRequiredBlockConfirmations()
     this.getValidators()
     this.getStatistics()
     this.getFeeEvents()
@@ -359,8 +371,27 @@ class ForeignStore {
     this.filter = value
   }
 
-  addWaitingForConfirmation(hash) {
-    this.waitingForConfirmation.add(hash)
+  addWaitingForConfirmation(hash, txReceipt) {
+    if (
+      isMediatorMode(this.rootStore.bridgeMode) &&
+      this.ambBridgeInterfaceVersion.major >= AMB_MULTIPLE_REQUESTS_PER_TX_VERSION.major
+    ) {
+      const UserRequestForSignatureAbi = HOME_AMB_ABI.filter(
+        e => e.type === 'event' && e.name === 'UserRequestForSignature'
+      )[0]
+      const UserRequestForSignatureHash = this.foreignWeb3.eth.abi.encodeEventSignature(UserRequestForSignatureAbi)
+      // Get event in amb bridge
+      const ambRawEvent = txReceipt.logs.filter(
+        e =>
+          e.address === this.rootStore.homeStore.ambBridgeContract.options.address &&
+          e.topics[0] === UserRequestForSignatureHash
+      )[0]
+
+      const messageId = ambRawEvent.topics[1]
+      this.waitingForConfirmation.add(messageId)
+    } else {
+      this.waitingForConfirmation.add(hash)
+    }
     this.setBlockFilter(0)
     this.homeStore.setBlockFilter(0)
   }
@@ -502,6 +533,17 @@ class ForeignStore {
       } catch (e) {
         console.log(e)
       }
+    }
+  }
+
+  async getRequiredBlockConfirmations() {
+    if (isMediatorMode(this.rootStore.bridgeMode)) {
+      const foreignAMBBridgeContract = await getBridgeContract(this.foreignBridge)
+      this.ambBridgeContract = new this.foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, foreignAMBBridgeContract)
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.ambBridgeContract)
+      this.ambBridgeInterfaceVersion = await getBridgeInterfacesVersion(this.ambBridgeContract)
+    } else {
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.foreignBridge)
     }
   }
 }

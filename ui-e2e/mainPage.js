@@ -2,7 +2,7 @@ const { By } = require('selenium-webdriver/lib/by')
 const { Page } = require('./Page.js')
 
 const fieldAmount = By.id('amount')
-const buttonTransfer = By.className('bridge-form-button ')
+const buttonTransfer = By.className('bridge-form-button')
 const buttonOk = By.className('swal-button swal-button--confirm')
 const fieldsBalance = By.className('network-balance')
 const classWeb3Loaded = By.className('web3-loaded')

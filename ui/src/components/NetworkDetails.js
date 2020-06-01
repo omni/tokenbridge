@@ -35,7 +35,6 @@ export const NetworkDetails = ({
   const formattedBalance = isNaN(numeral(balance).format('0.00', Math.floor))
     ? numeral(0).format('0,0.00', Math.floor)
     : numeral(balance).format('0,0.000', Math.floor)
-  const displayCopyIcon = REACT_APP_UI_STYLES !== 'stake'
 
   return (
     <div className="network-details" data-testid="network-details">
@@ -61,13 +60,11 @@ export const NetworkDetails = ({
             >
               {address.slice(0, 27).concat('...')}
             </a>
-            {displayCopyIcon && (
-              <CopyToClipboard text={address}>
-                <span className="copy-icon copy-icon-right">
-                  <CopyIcon />
-                </span>
-              </CopyToClipboard>
-            )}
+            <CopyToClipboard text={address}>
+              <span className="copy-icon copy-icon-right">
+                <CopyIcon />
+              </span>
+            </CopyToClipboard>
           </span>
         </p>
         {displayBridgeLimits && (
@@ -109,13 +106,11 @@ export const NetworkDetails = ({
               >
                 {tokenAddress.slice(0, 27).concat('...')}
               </a>
-              {displayCopyIcon && (
-                <CopyToClipboard text={tokenAddress}>
-                  <span className="copy-icon copy-icon-right">
-                    <CopyIcon />
-                  </span>
-                </CopyToClipboard>
-              )}
+              <CopyToClipboard text={tokenAddress}>
+                <span className="copy-icon copy-icon-right">
+                  <CopyIcon />
+                </span>
+              </CopyToClipboard>
             </span>
           </p>
         )}

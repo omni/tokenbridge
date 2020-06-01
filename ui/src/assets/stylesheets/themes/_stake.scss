@@ -10,6 +10,7 @@ $tertiary-color: #ffaa07;
 $danger-color: #f13662;
 $blue-color: #3ab9fe;
 $base-button-bg-color: #4DA9A6;
+$base-button-bg-color-darker: #408684;
 
 $text-color: #333;
 $link-color: #4DA9A6;
@@ -32,6 +33,7 @@ $header-menu-icon-color: #9EAAB6;
 $header-menu-text-color: #242A31;
 $header-menu-icon-color-selected: #4DA9A6;
 $header-menu-text-color-selected: #4DA9A6;
+$header-font-size: 14px;
 
 // daily quota
 $wallet-text: #3C454E;
@@ -95,9 +97,11 @@ $button-transfer-cancel-height: 42px;
 $button-transfer-cancel-max-width: 150px;
 $button-transfer-confirm-border-radius: 2px;
 $button-transfer-confirm-font-size: 14px;
-$button-transfer-confirm-hover-background-color: $button-background-color;
+$button-transfer-confirm-hover-background-color: $base-button-bg-color-darker;
 $button-transfer-confirm-height: 42px;
 $button-transfer-confirm-max-width: 150px;
+$button-transfer-cancel-hover-background-color: #75818D;
+$button-transfer-cancel-hover-text-color: #E6ECF1;
 
 // modals
 $modal-background-color: #fff;
@@ -114,6 +118,8 @@ $modal-close-button-top-mobile: $modal-close-button-top;
 $modal-close-button-right-mobile: 10px;
 $modal-min-width: 500px;
 $modal-min-height: 300px;
+$daily-quota-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/daily-quota-modal.svg';
+$network-select-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/network-select-modal.svg';
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-dark;
@@ -159,8 +165,8 @@ $bridge-transfer-button-border-radius: 2px;
 $form-container-height: 200px;
 $form-container-max-width: 380px;
 $network-container-height: 73px;
-$network-container-padding: 63.5px 1% 63.5px 5%;
-$network-container-padding-foreign: $network-container-padding;
+$network-container-padding: 63.5px 0 63.5px 30px;
+$network-container-padding-foreign: 63.5px 30px 63.5px 0;
 $network-basic-label-font-size: 12px;
 $info-icon-display: none;
 $network-show-more-font-weight: normal;
@@ -169,6 +175,7 @@ $bridge-input-label-font-size: 20px;
 $bridge-input-label-line-height: 42px;
 $bridge-input-label-margin: 0 20px 0 0;
 $bridge-transfer-button-border-radius: 2px 2px 2px 2px;
+$button-bridge-form-hover-background-color: $base-button-bg-color-darker;
 
 // Network details
 $network-details-body-border-radius: 10px;
@@ -193,7 +200,8 @@ $transfer-operation-arrow-ellipse-image: $base-images-path + '/themes/' + $theme
 $transfer-operation-arrow-image: $base-images-path + '/themes/' + $theme-name + '/bridge/arrow.svg';
 
 // copy icon
-$copy-icon-color: $primary-color;
+$copy-icon-color: #4DA9A6;
+$copy-icon-hover-color: #408684;
 
 // status section
 $status-text-color: #9EAAB6;
@@ -212,6 +220,8 @@ $status-container-padding: 37px 0 0 0;
 $status-page-container-mobile-width: 95%;
 $status-configuration-data-display: flex;
 $status-configuration-container-padding: 0 0 30px 0;
+$status-page-container-width: $container-width;
+$status-left-container: none;
 
 $status-authority-logo-0: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-0.svg';
 $status-authority-logo-1: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-1.svg';
@@ -253,6 +263,9 @@ $statistics-fee-data-justify-content: flex-start;
 $statistics-fee-container-width: auto;
 $statistics-deposit-container-width: auto;
 $statistics-bridge-data-mobile-margin: 0 0 10px 0;
+$statistics-page-container-width: $container-width;
+$statistics-left-container-display: none;
+$pattern-background-display: none;
 
 // events
 $events-title-color: $text-color;
