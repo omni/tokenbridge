@@ -25,6 +25,10 @@ class TxStore {
         return
       }
       try {
+        const requiredConfirmations =
+          this.web3Store.metamaskNet.id === this.web3Store.homeNet.id
+            ? this.homeStore.requiredBlockConfirmations
+            : this.foreignStore.requiredBlockConfirmations
         const gasPrice = this.gasPriceStore.gasPriceInHex
         const gas = await estimateGas(this.web3Store.injectedWeb3, to, gasPrice, from, value, data)
         return this.web3Store.injectedWeb3.eth
@@ -40,6 +44,7 @@ class TxStore {
           .on('transactionHash', hash => {
             console.log('txHash', hash)
             this.txsValues[hash] = sentValue
+            this.alertStore.setRequiredBlockConfirmations(requiredConfirmations)
             this.alertStore.setLoadingStepIndex(1)
             addPendingTransaction()
             this.getTxReceipt(hash)
@@ -120,8 +125,8 @@ class TxStore {
         if (this.isStatusSuccess(res)) {
           if (this.web3Store.metamaskNet.id === this.web3Store.homeNet.id) {
             const blockConfirmations = this.homeStore.latestBlockNumber - res.blockNumber
-            if (blockConfirmations >= 8) {
-              this.alertStore.setBlockConfirmations(8)
+            if (blockConfirmations >= this.homeStore.requiredBlockConfirmations) {
+              this.alertStore.setBlockConfirmations(this.homeStore.requiredBlockConfirmations)
               this.alertStore.setLoadingStepIndex(2)
 
               if (yn(process.env.REACT_APP_UI_FOREIGN_WITHOUT_EVENTS)) {
@@ -137,7 +142,7 @@ class TxStore {
                   removePendingTransaction()
                 })
               } else {
-                this.foreignStore.addWaitingForConfirmation(hash)
+                this.foreignStore.addWaitingForConfirmation(hash, res)
               }
             } else {
               if (blockConfirmations > 0) {
@@ -147,8 +152,8 @@ class TxStore {
             }
           } else {
             const blockConfirmations = this.foreignStore.latestBlockNumber - res.blockNumber
-            if (blockConfirmations >= 8) {
-              this.alertStore.setBlockConfirmations(8)
+            if (blockConfirmations >= this.foreignStore.requiredBlockConfirmations) {
+              this.alertStore.setBlockConfirmations(this.foreignStore.requiredBlockConfirmations)
               this.alertStore.setLoadingStepIndex(2)
 
               if (yn(process.env.REACT_APP_UI_HOME_WITHOUT_EVENTS)) {
@@ -164,7 +169,7 @@ class TxStore {
                   removePendingTransaction()
                 })
               } else {
-                this.homeStore.addWaitingForConfirmation(hash)
+                this.homeStore.addWaitingForConfirmation(hash, res)
               }
             } else {
               if (blockConfirmations > 0) {

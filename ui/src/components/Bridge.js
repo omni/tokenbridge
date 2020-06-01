@@ -346,7 +346,9 @@ export class Bridge extends React.Component {
               <div className="left-image" />
             </div>
             <div className={`bridge-transfer-content bridge-transfer-content-${REACT_APP_UI_STYLES}`}>
-              <div className="bridge-transfer-content-background">
+              <div
+                className={`bridge-transfer-content-background bridge-transfer-content-background-${REACT_APP_UI_STYLES}`}
+              >
                 <BridgeNetwork
                   balance={reverse ? foreignStore.balance : homeStore.getDisplayedBalance()}
                   currency={reverse ? foreignStore.symbol : homeStore.symbol}

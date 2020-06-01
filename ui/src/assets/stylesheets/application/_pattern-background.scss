@@ -3,6 +3,7 @@
     overflow: hidden;
     padding-top: 25px;
     width: 15%;
+    display: $pattern-background-display;
 
     .pattern-background-image {
       background-image: url('#{ $pattern-background-image }');

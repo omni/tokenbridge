@@ -14,7 +14,9 @@ import {
   ERC20_BYTES32_ABI,
   getDeployedAtBlock,
   isErcToErcMode,
-  isMediatorMode
+  isMediatorMode,
+  HOME_AMB_ABI,
+  FOREIGN_AMB_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -40,7 +42,11 @@ import {
   getValidatorContract,
   getRequiredSignatures,
   getValidatorCount,
-  getFee
+  getFee,
+  getRequiredBlockConfirmations,
+  getBridgeContract,
+  getBridgeInterfacesVersion,
+  AMB_MULTIPLE_REQUESTS_PER_TX_VERSION
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
@@ -147,6 +153,9 @@ class HomeStore {
     title: ''
   }
 
+  @observable
+  requiredBlockConfirmations = 8
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
@@ -160,6 +169,8 @@ class HomeStore {
   tokenContract = {}
   tokenDecimals = 18
   blockRewardContract = {}
+  ambBridgeContract = {}
+  ambBridgeInterfaceVersion = {}
 
   constructor(rootStore) {
     this.homeWeb3 = rootStore.web3Store.homeWeb3
@@ -189,6 +200,7 @@ class HomeStore {
     this.getBalance()
     this.getCurrentLimit()
     this.getFee()
+    this.getRequiredBlockConfirmations()
     this.getValidators()
     this.getStatistics()
     this.getFeeEvents()
@@ -426,8 +438,27 @@ class HomeStore {
     }
   }
 
-  addWaitingForConfirmation(hash) {
-    this.waitingForConfirmation.add(hash)
+  addWaitingForConfirmation(hash, txReceipt) {
+    if (
+      isMediatorMode(this.rootStore.bridgeMode) &&
+      this.ambBridgeInterfaceVersion.major >= AMB_MULTIPLE_REQUESTS_PER_TX_VERSION.major
+    ) {
+      const userRequestForAffirmationAbi = FOREIGN_AMB_ABI.filter(
+        e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
+      )[0]
+      const userRequestForAffirmationHash = this.homeWeb3.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
+      // Get event in amb bridge
+      const ambRawEvent = txReceipt.logs.filter(
+        e =>
+          e.address === this.rootStore.foreignStore.ambBridgeContract.options.address &&
+          e.topics[0] === userRequestForAffirmationHash
+      )[0]
+
+      const messageId = ambRawEvent.topics[1]
+      this.waitingForConfirmation.add(messageId)
+    } else {
+      this.waitingForConfirmation.add(hash)
+    }
     this.setBlockFilter(0)
     this.rootStore.foreignStore.setBlockFilter(0)
   }
@@ -636,6 +667,17 @@ class HomeStore {
       } catch (e) {
         console.log(e)
       }
+    }
+  }
+
+  async getRequiredBlockConfirmations() {
+    if (isMediatorMode(this.rootStore.bridgeMode)) {
+      const homeAMBBridgeContract = await getBridgeContract(this.homeBridge)
+      this.ambBridgeContract = new this.homeWeb3.eth.Contract(HOME_AMB_ABI, homeAMBBridgeContract)
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.ambBridgeContract)
+      this.ambBridgeInterfaceVersion = await getBridgeInterfacesVersion(this.ambBridgeContract)
+    } else {
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.homeBridge)
     }
   }
 }

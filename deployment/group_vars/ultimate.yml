@@ -33,6 +33,7 @@ ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
 
 #ui
 UI_TITLE: "TokenBridge UI app - %c"
+UI_OG_TITLE: "POA Bridge UI"
 UI_DESCRIPTION: "The POA cross-chain bridge serves as a method of transferring POA native tokens from the POA Network to the Ethereum network in a quick and cost-efficient manner."
 UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/sokol/tx/%s
 UI_FOREIGN_EXPLORER_TX_TEMPLATE: https://blockscout.com/eth/kovan/tx/%s
@@ -40,6 +41,8 @@ UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/sokol/address/%s
 UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/kovan/address/%s
 UI_HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
 UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
+UI_STYLES: "core"
+UI_PUBLIC_URL: "http://localhost"
 
 #monitor
 MONITOR_BRIDGE_NAME: "bridge"

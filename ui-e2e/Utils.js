@@ -5,6 +5,7 @@ const {
   nativeToErcBridge,
   ercToErcBridge,
   ercToNativeBridge,
+  ambStakeErcToErc,
   homeRPC,
   foreignRPC
 } = require('../e2e-commons/constants.json')
@@ -36,6 +37,10 @@ class Utils {
 
   static async getErc20NativeStartURL() {
     return ercToNativeBridge.ui
+  }
+
+  static async getAMBStakeStartURL() {
+    return ambStakeErcToErc.ui
   }
 
   static async startBrowserWithMetamask() {

@@ -7,7 +7,7 @@
     flex-direction: $status-container-flex-direction;
     justify-content: $status-container-justify-content;
     max-width: $container-width;
-    width: 70%;
+    width: $status-page-container-width;
     padding: $status-container-padding;
 
     @media screen and (max-width: $tablet-width-landscape) {
@@ -133,6 +133,7 @@
     margin-right: auto;
     padding-top: 25px;
     width: 15%;
+    display: $status-left-container;
 
     @media screen and (max-width: $tablet-width-landscape) {
       display: none;
