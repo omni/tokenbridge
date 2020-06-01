@@ -2,12 +2,7 @@
   display: flex;
   @media (min-width: $tablet-width) {
     position: relative;
-    margin-left: 10px;
-    &:hover {
-      .NetworkSelect_List {
-        display: block;
-      }
-    }
+    margin-left: 8px;
   }
 }
 
@@ -63,16 +58,19 @@
   width: 100%;
   margin: 0;
   @media (min-width: $tablet-width) {
+    background-image: url('#{ $network-select-modal-image }');
+    background-position: center;
+    background-repeat: no-repeat;
     display: none;
     position: absolute;
     top: 100%;
     right: 0;
-    background-color: #fff;
-    width: 160px;
-    border-radius: 4px 0 4px 4px;
-    box-shadow: 0 5px 10px rgba(#000, .05);
-    padding-top: 8px;
-    padding-bottom: 8px;
+    width: 127px;
+    height: 89px;
+    li:first-child {
+      margin-top: 8px;
+    }
+
   }
   li.currentNetwork {
     @media (max-width: $tablet-width) {
@@ -154,10 +152,18 @@
 }
 
 .nl-NavigationLinks_Text {
-  margin-left: 10px;
+  margin-left: 8px;
   text-decoration: none;
 }
 
 .nl-IconNetwork_Path {
   fill: $header-menu-icon-color;
+}
+
+.Show-NetworkSelect_List {
+  @media (min-width: $tablet-width) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
 }

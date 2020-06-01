@@ -3,7 +3,7 @@ import React from 'react'
 export const BridgeForm = ({ reverse, currency, onTransfer, onInputChange, displayArrow }) => {
   const { REACT_APP_UI_STYLES } = process.env
   return (
-    <div className={`form-container ${displayArrow ? 'transfer-right' : ''}`}>
+    <div className={`form-container ${displayArrow || REACT_APP_UI_STYLES === 'stake' ? 'transfer-right' : ''}`}>
       <form className="bridge-form" onSubmit={onTransfer} autoComplete="off">
         <div className={`bridge-form-controls bridge-form-controls-${REACT_APP_UI_STYLES}`}>
           <div className="bridge-form-input-container">

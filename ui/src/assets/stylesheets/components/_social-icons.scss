@@ -31,5 +31,15 @@
 }
 
 .social-alternative-icons-item {
-  margin-right: 10px;
+  margin-left: 10px;
+
+  &:hover {
+    circle {
+      fill: #9EAAB6;
+    }
+
+    path {
+      fill: #DBE0E5;
+    }
+  }
 }

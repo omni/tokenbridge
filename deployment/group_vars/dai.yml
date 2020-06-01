@@ -32,6 +32,7 @@ COMMON_FOREIGN_GAS_PRICE_FACTOR: 1
 
 ## UI
 UI_TITLE: "TokenBridge UI app - %c"
+UI_OG_TITLE: "POA Bridge UI"
 UI_DESCRIPTION: "The TokenBridge serves as a method of transferring MakerDAO stable tokens between the Ethereum network to xDai chain in a quick and cost-efficient manner."
 UI_PORT: 3001
 UI_HOME_EXPLORER_TX_TEMPLATE: https://blockscout.com/poa/dai/tx/%s
@@ -40,6 +41,8 @@ UI_HOME_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/poa/dai/address/%s
 UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE: https://blockscout.com/eth/mainnet/address/%s
 UI_HOME_GAS_PRICE_UPDATE_INTERVAL: 600000
 UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL: 600000
+UI_STYLES: "core"
+UI_PUBLIC_URL: "https://dai-bridge.poa.network"
 
 ## Monitor
 MONITOR_BRIDGE_NAME: "xdai"
