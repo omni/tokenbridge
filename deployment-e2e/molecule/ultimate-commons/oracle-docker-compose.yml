@@ -33,3 +33,6 @@
 
   - name: start the service
     shell: service poabridge start
+
+  - name: get statuses for docker containers
+    shell: docker ps -a
