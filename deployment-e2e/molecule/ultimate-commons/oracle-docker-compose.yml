@@ -3,8 +3,26 @@
   hosts: oracle
   become: true
   tasks:
+  - name: get statuses for docker containers
+    shell: docker ps -a
+    register: docker1out
+
+  - debug: var=docker1out.stdout_lines
+
+  - name: get status for poabridge
+    shell: systemctl status poabridge
+    register: serviceout
+
+  - debug: var=serviceout.stdout_lines
+
   - name: stop the service
     shell: service poabridge stop
+
+  - name: get statuses for docker containers
+    shell: docker ps -a
+    register: docker2out
+
+  - debug: var=docker2out.stdout_lines
 
   - name: Build current oracle image
     shell: docker build -t oracle:ultimate-testing --file oracle/Dockerfile .
@@ -36,6 +54,6 @@
 
   - name: get statuses for docker containers
     shell: docker ps -a
-    register: dockerout
+    register: docker3out
 
-  - debug: var=dockerout.stdout_lines
+  - debug: var=docker3out.stdout_lines
