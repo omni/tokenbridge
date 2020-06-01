@@ -170,7 +170,6 @@ class HomeStore {
   tokenDecimals = 18
   blockRewardContract = {}
   ambBridgeContract = {}
-
   ambBridgeInterfaceVersion = {}
 
   constructor(rootStore) {

@@ -32,6 +32,7 @@ $header-menu-icon-color: $primary-color;
 $header-menu-text-color: #fff;
 $header-menu-icon-color-selected: $primary-color;
 $header-menu-text-color-selected: #fff;
+$header-font-size: 16px;
 
 // daily quota
 $wallet-text: #fff;
@@ -114,6 +115,8 @@ $modal-close-button-top-mobile: -40px;
 $modal-close-button-right-mobile: 0px;
 $modal-min-width: 558px;
 $modal-min-height: 410px;
+$daily-quota-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/daily-quota-modal.svg';
+$network-select-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/network-select-modal.svg';
 
 // mobile menu
 $mobile-menu-background-color: $primary-color-darker;
@@ -169,6 +172,9 @@ $bridge-input-label-font-size: 24px;
 $bridge-input-label-line-height: 48px;
 $bridge-input-label-margin: 0 10px;
 $bridge-transfer-button-border-radius: 0 0 3px 3px;
+$button-bridge-form-hover-background-color: darken($bridge-button-background-color, 10%);
+$button-transfer-cancel-hover-background-color: $button-bordered-background-color;
+$button-transfer-cancel-hover-text-color: $button-bordered-text-color;
 
 // Network details
 $network-details-body-border-radius: 0 10px 10px 10px;
@@ -193,6 +199,7 @@ $transfer-operation-arrow-image: $base-images-path + '/themes/' + $theme-name + 
 
 // copy icon
 $copy-icon-color: $primary-color;
+$copy-icon-hover-color: $copy-icon-color;
 
 // status section
 $status-text-color: $text-color;
@@ -211,6 +218,8 @@ $status-title-padding: 0 0 0 0;
 $status-page-container-mobile-width: 100%;
 $status-configuration-data-display: grid;
 $status-configuration-container-padding: 0 0 0 0;
+$status-page-container-width: 70%;
+$status-left-container: initial;
 
 $status-authority-logo-0: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-0.svg';
 $status-authority-logo-1: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-1.svg';
@@ -252,6 +261,9 @@ $statistics-fee-data-justify-content: space-evenly;
 $statistics-fee-container-width: 50%;
 $statistics-deposit-container-width: 40%;
 $statistics-bridge-data-mobile-margin: 0 0 0 0;
+$statistics-page-container-width: 70%;
+$statistics-left-container-display: initial;
+$pattern-background-display: initial;
 
 // events
 $events-title-color: $text-color;

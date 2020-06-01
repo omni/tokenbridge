@@ -4,14 +4,30 @@ import { inject, observer } from 'mobx-react'
 @inject('RootStore')
 @observer
 export default class NetworkSelect extends Component {
-  changeNetworkRPC(e) {
+  state = {
+    displayList: false
+  }
+
+  changeNetworkRPC = e => {
     const { web3Store } = this.props.RootStore
     const newNetworkName = e.target.innerHTML
     web3Store.setSelectedNetwork(newNetworkName)
+    this.hideList()
+  }
+
+  displayList = () => {
+    console.log('Display List!')
+    this.setState({ displayList: true })
+  }
+
+  hideList = () => {
+    console.log('Hide List!')
+    this.setState({ displayList: false })
   }
 
   render() {
     const { web3Store } = this.props.RootStore
+    const { displayList } = this.state
     let currentNetworkFullName = ''
 
     const networks = web3Store.homeNet.id && web3Store.foreignNet.id ? [web3Store.homeNet, web3Store.foreignNet] : []
@@ -41,8 +57,14 @@ export default class NetworkSelect extends Component {
       )
     })
 
+    const displayListClass = displayList ? 'Show-NetworkSelect_List' : ''
+
     return (
-      <div className={`NetworkSelect nl-NavigationLinks_Link opacityFull`}>
+      <div
+        onMouseEnter={this.displayList}
+        onMouseLeave={this.hideList}
+        className={`NetworkSelect nl-NavigationLinks_Link opacityFull`}
+      >
         <div className={`NetworkSelect_Top`}>
           <svg className={`nl-IconNetwork`} xmlns="http://www.w3.org/2000/svg" width="18" height="18">
             <path
@@ -55,7 +77,7 @@ export default class NetworkSelect extends Component {
             <path d="M0 0h8L4 4 0 0z" />
           </svg>
         </div>
-        <ul className={`NetworkSelect_List`}>{listItems}</ul>
+        <ul className={`NetworkSelect_List  ${displayListClass}`}>{listItems}</ul>
       </div>
     )
   }

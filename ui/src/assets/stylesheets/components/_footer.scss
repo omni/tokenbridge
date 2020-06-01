@@ -36,4 +36,21 @@
     order: 0;
     width: $footer-logo-width;
   }
+
+  &-logo-alternative {
+    mask-image: url('#{ $footer-logo-image }');
+    mask-size: contain;
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: block;
+    height: $footer-logo-height;
+    left: 0;
+    order: 0;
+    width: $footer-logo-width;
+    background-color: #9eaab6;
+
+    &:hover {
+      background-color: #75818d;
+    }
+  }
 }

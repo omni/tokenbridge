@@ -115,6 +115,7 @@ export const getRequiredBlockConfirmations = async contract => {
 }
 
 export const getBridgeContract = contract => contract.methods.bridgeContract().call()
+
 export const getBridgeInterfacesVersion = async contract => {
   const { major, minor, patch } = await contract.methods.getBridgeInterfacesVersion().call()
   return {
