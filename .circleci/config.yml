@@ -61,18 +61,21 @@ orbs:
           - run:
               name: Wait for the Oracle to start
               command: |
-                set +e
                 i=0
-                while [[ $(redis-cli GET << parameters.redis-key >> ) ]]; do
-                  ((i++))
-                  if [ "$i" -gt 30 ]
-                  then
-                    exit -1
+                while : 
+                do
+                  (echo > /dev/tcp/127.0.0.1/6379) >/dev/null 2>&1
+                  if [[ $? -eq 0 ]]; then
+                    break
                   fi
-
+                  ((i++))
+                  if [ "$i" -gt 30 ]; then
+                    echo "Redis has not open the port"
+                    exit 1
+                  fi
                   echo "Sleeping..."
                   sleep 3
-                done
+                done                
     executors:
       docker-node:
         docker:
