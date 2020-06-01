@@ -16,12 +16,10 @@ export default class NetworkSelect extends Component {
   }
 
   displayList = () => {
-    console.log('Display List!')
     this.setState({ displayList: true })
   }
 
   hideList = () => {
-    console.log('Hide List!')
     this.setState({ displayList: false })
   }
 
