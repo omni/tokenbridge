@@ -36,3 +36,6 @@
 
   - name: get statuses for docker containers
     shell: docker ps -a
+    register: dockerout
+
+  - debug: var=dockerout.stdout_lines
