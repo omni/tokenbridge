@@ -10,13 +10,16 @@
   - debug: var=docker1out.stdout_lines
 
   - name: get status for poabridge
-    shell: systemctl status poabridge
+    shell: /etc/init.d/poabridge status
     register: serviceout
 
   - debug: var=serviceout.stdout_lines
 
   - name: stop the service
     shell: service poabridge stop
+
+  - name: force to stop redis and rabit
+    shell: docker rm -f oracle_rabbit_1 oracle_redis_1 || true
 
   - name: get statuses for docker containers
     shell: docker ps -a
@@ -50,7 +53,11 @@
       loop_var: file
 
   - name: start the service
-    shell: service poabridge start
+    #shell: service poabridge start
+    shell: /etc/init.d/poabridge start
+    register: startout
+
+  - debug: var=startout.stdout_lines
 
   - name: get statuses for docker containers
     shell: docker ps -a
