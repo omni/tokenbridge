@@ -102,3 +102,10 @@ export const getValidatorContract = contract => contract.methods.validatorContra
 export const getRequiredSignatures = contract => contract.methods.requiredSignatures().call()
 
 export const getValidatorCount = contract => contract.methods.validatorCount().call()
+
+export const getRequiredBlockConfirmations = async contract => {
+  const blockConfirmations = await contract.methods.requiredBlockConfirmations().call()
+  return parseInt(blockConfirmations)
+}
+
+export const getBridgeContract = contract => contract.methods.bridgeContract().call()

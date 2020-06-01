@@ -14,7 +14,8 @@ import {
   ERC20_BYTES32_ABI,
   getDeployedAtBlock,
   isErcToErcMode,
-  isMediatorMode
+  isMediatorMode,
+  HOME_AMB_ABI
 } from '../../../commons'
 import {
   getMaxPerTxLimit,
@@ -40,7 +41,9 @@ import {
   getValidatorContract,
   getRequiredSignatures,
   getValidatorCount,
-  getFee
+  getFee,
+  getRequiredBlockConfirmations,
+  getBridgeContract
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
@@ -147,6 +150,9 @@ class HomeStore {
     title: ''
   }
 
+  @observable
+  requiredBlockConfirmations = 8
+
   feeManager = {
     totalFeeDistributedFromSignatures: BN(0),
     totalFeeDistributedFromAffirmation: BN(0)
@@ -160,6 +166,7 @@ class HomeStore {
   tokenContract = {}
   tokenDecimals = 18
   blockRewardContract = {}
+  ambBridgeContract = {}
 
   constructor(rootStore) {
     this.homeWeb3 = rootStore.web3Store.homeWeb3
@@ -189,6 +196,7 @@ class HomeStore {
     this.getBalance()
     this.getCurrentLimit()
     this.getFee()
+    this.getRequiredBlockConfirmations()
     this.getValidators()
     this.getStatistics()
     this.getFeeEvents()
@@ -636,6 +644,16 @@ class HomeStore {
       } catch (e) {
         console.log(e)
       }
+    }
+  }
+
+  async getRequiredBlockConfirmations() {
+    if (isMediatorMode(this.rootStore.bridgeMode)) {
+      const homeAMBBridgeContract = await getBridgeContract(this.homeBridge)
+      this.ambBridgeContract = new this.homeWeb3.eth.Contract(HOME_AMB_ABI, homeAMBBridgeContract)
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.ambBridgeContract)
+    } else {
+      this.requiredBlockConfirmations = await getRequiredBlockConfirmations(this.homeBridge)
     }
   }
 }

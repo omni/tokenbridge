@@ -34,6 +34,7 @@ describe('HomeStore', () => {
     contract.getRequiredSignatures = jest.fn(() => Promise.resolve(1))
     contract.getValidatorCount = jest.fn(() => Promise.resolve(1))
     contract.getValidatorList = jest.fn(() => Promise.resolve(['0x52576e0cCaA0C9157142Fbf1d1c6DbfAc5e4E33e']))
+    contract.getRequiredBlockConfirmations = jest.fn(() => Promise.resolve(1))
 
     // When
     new HomeStore(rootStore)
