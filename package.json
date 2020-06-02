@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "initialize": "yarn clean && git submodule update --init && yarn install --unsafe-perm --frozen-lockfile && yarn install:deploy && yarn compile:contracts",
-    "build": "yarn build:ui && yarn build:alm",
+    "build": "yarn build:ui && yarn build:alm && yarn build:plugin",
     "build:ui": "yarn workspace ui run build",
     "build:alm": "yarn workspace alm run build",
     "build:plugin": "yarn workspace burner-wallet-plugin run build",
