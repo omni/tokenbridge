@@ -1,4 +1,4 @@
-const { override } = require('customize-cra')
+const { override, disableEsLint } = require('customize-cra')
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
 
 const disableModuleScopePlugin = () => config => {
@@ -6,4 +6,4 @@ const disableModuleScopePlugin = () => config => {
   return config
 }
 
-module.exports = override(disableModuleScopePlugin())
+module.exports = override(disableEsLint(), disableModuleScopePlugin())
