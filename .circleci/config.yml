@@ -51,13 +51,7 @@ orbs:
               paths:
                 - ~/.cache/yarn
       wait-for-oracle:
-        parameters:
-          redis-key:
-            type: string
         steps:
-          - run:
-              name: Install redis tools
-              command: sudo apt-get install -y redis-tools
           - run:
               name: Wait for the Oracle to start
               command: |
@@ -228,9 +222,6 @@ jobs:
       scenario-name:
         description: "Molecule scenario name used to create the infrastructure"
         type: string
-      redis-key:
-        description: "Redis key checked for non-emptiness to assert if Oracle is running"
-        type: string
       ui-e2e-grep:
         description: "Mocha grep string used to run ui-e2e tests specific to given type of bridge"
         default: ''
@@ -250,8 +241,7 @@ jobs:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy << parameters.scenario-name >> blocks
           no_output_timeout: 50m
-      - tokenbridge-orb/wait-for-oracle:
-          redis-key: << parameters.redis-key >>
+      - tokenbridge-orb/wait-for-oracle
       - when:
           condition: << parameters.ui-e2e-grep >>
           steps:
@@ -300,25 +290,20 @@ workflows:
       - ultimate:
           name: "ultimate: native to erc"
           scenario-name: native-to-erc
-          redis-key: native-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "NATIVE TO ERC"
       - ultimate:
           name: "ultimate: erc to native"
           scenario-name: erc-to-native
-          redis-key: erc-native-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO NATIVE"
       - ultimate:
           name: "ultimate: erc to erc"
           scenario-name: erc-to-erc
-          redis-key: erc-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO ERC"
       - ultimate:
           name: "ultimate: amb"
           scenario-name: amb
-          redis-key: amb-collected-signatures:lastProcessedBlock
           oracle-e2e-script: "amb"
       - ultimate:
           name: "ultimate: amb stake erc to erc"
           scenario-name: ultimate-amb-stake-erc-to-erc
-          redis-key: amb-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "AMB-STAKE-ERC-TO-ERC"
