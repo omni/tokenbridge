@@ -38,9 +38,6 @@ services:
     cpus: 0.1
     mem_limit: 500m
     image: poanetwork/tokenbridge-oracle:latest
-    depends_on:
-      - redis
-      - rabbit
     env_file: ./.env
     environment:
       - NODE_ENV=production
