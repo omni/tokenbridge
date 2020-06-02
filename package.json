@@ -29,11 +29,14 @@
     "monitor",
     "monitor-e2e",
     "contracts",
-    "burner-wallet-plugin"
+    "burner-wallet-plugin",
+    "alm"
   ],
   "scripts": {
     "initialize": "yarn clean && git submodule update --init && yarn install --unsafe-perm --frozen-lockfile && yarn install:deploy && yarn compile:contracts",
-    "build": "yarn workspace ui run build",
+    "build": "yarn build:ui && yarn build:alm",
+    "build:ui": "yarn workspace ui run build",
+    "build:alm": "yarn workspace alm run build",
     "build:plugin": "yarn workspace burner-wallet-plugin run build",
     "lint": "yarn wsrun --exclude token-bridge-contracts lint",
     "test": "yarn wsrun --exclude oracle-e2e --exclude ui-e2e --exclude monitor-e2e test",
