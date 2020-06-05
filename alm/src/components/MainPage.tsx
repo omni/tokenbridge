@@ -21,14 +21,14 @@ const Header = styled.header`
 `
 
 export interface FormSubmitParams {
-  networkId: number
+  chainId: number
   txHash: string
 }
 
 export const MainPage = () => {
   const history = useHistory()
-  const onFormSubmit = ({ networkId, txHash }: FormSubmitParams) => {
-    history.push(`/${networkId}/${txHash}`)
+  const onFormSubmit = ({ chainId, txHash }: FormSubmitParams) => {
+    history.push(`/${chainId}/${txHash}`)
   }
 
   return (
@@ -38,8 +38,8 @@ export const MainPage = () => {
           <p>AMB Live Monitoring</p>
         </Header>
         <div className="container">
-          <Form onSubmit={onFormSubmit} />
-          <Route path="/:networkId/:txHash" children={<StatusContainer />} />
+          <Route path={['/:chainId/:txHash', '/']} children={<Form onSubmit={onFormSubmit} />} />
+          <Route path="/:chainId/:txHash" children={<StatusContainer />} />
         </div>
       </StyledMainPage>
     </StateProvider>

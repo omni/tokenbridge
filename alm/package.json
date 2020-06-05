@@ -13,13 +13,16 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/styled-components": "^5.1.0",
     "customize-cra": "^1.0.0",
+    "date-fns": "^2.14.0",
+    "fast-memoize": "^2.5.2",
     "react": "^16.13.1",
     "react-app-rewired": "^2.1.6",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.0.1",
     "styled-components": "^5.1.1",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.2",
+    "web3": "^1.2.8"
   },
   "scripts": {
     "start": "./load-env.sh react-app-rewired start",

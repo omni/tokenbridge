@@ -1,8 +1,13 @@
 import React, { createContext, ReactNode } from 'react'
+import { useNetwork } from '../hooks/useNetwork'
+import { HOME_RPC_URL, FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } from '../config/constants'
+import Web3 from 'web3'
 
 export interface NetworkParams {
   chainId: number
   name: string
+  web3: Maybe<Web3>
+  bridgeAddress: string
 }
 
 export interface StateContext {
@@ -13,25 +18,32 @@ export interface StateContext {
 const initialState = {
   home: {
     chainId: 0,
-    name: ''
+    name: '',
+    web3: null,
+    bridgeAddress: HOME_BRIDGE_ADDRESS
   },
   foreign: {
     chainId: 0,
-    name: ''
+    name: '',
+    web3: null,
+    bridgeAddress: FOREIGN_BRIDGE_ADDRESS
   }
 }
 
 const StateContext = createContext<StateContext>(initialState)
 
 export const StateProvider = ({ children }: { children: ReactNode }) => {
+  const homeNetwork = useNetwork(HOME_RPC_URL)
+  const foreignNetwork = useNetwork(FOREIGN_RPC_URL)
+
   const value = {
     home: {
-      chainId: 100,
-      name: 'xDai Chain'
+      bridgeAddress: HOME_BRIDGE_ADDRESS,
+      ...homeNetwork
     },
     foreign: {
-      chainId: 1,
-      name: 'ETH Mainnet'
+      bridgeAddress: FOREIGN_BRIDGE_ADDRESS,
+      ...foreignNetwork
     }
   }
 

@@ -1,22 +1,37 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { useStateProvider } from '../state/StateProvider'
+import { useTransactionStatus } from '../hooks/useTransactionStatus'
+import { formatTxHash, validChainId, validTxHash } from '../utils/networks'
 
 export const StatusContainer = () => {
-  const { networkId, txHash } = useParams()
-  const { home, foreign } = useStateProvider()
+  const { chainId, txHash } = useParams()
+
+  const validParameters = validChainId(chainId) && validTxHash(txHash)
+
+  const { status, description } = useTransactionStatus({
+    txHash: validParameters ? txHash : '',
+    chainId: validParameters ? parseInt(chainId) : 0
+  })
+
+  if (!validParameters) {
+    return (
+      <div>
+        <p>
+          Chain Id: {chainId} and/or Transaction Hash: {txHash} are not valid
+        </p>
+      </div>
+    )
+  }
+
+  const formattedMessageId = formatTxHash(txHash)
 
   return (
     <div>
-      <p>
-        Hello! {networkId} - {txHash}
-      </p>
-      <p>
-        home: {home.name} - {home.chainId}
-      </p>
-      <p>
-        foreign: {foreign.name} - {foreign.chainId}
-      </p>
+      {status && (
+        <p>
+          The request <i>{formattedMessageId}</i> {description}
+        </p>
+      )}
     </div>
   )
 }
