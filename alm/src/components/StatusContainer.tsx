@@ -1,21 +1,22 @@
-import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React from 'react'
+import { useHistory, useParams } from 'react-router-dom'
 import { useTransactionStatus } from '../hooks/useTransactionStatus'
 import { formatTxHash, getTransactionStatusDescription, validChainId, validTxHash } from '../utils/networks'
 import { TRANSACTION_STATUS } from '../config/constants'
 import { MessageSelector } from './MessageSelector'
 
 export const StatusContainer = () => {
-  const [selectedMessageId, setSelectedMessageId] = useState(-1)
-
-  const { chainId, txHash } = useParams()
-
+  const history = useHistory()
+  const { chainId, txHash, messageIdParam } = useParams()
   const validParameters = validChainId(chainId) && validTxHash(txHash)
 
   const { messagesId, status, description, timestamp } = useTransactionStatus({
     txHash: validParameters ? txHash : '',
     chainId: validParameters ? parseInt(chainId) : 0
   })
+
+  const selectedMessageId =
+    messageIdParam === undefined || messagesId[messageIdParam] === undefined ? -1 : messageIdParam
 
   if (!validParameters) {
     return (
@@ -28,7 +29,7 @@ export const StatusContainer = () => {
   }
 
   const onMessageSelected = (messageId: number) => {
-    setSelectedMessageId(messageId)
+    history.push(`/${chainId}/${txHash}/${messageId}`)
   }
 
   const displayMessageSelector = status === TRANSACTION_STATUS.SUCCESS_MULTIPLE_MESSAGES && selectedMessageId === -1

@@ -33,9 +33,9 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
         setReceipt(txReceipt)
 
         if (!txReceipt) {
-          setMessagesId([txHash])
           setStatus(TRANSACTION_STATUS.NOT_FOUND)
           setDescription(getTransactionStatusDescription(TRANSACTION_STATUS.NOT_FOUND))
+          setMessagesId([txHash])
           const timeoutId = setTimeout(() => getReceipt(), 5000)
           subscriptions.push(timeoutId)
         } else {

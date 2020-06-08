@@ -36,8 +36,11 @@ export const MainPage = () => {
           <p>AMB Live Monitoring</p>
         </Header>
         <div className="container">
-          <Route path={['/:chainId/:txHash', '/']} children={<Form onSubmit={onFormSubmit} />} />
-          <Route path="/:chainId/:txHash" children={<StatusContainer />} />
+          <Route
+            path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash', '/']}
+            children={<Form onSubmit={onFormSubmit} />}
+          />
+          <Route path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']} children={<StatusContainer />} />
         </div>
       </StyledMainPage>
     </StateProvider>
