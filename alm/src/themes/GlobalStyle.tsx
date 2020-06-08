@@ -20,5 +20,6 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
     --color-primary: ${props => props.theme.colorPrimary};
     --color-grey: ${props => props.theme.colorGrey};
     --color-lightGrey: ${props => props.theme.colorLightGrey};
+    --link-color: ${props => props.theme.linkColor}
   }
 `

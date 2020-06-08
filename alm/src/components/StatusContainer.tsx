@@ -1,11 +1,12 @@
 import React from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { useTransactionStatus } from '../hooks/useTransactionStatus'
-import { formatTxHash, getTransactionStatusDescription, validTxHash } from '../utils/networks'
+import { formatTxHash, getExplorerTxUrl, getTransactionStatusDescription, validTxHash } from '../utils/networks'
 import { TRANSACTION_STATUS } from '../config/constants'
 import { MessageSelector } from './MessageSelector'
 import { Loading } from './commons/Loading'
 import { useStateProvider } from '../state/StateProvider'
+import { ExplorerTxLink } from './commons/ExplorerTxLink'
 
 export const StatusContainer = () => {
   const { home, foreign } = useStateProvider()
@@ -49,11 +50,24 @@ export const StatusContainer = () => {
     ? getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE, timestamp)
     : description
 
+  const isHome = chainId === home.chainId.toString()
+  const txExplorerLink = getExplorerTxUrl(txHash, isHome)
+  const displayExplorerLink = status !== TRANSACTION_STATUS.NOT_FOUND
+
   return (
     <div>
       {status && (
         <p>
-          The request <i>{formattedMessageId}</i> {displayedDescription}
+          The request{' '}
+          <i>
+            {displayExplorerLink && (
+              <ExplorerTxLink href={txExplorerLink} target="blank">
+                {formattedMessageId}
+              </ExplorerTxLink>
+            )}
+            {!displayExplorerLink && <label>{formattedMessageId}</label>}
+          </i>{' '}
+          {displayedDescription}
         </p>
       )}
       {displayMessageSelector && <MessageSelector messages={messagesId} onMessageSelected={onMessageSelected} />}
