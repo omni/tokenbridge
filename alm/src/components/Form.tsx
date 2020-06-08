@@ -3,18 +3,12 @@ import styled from 'styled-components'
 import { FormSubmitParams } from './MainPage'
 import { useStateProvider } from '../state/StateProvider'
 import { useParams } from 'react-router-dom'
+import { Button } from './commons/Button'
+import { RadioButtonLabel, RadioButtonContainer } from './commons/RadioButton'
 
 const LabelText = styled.label`
   line-height: 36px;
   max-width: 140px;
-`
-
-const Button = styled.button`
-  height: 36px;
-`
-
-const RadioButtonContainer = styled.div`
-  padding: 10px;
 `
 
 export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitParams) => void }) => {
@@ -60,25 +54,27 @@ export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitP
         </div>
       </div>
       <div className="row is-center">
-        <RadioButtonContainer onClick={() => setChainId(foreign.chainId)}>
+        <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(foreign.chainId)}>
           <input
+            className="is-marginless"
             type="radio"
             name="network"
             value={foreign.name}
             checked={chainId === foreign.chainId}
             onChange={() => setChainId(foreign.chainId)}
           />
-          <label htmlFor={foreign.name}>{foreign.name}</label>
+          <RadioButtonLabel htmlFor={foreign.name}>{foreign.name}</RadioButtonLabel>
         </RadioButtonContainer>
-        <RadioButtonContainer onClick={() => setChainId(home.chainId)}>
+        <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(home.chainId)}>
           <input
+            className="is-marginless"
             type="radio"
             name="network"
             value={home.name}
             checked={chainId === home.chainId}
             onChange={() => setChainId(home.chainId)}
           />
-          <label htmlFor={home.name}>{home.name}</label>
+          <RadioButtonLabel htmlFor={home.name}>{home.name}</RadioButtonLabel>
         </RadioButtonContainer>
       </div>
     </form>

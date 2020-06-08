@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { TransactionReceipt } from 'web3-eth'
 import { TRANSACTION_STATUS } from '../config/constants'
 import { getTransactionStatusDescription } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
@@ -9,6 +10,8 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
   const [messagesId, setMessagesId] = useState<Array<string>>([])
   const [status, setStatus] = useState('')
   const [description, setDescription] = useState('')
+  const [receipt, setReceipt] = useState<Maybe<TransactionReceipt>>(null)
+  const [timestamp, setTimestamp] = useState(0)
 
   useEffect(
     () => {
@@ -27,6 +30,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
         const web3 = isHome ? home.web3 : foreign.web3
 
         const txReceipt = await web3.eth.getTransactionReceipt(txHash)
+        setReceipt(txReceipt)
 
         if (!txReceipt) {
           setMessagesId([txHash])
@@ -38,6 +42,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
           const blockNumber = txReceipt.blockNumber
           const block = await web3.eth.getBlock(blockNumber)
           const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
+          setTimestamp(blockTimestamp)
 
           if (txReceipt.status) {
             let bridgeMessagesId
@@ -84,6 +89,8 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
   return {
     messagesId,
     status,
-    description
+    description,
+    receipt,
+    timestamp
   }
 }

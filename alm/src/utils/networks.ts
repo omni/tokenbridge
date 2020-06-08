@@ -10,6 +10,9 @@ export const validTxHash = (txHash: string) => /^0x[a-fA-F0-9]{64}$/.test(txHash
 
 export const formatTxHash = (txHash: string) => `${txHash.substring(0, 6)}...${txHash.substring(txHash.length - 4)}`
 
+export const formatTxHashExtended = (txHash: string) =>
+  `${txHash.substring(0, 10)}...${txHash.substring(txHash.length - 8)}`
+
 export const formatTimestamp = (timestamp: number): string => {
   const txDate = new Date(0).setUTCSeconds(timestamp)
   return formatDistance(txDate, new Date(), {
