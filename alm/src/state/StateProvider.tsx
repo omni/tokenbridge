@@ -13,6 +13,7 @@ export interface NetworkParams {
 export interface StateContext {
   home: NetworkParams
   foreign: NetworkParams
+  loading: boolean
 }
 
 const initialState = {
@@ -27,7 +28,8 @@ const initialState = {
     name: '',
     web3: null,
     bridgeAddress: FOREIGN_BRIDGE_ADDRESS
-  }
+  },
+  loading: true
 }
 
 const StateContext = createContext<StateContext>(initialState)
@@ -44,7 +46,8 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
     foreign: {
       bridgeAddress: FOREIGN_BRIDGE_ADDRESS,
       ...foreignNetwork
-    }
+    },
+    loading: homeNetwork.loading || foreignNetwork.loading
   }
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>

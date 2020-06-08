@@ -17,7 +17,7 @@ const Input = styled.input`
 `
 
 export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitParams) => void }) => {
-  const { home, foreign } = useStateProvider()
+  const { home, foreign, loading } = useStateProvider()
   const { chainId: paramChainId, txHash: paramTxHash } = useParams()
   const [chainId, setChainId] = useState(0)
   const [txHash, setTxHash] = useState('')
@@ -59,30 +59,32 @@ export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitP
           </Button>
         </div>
       </div>
-      <div className="row is-center">
-        <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(foreign.chainId)}>
-          <input
-            className="is-marginless"
-            type="radio"
-            name="network"
-            value={foreign.name}
-            checked={chainId === foreign.chainId}
-            onChange={() => setChainId(foreign.chainId)}
-          />
-          <RadioButtonLabel htmlFor={foreign.name}>{foreign.name}</RadioButtonLabel>
-        </RadioButtonContainer>
-        <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(home.chainId)}>
-          <input
-            className="is-marginless"
-            type="radio"
-            name="network"
-            value={home.name}
-            checked={chainId === home.chainId}
-            onChange={() => setChainId(home.chainId)}
-          />
-          <RadioButtonLabel htmlFor={home.name}>{home.name}</RadioButtonLabel>
-        </RadioButtonContainer>
-      </div>
+      {!loading && (
+        <div className="row is-center">
+          <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(foreign.chainId)}>
+            <input
+              className="is-marginless"
+              type="radio"
+              name="network"
+              value={foreign.name}
+              checked={chainId === foreign.chainId}
+              onChange={() => setChainId(foreign.chainId)}
+            />
+            <RadioButtonLabel htmlFor={foreign.name}>{foreign.name}</RadioButtonLabel>
+          </RadioButtonContainer>
+          <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(home.chainId)}>
+            <input
+              className="is-marginless"
+              type="radio"
+              name="network"
+              value={home.name}
+              checked={chainId === home.chainId}
+              onChange={() => setChainId(home.chainId)}
+            />
+            <RadioButtonLabel htmlFor={home.name}>{home.name}</RadioButtonLabel>
+          </RadioButtonContainer>
+        </div>
+      )}
     </form>
   )
 }

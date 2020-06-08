@@ -12,6 +12,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
   const [description, setDescription] = useState('')
   const [receipt, setReceipt] = useState<Maybe<TransactionReceipt>>(null)
   const [timestamp, setTimestamp] = useState(0)
+  const [loading, setLoading] = useState(true)
 
   useEffect(
     () => {
@@ -25,7 +26,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
 
       const getReceipt = async () => {
         if (!chainId || !txHash || !home.chainId || !foreign.chainId || !home.web3 || !foreign.web3) return
-
+        setLoading(true)
         const isHome = chainId === home.chainId
         const web3 = isHome ? home.web3 : foreign.web3
 
@@ -72,6 +73,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
             setDescription(getTransactionStatusDescription(TRANSACTION_STATUS.FAILED, blockTimestamp))
           }
         }
+        setLoading(false)
       }
 
       // unsubscribe from previous txHash
@@ -91,6 +93,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
     status,
     description,
     receipt,
-    timestamp
+    timestamp,
+    loading
   }
 }
