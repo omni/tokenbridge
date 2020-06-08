@@ -1,6 +1,13 @@
 import React, { createContext, ReactNode } from 'react'
 import { useNetwork } from '../hooks/useNetwork'
-import { HOME_RPC_URL, FOREIGN_RPC_URL, HOME_BRIDGE_ADDRESS, FOREIGN_BRIDGE_ADDRESS } from '../config/constants'
+import {
+  HOME_RPC_URL,
+  FOREIGN_RPC_URL,
+  HOME_BRIDGE_ADDRESS,
+  FOREIGN_BRIDGE_ADDRESS,
+  HOME_NETWORK_NAME,
+  FOREIGN_NETWORK_NAME
+} from '../config/constants'
 import Web3 from 'web3'
 
 export interface NetworkParams {
@@ -41,10 +48,12 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     home: {
       bridgeAddress: HOME_BRIDGE_ADDRESS,
+      name: HOME_NETWORK_NAME,
       ...homeNetwork
     },
     foreign: {
       bridgeAddress: FOREIGN_BRIDGE_ADDRESS,
+      name: FOREIGN_NETWORK_NAME,
       ...foreignNetwork
     },
     loading: homeNetwork.loading || foreignNetwork.loading

@@ -1,15 +1,18 @@
 import React from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import { useTransactionStatus } from '../hooks/useTransactionStatus'
-import { formatTxHash, getTransactionStatusDescription, validChainId, validTxHash } from '../utils/networks'
+import { formatTxHash, getTransactionStatusDescription, validTxHash } from '../utils/networks'
 import { TRANSACTION_STATUS } from '../config/constants'
 import { MessageSelector } from './MessageSelector'
 import { Loading } from './commons/Loading'
+import { useStateProvider } from '../state/StateProvider'
 
 export const StatusContainer = () => {
+  const { home, foreign } = useStateProvider()
   const history = useHistory()
   const { chainId, txHash, messageIdParam } = useParams()
-  const validParameters = validChainId(chainId) && validTxHash(txHash)
+  const validChainId = chainId === home.chainId.toString() || chainId === foreign.chainId.toString()
+  const validParameters = validChainId && validTxHash(txHash)
 
   const { messagesId, status, description, timestamp, loading } = useTransactionStatus({
     txHash: validParameters ? txHash : '',

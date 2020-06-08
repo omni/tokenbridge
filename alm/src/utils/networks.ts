@@ -1,10 +1,5 @@
 import { formatDistance } from 'date-fns'
-import { networks } from '../config/constants'
 import { TRANSACTION_STATUS_DESCRIPTION } from '../config/descriptions'
-
-export const getNetworkName = (id: number) => networks[id] || 'Unknown'
-
-export const validChainId = (id: number) => !!networks[id]
 
 export const validTxHash = (txHash: string) => /^0x[a-fA-F0-9]{64}$/.test(txHash)
 
