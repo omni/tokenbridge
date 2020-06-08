@@ -11,6 +11,11 @@ const LabelText = styled.label`
   max-width: 140px;
 `
 
+const Input = styled.input`
+  background-color: var(--color-primary);
+  color: var(--font-color);
+`
+
 export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitParams) => void }) => {
   const { home, foreign } = useStateProvider()
   const { chainId: paramChainId, txHash: paramTxHash } = useParams()
@@ -39,7 +44,8 @@ export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitP
       <div className="row is-center">
         <LabelText className="col-2">Bridgeable tx hash:</LabelText>
         <div className="col-7">
-          <input
+          <Input
+            placeholder="Enter transaction hash"
             type="text"
             onChange={e => setTxHash(e.target.value)}
             required

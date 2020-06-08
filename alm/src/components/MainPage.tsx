@@ -7,9 +7,7 @@ import { StateProvider } from '../state/StateProvider'
 
 const StyledMainPage = styled.div`
   text-align: center;
-  background-color: #282c34;
   min-height: 100vh;
-  color: white;
 `
 
 const Header = styled.header`
