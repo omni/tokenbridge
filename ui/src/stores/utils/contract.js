@@ -5,6 +5,12 @@ import { getValidatorList as commonGetValidatorList, getPastEvents as commonGetP
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
+export const AMB_MULTIPLE_REQUESTS_PER_TX_VERSION = {
+  major: 5,
+  minor: 0,
+  patch: 0
+}
+
 export const getMaxPerTxLimit = async (contract, decimals) => {
   const maxPerTx = await contract.methods.maxPerTx().call()
   return fromDecimals(maxPerTx, decimals)
@@ -27,8 +33,8 @@ export const getCurrentLimit = async (contract, decimals) => {
   }
 }
 
-export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents') =>
-  commonGetPastEvents(contract, { fromBlock, toBlock, event })
+export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents', options = {}) =>
+  commonGetPastEvents(contract, { fromBlock, toBlock, event, options })
 
 export const getErc677TokenAddress = contract => contract.methods.erc677token().call()
 
@@ -86,6 +92,15 @@ export const getForeignFee = async contract => {
   return new BN(fromWei(feeInWei.toString()))
 }
 
+export const getFee = async contract => {
+  try {
+    const feeInWei = await contract.methods.getFee().call()
+    return new BN(fromWei(feeInWei.toString()))
+  } catch (e) {
+    return new BN(0)
+  }
+}
+
 export const getBlockRewardContract = contract => contract.methods.blockRewardContract().call()
 
 export const getValidatorContract = contract => contract.methods.validatorContract().call()
@@ -93,3 +108,19 @@ export const getValidatorContract = contract => contract.methods.validatorContra
 export const getRequiredSignatures = contract => contract.methods.requiredSignatures().call()
 
 export const getValidatorCount = contract => contract.methods.validatorCount().call()
+
+export const getRequiredBlockConfirmations = async contract => {
+  const blockConfirmations = await contract.methods.requiredBlockConfirmations().call()
+  return parseInt(blockConfirmations)
+}
+
+export const getBridgeContract = contract => contract.methods.bridgeContract().call()
+
+export const getBridgeInterfacesVersion = async contract => {
+  const { major, minor, patch } = await contract.methods.getBridgeInterfacesVersion().call()
+  return {
+    major: parseInt(major),
+    minor: parseInt(minor),
+    patch: parseInt(patch)
+  }
+}

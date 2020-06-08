@@ -26,6 +26,10 @@
         height: 80px;
         width: 960px;
 
+        &-stake {
+          display: none
+        }
+
         @media screen and (max-width: $tablet-width) {
             display: none
         }
@@ -65,6 +69,10 @@
         display: flex;
         height: 80px;
         width: 960px;
+
+        &-stake {
+          display: none
+        }
 
         @media screen and (max-width: $tablet-width) {
             display: none
@@ -116,7 +124,7 @@
         }
     }
     .bridge-transfer {
-        height: 276px;
+        height: $form-container-height;
         display: flex;
         justify-content: center;
 
@@ -125,6 +133,11 @@
         }
         .left-image-wrapper {
             background-color: $bridge-gradient-start;
+
+            &-stake {
+              display: none
+            }
+
             .left-image {
                 background-color: $main-background-color;
                 background-image: url('#{ $bridge-image-left }');
@@ -144,6 +157,11 @@
 
         .right-image-wrapper {
             background-color: $bridge-gradient-end;
+
+            &-stake {
+              display: none
+            }
+
             .right-image {
               background-color: $main-background-color;
               background-image: url('#{ $bridge-image-right }');
@@ -168,7 +186,13 @@
             display: flex;
             flex-shrink: 0;
             flex-wrap: wrap;
-            width: 880px;
+            width: $bridge-transfer-width;
+
+            &-stake {
+              border: 1px solid #E6ECF1;
+              box-sizing: border-box;
+              border-radius: 10px;
+            }
 
             @media screen and (max-width: $tablet-width) {
                 border-radius: 8px;
@@ -180,7 +204,11 @@
                 display: flex;
                 flex-shrink: 0;
                 flex-wrap: wrap;
-                width: 880px;
+                width: $bridge-transfer-width;
+
+                &-stake {
+                  justify-content: space-between;
+                }
 
                 @media screen and (max-width: $tablet-width) {
                     background-image: url('#{ $bridge-image-center-pointing-down }');
@@ -196,10 +224,14 @@
                 align-items: flex-start;
                 display: flex;
                 flex-direction: column;
-                height: 136px;
-                justify-content: space-evenly;
-                padding: 70px 1% 70px 5%;
+                height: $network-container-height;
+                justify-content: $network-container-justify-content;
+                padding: $network-container-padding;
                 width: 22%;
+
+                &-stake {
+                  width: 260px;
+                }
 
                 @media screen and (max-width: $tablet-width) {
                     align-items: center;
@@ -207,16 +239,25 @@
                     height: 136px;
                     padding: 5px 0 5px 0;
                     width: auto;
+                    justify-content: space-around;
+
+                  &-stake {
+                    width: auto;
+                  }
                 }
             }
             .network-container-foreign {
                 align-items: flex-end;
                 display: flex;
                 flex-direction: column;
-                height: 136px;
-                justify-content: space-evenly;
-                padding: 70px 5% 70px 1%;
+                height: $network-container-height;
+                justify-content: $network-container-justify-content;
+                padding: $network-container-padding-foreign;
                 width: 22%;
+
+                &-stake {
+                  width: 260px;
+                }
 
                 @media screen and (max-width: $tablet-width) {
                     align-items: center;
@@ -224,6 +265,11 @@
                     height: 136px;
                     padding: 5px 0 5px 0;
                     width: auto;
+                    justify-content: space-around;
+
+                    &-stake {
+                      width: auto;
+                    }
                 }
             }
             .bridge-network-data {
@@ -232,7 +278,7 @@
                 display: flex;
             }
             .network-basic-label {
-                font-size: 13px;
+                font-size: $network-basic-label-font-size;
                 color: $bridge-label-color;
             }
             .network-title {
@@ -240,6 +286,12 @@
                 display: block;
                 font-size: 24px;
                 font-weight: 700;
+                &-stake {
+                  font-style: normal;
+                  font-weight: bold;
+                  font-size: 20px;
+                  line-height: 23px;
+                }
             }
             .network-name {
                 color: $bridge-label-color;
@@ -277,17 +329,20 @@
             }
             .network-balance {
                 color: $bridge-balance-color;
-                font-size: 13px;
+                font-size: $network-basic-label-font-size;
                 font-weight: 700;
             }
             .network-show-more {
                 color: $bridge-link-color;
                 font-size: 14px;
-                font-weight: 700;
+                font-weight: $network-show-more-font-weight;
+              &:hover {
+                text-decoration-line: underline;
+              }
             }
             .info-icon {
               align-items: center;
-              display: flex;
+              display: $info-icon-display;
               justify-content: center;
               path {
                 fill: $bridge-link-color;
@@ -318,8 +373,8 @@
                 }
             }
             .form-container {
-                height: 276px;
-                max-width: 384px;
+                height: $form-container-height;
+                max-width: $form-container-max-width;
                 width: 44%;
                 @media screen and (max-width: $tablet-width) {
                     align-self: center;
@@ -329,7 +384,7 @@
                 .bridge-form {
                     display: flex;
                     flex-direction: column;
-                    height: 276px;
+                    height: $form-container-height;
                     justify-content: space-evenly;
                     @media screen and (max-width: $tablet-width) {
                         height: auto;
@@ -345,6 +400,21 @@
                             background-color: unset;
                             flex-direction: column;
                             padding: 8px 8px 8px 8px;
+                        }
+
+                        &-stake {
+                          border: 1px solid #E6ECF1;
+                          box-sizing: border-box;
+                          border-radius: 4px;
+                          height: 60px;
+
+                          @media screen and (max-width: $tablet-width) {
+                            background-color: unset;
+                            flex-direction: column;
+                            padding: 0 0 0 0;
+                            margin: 0 8px 0 8px;
+                            height: 40px;
+                          }
                         }
                     }
                     .bridge-form-input-container {
@@ -363,7 +433,7 @@
                         color: $bridge-textfield-color;
                         font-size: 24px;
                         font-weight: 700;
-                        height: 48px;
+                        height: $bridge-input-label-line-height;
                         padding-left: 16px;
                         width: 165px;
 
@@ -386,10 +456,10 @@
                     }
                     &-label {
                         color: $bridge-input-label-color;
-                        font-size: 24px;
+                        font-size: $bridge-input-label-font-size;
                         font-weight: 700;
-                        line-height: 48px;
-                        margin: 0 10px;
+                        line-height: $bridge-input-label-line-height;
+                        margin: $bridge-input-label-margin;
                         text-transform: uppercase;
 
                         @media screen and (max-width: $tablet-width) {
@@ -398,22 +468,22 @@
                     }
                     &-button {
                         background-color: $bridge-button-background-color;
-                        border-radius: 3px;
+                        border-radius: $bridge-transfer-button-border-radius;
                         color: $bridge-button-text-color;
                         display: block;
                         flex-shrink: 0;
                         font-weight: 700;
-                        height: 48px;
+                        height: $bridge-transfer-button-height;
                         text-decoration: none;
-                        width: 92px;
+                        width: $bridge-transfer-button-width;
 
                         @media screen and (max-width: $tablet-width) {
-                            border-radius: 0 0 3px 3px;
+                            border-radius: $bridge-transfer-button-border-radius;
                             width: 100%;
                         }
 
                         &:hover {
-                            background-color: darken($bridge-button-background-color, 10%);
+                            background-color: $button-bridge-form-hover-background-color;
                         }
                     }
                     .bridge-transfer-direction {
@@ -454,6 +524,10 @@
             @media screen and (max-width: $tablet-width) {
                 display: none;
             }
+
+            &-stake {
+              display: none;
+            }
         }
 
         .details-logo-container:after {
@@ -480,13 +554,19 @@
         .details-body {
             align-self: flex-end;
             background-color: $modal-background-color;
-            border-radius: 0 10px 10px 10px;
+            border-radius: $network-details-body-border-radius;
             display: flex;
             flex-direction: column;
             height: 254px;
             justify-content: space-between;
             padding: 38px;
             width: 440px;
+
+            &-stake {
+              padding: 26px 30px 26px 30px;
+              width: 480px;
+              height: 380px;
+            }
 
             @media screen and (max-width: $tablet-width) {
                 align-self: center;
@@ -499,7 +579,7 @@
                 height: 300px;
             }
             @media screen and (max-width: 600px) {
-                height: 250px;
+                height: $network-details-body-mobile-height;
             }
 
             .details-data-container {
@@ -517,14 +597,39 @@
                 .details-description {
                     color: $modal-link-color;
                     font-size: 14px;
+
+                  &-currency {
+                    &-stake {
+                      font-weight: normal;
+                    }
+                  }
                 }
                 .details-description-black {
                     color: $modal-text-color;
                     font-size: 14px;
                     font-weight: 700;
+
+                    &-stake {
+                      font-weight: normal;
+                    }
                 }
                 .details-copy {
                     cursor: pointer;
+                }
+
+                .details-title {
+                  font-size: 20px;
+                  line-height: 23px;
+                  font-weight: bold;
+                  color: $modal-text-color;
+                }
+
+                &-core {
+                  display: none;
+                }
+
+                &-classic {
+                  display: none;
                 }
             }
         }
@@ -547,13 +652,17 @@
                 display: none;
             }
         }
+
+        .details-body-stake:before {
+            display: none;
+        }
     }
     .transfer-alert {
         background-color: $modal-background-color;
-        border-radius: 8px;
+        border-radius: $transfer-alert-border-radius;
         display: flex;
-        height: 265px;
-        width: 600px;
+        height: $transfer-alert-height;
+        width: $transfer-alert-width;
         @media screen and (max-width: $tablet-width) {
             flex-direction: column;
             height: auto;
@@ -572,20 +681,22 @@
                 margin-top: 39px;
                 width: 124px;
             }
+
+            &-stake {
+              display: none;
+            }
         }
         .alert-container {
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
-            padding-bottom: 40px;
-            padding-right: 60px;
-            padding-top: 40px;
-            width: 374px;
+            justify-content: $transfer-alert-container-justify-content;
+            padding: $transfer-alert-container-padding;
+            width: $transfer-alert-container-width;
 
             @media screen and (max-width: $tablet-width) {
-                padding-left: 5px;
-                padding-top: 0;
-                width: 100%;
+                padding: 10px 10px;
+                width: 94%;
+                height: 317px;
             }
             .alert-corner {
                 height: 12px;
@@ -611,48 +722,123 @@
                     justify-content: center;
                     width: 50px;
                 }
+
+                &-stake {
+                  display: none
+                }
             }
+
+            .transfer-title-alternative {
+              &-core,
+              &-classic {
+                display: none;
+              }
+              &-stake {
+
+                .transfer-title-text {
+                  color: $modal-text-color;
+                  font-weight: bold;
+                  font-size: 20px;
+                  line-height: 23px;
+                }
+                .transfer-operation-container {
+                  display: flex;
+                  justify-content: center;
+
+                  .transfer-operation-box {
+                    width: 180px;
+                    height: 60px;
+                    border: 1px solid #E6ECF1;
+                    box-sizing: border-box;
+                    border-radius: 4px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    text-align: center;
+
+                    .transfer-operation-box-value {
+                      font-size: 18px;
+                      line-height: 21px;
+                    }
+
+                    .transfer-operation-box-network {
+                      font-size: 12px;
+                      line-height: 14px;
+                    }
+                  }
+
+                  .transfer-operation-arrow-container {
+                    width: 120px;
+                    height: 60px;
+                    background-image: url('#{ $transfer-operation-arrow-line-image }');
+                    background-position: center;
+                    background-repeat: no-repeat;
+
+                    .transfer-operation-ellipse {
+                      width: 120px;
+                      height: 60px;
+                      background-image: url('#{ $transfer-operation-arrow-ellipse-image }');
+                      background-position: center;
+                      background-repeat: no-repeat;
+
+                      .transfer-operation-arrow {
+                        width: 113px;
+                        height: 60px;
+                        background-image: url('#{ $transfer-operation-arrow-image }');
+                        background-position: center;
+                        background-repeat: no-repeat;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
             .transfer-description {
                 color: $modal-text-color;
                 font-size: 14px;
                 line-height: 1.71;
-                padding-bottom: 10px;
-                padding-top: 10px;
+                padding: $transfer-description-padding;
             }
             .transfer-buttons {
                 display: flex;
                 justify-content: space-between;
-                padding: 20px 0 0;
+                padding: $transfer-buttons-padding;
 
                 .transfer-confirm {
                     background-color: $button-background-color;
-                    border-radius: 3px;
+                    border-radius: $button-transfer-confirm-border-radius;
                     color: $button-text-color;
                     flex-grow: 1;
-                    font-size: 15px;
+                    font-size: $button-transfer-confirm-font-size;
+                    line-height: 16px;
                     font-weight: 700;
-                    height: 40px;
-                    max-width: 49%;
+                    height: $button-transfer-confirm-height;
+                    max-width: $button-transfer-confirm-max-width;
                     text-decoration: none;
+                    order: $transfer-alert-confirm-button-order;
 
                     &:hover {
-                        background-color: darken($button-background-color, 10%);
+                        background-color: $button-transfer-confirm-hover-background-color;
                     }
                 }
                 .transfer-cancel {
                     background-color: $button-bordered-background-color;
-                    border-radius: 3px;
-                    border: solid 1px $button-bordered-border-color;
+                    border-radius: $button-transfer-cancel-border-radius;
+                    border: $button-transfer-cancel-border;
                     color: $button-bordered-text-color;
                     flex-grow: 1;
-                    font-size: 15px;
+                    font-size: $button-transfer-cancel-font-size;
+                    line-height: 16px;
                     font-weight: 700;
-                    height: 40px;
-                    max-width: 49%;
+                    height: $button-transfer-cancel-height;
+                    max-width: $button-transfer-cancel-max-width;
                     text-decoration: none;
 
                     &:hover {
-                        opacity: 0.7;
+                        opacity: $button-transfer-cancel-hover-opacity;
+                        background-color: $button-transfer-cancel-hover-background-color;
+                        color: $button-transfer-cancel-hover-text-color;
                     }
                 }
             }

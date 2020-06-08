@@ -7,14 +7,46 @@ export class ProgressRing extends Component {
   }
 
   render() {
-    const { radius, stroke, progress, confirmationNumber, hideConfirmationNumber } = this.props
+    const {
+      radius,
+      stroke,
+      progress,
+      confirmationNumber,
+      requiredBlockConfirmations,
+      hideConfirmationNumber
+    } = this.props
+    const { REACT_APP_UI_STYLES } = process.env
     const { circumference, normalizedRadius } = this.state
     const strokeDashoffset = circumference - (progress / 100) * circumference
-    const confirmations = hideConfirmationNumber ? '' : `${confirmationNumber}/8`
+    const confirmations = hideConfirmationNumber ? '' : `${confirmationNumber}/${requiredBlockConfirmations}`
+    const strokeColor = REACT_APP_UI_STYLES === 'stake' ? '#E6ECF1' : '#7b5ab2'
+    const strokeProgressColor = REACT_APP_UI_STYLES === 'stake' ? '#4DA9A6' : '#60dc97'
+
+    let textParams
+    if (REACT_APP_UI_STYLES === 'stake') {
+      const xPosTextParam =
+        requiredBlockConfirmations >= 10 && confirmationNumber >= 10
+          ? '15'
+          : requiredBlockConfirmations >= 10
+            ? '20'
+            : '22'
+      textParams = { x: xPosTextParam, y: '38', font: 'Roboto', fontSize: '14', fill: '#242A31' }
+    } else {
+      const xPosTextParam =
+        requiredBlockConfirmations >= 10 && confirmationNumber >= 10
+          ? '16'
+          : requiredBlockConfirmations >= 10
+            ? '22'
+            : '28'
+      textParams = { x: xPosTextParam, y: '47', font: 'Nunito', fontSize: '18', fill: 'white' }
+    }
+
+    const progressTransform = REACT_APP_UI_STYLES === 'stake' ? 'rotate(-90 33 33)' : ''
+
     return (
       <svg height={radius * 2} width={radius * 2}>
         <circle
-          stroke="#7b5ab2"
+          stroke={strokeColor}
           fill="transparent"
           strokeWidth={stroke}
           strokeDasharray={circumference + ' ' + circumference}
@@ -24,7 +56,7 @@ export class ProgressRing extends Component {
           cy={radius}
         />
         <circle
-          stroke="#60dc97"
+          stroke={strokeProgressColor}
           fill="transparent"
           strokeWidth={stroke}
           strokeDasharray={circumference + ' ' + circumference}
@@ -32,8 +64,15 @@ export class ProgressRing extends Component {
           r={normalizedRadius}
           cx={radius}
           cy={radius}
+          transform={progressTransform}
         />
-        <text x="28" y="47" fontFamily="Nunito" fontSize="18" fill="white">
+        <text
+          x={textParams.x}
+          y={textParams.y}
+          fontFamily={textParams.font}
+          fontSize={textParams.fontSize}
+          fill={textParams.fill}
+        >
           {confirmations}
         </text>
       </svg>

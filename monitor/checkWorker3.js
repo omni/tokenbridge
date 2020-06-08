@@ -19,6 +19,7 @@ async function checkWorker3() {
       const transfers = await stuckTransfers()
       if (!transfers) throw new Error('transfers is empty: ' + JSON.stringify(transfers))
       transfers.ok = transfers.total.length === 0
+      transfers.health = true
       writeFile(`/responses/${MONITOR_BRIDGE_NAME}/stuckTransfers.json`, transfers)
       logger.debug('Done')
     }

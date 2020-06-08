@@ -9,6 +9,8 @@
 **/*.md
 
 contracts/test
+contracts/build
 oracle/test
 oracle/**/*.png
 oracle/**/*.jpg
+audit

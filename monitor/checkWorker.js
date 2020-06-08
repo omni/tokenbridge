@@ -31,6 +31,7 @@ async function checkWorker() {
     const foreign = Object.assign({}, balances.foreign, events.foreign)
     const status = Object.assign({}, balances, events, { home }, { foreign })
     if (!status) throw new Error('status is empty: ' + JSON.stringify(status))
+    status.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/getBalances.json`, status)
 
     logger.debug('calling validators()')
@@ -59,6 +60,7 @@ async function checkWorker() {
     }
 
     vBalances.ok = vBalances.homeOk && vBalances.foreignOk
+    vBalances.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/validators.json`, vBalances)
     logger.debug('Done')
   } catch (e) {

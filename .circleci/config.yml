@@ -314,3 +314,8 @@ workflows:
           scenario-name: amb
           redis-key: amb-collected-signatures:lastProcessedBlock
           oracle-e2e-script: "amb"
+      - ultimate:
+          name: "ultimate: amb stake erc to erc"
+          scenario-name: ultimate-amb-stake-erc-to-erc
+          redis-key: amb-collected-signatures:lastProcessedBlock
+          ui-e2e-grep: "AMB-STAKE-ERC-TO-ERC"

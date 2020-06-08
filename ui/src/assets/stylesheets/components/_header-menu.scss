@@ -2,7 +2,7 @@
     align-items: center;
     display: flex;
     justify-content: space-between;
-    max-width: 700px;
+    font-size: $header-font-size;
     @media screen and (max-width: $mobile-width) {
         display: none;
     }

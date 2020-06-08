@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import getWeb3, { getBalance, getWeb3Instance, getNetwork } from './utils/web3'
 import { balanceLoaded } from './utils/testUtils'
 import { BRIDGE_MODES } from '../../../commons'
@@ -32,6 +32,9 @@ class Web3Store {
   foreignNet = { id: '', name: '' }
   @observable
   metamaskNet = { id: '', name: '' }
+
+  @observable
+  selectedNet = { id: '', name: '' }
 
   @observable
   walletInstalled = true
@@ -144,6 +147,22 @@ class Web3Store {
     await this.getWeb3Promise
     await this.setHomeWeb3Promise
     return this.metamaskNet.id === this.homeNet.id
+  }
+
+  @action
+  setSelectedNetwork(name) {
+    const newNetwork = name === this.homeNet.name ? this.homeNet : this.foreignNet
+    this.selectedNet = newNetwork
+  }
+
+  isSelectedNetwork(id) {
+    const compareNetwork = this.selectedNet.id ? this.selectedNet : this.metamaskNet
+    return compareNetwork.id.toString() === id.toString()
+  }
+
+  @computed
+  get reverse() {
+    return this.isSelectedNetwork(this.foreignNet.id)
   }
 }
 

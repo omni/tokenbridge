@@ -9,14 +9,14 @@ function addTxHashToData({ encodedData, transactionHash }) {
 function parseAMBMessage(message) {
   message = strip0x(message)
 
-  const txHash = `0x${message.slice(0, 64)}`
+  const messageId = `0x${message.slice(0, 64)}`
   const sender = `0x${message.slice(64, 104)}`
   const executor = `0x${message.slice(104, 144)}`
 
   return {
     sender,
     executor,
-    txHash
+    messageId
   }
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import yn from './utils/yn'
-import { BRIDGE_MODES } from '../../../commons'
+import { BRIDGE_MODES, isErcToErcMode } from '../../../commons'
 import { BridgeStatistics } from './index'
 import { Redirect } from 'react-router'
 import { TransactionsStatistics } from './TransactionsStatistics'
@@ -12,11 +12,12 @@ import { FeeStatistics } from './FeeStatistics'
 export class StatisticsPage extends React.Component {
   render() {
     const { homeStore, foreignStore, bridgeMode, web3Store } = this.props.RootStore
+    const statisticsReady = homeStore.statistics.finished && foreignStore.statistics.finished
     const isNativeToErc = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC
-    const leftTitle = isNativeToErc ? 'Deposits' : 'Withdraws'
-    const rightTitle = isNativeToErc ? 'Withdraws' : 'Deposits'
+    const leftTitle = isNativeToErc ? 'Deposits' : 'Withdrawals'
+    const rightTitle = isNativeToErc ? 'Withdrawals' : 'Deposits'
     const { REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME, REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
-    const withoutEvents = web3Store.metamaskNet.id === web3Store.homeNet.id.toString() ? yn(HOME) : yn(FOREIGN)
+    const withoutEvents = web3Store.isSelectedNetwork(web3Store.homeNet.id) ? yn(HOME) : yn(FOREIGN)
 
     return withoutEvents ? (
       <Redirect to="/" />
@@ -27,13 +28,14 @@ export class StatisticsPage extends React.Component {
           <div className="statistics-bridge-container">
             <span className="statistics-bridge-title statistics-title">Bridge Statistics</span>
             <BridgeStatistics
-              users={homeStore.statistics.finished ? homeStore.statistics.users.size : ''}
-              totalBridged={homeStore.statistics.finished ? homeStore.statistics.totalBridged.toString() : ''}
+              users={statisticsReady ? homeStore.statistics.users.size : ''}
+              totalBridged={statisticsReady ? homeStore.statistics.totalBridged.toString() : ''}
               homeBalance={homeStore.balance}
               homeSymbol={homeStore.symbol}
               homeNativeSupplyTitle={isNativeToErc}
               foreignSymbol={foreignStore.symbol}
               foreignSupply={foreignStore.totalSupply}
+              displayNetworkTokenSupply={isErcToErcMode(bridgeMode)}
             />
           </div>
           {homeStore.depositFeeCollected.finished &&
@@ -48,17 +50,17 @@ export class StatisticsPage extends React.Component {
             <div className="statistics-deposit-container">
               <span className="statistics-deposit-title statistics-title">Tokens {leftTitle}</span>
               <TransactionsStatistics
-                txNumber={homeStore.statistics.finished ? homeStore.statistics.deposits : ''}
+                txNumber={statisticsReady ? homeStore.statistics.deposits : ''}
                 type={foreignStore.symbol}
-                value={homeStore.statistics.finished ? homeStore.statistics.depositsValue : ''}
+                value={statisticsReady ? homeStore.statistics.depositsValue : ''}
               />
             </div>
             <div className="statistics-withdraw-container">
               <span className="statistics-withdraw-title statistics-title">Tokens {rightTitle}</span>
               <TransactionsStatistics
-                txNumber={homeStore.statistics.finished ? homeStore.statistics.withdraws : ''}
+                txNumber={statisticsReady ? homeStore.statistics.withdrawals : ''}
                 type={foreignStore.symbol}
-                value={homeStore.statistics.finished ? homeStore.statistics.withdrawsValue : ''}
+                value={statisticsReady ? homeStore.statistics.withdrawalsValue : ''}
               />
             </div>
           </div>

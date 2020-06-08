@@ -1,0 +1,277 @@
+$theme-name: 'stake';
+
+// base colors
+$primary-color: #E6ECF1;
+$primary-color-dark: #F5F7F9;
+$primary-color-darker: #45277a;
+$secondary-color: #60db97;
+$secondary-color-dark: #64a231;
+$tertiary-color: #ffaa07;
+$danger-color: #f13662;
+$blue-color: #3ab9fe;
+$base-button-bg-color: #4DA9A6;
+$base-button-bg-color-darker: #408684;
+
+$text-color: #333;
+$link-color: #4DA9A6;
+
+$gradient-color-1: $primary-color;
+$gradient-color-2: #7b5ab2;
+
+// main
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
+$main-background-color: #F5F7F9;
+$main-font-family: 'Roboto', sans-serif;
+
+// header
+$header-background-color: #fff;
+$header-logo-width: 128.54px;
+$header-logo-height: 30px;
+
+// header menu
+$header-menu-icon-color: #9EAAB6;
+$header-menu-text-color: #242A31;
+$header-menu-icon-color-selected: #4DA9A6;
+$header-menu-text-color-selected: #4DA9A6;
+$header-font-size: 14px;
+
+// daily quota
+$wallet-text: #3C454E;
+$daily-quota-background: #DBE0E5;
+$daily-quota-progress: #9EAAB6;
+
+// footer
+$footer-background-color: $primary-color;
+$footer-logo-width: 128.54px;
+$footer-logo-height: 30px;
+$footer-text-color: #fff;
+
+// separator
+$separator-color: #e4e4e4;
+$separator-display: none;
+
+// background
+$pattern-background-image: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
+
+// social icons
+$social-icons-background-color: #fff;
+$social-icons-icon-color: $primary-color;
+
+// logo
+$logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo.svg';
+$footer-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/footer-logo.svg';
+
+// home logo
+$home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.png';
+$home-logo-image-modal: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home-modal.png';
+$home-logo-width: 52px;
+$home-logo-height: 16px;
+
+// foreign logo
+$foreign-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-foreign.svg';
+$foreign-logo-image-modal: $base-images-path + '/themes/' + $theme-name + '/logos/logo-foreign-modal.svg';
+$foreign-logo-width: 54px;
+$foreign-logo-height: 11px;
+
+// buttons
+$button-background-color: #4DA9A6;
+$button-text-color: #fff;
+
+$button-background-color-2: $tertiary-color;
+$button-text-color-2: #fff;
+
+$button-background-color-3: $secondary-color-dark;
+$button-text-color-3: #fff;
+
+$button-background-color-4: #5c34a2;
+$button-text-color-4: #fff;
+
+$button-bordered-background-color: #E6ECF1;
+$button-bordered-text-color: #75818D;
+$button-bordered-border-color: $primary-color;
+$button-transfer-cancel-border-radius: 2px;
+$button-transfer-cancel-border: none;
+$button-transfer-cancel-font-size: 14px;
+$button-transfer-cancel-hover-opacity: 1;
+$button-transfer-cancel-height: 42px;
+$button-transfer-cancel-max-width: 150px;
+$button-transfer-confirm-border-radius: 2px;
+$button-transfer-confirm-font-size: 14px;
+$button-transfer-confirm-hover-background-color: $base-button-bg-color-darker;
+$button-transfer-confirm-height: 42px;
+$button-transfer-confirm-max-width: 150px;
+$button-transfer-cancel-hover-background-color: #75818D;
+$button-transfer-cancel-hover-text-color: #E6ECF1;
+
+// modals
+$modal-background-color: #fff;
+$modal-overlay-background-color: rgba(#9EAAB6, 0.8);
+$modal-title-color: #242A31;
+$modal-text-color: #242A31;
+$modal-link-color: #4DA9A6;
+$daily-quota-modal-title: $text-color;
+$modal-close-button: "../images/themes/stake/bridge/close.svg";
+$modal-close-button-padding: 0;
+$modal-close-button-right: -30px;
+$modal-close-button-top: -30px;
+$modal-close-button-top-mobile: $modal-close-button-top;
+$modal-close-button-right-mobile: 10px;
+$modal-min-width: 500px;
+$modal-min-height: 300px;
+$daily-quota-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/daily-quota-modal.svg';
+$network-select-modal-image: $base-images-path + '/themes/' + $theme-name + '/bridge/network-select-modal.svg';
+
+// mobile menu
+$mobile-menu-background-color: $primary-color-dark;
+$mobile-menu-overlay-color: rgba(#9EAAB6, 0.8);
+
+// loading
+$loading-item-background-color: $secondary-color;
+$loading-item-text-color: #242A31;
+$loading-logo: $base-images-path + '/themes/' + $theme-name + '/logos/logo-loading.svg';
+$loading-logo-height: 193px;
+$loading-logo-width: 150px;
+$loading-logo-i-display: none;
+$loading-text-font-size: 14px;
+$loading-text-line-height: 24px;
+$loading-text-width: auto;
+$loading-container-justify-content: space-around;
+
+// bridge section
+$bridge-gradient-start: #fff;
+$bridge-gradient-end: #fff;
+$bridge-logo-background-color: $primary-color;
+$bridge-link-color: #4DA9A6;
+$bridge-balance-color: #4DA9A6;
+$bridge-button-background-color: #4DA9A6;
+$bridge-button-text-color: #fff;
+$bridge-textfield-background: #F5F7F9;
+$bridge-input-label-color: #75818D;
+$bridge-label-color: #242A31;
+$bridge-textfield-color: #242A31;
+$bridge-textfield-placeholder-color: #75818D;
+$bridge-side-image-width: 272px;
+$bridge-side-image-height: 276px;
+$bridge-image-center-pointing-left: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-left.svg';
+$bridge-image-center-pointing-right: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-right.svg';
+$bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-down@2x.png';
+$bridge-image-left: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-1.png';
+$bridge-image-right: $base-images-path + '/themes/' + $theme-name + '/bridge/pattern-2.png';
+$bridge-transfer-title-color: $primary-color;
+$bridge-transfer-width: 960px;
+$bridge-transfer-button-height: 42px;
+$bridge-transfer-button-width: 100px;
+$bridge-transfer-button-border-radius: 2px;
+$form-container-height: 200px;
+$form-container-max-width: 380px;
+$network-container-height: 73px;
+$network-container-padding: 63.5px 0 63.5px 30px;
+$network-container-padding-foreign: 63.5px 30px 63.5px 0;
+$network-basic-label-font-size: 12px;
+$info-icon-display: none;
+$network-show-more-font-weight: normal;
+$network-container-justify-content: space-between;
+$bridge-input-label-font-size: 20px;
+$bridge-input-label-line-height: 42px;
+$bridge-input-label-margin: 0 20px 0 0;
+$bridge-transfer-button-border-radius: 2px 2px 2px 2px;
+$button-bridge-form-hover-background-color: $base-button-bg-color-darker;
+
+// Network details
+$network-details-body-border-radius: 10px;
+$network-details-body-mobile-height: 400px;
+
+
+// bridge alert
+$alert-logo-box-background-color: $primary-color;
+
+// bridge transfer alert
+$transfer-alert-height: 317px;
+$transfer-alert-width: 540px;
+$transfer-alert-border-radius: 10px;
+$transfer-alert-container-width: $transfer-alert-width;
+$transfer-alert-container-padding: 26px 30px 30px 30px;
+$transfer-alert-confirm-button-order: 1;
+$transfer-alert-container-justify-content: space-between;
+$transfer-description-padding: 0 0 0 0;
+$transfer-buttons-padding: 0 0 0 0;
+$transfer-operation-arrow-line-image: $base-images-path + '/themes/' + $theme-name + '/bridge/transfer-line.svg';
+$transfer-operation-arrow-ellipse-image: $base-images-path + '/themes/' + $theme-name + '/bridge/transfer-ellipse.svg';
+$transfer-operation-arrow-image: $base-images-path + '/themes/' + $theme-name + '/bridge/arrow.svg';
+
+// copy icon
+$copy-icon-color: #4DA9A6;
+$copy-icon-hover-color: #408684;
+
+// status section
+$status-text-color: #9EAAB6;
+$status-authority-number-color: $primary-color;
+$status-authority-address-color: $text-color;
+$status-title-font-size: 12px;
+$status-title-line-height: 14px;
+$status-title-font-weight: bold;
+$status-title-letter-spacing: 0.2em;
+$status-title-text-transform: uppercase;
+$status-title-padding: 0 0 17px 0;
+$status-container-flex-direction: row;
+$status-container-mobile-flex-direction: column;
+$status-container-justify-content: space-between;
+$status-container-padding: 37px 0 0 0;
+$status-page-container-mobile-width: 95%;
+$status-configuration-data-display: flex;
+$status-configuration-container-padding: 0 0 30px 0;
+$status-page-container-width: $container-width;
+$status-left-container: none;
+
+$status-authority-logo-0: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-0.svg';
+$status-authority-logo-1: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-1.svg';
+$status-authority-logo-2: $base-images-path + '/themes/' + $theme-name + '/status/authority/logo-2.svg';
+
+// datablock
+$datablock-value-color: #242A31;
+$datablock-value-font-size: 20px;
+$datablock-value-line-height: 23px;
+$datablock-type-font-size: 20px;
+$datablock-type-line-height: 23px;
+$datablock-type-font-weight: bold;
+$datablock-type-color: #242A31;
+$datablock-type-margin-left: 5px;
+$datablock-text-color: #242A31;
+$datablock-container-width: 217px;
+$datablock-container-height: 70px;
+$datablock-container-background: #fff;
+$datablock-container-border: 1px solid #E6ECF1;
+$datablock-container-box-sizing: border-box;
+$datablock-container-border-radius: 4px;
+$datablock-container-margin: 0 30px 0 0;
+$datablock-container-mobile-align-items: center;
+$datablock-container-mobile-justify-content: space-evenly;
+$datablock-description-font-size: 12px;
+$datablock-description-line-height: 14px;
+
+// statistics
+$statistics-title-color: $status-text-color;
+$statistics-title-font-size: $status-title-font-size;
+$statistics-title-line-height: $status-title-line-height;
+$statistics-title-font-weight: $status-title-font-weight;
+$statistics-title-letter-spacing: $status-title-letter-spacing;
+$statistics-title-text-transform: $status-title-text-transform;
+$statistics-title-padding: $status-title-padding;
+$statistics-fee-container-order: 1;
+$statistics-fee-container-padding: 38px 0 0 0;
+$statistics-fee-data-justify-content: flex-start;
+$statistics-fee-container-width: auto;
+$statistics-deposit-container-width: auto;
+$statistics-bridge-data-mobile-margin: 0 0 10px 0;
+$statistics-page-container-width: $container-width;
+$statistics-left-container-display: none;
+$pattern-background-display: none;
+
+// events
+$events-title-color: $text-color;
+$events-filter-color: $text-color;
+$events-select-color: $text-color;
+$events-column-title-color: $text-color;
+$events-recipient-label-color: $text-color;
+$events-value-color: $text-color;
+$events-block-color: $text-color;

@@ -4,6 +4,12 @@
     path {
         fill: $copy-icon-color;
     }
+
+  &:hover {
+    path {
+      fill: $copy-icon-hover-color;
+    }
+  }
 }
 
 .copy-icon-right {

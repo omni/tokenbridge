@@ -1,0 +1,12 @@
+---
+version: '2.4'
+services:
+  alm:
+    build:
+      context: ..
+      dockerfile: alm/Dockerfile
+    env_file: ./.env
+    environment: 
+      - NODE_ENV=production
+    restart: unless-stopped
+    entrypoint: yarn start

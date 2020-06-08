@@ -16,12 +16,14 @@ async function checkWorker2() {
       (evStats.onlyInForeignDeposits || evStats.home.processedMsgNotDeliveredInForeign).length === 0 &&
       (evStats.onlyInHomeWithdrawals || evStats.foreign.deliveredMsgNotProcessedInHome).length === 0 &&
       (evStats.onlyInForeignWithdrawals || evStats.foreign.processedMsgNotDeliveredInHome).length === 0
+    evStats.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/eventsStats.json`, evStats)
 
     logger.debug('calling alerts()')
     const _alerts = await alerts()
     if (!_alerts) throw new Error('alerts is empty: ' + JSON.stringify(_alerts))
     _alerts.ok = !_alerts.executeAffirmations.mostRecentTxHash && !_alerts.executeSignatures.mostRecentTxHash
+    _alerts.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/alerts.json`, _alerts)
     logger.debug('Done x2')
   } catch (e) {

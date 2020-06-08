@@ -3,26 +3,51 @@
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    width: $datablock-container-width;
+    min-width: $datablock-container-width;
+    height: $datablock-container-height;
+    background-color: $datablock-container-background;
+    border: $datablock-container-border;
+    box-sizing: $datablock-container-box-sizing;
+    border-radius: $datablock-container-border-radius;
+    margin: $datablock-container-margin;
 
     @media screen and (max-width: $tablet-width) {
-      align-items: normal;
-      justify-content: flex-start;
+      align-items: $datablock-container-mobile-align-items;
+      justify-content: $datablock-container-mobile-justify-content;
+      min-width: auto;
     }
 
     .datablock-value {
       color: $datablock-value-color;
-      font-size: 30px;
+      font-size: $datablock-value-font-size;
+      line-height: $datablock-value-line-height;
       font-weight: bold;
+
+      &-green {
+        color: #4DA9A6;
+      }
+
+      &-yellow {
+        color: #FFA800;
+      }
+
+      &-red {
+        color: #FF002E;
+      }
     }
 
     .datablock-type {
       color: $datablock-type-color;
-      font-size: 18px;
-      margin-left: 10px;
+      font-size: $datablock-type-font-size;
+      line-height: $datablock-type-line-height;
+      font-weight: $datablock-type-font-weight;
+      margin-left: $datablock-type-margin-left;
     }
 
     .datablock-description {
       color: $datablock-text-color;
-      font-size: 14px;
+      font-size: $datablock-description-font-size;
+      line-height: $datablock-description-line-height;
     }
   }
