@@ -72,9 +72,11 @@ async function main(mode) {
 
   logger.debug('getting last block numbers')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
+  let homeToForeignRequests
+  let foreignToHomeRequests
 
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
-  const homeToForeignRequests = (await getPastEvents(homeBridge, {
+  homeToForeignRequests = (await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
     fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber
@@ -95,11 +97,52 @@ async function main(mode) {
   })).map(normalizeEvent)
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
-  let foreignToHomeRequests = (await getPastEvents(foreignBridge, {
+  foreignToHomeRequests = (await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
     fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: foreignBlockNumber
   })).map(normalizeEvent)
+
+  // append old AMB UserRequestForSignature and UserRequestForAffirmation events
+  if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    // replace UserRequestForSignature abi with the old one
+    const OLD_HOME_ABI = HOME_ABI.filter(x => x.name !== 'UserRequestForSignature')
+    OLD_HOME_ABI.push({
+      anonymous: false,
+      inputs: [{ indexed: false, name: 'encodedData', type: 'bytes' }],
+      name: 'UserRequestForSignature',
+      type: 'event'
+    })
+    // replace UserRequestForAffirmation abi with the old one
+    const OLD_FOREIGN_ABI = FOREIGN_ABI.filter(x => x.name !== 'UserRequestForAffirmation')
+    OLD_FOREIGN_ABI.push({
+      anonymous: false,
+      inputs: [{ indexed: false, name: 'encodedData', type: 'bytes' }],
+      name: 'UserRequestForAffirmation',
+      type: 'event'
+    })
+    const oldHomeBridge = new web3Home.eth.Contract(OLD_HOME_ABI, COMMON_HOME_BRIDGE_ADDRESS)
+    const oldForeignBridge = new web3Foreign.eth.Contract(OLD_FOREIGN_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
+
+    logger.debug("calling oldHomeBridge.getPastEvents('UserRequestForSignature(bytes)')")
+    const homeToForeignRequestsOld = (await getPastEvents(oldHomeBridge, {
+      event: 'UserRequestForSignature',
+      fromBlock: MONITOR_HOME_START_BLOCK,
+      toBlock: homeBlockNumber
+    })).map(normalizeEvent)
+    logger.debug(`found ${homeToForeignRequestsOld.length} events`)
+    homeToForeignRequests = [...homeToForeignRequests, ...homeToForeignRequestsOld]
+
+    logger.debug("calling oldForeignBridge.getPastEvents('UserRequestForAffirmation(bytes)')")
+    const foreignToHomeRequestsOld = (await getPastEvents(oldForeignBridge, {
+      event: 'UserRequestForAffirmation',
+      fromBlock: MONITOR_FOREIGN_START_BLOCK,
+      toBlock: foreignBlockNumber
+    })).map(normalizeEvent)
+    logger.debug(`found ${foreignToHomeRequestsOld.length} events`)
+    foreignToHomeRequests = [...foreignToHomeRequests, ...foreignToHomeRequestsOld]
+  }
+
   if (isExternalErc20) {
     logger.debug("calling erc20Contract.getPastEvents('Transfer')")
     let transferEvents = (await getPastEvents(erc20Contract, {
