@@ -23,7 +23,7 @@
     "react-scripts": "3.0.1",
     "styled-components": "^5.1.1",
     "typescript": "^3.5.2",
-    "web3": "^1.2.8"
+    "web3": "1.2.7"
   },
   "scripts": {
     "start": "./load-env.sh react-app-rewired start",
