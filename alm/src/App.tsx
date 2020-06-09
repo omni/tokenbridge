@@ -1,13 +1,12 @@
 import React from 'react'
-import './App.css'
+import { BrowserRouter } from 'react-router-dom'
+import { MainPage } from './components/MainPage'
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>AMB Live Monitoring</p>
-      </header>
-    </div>
+    <BrowserRouter>
+      <MainPage />
+    </BrowserRouter>
   )
 }
 
