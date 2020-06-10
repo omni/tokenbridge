@@ -12,7 +12,9 @@ const {
   ERC677_BRIDGE_TOKEN_ABI,
   getTokenType,
   getPastEvents,
-  ZERO_ADDRESS
+  ZERO_ADDRESS,
+  OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI,
+  OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
 const { filterTransferBeforeES } = require('./tokenUtils')
@@ -105,24 +107,11 @@ async function main(mode) {
 
   // append old AMB UserRequestForSignature and UserRequestForAffirmation events
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
-    // replace UserRequestForSignature abi with the old one
-    const OLD_HOME_ABI = HOME_ABI.filter(x => x.name !== 'UserRequestForSignature')
-    OLD_HOME_ABI.push({
-      anonymous: false,
-      inputs: [{ indexed: false, name: 'encodedData', type: 'bytes' }],
-      name: 'UserRequestForSignature',
-      type: 'event'
-    })
-    // replace UserRequestForAffirmation abi with the old one
-    const OLD_FOREIGN_ABI = FOREIGN_ABI.filter(x => x.name !== 'UserRequestForAffirmation')
-    OLD_FOREIGN_ABI.push({
-      anonymous: false,
-      inputs: [{ indexed: false, name: 'encodedData', type: 'bytes' }],
-      name: 'UserRequestForAffirmation',
-      type: 'event'
-    })
-    const oldHomeBridge = new web3Home.eth.Contract(OLD_HOME_ABI, COMMON_HOME_BRIDGE_ADDRESS)
-    const oldForeignBridge = new web3Foreign.eth.Contract(OLD_FOREIGN_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
+    const oldHomeBridge = new web3Home.eth.Contract(OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
+    const oldForeignBridge = new web3Foreign.eth.Contract(
+      OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI,
+      COMMON_FOREIGN_BRIDGE_ADDRESS
+    )
 
     logger.debug("calling oldHomeBridge.getPastEvents('UserRequestForSignature(bytes)')")
     const homeToForeignRequestsOld = (await getPastEvents(oldHomeBridge, {
