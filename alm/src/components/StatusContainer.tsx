@@ -7,6 +7,7 @@ import { MessageSelector } from './MessageSelector'
 import { Loading } from './commons/Loading'
 import { useStateProvider } from '../state/StateProvider'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
+import { ConfirmationsContainer } from './ConfirmationsContainer'
 
 export const StatusContainer = () => {
   const { home, foreign } = useStateProvider()
@@ -15,15 +16,14 @@ export const StatusContainer = () => {
   const validChainId = chainId === home.chainId.toString() || chainId === foreign.chainId.toString()
   const validParameters = validChainId && validTxHash(txHash)
 
-  const { messagesId, status, description, timestamp, loading } = useTransactionStatus({
+  const { messages, receipt, status, description, timestamp, loading } = useTransactionStatus({
     txHash: validParameters ? txHash : '',
     chainId: validParameters ? parseInt(chainId) : 0
   })
 
-  const selectedMessageId =
-    messageIdParam === undefined || messagesId[messageIdParam] === undefined ? -1 : messageIdParam
+  const selectedMessageId = messageIdParam === undefined || messages[messageIdParam] === undefined ? -1 : messageIdParam
 
-  if (!validParameters) {
+  if (!validParameters && home.chainId && foreign.chainId) {
     return (
       <div>
         <p>
@@ -43,7 +43,7 @@ export const StatusContainer = () => {
 
   const displayMessageSelector = status === TRANSACTION_STATUS.SUCCESS_MULTIPLE_MESSAGES && selectedMessageId === -1
   const multiMessageSelected = status === TRANSACTION_STATUS.SUCCESS_MULTIPLE_MESSAGES && selectedMessageId !== -1
-  const displayReference = multiMessageSelected ? messagesId[selectedMessageId] : txHash
+  const displayReference = multiMessageSelected ? messages[selectedMessageId].id : txHash
   const formattedMessageId = formatTxHash(displayReference)
 
   const displayedDescription = multiMessageSelected
@@ -54,6 +54,9 @@ export const StatusContainer = () => {
   const txExplorerLink = getExplorerTxUrl(txHash, isHome)
   const displayExplorerLink = status !== TRANSACTION_STATUS.NOT_FOUND
 
+  const displayConfirmations = status === TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE || multiMessageSelected
+  const messageToConfirm =
+    messages.length > 1 ? messages[selectedMessageId] : messages.length > 0 ? messages[0] : { id: '', data: '' }
   return (
     <div>
       {status && (
@@ -70,7 +73,10 @@ export const StatusContainer = () => {
           {displayedDescription}
         </p>
       )}
-      {displayMessageSelector && <MessageSelector messages={messagesId} onMessageSelected={onMessageSelected} />}
+      {displayMessageSelector && <MessageSelector messages={messages} onMessageSelected={onMessageSelected} />}
+      {displayConfirmations && (
+        <ConfirmationsContainer message={messageToConfirm} receipt={receipt} fromHome={isHome} />
+      )}
     </div>
   )
 }

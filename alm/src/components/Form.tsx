@@ -14,6 +14,7 @@ const LabelText = styled.label`
 const Input = styled.input`
   background-color: var(--color-primary);
   color: var(--font-color);
+  max-width: 100%;
 `
 
 export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitParams) => void }) => {

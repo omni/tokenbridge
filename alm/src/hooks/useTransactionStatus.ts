@@ -3,11 +3,11 @@ import { TransactionReceipt } from 'web3-eth'
 import { TRANSACTION_STATUS } from '../config/constants'
 import { getTransactionStatusDescription } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
-import { getHomeMessagesFromReceipt, getForeignMessagesFromReceipt } from '../utils/web3'
+import { getHomeMessagesFromReceipt, getForeignMessagesFromReceipt, MessageObject } from '../utils/web3'
 
 export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chainId: number }) => {
   const { home, foreign } = useStateProvider()
-  const [messagesId, setMessagesId] = useState<Array<string>>([])
+  const [messages, setMessages] = useState<Array<MessageObject>>([])
   const [status, setStatus] = useState('')
   const [description, setDescription] = useState('')
   const [receipt, setReceipt] = useState<Maybe<TransactionReceipt>>(null)
@@ -36,7 +36,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
         if (!txReceipt) {
           setStatus(TRANSACTION_STATUS.NOT_FOUND)
           setDescription(getTransactionStatusDescription(TRANSACTION_STATUS.NOT_FOUND))
-          setMessagesId([txHash])
+          setMessages([{ id: txHash, data: '' }])
           const timeoutId = setTimeout(() => getReceipt(), 5000)
           subscriptions.push(timeoutId)
         } else {
@@ -46,23 +46,23 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
           setTimestamp(blockTimestamp)
 
           if (txReceipt.status) {
-            let bridgeMessagesId
+            let bridgeMessages: Array<MessageObject>
             if (isHome) {
-              bridgeMessagesId = getHomeMessagesFromReceipt(txReceipt, home.web3, home.bridgeAddress)
+              bridgeMessages = getHomeMessagesFromReceipt(txReceipt, home.web3, home.bridgeAddress)
             } else {
-              bridgeMessagesId = getForeignMessagesFromReceipt(txReceipt, foreign.web3, foreign.bridgeAddress)
+              bridgeMessages = getForeignMessagesFromReceipt(txReceipt, foreign.web3, foreign.bridgeAddress)
             }
 
-            if (bridgeMessagesId.length === 0) {
-              setMessagesId([txHash])
+            if (bridgeMessages.length === 0) {
+              setMessages([{ id: txHash, data: '' }])
               setStatus(TRANSACTION_STATUS.SUCCESS_NO_MESSAGES)
               setDescription(getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_NO_MESSAGES, blockTimestamp))
-            } else if (bridgeMessagesId.length === 1) {
-              setMessagesId(bridgeMessagesId)
+            } else if (bridgeMessages.length === 1) {
+              setMessages(bridgeMessages)
               setStatus(TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE)
               setDescription(getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE, blockTimestamp))
             } else {
-              setMessagesId(bridgeMessagesId)
+              setMessages(bridgeMessages)
               setStatus(TRANSACTION_STATUS.SUCCESS_MULTIPLE_MESSAGES)
               setDescription(
                 getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_MULTIPLE_MESSAGES, blockTimestamp)
@@ -89,7 +89,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
   )
 
   return {
-    messagesId,
+    messages,
     status,
     description,
     receipt,

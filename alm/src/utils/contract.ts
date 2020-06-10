@@ -13,3 +13,8 @@ export const getRequiredSignatures = async (contract: Contract) => {
 }
 
 export const getValidatorList = (contract: Contract) => contract.methods.validatorList().call()
+
+export const getMessagesSigned = (contract: Contract, hash: string) => contract.methods.messagesSigned(hash).call()
+
+export const getAffirmationsSigned = (contract: Contract, hash: string) =>
+  contract.methods.affirmationsSigned(hash).call()
