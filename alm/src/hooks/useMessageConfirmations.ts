@@ -6,7 +6,7 @@ import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { getAffirmationsSigned, getMessagesSigned } from '../utils/contract'
 import { CONFIRMATIONS_STATUS, HOME_RPC_POLLING_INTERVAL, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
-import { getValidatorSignatureCache, setValidatorSignatureCache } from '../utils/validators'
+import validatorsCache from '../services/ValidatorsCache'
 
 export interface useMessageConfirmationsParams {
   message: MessageObject
@@ -51,7 +51,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
           validatorList.map(async validator => {
             const hashSenderMsg = web3.utils.soliditySha3Raw(validator, hashMsg)
 
-            const signatureFromCache = getValidatorSignatureCache(hashSenderMsg)
+            const signatureFromCache = validatorsCache.get(hashSenderMsg)
             if (signatureFromCache) {
               return {
                 validator,
@@ -64,7 +64,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
 
             // If validator confirmed signature, we cache the result to avoid doing future requests for a result that won't change
             if (confirmed) {
-              setValidatorSignatureCache(hashSenderMsg, confirmed)
+              validatorsCache.set(hashSenderMsg, confirmed)
             }
 
             return {
