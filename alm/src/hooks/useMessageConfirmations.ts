@@ -47,7 +47,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
       ) => {
         if (!web3 || !validatorList || !bridgeContract) return
         const hashMsg = web3.utils.soliditySha3Raw(messageData)
-        const validatorConfirmations = await Promise.all(
+        let validatorConfirmations = await Promise.all(
           validatorList.map(async validator => {
             const hashSenderMsg = web3.utils.soliditySha3Raw(validator, hashMsg)
 
@@ -74,12 +74,12 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
           })
         )
 
-        setResult(validatorConfirmations)
-
         const successConfirmations = validatorConfirmations.filter(
           c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS
         )
-        if (successConfirmations.length === requiredSignatures) {
+
+        // If signatures not collected, it needs to retry in the next blocks
+        if (successConfirmations.length !== requiredSignatures) {
           setStatus(CONFIRMATIONS_STATUS.SUCCESS)
           const timeoutId = setTimeout(
             () =>
@@ -95,7 +95,19 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
             5000
           )
           subscriptions.push(timeoutId)
+        } else {
+          // If signatures collected, it should set other signatures as not required
+          const notSuccessConfirmations = validatorConfirmations.filter(
+            c => c.status !== VALIDATOR_CONFIRMATION_STATUS.SUCCESS
+          )
+          const notRequiredConfirmations = notSuccessConfirmations.map(c => ({
+            validator: c.validator,
+            status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED
+          }))
+
+          validatorConfirmations = [...successConfirmations, ...notRequiredConfirmations]
         }
+        setResult(validatorConfirmations)
       }
 
       getConfirmationsForTx(

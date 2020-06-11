@@ -18,6 +18,13 @@ const SuccessLabel = styled.label`
   border-radius: 4px;
 `
 
+const NotRequiredLabel = styled.label`
+  color: #bdbdbd;
+  background-color: #424242;
+  padding: 0.4rem 0.7rem;
+  border-radius: 4px;
+`
+
 const RequiredConfirmations = styled.label`
   font-size: 14px;
 `
@@ -36,6 +43,8 @@ export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmatio
     switch (validatorStatus) {
       case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED:
+        return <NotRequiredLabel>{validatorStatus}</NotRequiredLabel>
       default:
         return <SimpleLoading />
     }
