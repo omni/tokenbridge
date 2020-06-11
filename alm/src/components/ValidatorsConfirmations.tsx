@@ -19,8 +19,8 @@ const SuccessLabel = styled.label`
 `
 
 const NotRequiredLabel = styled.label`
-  color: #bdbdbd;
-  background-color: #424242;
+  color: var(--not-required-color);
+  background-color: var(--not-required-bg-color);
   padding: 0.4rem 0.7rem;
   border-radius: 4px;
 `

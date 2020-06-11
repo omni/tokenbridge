@@ -23,5 +23,7 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
     --link-color: ${props => props.theme.linkColor};
     --success-color: ${props => props.theme.success.textColor};
     --success-bg-color: ${props => props.theme.success.backgroundColor};
+    --not-required-color: ${props => props.theme.notRequired.textColor};
+    --not-required-bg-color: ${props => props.theme.notRequired.backgroundColor};
   }
 `

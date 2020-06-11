@@ -8,6 +8,10 @@ const theme = {
   success: {
     textColor: '#00c9a7',
     backgroundColor: '#004d40'
+  },
+  notRequired: {
+    textColor: '#bdbdbd',
+    backgroundColor: '#424242'
   }
 }
 export default theme
