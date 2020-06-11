@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { getAffirmationsSigned, getMessagesSigned } from '../utils/contract'
-import { CONFIRMATIONS_STATUS, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { CONFIRMATIONS_STATUS, HOME_RPC_POLLING_INTERVAL, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { getValidatorSignatureCache, setValidatorSignatureCache } from '../utils/validators'
 
 export interface useMessageConfirmationsParams {
@@ -92,7 +92,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
                 setResult,
                 requiredSignatures
               ),
-            5000
+            HOME_RPC_POLLING_INTERVAL
           )
           subscriptions.push(timeoutId)
         } else {
