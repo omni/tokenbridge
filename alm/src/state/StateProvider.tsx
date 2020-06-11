@@ -12,21 +12,24 @@ import Web3 from 'web3'
 import { useBridgeContracts } from '../hooks/useBridgeContracts'
 import { Contract } from 'web3-eth-contract'
 
-export interface NetworkParams {
+export interface BaseNetworkParams {
   chainId: number
   name: string
   web3: Maybe<Web3>
   bridgeAddress: string
   bridgeContract: Maybe<Contract>
   blockConfirmations: number
+}
+
+export interface HomeNetworkParams extends BaseNetworkParams {
   validatorContract: Maybe<Contract>
   requiredSignatures: number
   validatorList: Array<string>
 }
 
 export interface StateContext {
-  home: NetworkParams
-  foreign: NetworkParams
+  home: HomeNetworkParams
+  foreign: BaseNetworkParams
   loading: boolean
 }
 
@@ -48,10 +51,7 @@ const initialState = {
     web3: null,
     bridgeAddress: FOREIGN_BRIDGE_ADDRESS,
     bridgeContract: null,
-    blockConfirmations: 0,
-    validatorContract: null,
-    requiredSignatures: 0,
-    validatorList: []
+    blockConfirmations: 0
   },
   loading: true
 }
@@ -67,11 +67,8 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
     homeBlockConfirmations,
     foreignBlockConfirmations,
     homeValidatorContract,
-    foreignValidatorContract,
     homeRequiredSignatures,
-    foreignRequiredSignatures,
-    homeValidatorList,
-    foreignValidatorList
+    homeValidatorList
   } = useBridgeContracts({
     homeWeb3: homeNetwork.web3,
     foreignWeb3: foreignNetwork.web3
@@ -93,9 +90,6 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
       name: FOREIGN_NETWORK_NAME,
       bridgeContract: foreignBridge,
       blockConfirmations: foreignBlockConfirmations,
-      validatorContract: foreignValidatorContract,
-      requiredSignatures: foreignRequiredSignatures,
-      validatorList: foreignValidatorList,
       ...foreignNetwork
     },
     loading: homeNetwork.loading || foreignNetwork.loading

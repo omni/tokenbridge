@@ -21,11 +21,8 @@ export const useBridgeContracts = ({ homeWeb3, foreignWeb3 }: useBridgeContracts
   const [homeBlockConfirmations, setHomeBlockConfirmations] = useState(0)
   const [foreignBlockConfirmations, setForeignBlockConfirmations] = useState(0)
   const [homeValidatorContract, setHomeValidatorContract] = useState<Maybe<Contract>>(null)
-  const [foreignValidatorContract, setForeignValidatorContract] = useState<Maybe<Contract>>(null)
   const [homeRequiredSignatures, setHomeRequiredSignatures] = useState(0)
-  const [foreignRequiredSignatures, setForeignRequiredSignatures] = useState(0)
   const [homeValidatorList, setHomeValidatorList] = useState([])
-  const [foreignValidatorList, setForeignValidatorList] = useState([])
 
   const callRequireBlockConfirmations = async (contract: Maybe<Contract>, setResult: Function) => {
     if (!contract) return
@@ -68,7 +65,6 @@ export const useBridgeContracts = ({ homeWeb3, foreignWeb3 }: useBridgeContracts
       if (!foreignWeb3) return
       const foreignContract = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, FOREIGN_BRIDGE_ADDRESS)
       callRequireBlockConfirmations(foreignContract, setForeignBlockConfirmations)
-      callValidatorContract(foreignContract, foreignWeb3, setForeignValidatorContract)
       setForeignBridge(foreignContract)
     },
     [foreignWeb3]
@@ -82,24 +78,13 @@ export const useBridgeContracts = ({ homeWeb3, foreignWeb3 }: useBridgeContracts
     [homeValidatorContract]
   )
 
-  useEffect(
-    () => {
-      callRequiredSignatures(foreignValidatorContract, setForeignRequiredSignatures)
-      callValidatorList(foreignValidatorContract, setForeignValidatorList)
-    },
-    [foreignValidatorContract]
-  )
-
   return {
     homeBridge,
     foreignBridge,
     homeBlockConfirmations,
     foreignBlockConfirmations,
     homeValidatorContract,
-    foreignValidatorContract,
     homeRequiredSignatures,
-    foreignRequiredSignatures,
-    homeValidatorList,
-    foreignValidatorList
+    homeValidatorList
   }
 }
