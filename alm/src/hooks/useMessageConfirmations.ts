@@ -6,6 +6,7 @@ import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { getAffirmationsSigned, getMessagesSigned } from '../utils/contract'
 import { CONFIRMATIONS_STATUS, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { getValidatorSignatureCache, setValidatorSignatureCache } from '../utils/validators'
 
 export interface useMessageConfirmationsParams {
   message: MessageObject
@@ -23,44 +24,95 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
   const [confirmations, setConfirmations] = useState<Array<ConfirmationParam>>([])
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
 
-  const getConfirmationsFromHomeTx = async (
-    messageData: string,
-    web3: Maybe<Web3>,
-    validatorList: string[],
-    bridgeContract: Maybe<Contract>,
-    confirmationContractMethod: Function,
-    setResult: Function
-  ) => {
-    if (!web3 || !validatorList || !bridgeContract) return
-    const hashMsg = web3.utils.soliditySha3Raw(messageData)
-    const validatorConfirmations = await Promise.all(
-      validatorList.map(async validator => {
-        const hashSenderMsg = web3.utils.soliditySha3(validator, hashMsg)
-        const confirmed = await confirmationContractMethod(bridgeContract, hashSenderMsg)
-        const status = confirmed ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
-        return {
-          validator,
-          status
-        }
-      })
-    )
-
-    setResult(validatorConfirmations)
-  }
-
   useEffect(
     () => {
+      const subscriptions: Array<number> = []
+
+      const unsubscribe = () => {
+        subscriptions.forEach(s => {
+          clearTimeout(s)
+        })
+      }
+
       const confirmationContractMethod = fromHome ? getMessagesSigned : getAffirmationsSigned
-      getConfirmationsFromHomeTx(
+
+      const getConfirmationsForTx = async (
+        messageData: string,
+        web3: Maybe<Web3>,
+        validatorList: string[],
+        bridgeContract: Maybe<Contract>,
+        confirmationContractMethod: Function,
+        setResult: Function,
+        requiredSignatures: number
+      ) => {
+        if (!web3 || !validatorList || !bridgeContract) return
+        const hashMsg = web3.utils.soliditySha3Raw(messageData)
+        const validatorConfirmations = await Promise.all(
+          validatorList.map(async validator => {
+            const hashSenderMsg = web3.utils.soliditySha3Raw(validator, hashMsg)
+
+            const signatureFromCache = getValidatorSignatureCache(hashSenderMsg)
+            if (signatureFromCache) {
+              return {
+                validator,
+                status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS
+              }
+            }
+
+            const confirmed = await confirmationContractMethod(bridgeContract, hashSenderMsg)
+            const status = confirmed ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+
+            // If validator confirmed signature, we cache the result to avoid doing future requests for a result that won't change
+            if (confirmed) {
+              setValidatorSignatureCache(hashSenderMsg, confirmed)
+            }
+
+            return {
+              validator,
+              status
+            }
+          })
+        )
+
+        setResult(validatorConfirmations)
+
+        const successConfirmations = validatorConfirmations.filter(
+          c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS
+        )
+        if (successConfirmations.length === requiredSignatures) {
+          setStatus(CONFIRMATIONS_STATUS.SUCCESS)
+          const timeoutId = setTimeout(
+            () =>
+              getConfirmationsForTx(
+                messageData,
+                web3,
+                validatorList,
+                bridgeContract,
+                confirmationContractMethod,
+                setResult,
+                requiredSignatures
+              ),
+            5000
+          )
+          subscriptions.push(timeoutId)
+        }
+      }
+
+      getConfirmationsForTx(
         message.data,
         home.web3,
         home.validatorList,
         home.bridgeContract,
         confirmationContractMethod,
-        setConfirmations
+        setConfirmations,
+        home.requiredSignatures
       )
+
+      return () => {
+        unsubscribe()
+      }
     },
-    [fromHome, message.data, home.web3, home.validatorList, home.bridgeContract]
+    [fromHome, message.data, home.web3, home.validatorList, home.bridgeContract, home.requiredSignatures]
   )
 
   useEffect(
