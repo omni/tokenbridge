@@ -9,6 +9,7 @@ import { SimpleLoading } from './commons/Loading'
 import { ValidatorsConfirmations } from './ValidatorsConfirmations'
 import { getConfirmationsStatusDescription } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
+import { ExecutionConfirmation } from './ExecutionConfirmation'
 
 const StatusLabel = styled.label`
   font-weight: bold;
@@ -41,7 +42,11 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome }: Confirmat
     home: { name: homeName },
     foreign: { name: foreignName }
   } = useStateProvider()
-  const { confirmations, status } = useMessageConfirmations({ message, receipt, fromHome })
+  const { confirmations, status, executionData, signatureCollected } = useMessageConfirmations({
+    message,
+    receipt,
+    fromHome
+  })
 
   return (
     <div className="row is-center">
@@ -60,6 +65,7 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome }: Confirmat
           </p>
         </StatusDescription>
         <ValidatorsConfirmations confirmations={confirmations} />
+        {signatureCollected && <ExecutionConfirmation executionData={executionData} isHome={!fromHome} />}
       </StyledConfirmationContainer>
     </div>
   )

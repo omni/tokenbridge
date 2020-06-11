@@ -6,23 +6,10 @@ import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
+import { NotRequiredLabel, SuccessLabel } from './commons/Labels'
 
 const Thead = styled.thead`
   border-bottom: 2px solid #9e9e9e;
-`
-
-const SuccessLabel = styled.label`
-  color: var(--success-color);
-  background-color: var(--success-bg-color);
-  padding: 0.4rem 0.7rem;
-  border-radius: 4px;
-`
-
-const NotRequiredLabel = styled.label`
-  color: var(--not-required-color);
-  background-color: var(--not-required-bg-color);
-  padding: 0.4rem 0.7rem;
-  border-radius: 4px;
 `
 
 const RequiredConfirmations = styled.label`
@@ -66,8 +53,8 @@ export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmatio
             const displayedStatus = confirmation && confirmation.status ? confirmation.status : ''
             return (
               <tr key={i}>
-                <td>{windowWidth < 700 ? formatTxHashExtended(validator) : validator}</td>
-                <td className="is-center">{getValidatorStatusElement(displayedStatus)}</td>
+                <td>{windowWidth < 850 ? formatTxHashExtended(validator) : validator}</td>
+                <td className="text-center">{getValidatorStatusElement(displayedStatus)}</td>
               </tr>
             )
           })}

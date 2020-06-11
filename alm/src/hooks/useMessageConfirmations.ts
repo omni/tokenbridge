@@ -3,9 +3,14 @@ import { TransactionReceipt } from 'web3-eth'
 import { MessageObject } from '../utils/web3'
 import { useEffect, useState } from 'react'
 import Web3 from 'web3'
-import { Contract } from 'web3-eth-contract'
+import { Contract, EventData } from 'web3-eth-contract'
 import { getAffirmationsSigned, getMessagesSigned } from '../utils/contract'
-import { CONFIRMATIONS_STATUS, HOME_RPC_POLLING_INTERVAL, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import {
+  CONFIRMATIONS_STATUS,
+  FOREIGN_RPC_POLLING_INTERVAL,
+  HOME_RPC_POLLING_INTERVAL,
+  VALIDATOR_CONFIRMATION_STATUS
+} from '../config/constants'
 import validatorsCache from '../services/ValidatorsCache'
 
 export interface useMessageConfirmationsParams {
@@ -19,10 +24,26 @@ export interface ConfirmationParam {
   status: string
 }
 
+export interface ExecutionData {
+  status: string
+  validator: string
+  txHash: string
+  timestamp: number
+  executionResult: boolean
+}
+
 export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
   const [confirmations, setConfirmations] = useState<Array<ConfirmationParam>>([])
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
+  const [signatureCollected, setSignatureCollected] = useState(false)
+  const [executionData, setExecutionData] = useState<ExecutionData>({
+    status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+    validator: '',
+    txHash: '',
+    timestamp: 0,
+    executionResult: false
+  })
 
   useEffect(
     () => {
@@ -43,7 +64,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
         bridgeContract: Maybe<Contract>,
         confirmationContractMethod: Function,
         setResult: Function,
-        requiredSignatures: number
+        requiredSignatures: number,
+        setSignatureCollected: Function
       ) => {
         if (!web3 || !validatorList || !bridgeContract) return
         const hashMsg = web3.utils.soliditySha3Raw(messageData)
@@ -80,7 +102,6 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
 
         // If signatures not collected, it needs to retry in the next blocks
         if (successConfirmations.length !== requiredSignatures) {
-          setStatus(CONFIRMATIONS_STATUS.SUCCESS)
           const timeoutId = setTimeout(
             () =>
               getConfirmationsForTx(
@@ -90,7 +111,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
                 bridgeContract,
                 confirmationContractMethod,
                 setResult,
-                requiredSignatures
+                requiredSignatures,
+                setSignatureCollected
               ),
             HOME_RPC_POLLING_INTERVAL
           )
@@ -106,6 +128,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
           }))
 
           validatorConfirmations = [...successConfirmations, ...notRequiredConfirmations]
+          setSignatureCollected(true)
         }
         setResult(validatorConfirmations)
       }
@@ -117,7 +140,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
         home.bridgeContract,
         confirmationContractMethod,
         setConfirmations,
-        home.requiredSignatures
+        home.requiredSignatures,
+        setSignatureCollected
       )
 
       return () => {
@@ -129,17 +153,86 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
 
   useEffect(
     () => {
-      if (!confirmations.length) return
-      const successConfirmations = confirmations.filter(c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
-      if (successConfirmations.length === home.requiredSignatures) {
-        setStatus(CONFIRMATIONS_STATUS.SUCCESS)
+      const subscriptions: Array<number> = []
+
+      const unsubscribe = () => {
+        subscriptions.forEach(s => {
+          clearTimeout(s)
+        })
+      }
+
+      const contractEvent = fromHome ? 'RelayedMessage' : 'AffirmationCompleted'
+      const bridgeContract = fromHome ? foreign.bridgeContract : home.bridgeContract
+      const providedWeb3 = fromHome ? foreign.web3 : home.web3
+      const pollingInterval = fromHome ? FOREIGN_RPC_POLLING_INTERVAL : HOME_RPC_POLLING_INTERVAL
+
+      const getFinalizationEvent = async (
+        contract: Maybe<Contract>,
+        eventName: string,
+        web3: Maybe<Web3>,
+        setResult: React.Dispatch<React.SetStateAction<ExecutionData>>
+      ) => {
+        if (!contract || !web3) return
+        const events: EventData[] = await contract.getPastEvents(eventName, {
+          fromBlock: 0,
+          toBlock: 'latest',
+          filter: {
+            messageId: message.id
+          }
+        })
+        if (events.length > 0) {
+          const event = events[0]
+          const [txReceipt, block] = await Promise.all([
+            web3.eth.getTransactionReceipt(event.transactionHash),
+            web3.eth.getBlock(event.blockNumber)
+          ])
+
+          const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
+          const validatorAddress = web3.utils.toChecksumAddress(txReceipt.from)
+
+          setResult({
+            status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
+            validator: validatorAddress,
+            txHash: event.transactionHash,
+            timestamp: blockTimestamp,
+            executionResult: event.returnValues.status
+          })
+        } else {
+          const timeoutId = setTimeout(
+            () => getFinalizationEvent(contract, eventName, web3, setResult),
+            pollingInterval
+          )
+          subscriptions.push(timeoutId)
+        }
+      }
+
+      getFinalizationEvent(bridgeContract, contractEvent, providedWeb3, setExecutionData)
+
+      return () => {
+        unsubscribe()
       }
     },
-    [confirmations, home.requiredSignatures]
+    [fromHome, foreign.bridgeContract, home.bridgeContract, message.id, foreign.web3, home.web3]
+  )
+
+  useEffect(
+    () => {
+      if (executionData.txHash) {
+        const newStatus = executionData.executionResult
+          ? CONFIRMATIONS_STATUS.SUCCESS
+          : CONFIRMATIONS_STATUS.SUCCESS_MESSAGE_FAILED
+        setStatus(newStatus)
+      } else if (signatureCollected) {
+        setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
+      }
+    },
+    [executionData, signatureCollected]
   )
 
   return {
     confirmations,
-    status
+    status,
+    signatureCollected,
+    executionData
   }
 }
