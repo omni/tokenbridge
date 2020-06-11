@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Route, useHistory } from 'react-router-dom'
+import { Route, useHistory, Link } from 'react-router-dom'
 import { Form } from './Form'
 import { StatusContainer } from './StatusContainer'
 import { StateProvider } from '../state/StateProvider'
@@ -18,6 +18,10 @@ const Header = styled.header`
   font-size: calc(10px + 2vmin);
 `
 
+const Title = styled.p`
+  color: var(--font-color);
+`
+
 export interface FormSubmitParams {
   chainId: number
   txHash: string
@@ -33,13 +37,12 @@ export const MainPage = () => {
     <StateProvider>
       <StyledMainPage>
         <Header>
-          <p>AMB Live Monitoring</p>
+          <Link to="/">
+            <Title>AMB Live Monitoring</Title>
+          </Link>
         </Header>
         <div className="container">
-          <Route
-            path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash', '/']}
-            children={<Form onSubmit={onFormSubmit} />}
-          />
+          <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />
           <Route path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']} children={<StatusContainer />} />
         </div>
       </StyledMainPage>
