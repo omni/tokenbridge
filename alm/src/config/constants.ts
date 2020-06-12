@@ -12,6 +12,7 @@ export const FOREIGN_EXPLORER_TX_TEMPLATE: string = process.env.REACT_APP_ALM_FO
 
 export const HOME_RPC_POLLING_INTERVAL: number = 5000
 export const FOREIGN_RPC_POLLING_INTERVAL: number = 15000
+export const BLOCK_RANGE: number = 50
 
 export const TRANSACTION_STATUS = {
   SUCCESS_MULTIPLE_MESSAGES: 'SUCCESS_MULTIPLE_MESSAGES',

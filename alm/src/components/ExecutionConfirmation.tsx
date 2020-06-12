@@ -5,7 +5,7 @@ import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
-import { SuccessLabel } from './commons/Labels'
+import { GreyLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 
 const Thead = styled.thead`
@@ -32,6 +32,8 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
     switch (validatorStatus) {
       case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.WAITING:
+        return <GreyLabel>{validatorStatus}</GreyLabel>
       default:
         return <SimpleLoading />
     }
@@ -53,7 +55,7 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
             <td className="text-center">{getExecutionStatusElement(executionData.status)}</td>
             <td className="text-center">
               <ExplorerTxLink href={txExplorerLink} target="blank">
-                {executionData.timestamp > 0 ? formatTimestamp(executionData.timestamp) : <SimpleLoading />}
+                {executionData.timestamp > 0 ? formatTimestamp(executionData.timestamp) : ''}
               </ExplorerTxLink>
             </td>
           </tr>
