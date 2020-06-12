@@ -30,6 +30,7 @@ export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmatio
     switch (validatorStatus) {
       case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.WAITING:
       case VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED:
         return <NotRequiredLabel>{validatorStatus}</NotRequiredLabel>
       default:

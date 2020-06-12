@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatTimestamp, formatTxHashExtended, getExplorerTxUrl } from '../utils/networks'
+import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useWindowWidth } from '@react-hook/window-size'
 import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
@@ -26,9 +26,7 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
 
   const txExplorerLink = getExplorerTxUrl(executionData.txHash, isHome)
   const formattedValidator =
-    windowWidth < 850 && executionData.validator
-      ? formatTxHashExtended(executionData.validator)
-      : executionData.validator
+    windowWidth < 850 && executionData.validator ? formatTxHash(executionData.validator) : executionData.validator
 
   const getExecutionStatusElement = (validatorStatus = '') => {
     switch (validatorStatus) {

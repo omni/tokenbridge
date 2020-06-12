@@ -12,6 +12,7 @@ import {
   VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
 import validatorsCache from '../services/ValidatorsCache'
+import { BlockNumberProvider } from '../services/BlockNumberProvider'
 
 export interface useMessageConfirmationsParams {
   message: MessageObject
@@ -36,6 +37,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
   const { home, foreign } = useStateProvider()
   const [confirmations, setConfirmations] = useState<Array<ConfirmationParam>>([])
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
+  const [waitingBlocks, setWaitingBlocks] = useState(false)
+  const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
   const [signatureCollected, setSignatureCollected] = useState(false)
   const [executionData, setExecutionData] = useState<ExecutionData>({
     status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
@@ -44,6 +47,89 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
     timestamp: 0,
     executionResult: false
   })
+
+  useEffect(
+    () => {
+      if (!receipt) return
+
+      const subscriptions: Array<number> = []
+
+      const unsubscribe = () => {
+        subscriptions.forEach(s => {
+          clearTimeout(s)
+        })
+      }
+
+      const blockProvider = new BlockNumberProvider()
+      const interval = fromHome ? HOME_RPC_POLLING_INTERVAL : FOREIGN_RPC_POLLING_INTERVAL
+      const web3 = fromHome ? home.web3 : foreign.web3
+      blockProvider.start(web3, interval)
+      const requiredBlockConfirmations = fromHome ? home.blockConfirmations : foreign.blockConfirmations
+      const targetBlock = receipt.blockNumber + requiredBlockConfirmations
+      const checkWaitingForBLocks = async (
+        targetBlock: number,
+        setWaitingStatus: Function,
+        setWaitingBlocksResolved: Function,
+        validatorList: string[],
+        setConfirmations: Function
+      ) => {
+        const currentBlock = blockProvider.get()
+        if (currentBlock && currentBlock >= targetBlock) {
+          setWaitingStatus(false)
+          setWaitingBlocksResolved(true)
+          blockProvider.stop()
+        } else {
+          let nextInterval = interval
+          if (!currentBlock) {
+            nextInterval = 500
+          } else {
+            const validatorsWaiting = validatorList.map(validator => {
+              return {
+                validator,
+                status: VALIDATOR_CONFIRMATION_STATUS.WAITING
+              }
+            })
+            setWaitingStatus(true)
+            setConfirmations(validatorsWaiting)
+          }
+          const timeoutId = setTimeout(
+            () =>
+              checkWaitingForBLocks(
+                targetBlock,
+                setWaitingStatus,
+                setWaitingBlocksResolved,
+                validatorList,
+                setConfirmations
+              ),
+            nextInterval
+          )
+          subscriptions.push(timeoutId)
+        }
+      }
+
+      checkWaitingForBLocks(
+        targetBlock,
+        setWaitingBlocks,
+        setWaitingBlocksResolved,
+        home.validatorList,
+        setConfirmations
+      )
+
+      return () => {
+        unsubscribe()
+        blockProvider.stop()
+      }
+    },
+    [
+      foreign.blockConfirmations,
+      foreign.web3,
+      fromHome,
+      home.blockConfirmations,
+      home.validatorList,
+      home.web3,
+      receipt
+    ]
+  )
 
   useEffect(
     () => {
@@ -65,9 +151,10 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
         confirmationContractMethod: Function,
         setResult: Function,
         requiredSignatures: number,
-        setSignatureCollected: Function
+        setSignatureCollected: Function,
+        waitingBlocksResolved: boolean
       ) => {
-        if (!web3 || !validatorList || !bridgeContract) return
+        if (!web3 || !validatorList || !bridgeContract || !waitingBlocksResolved) return
         const hashMsg = web3.utils.soliditySha3Raw(messageData)
         let validatorConfirmations = await Promise.all(
           validatorList.map(async validator => {
@@ -112,7 +199,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
                 confirmationContractMethod,
                 setResult,
                 requiredSignatures,
-                setSignatureCollected
+                setSignatureCollected,
+                waitingBlocksResolved
               ),
             HOME_RPC_POLLING_INTERVAL
           )
@@ -141,14 +229,23 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
         confirmationContractMethod,
         setConfirmations,
         home.requiredSignatures,
-        setSignatureCollected
+        setSignatureCollected,
+        waitingBlocksResolved
       )
 
       return () => {
         unsubscribe()
       }
     },
-    [fromHome, message.data, home.web3, home.validatorList, home.bridgeContract, home.requiredSignatures]
+    [
+      fromHome,
+      message.data,
+      home.web3,
+      home.validatorList,
+      home.bridgeContract,
+      home.requiredSignatures,
+      waitingBlocksResolved
+    ]
   )
 
   useEffect(
@@ -170,9 +267,10 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
         contract: Maybe<Contract>,
         eventName: string,
         web3: Maybe<Web3>,
-        setResult: React.Dispatch<React.SetStateAction<ExecutionData>>
+        setResult: React.Dispatch<React.SetStateAction<ExecutionData>>,
+        waitingBlocksResolved: boolean
       ) => {
-        if (!contract || !web3) return
+        if (!contract || !web3 || !waitingBlocksResolved) return
         const events: EventData[] = await contract.getPastEvents(eventName, {
           fromBlock: 0,
           toBlock: 'latest',
@@ -199,20 +297,20 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
           })
         } else {
           const timeoutId = setTimeout(
-            () => getFinalizationEvent(contract, eventName, web3, setResult),
+            () => getFinalizationEvent(contract, eventName, web3, setResult, waitingBlocksResolved),
             pollingInterval
           )
           subscriptions.push(timeoutId)
         }
       }
 
-      getFinalizationEvent(bridgeContract, contractEvent, providedWeb3, setExecutionData)
+      getFinalizationEvent(bridgeContract, contractEvent, providedWeb3, setExecutionData, waitingBlocksResolved)
 
       return () => {
         unsubscribe()
       }
     },
-    [fromHome, foreign.bridgeContract, home.bridgeContract, message.id, foreign.web3, home.web3]
+    [fromHome, foreign.bridgeContract, home.bridgeContract, message.id, foreign.web3, home.web3, waitingBlocksResolved]
   )
 
   useEffect(
@@ -224,9 +322,11 @@ export const useMessageConfirmations = ({ message, receipt, fromHome }: useMessa
         setStatus(newStatus)
       } else if (signatureCollected) {
         setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
+      } else if (waitingBlocks) {
+        setStatus(CONFIRMATIONS_STATUS.WAITING)
       }
     },
-    [executionData, signatureCollected]
+    [executionData, signatureCollected, waitingBlocks]
   )
 
   return {
