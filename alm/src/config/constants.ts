@@ -10,9 +10,15 @@ export const FOREIGN_NETWORK_NAME: string = process.env.REACT_APP_ALM_FOREIGN_NE
 export const HOME_EXPLORER_TX_TEMPLATE: string = process.env.REACT_APP_ALM_HOME_EXPLORER_TX_TEMPLATE || ''
 export const FOREIGN_EXPLORER_TX_TEMPLATE: string = process.env.REACT_APP_ALM_FOREIGN_EXPLORER_TX_TEMPLATE || ''
 
+export const HOME_EXPLORER_API: string = process.env.REACT_APP_ALM_HOME_EXPLORER_API || ''
+
 export const HOME_RPC_POLLING_INTERVAL: number = 5000
 export const FOREIGN_RPC_POLLING_INTERVAL: number = 15000
 export const BLOCK_RANGE: number = 50
+export const ONE_DAY_TIMESTAMP: number = 86400
+
+export const EXECUTE_AFFIRMATION_HASH = 'e7a2c01f'
+export const SUBMIT_SIGNATURE_HASH = '630cea8e'
 
 export const TRANSACTION_STATUS = {
   SUCCESS_MULTIPLE_MESSAGES: 'SUCCESS_MULTIPLE_MESSAGES',

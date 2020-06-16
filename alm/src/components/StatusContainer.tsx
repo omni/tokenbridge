@@ -75,7 +75,7 @@ export const StatusContainer = () => {
       )}
       {displayMessageSelector && <MessageSelector messages={messages} onMessageSelected={onMessageSelected} />}
       {displayConfirmations && (
-        <ConfirmationsContainer message={messageToConfirm} receipt={receipt} fromHome={isHome} />
+        <ConfirmationsContainer message={messageToConfirm} receipt={receipt} fromHome={isHome} timestamp={timestamp} />
       )}
     </div>
   )

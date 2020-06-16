@@ -1,7 +1,8 @@
 import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import validatorsCache from '../services/ValidatorsCache'
-import { HOME_RPC_POLLING_INTERVAL, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { HOME_RPC_POLLING_INTERVAL, ONE_DAY_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { GetFailedTransactionParams, APITransaction } from './explorer'
 
 export const getConfirmationsForTx = async (
   messageData: string,
@@ -13,7 +14,10 @@ export const getConfirmationsForTx = async (
   requiredSignatures: number,
   setSignatureCollected: Function,
   waitingBlocksResolved: boolean,
-  subscriptions: number[]
+  subscriptions: number[],
+  timestamp: number,
+  getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>,
+  setFailedConfirmations: Function
 ) => {
   if (!web3 || !validatorList || !bridgeContract || !waitingBlocksResolved) return
   const hashMsg = web3.utils.soliditySha3Raw(messageData)
@@ -46,30 +50,68 @@ export const getConfirmationsForTx = async (
 
   const successConfirmations = validatorConfirmations.filter(c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
 
+  const notSuccessConfirmations = validatorConfirmations.filter(c => c.status !== VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
+
   // If signatures not collected, it needs to retry in the next blocks
   if (successConfirmations.length !== requiredSignatures) {
-    const timeoutId = setTimeout(
-      () =>
-        getConfirmationsForTx(
+    // Check if confirmation failed
+    const validatorFailedConfirmationsChecks = await Promise.all(
+      notSuccessConfirmations.map(async validatorData => {
+        const failedTransactions = await getFailedTransactions({
+          account: validatorData.validator,
+          to: bridgeContract.options.address,
           messageData,
-          web3,
-          validatorList,
-          bridgeContract,
-          confirmationContractMethod,
-          setResult,
-          requiredSignatures,
-          setSignatureCollected,
-          waitingBlocksResolved,
-          subscriptions
-        ),
-      HOME_RPC_POLLING_INTERVAL
+          startTimestamp: timestamp,
+          endTimestamp: timestamp + ONE_DAY_TIMESTAMP
+        })
+        const newStatus =
+          failedTransactions.length > 0 ? VALIDATOR_CONFIRMATION_STATUS.FAILED : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+        return {
+          validator: validatorData.validator,
+          status: newStatus
+        }
+      })
     )
-    subscriptions.push(timeoutId)
+    const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
+      c => c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED
+    )
+    validatorFailedConfirmations.forEach(validatorData => {
+      const index = validatorConfirmations.findIndex(e => e.validator === validatorData.validator)
+      validatorConfirmations[index] = validatorData
+    })
+    const messageConfirmationsFailed = validatorFailedConfirmations.length > validatorList.length - requiredSignatures
+    if (messageConfirmationsFailed) {
+      setFailedConfirmations(true)
+    }
+
+    const missingConfirmations = validatorConfirmations.filter(
+      c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+    )
+
+    if (missingConfirmations.length > 0) {
+      const timeoutId = setTimeout(
+        () =>
+          getConfirmationsForTx(
+            messageData,
+            web3,
+            validatorList,
+            bridgeContract,
+            confirmationContractMethod,
+            setResult,
+            requiredSignatures,
+            setSignatureCollected,
+            waitingBlocksResolved,
+            subscriptions,
+            timestamp,
+            getFailedTransactions,
+            setFailedConfirmations
+          ),
+        HOME_RPC_POLLING_INTERVAL
+      )
+      subscriptions.push(timeoutId)
+    }
   } else {
     // If signatures collected, it should set other signatures as not required
-    const notSuccessConfirmations = validatorConfirmations.filter(
-      c => c.status !== VALIDATOR_CONFIRMATION_STATUS.SUCCESS
-    )
     const notRequiredConfirmations = notSuccessConfirmations.map(c => ({
       validator: c.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED

@@ -13,3 +13,10 @@ export const GreyLabel = styled.label`
   padding: 0.4rem 0.7rem;
   border-radius: 4px;
 `
+
+export const RedLabel = styled.label`
+  color: var(--failed-color);
+  background-color: var(--failed-bg-color);
+  padding: 0.4rem 0.7rem;
+  border-radius: 4px;
+`

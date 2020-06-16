@@ -6,7 +6,7 @@ import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
-import { GreyLabel, SuccessLabel } from './commons/Labels'
+import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 
 const Thead = styled.thead`
   border-bottom: 2px solid #9e9e9e;
@@ -30,6 +30,8 @@ export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmatio
     switch (validatorStatus) {
       case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.FAILED:
+        return <RedLabel>{validatorStatus}</RedLabel>
       case VALIDATOR_CONFIRMATION_STATUS.WAITING:
       case VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED:
         return <GreyLabel>{validatorStatus}</GreyLabel>
