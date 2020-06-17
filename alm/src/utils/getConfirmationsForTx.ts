@@ -3,6 +3,58 @@ import { Contract } from 'web3-eth-contract'
 import validatorsCache from '../services/ValidatorsCache'
 import { HOME_RPC_POLLING_INTERVAL, ONE_DAY_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { GetFailedTransactionParams, APITransaction } from './explorer'
+import { ConfirmationParam } from '../hooks/useMessageConfirmations'
+
+export const getValidatorConfirmation = (
+  web3: Web3,
+  hashMsg: string,
+  bridgeContract: Contract,
+  confirmationContractMethod: Function
+) => async (validator: string): Promise<ConfirmationParam> => {
+  const hashSenderMsg = web3.utils.soliditySha3Raw(validator, hashMsg)
+
+  const signatureFromCache = validatorsCache.get(hashSenderMsg)
+  if (signatureFromCache) {
+    return {
+      validator,
+      status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS
+    }
+  }
+
+  const confirmed = await confirmationContractMethod(bridgeContract, hashSenderMsg)
+  const status = confirmed ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+
+  // If validator confirmed signature, we cache the result to avoid doing future requests for a result that won't change
+  if (confirmed) {
+    validatorsCache.set(hashSenderMsg, confirmed)
+  }
+
+  return {
+    validator,
+    status
+  }
+}
+
+export const getValidatorFailedTransaction = (
+  bridgeContract: Contract,
+  messageData: string,
+  timestamp: number,
+  getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
+) => async (validatorData: ConfirmationParam): Promise<ConfirmationParam> => {
+  const failedTransactions = await getFailedTransactions({
+    account: validatorData.validator,
+    to: bridgeContract.options.address,
+    messageData,
+    startTimestamp: timestamp,
+    endTimestamp: timestamp + ONE_DAY_TIMESTAMP
+  })
+  const newStatus =
+    failedTransactions.length > 0 ? VALIDATOR_CONFIRMATION_STATUS.FAILED : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+  return {
+    validator: validatorData.validator,
+    status: newStatus
+  }
+}
 
 export const getConfirmationsForTx = async (
   messageData: string,
@@ -22,30 +74,7 @@ export const getConfirmationsForTx = async (
   if (!web3 || !validatorList || !bridgeContract || !waitingBlocksResolved) return
   const hashMsg = web3.utils.soliditySha3Raw(messageData)
   let validatorConfirmations = await Promise.all(
-    validatorList.map(async validator => {
-      const hashSenderMsg = web3.utils.soliditySha3Raw(validator, hashMsg)
-
-      const signatureFromCache = validatorsCache.get(hashSenderMsg)
-      if (signatureFromCache) {
-        return {
-          validator,
-          status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS
-        }
-      }
-
-      const confirmed = await confirmationContractMethod(bridgeContract, hashSenderMsg)
-      const status = confirmed ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
-
-      // If validator confirmed signature, we cache the result to avoid doing future requests for a result that won't change
-      if (confirmed) {
-        validatorsCache.set(hashSenderMsg, confirmed)
-      }
-
-      return {
-        validator,
-        status
-      }
-    })
+    validatorList.map(getValidatorConfirmation(web3, hashMsg, bridgeContract, confirmationContractMethod))
   )
 
   const successConfirmations = validatorConfirmations.filter(c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
@@ -56,21 +85,9 @@ export const getConfirmationsForTx = async (
   if (successConfirmations.length !== requiredSignatures) {
     // Check if confirmation failed
     const validatorFailedConfirmationsChecks = await Promise.all(
-      notSuccessConfirmations.map(async validatorData => {
-        const failedTransactions = await getFailedTransactions({
-          account: validatorData.validator,
-          to: bridgeContract.options.address,
-          messageData,
-          startTimestamp: timestamp,
-          endTimestamp: timestamp + ONE_DAY_TIMESTAMP
-        })
-        const newStatus =
-          failedTransactions.length > 0 ? VALIDATOR_CONFIRMATION_STATUS.FAILED : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
-        return {
-          validator: validatorData.validator,
-          status: newStatus
-        }
-      })
+      notSuccessConfirmations.map(
+        getValidatorFailedTransaction(bridgeContract, messageData, timestamp, getFailedTransactions)
+      )
     )
     const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
       c => c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED
