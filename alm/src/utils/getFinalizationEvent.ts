@@ -1,9 +1,10 @@
 import { Contract, EventData } from 'web3-eth-contract'
 import Web3 from 'web3'
-import { THREE_DAYS_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { CACHE_KEY_EXECUTION_FAILED, THREE_DAYS_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
 import { APITransaction, GetFailedTransactionParams } from './explorer'
 import { MessageObject } from './web3'
+import validatorsCache from '../services/ValidatorsCache'
 
 export const getFinalizationEvent = async (
   contract: Maybe<Contract>,
@@ -49,24 +50,36 @@ export const getFinalizationEvent = async (
   } else {
     // If event is defined, it means it is a message from Home to Foreign
     if (collectedSignaturesEvent) {
-      const failedTransactions = await getFailedExecution({
-        account: collectedSignaturesEvent.returnValues.authorityResponsibleForRelay,
-        to: contract.options.address,
-        messageData: message.data,
-        startTimestamp: timestamp,
-        endTimestamp: timestamp + THREE_DAYS_TIMESTAMP
-      })
+      const validator = collectedSignaturesEvent.returnValues.authorityResponsibleForRelay
 
-      if (failedTransactions.length > 0) {
-        const failedTx = failedTransactions[0]
-        setResult({
-          status: VALIDATOR_CONFIRMATION_STATUS.FAILED,
-          validator: collectedSignaturesEvent.returnValues.authorityResponsibleForRelay,
-          txHash: failedTx.hash,
-          timestamp: parseInt(failedTx.timeStamp),
-          executionResult: false
+      const validatorExecutionCacheKey = `${CACHE_KEY_EXECUTION_FAILED}${validator}`
+      const failedFromCache = validatorsCache.get(validatorExecutionCacheKey)
+
+      if (!failedFromCache) {
+        const failedTransactions = await getFailedExecution({
+          account: validator,
+          to: contract.options.address,
+          messageData: message.data,
+          startTimestamp: timestamp,
+          endTimestamp: timestamp + THREE_DAYS_TIMESTAMP
         })
-        setFailedExecution(true)
+
+        if (failedTransactions.length > 0) {
+          const failedTx = failedTransactions[0]
+
+          // If validator execution failed, we cache the result to avoid doing future requests for a result that won't change
+          validatorsCache.set(validatorExecutionCacheKey, true)
+
+          const timestamp = parseInt(failedTx.timeStamp)
+          setResult({
+            status: VALIDATOR_CONFIRMATION_STATUS.FAILED,
+            validator: validator,
+            txHash: failedTx.hash,
+            timestamp,
+            executionResult: false
+          })
+          setFailedExecution(true)
+        }
       }
     }
 

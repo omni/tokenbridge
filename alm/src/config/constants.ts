@@ -23,6 +23,9 @@ export const EXECUTE_AFFIRMATION_HASH = 'e7a2c01f'
 export const SUBMIT_SIGNATURE_HASH = '630cea8e'
 export const EXECUTE_SIGNATURES_HASH = '3f7658fd'
 
+export const CACHE_KEY_FAILED = 'failed-confirmation-validator-'
+export const CACHE_KEY_EXECUTION_FAILED = 'failed-execution-validator-'
+
 export const TRANSACTION_STATUS = {
   SUCCESS_MULTIPLE_MESSAGES: 'SUCCESS_MULTIPLE_MESSAGES',
   SUCCESS_ONE_MESSAGE: 'SUCCESS_ONE_MESSAGE',

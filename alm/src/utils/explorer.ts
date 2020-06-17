@@ -41,7 +41,6 @@ export const fetchAccountTransactionsFromBlockscout = async ({
 
   try {
     const result = await fetch(url).then(res => res.json())
-    console.log(result)
     if (result.status === '0') {
       return []
     }
@@ -89,7 +88,6 @@ export const fetchAccountTransactionsFromEtherscan = async ({
 
   try {
     const result = await fetch(url).then(res => res.json())
-    console.log(result)
 
     if (result.status === '0') {
       return []

@@ -1,7 +1,12 @@
 import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import validatorsCache from '../services/ValidatorsCache'
-import { HOME_RPC_POLLING_INTERVAL, ONE_DAY_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import {
+  CACHE_KEY_FAILED,
+  HOME_RPC_POLLING_INTERVAL,
+  ONE_DAY_TIMESTAMP,
+  VALIDATOR_CONFIRMATION_STATUS
+} from '../config/constants'
 import { GetFailedTransactionParams, APITransaction } from './explorer'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
@@ -41,6 +46,16 @@ export const getValidatorFailedTransaction = (
   timestamp: number,
   getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
 ) => async (validatorData: ConfirmationParam): Promise<ConfirmationParam> => {
+  const validatorCacheKey = `${CACHE_KEY_FAILED}${validatorData.validator}`
+  const failedFromCache = validatorsCache.get(validatorCacheKey)
+
+  if (failedFromCache) {
+    return {
+      validator: validatorData.validator,
+      status: VALIDATOR_CONFIRMATION_STATUS.FAILED
+    }
+  }
+
   const failedTransactions = await getFailedTransactions({
     account: validatorData.validator,
     to: bridgeContract.options.address,
@@ -50,6 +65,12 @@ export const getValidatorFailedTransaction = (
   })
   const newStatus =
     failedTransactions.length > 0 ? VALIDATOR_CONFIRMATION_STATUS.FAILED : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+
+  // If validator signature failed, we cache the result to avoid doing future requests for a result that won't change
+  if (failedTransactions.length > 0) {
+    validatorsCache.set(validatorCacheKey, true)
+  }
+
   return {
     validator: validatorData.validator,
     status: newStatus
