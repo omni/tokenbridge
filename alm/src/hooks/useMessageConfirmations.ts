@@ -17,7 +17,7 @@ import { getCollectedSignaturesEvent } from '../utils/getCollectedSignaturesEven
 import { checkWaitingBlocksForExecution } from '../utils/executionWaitingForBlocks'
 import { getConfirmationsForTx } from '../utils/getConfirmationsForTx'
 import { getFinalizationEvent } from '../utils/getFinalizationEvent'
-import { getValidatorFailedTransactionsForMessage } from '../utils/explorer'
+import { getValidatorFailedTransactionsForMessage, getExecutionFailedTransactionForMessage } from '../utils/explorer'
 
 export interface useMessageConfirmationsParams {
   message: MessageObject
@@ -57,6 +57,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
   const [waitingBlocksForExecution, setWaitingBlocksForExecution] = useState(false)
   const [waitingBlocksForExecutionResolved, setWaitingBlocksForExecutionResolved] = useState(false)
   const [failedConfirmations, setFailedConfirmations] = useState(false)
+  const [failedExecution, setFailedExecution] = useState(false)
+
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
     () => {
@@ -254,9 +256,13 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
         providedWeb3,
         setExecutionData,
         waitingBlocksResolved,
-        message.id,
+        message,
         interval,
-        subscriptions
+        subscriptions,
+        timestamp,
+        collectedSignaturesEvent,
+        getExecutionFailedTransactionForMessage,
+        setFailedExecution
       )
 
       return () => {
@@ -267,18 +273,20 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
       fromHome,
       foreign.bridgeContract,
       home.bridgeContract,
-      message.id,
+      message,
       foreign.web3,
       home.web3,
       waitingBlocksResolved,
-      waitingBlocksForExecutionResolved
+      waitingBlocksForExecutionResolved,
+      timestamp,
+      collectedSignaturesEvent
     ]
   )
 
   // Sets the message status based in the collected information
   useEffect(
     () => {
-      if (executionData.txHash) {
+      if (executionData.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS) {
         const newStatus = executionData.executionResult
           ? CONFIRMATIONS_STATUS.SUCCESS
           : CONFIRMATIONS_STATUS.SUCCESS_MESSAGE_FAILED
@@ -287,6 +295,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
         if (fromHome) {
           if (waitingBlocksForExecution) {
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_WAITING)
+          } else if (failedExecution) {
+            setStatus(CONFIRMATIONS_STATUS.EXECUTION_FAILED)
           } else {
             setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
           }
@@ -301,7 +311,15 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
         setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
       }
     },
-    [executionData, fromHome, signatureCollected, waitingBlocks, waitingBlocksForExecution, failedConfirmations]
+    [
+      executionData,
+      fromHome,
+      signatureCollected,
+      waitingBlocks,
+      waitingBlocksForExecution,
+      failedConfirmations,
+      failedExecution
+    ]
   )
 
   return {
