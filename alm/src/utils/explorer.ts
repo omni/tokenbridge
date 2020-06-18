@@ -14,6 +14,17 @@ export interface APITransaction {
   hash: string
 }
 
+export interface APIPendingTransaction {
+  input: string
+  to: string
+  hash: string
+}
+
+export interface PendingTransactionsParams {
+  account: string
+  api: string
+}
+
 export interface AccountTransactionsParams {
   account: string
   to: string
@@ -28,6 +39,12 @@ export interface GetFailedTransactionParams {
   messageData: string
   startTimestamp: number
   endTimestamp: number
+}
+
+export interface GetPendingTransactionParams {
+  account: string
+  to: string
+  messageData: string
 }
 
 export const fetchAccountTransactionsFromBlockscout = async ({
@@ -106,6 +123,24 @@ export const fetchAccountTransactions = (api: string) => {
   return api.includes('blockscout') ? fetchAccountTransactionsFromBlockscout : fetchAccountTransactionsFromEtherscan
 }
 
+export const fetchPendingTransactions = async ({
+  account,
+  api
+}: PendingTransactionsParams): Promise<APIPendingTransaction[]> => {
+  const url = `${api}?module=account&action=pendingtxlist&address=${account}`
+
+  try {
+    const result = await fetch(url).then(res => res.json())
+    if (result.status === '0') {
+      return []
+    }
+
+    return result.result
+  } catch (e) {
+    return []
+  }
+}
+
 export const getFailedTransactions = async (
   account: string,
   to: string,
@@ -161,4 +196,25 @@ export const getExecutionFailedTransactionForMessage = async ({
 
   const messageDataValue = messageData.replace('0x', '')
   return failedTransactions.filter(t => t.input.includes(EXECUTE_SIGNATURES_HASH) && t.input.includes(messageDataValue))
+}
+
+export const getValidatorPendingTransactionsForMessage = async ({
+  account,
+  to,
+  messageData
+}: GetPendingTransactionParams): Promise<APIPendingTransaction[]> => {
+  const pendingTransactions = await fetchPendingTransactions({
+    account,
+    api: HOME_EXPLORER_API
+  })
+
+  const toAddressLowerCase = to.toLowerCase()
+  const messageDataValue = messageData.replace('0x', '')
+
+  return pendingTransactions.filter(
+    t =>
+      t.to.toLowerCase() === toAddressLowerCase &&
+      (t.input.includes(SUBMIT_SIGNATURE_HASH) || t.input.includes(EXECUTE_AFFIRMATION_HASH)) &&
+      t.input.includes(messageDataValue)
+  )
 }

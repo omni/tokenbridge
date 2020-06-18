@@ -7,7 +7,12 @@ import {
   ONE_DAY_TIMESTAMP,
   VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
-import { GetFailedTransactionParams, APITransaction } from './explorer'
+import {
+  GetFailedTransactionParams,
+  APITransaction,
+  APIPendingTransaction,
+  GetPendingTransactionParams
+} from './explorer'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
 export const getValidatorConfirmation = (
@@ -77,6 +82,26 @@ export const getValidatorFailedTransaction = (
   }
 }
 
+export const getValidatorPendingTransaction = (
+  bridgeContract: Contract,
+  messageData: string,
+  getPendingTransactions: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>
+) => async (validatorData: ConfirmationParam): Promise<ConfirmationParam> => {
+  const failedTransactions = await getPendingTransactions({
+    account: validatorData.validator,
+    to: bridgeContract.options.address,
+    messageData
+  })
+
+  const newStatus =
+    failedTransactions.length > 0 ? VALIDATOR_CONFIRMATION_STATUS.PENDING : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+
+  return {
+    validator: validatorData.validator,
+    status: newStatus
+  }
+}
+
 export const getConfirmationsForTx = async (
   messageData: string,
   web3: Maybe<Web3>,
@@ -90,7 +115,9 @@ export const getConfirmationsForTx = async (
   subscriptions: number[],
   timestamp: number,
   getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>,
-  setFailedConfirmations: Function
+  setFailedConfirmations: Function,
+  getPendingTransactions: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>,
+  setPendingConfirmations: Function
 ) => {
   if (!web3 || !validatorList || !bridgeContract || !waitingBlocksResolved) return
   const hashMsg = web3.utils.soliditySha3Raw(messageData)
@@ -104,9 +131,29 @@ export const getConfirmationsForTx = async (
 
   // If signatures not collected, it needs to retry in the next blocks
   if (successConfirmations.length !== requiredSignatures) {
+    // Check if confirmation is pending
+    const validatorPendingConfirmationsChecks = await Promise.all(
+      notSuccessConfirmations.map(getValidatorPendingTransaction(bridgeContract, messageData, getPendingTransactions))
+    )
+    const validatorPendingConfirmations = validatorPendingConfirmationsChecks.filter(
+      c => c.status === VALIDATOR_CONFIRMATION_STATUS.PENDING
+    )
+
+    validatorPendingConfirmations.forEach(validatorData => {
+      const index = validatorConfirmations.findIndex(e => e.validator === validatorData.validator)
+      validatorConfirmations[index] = validatorData
+    })
+
+    if (validatorPendingConfirmations.length > 0) {
+      setPendingConfirmations(true)
+    }
+
+    const undefinedConfirmations = validatorConfirmations.filter(
+      c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+    )
     // Check if confirmation failed
     const validatorFailedConfirmationsChecks = await Promise.all(
-      notSuccessConfirmations.map(
+      undefinedConfirmations.map(
         getValidatorFailedTransaction(bridgeContract, messageData, timestamp, getFailedTransactions)
       )
     )
@@ -123,7 +170,7 @@ export const getConfirmationsForTx = async (
     }
 
     const missingConfirmations = validatorConfirmations.filter(
-      c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+      c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED || c.status === VALIDATOR_CONFIRMATION_STATUS.PENDING
     )
 
     if (missingConfirmations.length > 0) {
@@ -142,7 +189,9 @@ export const getConfirmationsForTx = async (
             subscriptions,
             timestamp,
             getFailedTransactions,
-            setFailedConfirmations
+            setFailedConfirmations,
+            getPendingTransactions,
+            setPendingConfirmations
           ),
         HOME_RPC_POLLING_INTERVAL
       )
