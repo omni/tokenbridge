@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import { CACHE_KEY_EXECUTION_FAILED, THREE_DAYS_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
 import { APITransaction, GetFailedTransactionParams } from './explorer'
-import { MessageObject } from './web3'
+import { getBlock, MessageObject } from './web3'
 import validatorsCache from '../services/ValidatorsCache'
 
 export const getFinalizationEvent = async (
@@ -34,7 +34,7 @@ export const getFinalizationEvent = async (
     const event = events[0]
     const [txReceipt, block] = await Promise.all([
       web3.eth.getTransactionReceipt(event.transactionHash),
-      web3.eth.getBlock(event.blockNumber)
+      getBlock(web3, event.blockNumber)
     ])
 
     const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
