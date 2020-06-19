@@ -20,7 +20,8 @@ import { getFinalizationEvent } from '../utils/getFinalizationEvent'
 import {
   getValidatorFailedTransactionsForMessage,
   getExecutionFailedTransactionForMessage,
-  getValidatorPendingTransactionsForMessage
+  getValidatorPendingTransactionsForMessage,
+  getExecutionPendingTransactionsForMessage
 } from '../utils/explorer'
 
 export interface useMessageConfirmationsParams {
@@ -63,6 +64,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
   const [failedConfirmations, setFailedConfirmations] = useState(false)
   const [failedExecution, setFailedExecution] = useState(false)
   const [pendingConfirmations, setPendingConfirmations] = useState(false)
+  const [pendingExecution, setPendingExecution] = useState(false)
 
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
@@ -269,7 +271,9 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
         timestamp,
         collectedSignaturesEvent,
         getExecutionFailedTransactionForMessage,
-        setFailedExecution
+        setFailedExecution,
+        getExecutionPendingTransactionsForMessage,
+        setPendingExecution
       )
 
       return () => {
@@ -304,6 +308,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_WAITING)
           } else if (failedExecution) {
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_FAILED)
+          } else if (pendingExecution) {
+            setStatus(CONFIRMATIONS_STATUS.EXECUTION_PENDING)
           } else {
             setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
           }
@@ -328,7 +334,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
       waitingBlocksForExecution,
       failedConfirmations,
       failedExecution,
-      pendingConfirmations
+      pendingConfirmations,
+      pendingExecution
     ]
   )
 

@@ -218,3 +218,24 @@ export const getValidatorPendingTransactionsForMessage = async ({
       t.input.includes(messageDataValue)
   )
 }
+
+export const getExecutionPendingTransactionsForMessage = async ({
+  account,
+  to,
+  messageData
+}: GetPendingTransactionParams): Promise<APIPendingTransaction[]> => {
+  const pendingTransactions = await fetchPendingTransactions({
+    account,
+    api: FOREIGN_EXPLORER_API
+  })
+
+  const toAddressLowerCase = to.toLowerCase()
+  const messageDataValue = messageData.replace('0x', '')
+
+  return pendingTransactions.filter(
+    t =>
+      t.to.toLowerCase() === toAddressLowerCase &&
+      t.input.includes(EXECUTE_SIGNATURES_HASH) &&
+      t.input.includes(messageDataValue)
+  )
+}
