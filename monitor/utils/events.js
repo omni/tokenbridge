@@ -12,7 +12,9 @@ const {
   ERC677_BRIDGE_TOKEN_ABI,
   getTokenType,
   getPastEvents,
-  ZERO_ADDRESS
+  ZERO_ADDRESS,
+  OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI,
+  OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
 const { filterTransferBeforeES } = require('./tokenUtils')
@@ -72,13 +74,48 @@ async function main(mode) {
 
   logger.debug('getting last block numbers')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
+  let homeToForeignRequests = []
+  let foreignToHomeRequests = []
+  let homeMigrationBlock = MONITOR_HOME_START_BLOCK
+  let foreignMigrationBlock = MONITOR_FOREIGN_START_BLOCK
+
+  if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    const oldHomeBridge = new web3Home.eth.Contract(OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
+    const oldForeignBridge = new web3Foreign.eth.Contract(
+      OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI,
+      COMMON_FOREIGN_BRIDGE_ADDRESS
+    )
+
+    logger.debug("calling oldHomeBridge.getPastEvents('UserRequestForSignature(bytes)')")
+    homeToForeignRequests = (await getPastEvents(oldHomeBridge, {
+      event: 'UserRequestForSignature',
+      fromBlock: MONITOR_HOME_START_BLOCK,
+      toBlock: homeBlockNumber
+    })).map(normalizeEvent)
+    logger.debug(`found ${homeToForeignRequests.length} events`)
+    if (homeToForeignRequests.length > 0) {
+      homeMigrationBlock = toBN(Math.max(...homeToForeignRequests.map(x => x.blockNumber)))
+    }
+
+    logger.debug("calling oldForeignBridge.getPastEvents('UserRequestForAffirmation(bytes)')")
+    foreignToHomeRequests = (await getPastEvents(oldForeignBridge, {
+      event: 'UserRequestForAffirmation',
+      fromBlock: MONITOR_FOREIGN_START_BLOCK,
+      toBlock: foreignBlockNumber
+    })).map(normalizeEvent)
+    logger.debug(`found ${foreignToHomeRequests.length} events`)
+    if (foreignToHomeRequests.length > 0) {
+      foreignMigrationBlock = toBN(Math.max(...foreignToHomeRequests.map(x => x.blockNumber)))
+    }
+  }
 
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
-  const homeToForeignRequests = (await getPastEvents(homeBridge, {
+  const homeToForeignRequestsNew = (await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
-    fromBlock: MONITOR_HOME_START_BLOCK,
+    fromBlock: homeMigrationBlock,
     toBlock: homeBlockNumber
   })).map(normalizeEvent)
+  homeToForeignRequests = [...homeToForeignRequests, ...homeToForeignRequestsNew]
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
   const homeToForeignConfirmations = (await getPastEvents(foreignBridge, {
@@ -95,11 +132,13 @@ async function main(mode) {
   })).map(normalizeEvent)
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
-  let foreignToHomeRequests = (await getPastEvents(foreignBridge, {
+  const foreignToHomeRequestsNew = (await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
-    fromBlock: MONITOR_FOREIGN_START_BLOCK,
+    fromBlock: foreignMigrationBlock,
     toBlock: foreignBlockNumber
   })).map(normalizeEvent)
+  foreignToHomeRequests = [...foreignToHomeRequests, ...foreignToHomeRequestsNew]
+
   if (isExternalErc20) {
     logger.debug("calling erc20Contract.getPastEvents('Transfer')")
     let transferEvents = (await getPastEvents(erc20Contract, {
