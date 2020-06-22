@@ -10,6 +10,7 @@ import { ValidatorsConfirmations } from './ValidatorsConfirmations'
 import { getConfirmationsStatusDescription } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
 import { ExecutionConfirmation } from './ExecutionConfirmation'
+import { useValidatorContract } from '../hooks/useValidatorContract'
 
 const StatusLabel = styled.label`
   font-weight: bold;
@@ -42,10 +43,13 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome }: Confirmat
     home: { name: homeName },
     foreign: { name: foreignName }
   } = useStateProvider()
+  const { requiredSignatures, validatorList } = useValidatorContract({ fromHome, receipt })
   const { confirmations, status, executionData, signatureCollected } = useMessageConfirmations({
     message,
     receipt,
-    fromHome
+    fromHome,
+    requiredSignatures,
+    validatorList
   })
 
   return (
@@ -64,7 +68,11 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome }: Confirmat
               : ''}
           </p>
         </StatusDescription>
-        <ValidatorsConfirmations confirmations={confirmations} />
+        <ValidatorsConfirmations
+          confirmations={confirmations}
+          requiredSignatures={requiredSignatures}
+          validatorList={validatorList}
+        />
         {signatureCollected && <ExecutionConfirmation executionData={executionData} isHome={!fromHome} />}
       </StyledConfirmationContainer>
     </div>
