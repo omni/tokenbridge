@@ -1,12 +1,18 @@
 import React from 'react'
 
-export const Loading = () => (
+export interface LoadingParams {
+  width?: string
+  height?: string
+  displayMessage?: boolean
+}
+
+export const Loading = ({ width = '50px', height = '50px', displayMessage = true }: LoadingParams) => (
   <div className="row is-center">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       style={{ background: 'none', display: 'block', shapeRendering: 'auto' }}
-      width="50px"
-      height="50px"
+      width={width}
+      height={height}
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid"
     >
@@ -148,6 +154,8 @@ export const Loading = () => (
         </rect>
       </g>
     </svg>
-    <label>Loading...</label>
+    {displayMessage && <label>Loading...</label>}
   </div>
 )
+
+export const SimpleLoading = () => <Loading width="30px" height="30px" displayMessage={false} />

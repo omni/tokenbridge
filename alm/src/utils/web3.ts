@@ -4,6 +4,11 @@ import { AbiItem } from 'web3-utils'
 import memoize from 'fast-memoize'
 import { HOME_AMB_ABI, FOREIGN_AMB_ABI } from '../../../commons'
 
+export interface MessageObject {
+  id: string
+  data: string
+}
+
 const rawGetWeb3 = (url: string) => new Web3(new Web3.providers.HttpProvider(url))
 const memoized = memoize(rawGetWeb3)
 
@@ -14,11 +19,20 @@ export const filterEventsByAbi = (
   web3: Web3,
   bridgeAddress: string,
   eventAbi: AbiItem
-) => {
+): MessageObject[] => {
   const eventHash = web3.eth.abi.encodeEventSignature(eventAbi)
   const events = txReceipt.logs.filter(e => e.address === bridgeAddress && e.topics[0] === eventHash)
 
-  return events.map(e => e.topics[1])
+  return events.map(e => {
+    let decodedLogs: { [p: string]: string } = {
+      messageId: '',
+      encodedData: ''
+    }
+    if (eventAbi && eventAbi.inputs && eventAbi.inputs.length) {
+      decodedLogs = web3.eth.abi.decodeLog(eventAbi.inputs, e.data, [e.topics[1]])
+    }
+    return { id: decodedLogs.messageId, data: decodedLogs.encodedData }
+  })
 }
 
 export const getHomeMessagesFromReceipt = (txReceipt: TransactionReceipt, web3: Web3, bridgeAddress: string) => {

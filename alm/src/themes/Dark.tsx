@@ -4,6 +4,14 @@ const theme = {
   colorPrimary: '#272727',
   colorGrey: '#272727',
   colorLightGrey: '#272727',
-  linkColor: '#ffffff'
+  linkColor: '#ffffff',
+  success: {
+    textColor: '#00c9a7',
+    backgroundColor: '#004d40'
+  },
+  notRequired: {
+    textColor: '#bdbdbd',
+    backgroundColor: '#424242'
+  }
 }
 export default theme
