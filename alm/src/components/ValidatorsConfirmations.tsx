@@ -32,6 +32,7 @@ export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmatio
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
       case VALIDATOR_CONFIRMATION_STATUS.FAILED:
         return <RedLabel>{validatorStatus}</RedLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.PENDING:
       case VALIDATOR_CONFIRMATION_STATUS.WAITING:
       case VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED:
         return <GreyLabel>{validatorStatus}</GreyLabel>

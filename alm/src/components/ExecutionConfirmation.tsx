@@ -34,6 +34,7 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
       case VALIDATOR_CONFIRMATION_STATUS.FAILED:
         return <RedLabel>{validatorStatus}</RedLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.PENDING:
       case VALIDATOR_CONFIRMATION_STATUS.WAITING:
         return <GreyLabel>{validatorStatus}</GreyLabel>
       default:
