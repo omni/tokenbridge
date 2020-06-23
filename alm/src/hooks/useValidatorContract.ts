@@ -12,7 +12,7 @@ export interface useValidatorContractParams {
 }
 
 export const useValidatorContract = ({ receipt, fromHome }: useValidatorContractParams) => {
-  const [homeValidatorContract, setHomeValidatorContract] = useState<Maybe<Contract>>(null)
+  const [validatorContract, setValidatorContract] = useState<Maybe<Contract>>(null)
   const [requiredSignatures, setRequiredSignatures] = useState(0)
   const [validatorList, setValidatorList] = useState([])
 
@@ -25,15 +25,19 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
     setValidatorContract(contract)
   }
 
-  const callRequiredSignatures = async (contract: Maybe<Contract>, setResult: Function) => {
+  const callRequiredSignatures = async (
+    contract: Maybe<Contract>,
+    receipt: TransactionReceipt,
+    setResult: Function
+  ) => {
     if (!contract) return
-    const result = await getRequiredSignatures(contract)
+    const result = await getRequiredSignatures(contract, receipt.blockNumber)
     setResult(result)
   }
 
-  const callValidatorList = async (contract: Maybe<Contract>, setResult: Function) => {
+  const callValidatorList = async (contract: Maybe<Contract>, receipt: TransactionReceipt, setResult: Function) => {
     if (!contract) return
-    const result = await getValidatorList(contract)
+    const result = await getValidatorList(contract, receipt.blockNumber)
     setResult(result)
   }
 
@@ -43,17 +47,18 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
       const bridgeContract = fromHome ? home.bridgeContract : foreign.bridgeContract
 
       if (!web3 || !bridgeContract) return
-      callValidatorContract(bridgeContract, web3, setHomeValidatorContract)
+      callValidatorContract(bridgeContract, web3, setValidatorContract)
     },
     [home.web3, foreign.web3, home.bridgeContract, foreign.bridgeContract, fromHome]
   )
 
   useEffect(
     () => {
-      callRequiredSignatures(homeValidatorContract, setRequiredSignatures)
-      callValidatorList(homeValidatorContract, setValidatorList)
+      if (!receipt) return
+      callRequiredSignatures(validatorContract, receipt, setRequiredSignatures)
+      callValidatorList(validatorContract, receipt, setValidatorList)
     },
-    [homeValidatorContract]
+    [validatorContract, receipt]
   )
 
   return {
