@@ -1,3 +1,4 @@
+require('dotenv').config()
 const logger = require('./logger')('checkWorker2')
 const eventsStats = require('./eventsStats')
 const alerts = require('./alerts')

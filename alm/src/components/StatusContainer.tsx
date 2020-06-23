@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import { useTransactionStatus } from '../hooks/useTransactionStatus'
 import { formatTxHash, getExplorerTxUrl, getTransactionStatusDescription, validTxHash } from '../utils/networks'
 import { TRANSACTION_STATUS } from '../config/constants'
@@ -8,6 +8,19 @@ import { Loading } from './commons/Loading'
 import { useStateProvider } from '../state/StateProvider'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { ConfirmationsContainer } from './ConfirmationsContainer'
+import { LeftArrow } from './commons/LeftArrow'
+import styled from 'styled-components'
+
+const BackButton = styled.button`
+  color: var(--font-color);
+  border-color: var(--font-color);
+  margin-top: 10px;
+`
+
+const BackLabel = styled.label`
+  margin-left: 5px;
+  cursor: pointer;
+`
 
 export const StatusContainer = () => {
   const { home, foreign } = useStateProvider()
@@ -77,6 +90,16 @@ export const StatusContainer = () => {
       {displayConfirmations && (
         <ConfirmationsContainer message={messageToConfirm} receipt={receipt} fromHome={isHome} timestamp={timestamp} />
       )}
+      <div className="row is-center">
+        <div className="col-9">
+          <Link to="/">
+            <BackButton className="button outline is-left">
+              <LeftArrow />
+              <BackLabel>Search another transaction</BackLabel>
+            </BackButton>
+          </Link>
+        </div>
+      </div>
     </div>
   )
 }
