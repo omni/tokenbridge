@@ -1,7 +1,9 @@
 import Web3 from 'web3'
+import { BlockTransactionString } from 'web3-eth'
 import { TransactionReceipt } from 'web3-eth'
 import { AbiItem } from 'web3-utils'
 import memoize from 'fast-memoize'
+import promiseRetry from 'promise-retry'
 import { HOME_AMB_ABI, FOREIGN_AMB_ABI } from '../../../commons'
 
 export interface MessageObject {
@@ -48,3 +50,14 @@ export const getForeignMessagesFromReceipt = (txReceipt: TransactionReceipt, web
   )[0]
   return filterEventsByAbi(txReceipt, web3, bridgeAddress, userRequestForAffirmationAbi)
 }
+
+// In some rare cases the block data is not available yet for the block of a new event detected
+// so this logic retry to get the block in case it fails
+export const getBlock = async (web3: Web3, blockNumber: number): Promise<BlockTransactionString> =>
+  promiseRetry(async retry => {
+    const result = await web3.eth.getBlock(blockNumber)
+    if (!result) {
+      return retry('Error getting block data')
+    }
+    return result
+  })

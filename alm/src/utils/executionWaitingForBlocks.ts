@@ -15,6 +15,13 @@ export const checkWaitingBlocksForExecution = async (
   const currentBlock = blockProvider.get()
 
   if (currentBlock && currentBlock >= targetBlock) {
+    setExecutionData({
+      status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+      validator: collectedSignaturesEvent.returnValues.authorityResponsibleForRelay,
+      txHash: '',
+      timestamp: 0,
+      executionResult: false
+    })
     setWaitingBlocksForExecution(false)
     setWaitingBlocksForExecutionResolved(true)
     blockProvider.stop()

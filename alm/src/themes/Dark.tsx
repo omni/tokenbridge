@@ -12,6 +12,10 @@ const theme = {
   notRequired: {
     textColor: '#bdbdbd',
     backgroundColor: '#424242'
+  },
+  failed: {
+    textColor: '#EF5350',
+    backgroundColor: '#4E342E'
   }
 }
 export default theme
