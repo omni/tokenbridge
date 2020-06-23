@@ -17,7 +17,12 @@ import { getCollectedSignaturesEvent } from '../utils/getCollectedSignaturesEven
 import { checkWaitingBlocksForExecution } from '../utils/executionWaitingForBlocks'
 import { getConfirmationsForTx } from '../utils/getConfirmationsForTx'
 import { getFinalizationEvent } from '../utils/getFinalizationEvent'
-import { getValidatorFailedTransactionsForMessage, getExecutionFailedTransactionForMessage } from '../utils/explorer'
+import {
+  getValidatorFailedTransactionsForMessage,
+  getExecutionFailedTransactionForMessage,
+  getValidatorPendingTransactionsForMessage,
+  getExecutionPendingTransactionsForMessage
+} from '../utils/explorer'
 
 export interface useMessageConfirmationsParams {
   message: MessageObject
@@ -67,6 +72,8 @@ export const useMessageConfirmations = ({
   const [waitingBlocksForExecutionResolved, setWaitingBlocksForExecutionResolved] = useState(false)
   const [failedConfirmations, setFailedConfirmations] = useState(false)
   const [failedExecution, setFailedExecution] = useState(false)
+  const [pendingConfirmations, setPendingConfirmations] = useState(false)
+  const [pendingExecution, setPendingExecution] = useState(false)
 
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
@@ -212,7 +219,9 @@ export const useMessageConfirmations = ({
         subscriptions,
         timestamp,
         getValidatorFailedTransactionsForMessage,
-        setFailedConfirmations
+        setFailedConfirmations,
+        getValidatorPendingTransactionsForMessage,
+        setPendingConfirmations
       )
 
       return () => {
@@ -263,7 +272,9 @@ export const useMessageConfirmations = ({
         timestamp,
         collectedSignaturesEvent,
         getExecutionFailedTransactionForMessage,
-        setFailedExecution
+        setFailedExecution,
+        getExecutionPendingTransactionsForMessage,
+        setPendingExecution
       )
 
       return () => {
@@ -298,6 +309,8 @@ export const useMessageConfirmations = ({
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_WAITING)
           } else if (failedExecution) {
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_FAILED)
+          } else if (pendingExecution) {
+            setStatus(CONFIRMATIONS_STATUS.EXECUTION_PENDING)
           } else {
             setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
           }
@@ -308,6 +321,8 @@ export const useMessageConfirmations = ({
         setStatus(CONFIRMATIONS_STATUS.WAITING)
       } else if (failedConfirmations) {
         setStatus(CONFIRMATIONS_STATUS.FAILED)
+      } else if (pendingConfirmations) {
+        setStatus(CONFIRMATIONS_STATUS.PENDING)
       } else {
         setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
       }
@@ -319,7 +334,9 @@ export const useMessageConfirmations = ({
       waitingBlocks,
       waitingBlocksForExecution,
       failedConfirmations,
-      failedExecution
+      failedExecution,
+      pendingConfirmations,
+      pendingExecution
     ]
   )
 
