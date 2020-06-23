@@ -3,7 +3,7 @@ import { TransactionReceipt } from 'web3-eth'
 import { HOME_RPC_POLLING_INTERVAL, TRANSACTION_STATUS } from '../config/constants'
 import { getTransactionStatusDescription } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
-import { getHomeMessagesFromReceipt, getForeignMessagesFromReceipt, MessageObject } from '../utils/web3'
+import { getHomeMessagesFromReceipt, getForeignMessagesFromReceipt, MessageObject, getBlock } from '../utils/web3'
 
 export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chainId: number }) => {
   const { home, foreign } = useStateProvider()
@@ -41,7 +41,7 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
           subscriptions.push(timeoutId)
         } else {
           const blockNumber = txReceipt.blockNumber
-          const block = await web3.eth.getBlock(blockNumber)
+          const block = await getBlock(web3, blockNumber)
           const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
           setTimestamp(blockTimestamp)
 

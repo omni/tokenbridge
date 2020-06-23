@@ -5,7 +5,7 @@ import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
-import { GreyLabel, SuccessLabel } from './commons/Labels'
+import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 
 const Thead = styled.thead`
@@ -32,6 +32,8 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
     switch (validatorStatus) {
       case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.FAILED:
+        return <RedLabel>{validatorStatus}</RedLabel>
       case VALIDATOR_CONFIRMATION_STATUS.WAITING:
         return <GreyLabel>{validatorStatus}</GreyLabel>
       default:
