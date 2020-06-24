@@ -12,9 +12,15 @@ const LabelText = styled.label`
 `
 
 const Input = styled.input`
-  background-color: var(--color-primary);
+  background-color: var(--bg-color);
   color: var(--font-color);
   max-width: 100%;
+  border-color: var(--color-primary) !important;
+  &:hover,
+  &:active,
+  &:focus {
+    border-color: var(--button-color) !important;
+  }
 `
 
 export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitParams) => void }) => {
@@ -55,7 +61,7 @@ export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitP
           />
         </div>
         <div className="col-1">
-          <Button className="button dark" type="submit">
+          <Button className="button outline" type="submit">
             Check
           </Button>
         </div>

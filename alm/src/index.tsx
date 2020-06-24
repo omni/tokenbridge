@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom'
 import { ThemeProvider } from 'styled-components'
 import { GlobalStyle } from './themes/GlobalStyle'
 import App from './App'
-import Dark from './themes/Dark'
+import Light from './themes/Light'
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={Dark}>
+    <ThemeProvider theme={Light}>
       <GlobalStyle />
       <App />
     </ThemeProvider>

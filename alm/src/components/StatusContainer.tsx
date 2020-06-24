@@ -12,7 +12,7 @@ import { LeftArrow } from './commons/LeftArrow'
 import styled from 'styled-components'
 
 const BackButton = styled.button`
-  color: var(--font-color);
+  color: var(--button-color);
   border-color: var(--font-color);
   margin-top: 10px;
 `
