@@ -57,7 +57,7 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
             <td>{formattedValidator ? formattedValidator : <SimpleLoading />}</td>
             <td className="text-center">{getExecutionStatusElement(executionData.status)}</td>
             <td className="text-center">
-              <ExplorerTxLink href={txExplorerLink} target="blank">
+              <ExplorerTxLink href={txExplorerLink} target="_blank">
                 {executionData.timestamp > 0 ? formatTimestamp(executionData.timestamp) : ''}
               </ExplorerTxLink>
             </td>

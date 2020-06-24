@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatTxHashExtended } from '../utils/networks'
+import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
 import { useWindowWidth } from '@react-hook/window-size'
 import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
@@ -7,6 +7,7 @@ import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
+import { ExplorerTxLink } from './commons/ExplorerTxLink'
 
 const Thead = styled.thead`
   border-bottom: 2px solid #9e9e9e;
@@ -47,7 +48,8 @@ export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmatio
         <Thead>
           <tr>
             <th>Validator</th>
-            <th className="is-center">Confirmations</th>
+            <th className="text-center">Status</th>
+            <th className="text-center">Age</th>
           </tr>
         </Thead>
         <tbody>
@@ -55,10 +57,25 @@ export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmatio
             const filteredConfirmation = confirmations.filter(c => c.validator === validator)
             const confirmation = filteredConfirmation.length > 0 ? filteredConfirmation[0] : null
             const displayedStatus = confirmation && confirmation.status ? confirmation.status : ''
+            const explorerLink = confirmation && confirmation.txHash ? getExplorerTxUrl(confirmation.txHash, true) : ''
+            const elementIfNoTimestamp =
+              displayedStatus !== VALIDATOR_CONFIRMATION_STATUS.WAITING &&
+              displayedStatus !== VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED ? (
+                <SimpleLoading />
+              ) : (
+                ''
+              )
             return (
               <tr key={i}>
-                <td>{windowWidth < 850 ? formatTxHashExtended(validator) : validator}</td>
+                <td>{windowWidth < 850 ? formatTxHash(validator) : validator}</td>
                 <td className="text-center">{getValidatorStatusElement(displayedStatus)}</td>
+                <td className="text-center">
+                  <ExplorerTxLink href={explorerLink} target="_blank">
+                    {confirmation && confirmation.timestamp > 0
+                      ? formatTimestamp(confirmation.timestamp)
+                      : elementIfNoTimestamp}
+                  </ExplorerTxLink>
+                </td>
               </tr>
             )
           })}

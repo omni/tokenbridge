@@ -21,7 +21,8 @@ import {
   getValidatorFailedTransactionsForMessage,
   getExecutionFailedTransactionForMessage,
   getValidatorPendingTransactionsForMessage,
-  getExecutionPendingTransactionsForMessage
+  getExecutionPendingTransactionsForMessage,
+  getValidatorSuccessTransactionsForMessage
 } from '../utils/explorer'
 
 export interface useMessageConfirmationsParams {
@@ -31,9 +32,14 @@ export interface useMessageConfirmationsParams {
   timestamp: number
 }
 
-export interface ConfirmationParam {
+export interface BasicConfirmationParam {
   validator: string
   status: string
+}
+
+export interface ConfirmationParam extends BasicConfirmationParam {
+  txHash: string
+  timestamp: number
 }
 
 export interface ExecutionData {
@@ -220,7 +226,8 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
         getValidatorFailedTransactionsForMessage,
         setFailedConfirmations,
         getValidatorPendingTransactionsForMessage,
-        setPendingConfirmations
+        setPendingConfirmations,
+        getValidatorSuccessTransactionsForMessage
       )
 
       return () => {
