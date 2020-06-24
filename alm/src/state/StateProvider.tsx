@@ -21,14 +21,8 @@ export interface BaseNetworkParams {
   blockConfirmations: number
 }
 
-export interface HomeNetworkParams extends BaseNetworkParams {
-  validatorContract: Maybe<Contract>
-  requiredSignatures: number
-  validatorList: Array<string>
-}
-
 export interface StateContext {
-  home: HomeNetworkParams
+  home: BaseNetworkParams
   foreign: BaseNetworkParams
   loading: boolean
 }
@@ -40,10 +34,7 @@ const initialState = {
     web3: null,
     bridgeAddress: HOME_BRIDGE_ADDRESS,
     bridgeContract: null,
-    blockConfirmations: 0,
-    validatorContract: null,
-    requiredSignatures: 0,
-    validatorList: []
+    blockConfirmations: 0
   },
   foreign: {
     chainId: 0,
@@ -61,15 +52,7 @@ const StateContext = createContext<StateContext>(initialState)
 export const StateProvider = ({ children }: { children: ReactNode }) => {
   const homeNetwork = useNetwork(HOME_RPC_URL)
   const foreignNetwork = useNetwork(FOREIGN_RPC_URL)
-  const {
-    homeBridge,
-    foreignBridge,
-    homeBlockConfirmations,
-    foreignBlockConfirmations,
-    homeValidatorContract,
-    homeRequiredSignatures,
-    homeValidatorList
-  } = useBridgeContracts({
+  const { homeBridge, foreignBridge, homeBlockConfirmations, foreignBlockConfirmations } = useBridgeContracts({
     homeWeb3: homeNetwork.web3,
     foreignWeb3: foreignNetwork.web3
   })
@@ -80,9 +63,6 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
       name: HOME_NETWORK_NAME,
       bridgeContract: homeBridge,
       blockConfirmations: homeBlockConfirmations,
-      validatorContract: homeValidatorContract,
-      requiredSignatures: homeRequiredSignatures,
-      validatorList: homeValidatorList,
       ...homeNetwork
     },
     foreign: {
