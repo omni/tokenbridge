@@ -29,6 +29,8 @@ export interface useMessageConfirmationsParams {
   receipt: Maybe<TransactionReceipt>
   fromHome: boolean
   timestamp: number
+  requiredSignatures: number
+  validatorList: string[]
 }
 
 export interface ConfirmationParam {
@@ -44,7 +46,14 @@ export interface ExecutionData {
   executionResult: boolean
 }
 
-export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp }: useMessageConfirmationsParams) => {
+export const useMessageConfirmations = ({
+  message,
+  receipt,
+  fromHome,
+  timestamp,
+  requiredSignatures,
+  validatorList
+}: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
   const [confirmations, setConfirmations] = useState<Array<ConfirmationParam>>([])
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
@@ -91,7 +100,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
         targetBlock,
         setWaitingBlocks,
         setWaitingBlocksResolved,
-        home.validatorList,
+        validatorList,
         setConfirmations,
         blockProvider,
         interval,
@@ -103,15 +112,7 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
         blockProvider.stop()
       }
     },
-    [
-      foreign.blockConfirmations,
-      foreign.web3,
-      fromHome,
-      home.blockConfirmations,
-      home.validatorList,
-      home.web3,
-      receipt
-    ]
+    [foreign.blockConfirmations, foreign.web3, fromHome, home.blockConfirmations, validatorList, home.web3, receipt]
   )
 
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
@@ -208,11 +209,11 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
       getConfirmationsForTx(
         message.data,
         home.web3,
-        home.validatorList,
+        validatorList,
         home.bridgeContract,
         confirmationContractMethod,
         setConfirmations,
-        home.requiredSignatures,
+        requiredSignatures,
         setSignatureCollected,
         waitingBlocksResolved,
         subscriptions,
@@ -231,9 +232,9 @@ export const useMessageConfirmations = ({ message, receipt, fromHome, timestamp 
       fromHome,
       message.data,
       home.web3,
-      home.validatorList,
+      validatorList,
       home.bridgeContract,
-      home.requiredSignatures,
+      requiredSignatures,
       waitingBlocksResolved,
       timestamp
     ]

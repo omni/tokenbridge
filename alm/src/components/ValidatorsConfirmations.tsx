@@ -1,6 +1,5 @@
 import React from 'react'
 import { formatTxHashExtended } from '../utils/networks'
-import { useStateProvider } from '../state/StateProvider'
 import { useWindowWidth } from '@react-hook/window-size'
 import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
@@ -18,12 +17,15 @@ const RequiredConfirmations = styled.label`
 
 export interface ValidatorsConfirmationsParams {
   confirmations: Array<ConfirmationParam>
+  requiredSignatures: number
+  validatorList: string[]
 }
 
-export const ValidatorsConfirmations = ({ confirmations }: ValidatorsConfirmationsParams) => {
-  const {
-    home: { requiredSignatures, validatorList }
-  } = useStateProvider()
+export const ValidatorsConfirmations = ({
+  confirmations,
+  requiredSignatures,
+  validatorList
+}: ValidatorsConfirmationsParams) => {
   const windowWidth = useWindowWidth()
 
   const getValidatorStatusElement = (validatorStatus = '') => {
