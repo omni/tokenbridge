@@ -15,6 +15,9 @@ const BackButton = styled.button`
   color: var(--button-color);
   border-color: var(--font-color);
   margin-top: 10px;
+  &:focus {
+    outline: var(--button-color);
+  }
 `
 
 const BackLabel = styled.label`
