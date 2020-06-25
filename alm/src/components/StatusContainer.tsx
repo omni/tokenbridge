@@ -92,15 +92,12 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams }: StatusCo
       {status && (
         <p>
           The request{' '}
-          <i>
-            {displayExplorerLink && (
-              <ExplorerTxLink href={txExplorerLink} target="blank">
-                {formattedMessageId}
-              </ExplorerTxLink>
-            )}
-            {!displayExplorerLink && <label>{formattedMessageId}</label>}
-          </i>{' '}
-          {displayedDescription}
+          {displayExplorerLink && (
+            <ExplorerTxLink href={txExplorerLink} target="blank">
+              {formattedMessageId}
+            </ExplorerTxLink>
+          )}
+          {!displayExplorerLink && <label>{formattedMessageId}</label>} {displayedDescription}
         </p>
       )}
       {displayMessageSelector && <MessageSelector messages={messages} onMessageSelected={onMessageSelected} />}

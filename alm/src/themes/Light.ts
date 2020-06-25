@@ -7,7 +7,7 @@ const theme = {
   colorLightGrey: '#1890ff',
   linkColor: '#1890ff',
   success: {
-    textColor: '#00c9a7',
+    textColor: '#388E3C',
     backgroundColor: 'rgba(0,201,167,.1)'
   },
   notRequired: {
