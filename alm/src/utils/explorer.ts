@@ -154,6 +154,31 @@ export const getFailedTransactions = async (
   return transactions.filter(t => t.isError !== '0')
 }
 
+export const getSuccessTransactions = async (
+  account: string,
+  to: string,
+  startTimestamp: number,
+  endTimestamp: number,
+  api: string,
+  fetchAccountTransactions: (args: AccountTransactionsParams) => Promise<APITransaction[]>
+): Promise<APITransaction[]> => {
+  const transactions = await fetchAccountTransactions({ account, to, startTimestamp, endTimestamp, api })
+
+  return transactions.filter(t => t.isError === '0')
+}
+
+export const filterValidatorSignatureTransaction = (
+  transactions: APITransaction[],
+  messageData: string
+): APITransaction[] => {
+  const messageDataValue = messageData.replace('0x', '')
+  return transactions.filter(
+    t =>
+      (t.input.includes(SUBMIT_SIGNATURE_HASH) || t.input.includes(EXECUTE_AFFIRMATION_HASH)) &&
+      t.input.includes(messageDataValue)
+  )
+}
+
 export const getValidatorFailedTransactionsForMessage = async ({
   account,
   to,
@@ -170,12 +195,26 @@ export const getValidatorFailedTransactionsForMessage = async ({
     fetchAccountTransactionsFromBlockscout
   )
 
-  const messageDataValue = messageData.replace('0x', '')
-  return failedTransactions.filter(
-    t =>
-      (t.input.includes(SUBMIT_SIGNATURE_HASH) || t.input.includes(EXECUTE_AFFIRMATION_HASH)) &&
-      t.input.includes(messageDataValue)
+  return filterValidatorSignatureTransaction(failedTransactions, messageData)
+}
+
+export const getValidatorSuccessTransactionsForMessage = async ({
+  account,
+  to,
+  messageData,
+  startTimestamp,
+  endTimestamp
+}: GetFailedTransactionParams): Promise<APITransaction[]> => {
+  const transactions = await getSuccessTransactions(
+    account,
+    to,
+    startTimestamp,
+    endTimestamp,
+    HOME_EXPLORER_API,
+    fetchAccountTransactionsFromBlockscout
   )
+
+  return filterValidatorSignatureTransaction(transactions, messageData)
 }
 
 export const getExecutionFailedTransactionForMessage = async ({

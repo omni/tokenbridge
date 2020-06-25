@@ -4,6 +4,7 @@ import { HOME_RPC_POLLING_INTERVAL, TRANSACTION_STATUS } from '../config/constan
 import { getTransactionStatusDescription } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
 import { getHomeMessagesFromReceipt, getForeignMessagesFromReceipt, MessageObject, getBlock } from '../utils/web3'
+import useInterval from '@use-it/interval'
 
 export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chainId: number }) => {
   const { home, foreign } = useStateProvider()
@@ -13,6 +14,12 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
   const [receipt, setReceipt] = useState<Maybe<TransactionReceipt>>(null)
   const [timestamp, setTimestamp] = useState(0)
   const [loading, setLoading] = useState(true)
+
+  // Update description so the time displayed is accurate
+  useInterval(() => {
+    if (!status || !timestamp || !description) return
+    setDescription(getTransactionStatusDescription(status, timestamp))
+  }, 30000)
 
   useEffect(
     () => {
