@@ -200,7 +200,7 @@ export const useMessageConfirmations = ({
   // To avoid making extra requests, this is only executed when validators finished waiting for blocks confirmations
   useEffect(
     () => {
-      if (!waitingBlocksResolved || !timestamp) return
+      if (!waitingBlocksResolved || !timestamp || !requiredSignatures) return
 
       const subscriptions: Array<number> = []
 

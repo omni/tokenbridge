@@ -190,7 +190,7 @@ export const getConfirmationsForTx = async (
   setPendingConfirmations: Function,
   getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
 ) => {
-  if (!web3 || !validatorList || !bridgeContract || !waitingBlocksResolved) return
+  if (!web3 || !validatorList || !validatorList.length || !bridgeContract || !waitingBlocksResolved) return
 
   // If all the information was not collected, then it should retry
   let shouldRetry = false
