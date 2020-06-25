@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { HOME_AMB_ABI, FOREIGN_AMB_ABI } from '../../../commons'
+import { HOME_AMB_ABI, FOREIGN_AMB_ABI } from '../abis'
 import { FOREIGN_BRIDGE_ADDRESS, HOME_BRIDGE_ADDRESS } from '../config/constants'
 import { Contract } from 'web3-eth-contract'
 import Web3 from 'web3'

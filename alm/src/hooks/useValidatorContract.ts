@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Contract } from 'web3-eth-contract'
 import Web3 from 'web3'
 import { getRequiredSignatures, getValidatorAddress, getValidatorList } from '../utils/contract'
-import { BRIDGE_VALIDATORS_ABI } from '../../../commons'
+import { BRIDGE_VALIDATORS_ABI } from '../abis'
 import { useStateProvider } from '../state/StateProvider'
 import { TransactionReceipt } from 'web3-eth'
 
