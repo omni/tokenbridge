@@ -72,7 +72,7 @@ export const MainPage = () => {
         </HeaderContainer>
       </Header>
       <div className="container">
-        <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />
+        <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} lastUsedChain={selectedChainId} />} />
         <Route
           path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']}
           children={<StatusContainer onBackToMain={resetNetworkHeader} setNetworkFromParams={setNetworkFromParams} />}
