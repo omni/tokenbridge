@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link, useHistory, useParams } from 'react-router-dom'
 import { useTransactionStatus } from '../hooks/useTransactionStatus'
 import { formatTxHash, getExplorerTxUrl, getTransactionStatusDescription, validTxHash } from '../utils/networks'
@@ -22,7 +22,12 @@ const BackLabel = styled.label`
   cursor: pointer;
 `
 
-export const StatusContainer = () => {
+export interface StatusContainerParam {
+  onBackToMain: () => void
+  setNetworkFromParams: (chainId: number) => void
+}
+
+export const StatusContainer = ({ onBackToMain, setNetworkFromParams }: StatusContainerParam) => {
   const { home, foreign } = useStateProvider()
   const history = useHistory()
   const { chainId, txHash, messageIdParam } = useParams()
@@ -35,6 +40,15 @@ export const StatusContainer = () => {
   })
 
   const selectedMessageId = messageIdParam === undefined || messages[messageIdParam] === undefined ? -1 : messageIdParam
+
+  useEffect(
+    () => {
+      if (validChainId) {
+        setNetworkFromParams(parseInt(chainId))
+      }
+    },
+    [validChainId, chainId, setNetworkFromParams]
+  )
 
   if (!validParameters && home.chainId && foreign.chainId) {
     return (
@@ -92,7 +106,7 @@ export const StatusContainer = () => {
       )}
       <div className="row is-center">
         <div className="col-9">
-          <Link to="/">
+          <Link to="/" onClick={onBackToMain}>
             <BackButton className="button outline is-left">
               <LeftArrow />
               <BackLabel>Search another transaction</BackLabel>

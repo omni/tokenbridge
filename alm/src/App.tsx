@@ -1,11 +1,14 @@
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { MainPage } from './components/MainPage'
+import { StateProvider } from './state/StateProvider'
 
 function App() {
   return (
     <BrowserRouter>
-      <MainPage />
+      <StateProvider>
+        <MainPage />
+      </StateProvider>
     </BrowserRouter>
   )
 }
