@@ -6,7 +6,15 @@ import { useStateProvider } from '../state/StateProvider'
 import { getHomeMessagesFromReceipt, getForeignMessagesFromReceipt, MessageObject, getBlock } from '../utils/web3'
 import useInterval from '@use-it/interval'
 
-export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chainId: number }) => {
+export const useTransactionStatus = ({
+  txHash,
+  chainId,
+  receiptParam
+}: {
+  txHash: string
+  chainId: number
+  receiptParam: Maybe<TransactionReceipt>
+}) => {
   const { home, foreign } = useStateProvider()
   const [messages, setMessages] = useState<Array<MessageObject>>([])
   const [status, setStatus] = useState('')
@@ -37,7 +45,14 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
         const isHome = chainId === home.chainId
         const web3 = isHome ? home.web3 : foreign.web3
 
-        const txReceipt = await web3.eth.getTransactionReceipt(txHash)
+        let txReceipt
+
+        if (receiptParam) {
+          txReceipt = receiptParam
+        } else {
+          txReceipt = await web3.eth.getTransactionReceipt(txHash)
+        }
+
         setReceipt(txReceipt)
 
         if (!txReceipt) {
@@ -92,7 +107,17 @@ export const useTransactionStatus = ({ txHash, chainId }: { txHash: string; chai
         unsubscribe()
       }
     },
-    [txHash, chainId, home.chainId, foreign.chainId, home.web3, foreign.web3, home.bridgeAddress, foreign.bridgeAddress]
+    [
+      txHash,
+      chainId,
+      home.chainId,
+      foreign.chainId,
+      home.web3,
+      foreign.web3,
+      home.bridgeAddress,
+      foreign.bridgeAddress,
+      receiptParam
+    ]
   )
 
   return {

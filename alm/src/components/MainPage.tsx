@@ -4,6 +4,7 @@ import { Route, useHistory } from 'react-router-dom'
 import { Form } from './Form'
 import { StatusContainer } from './StatusContainer'
 import { useStateProvider } from '../state/StateProvider'
+import { TransactionReceipt } from 'web3-eth'
 
 const StyledMainPage = styled.div`
   text-align: center;
@@ -34,24 +35,24 @@ const HeaderContainer = styled.header`
 export interface FormSubmitParams {
   chainId: number
   txHash: string
+  receipt: TransactionReceipt
 }
 
 export const MainPage = () => {
   const history = useHistory()
   const { home, foreign } = useStateProvider()
-  const [selectedChainId, setSelectedChainId] = useState(0)
   const [networkName, setNetworkName] = useState('')
+  const [receipt, setReceipt] = useState<Maybe<TransactionReceipt>>(null)
 
   const setNetworkData = (chainId: number) => {
     const network = chainId === home.chainId ? home.name : foreign.name
 
     setNetworkName(network)
-    setSelectedChainId(chainId)
   }
 
-  const onFormSubmit = ({ chainId, txHash }: FormSubmitParams) => {
+  const onFormSubmit = ({ chainId, txHash, receipt }: FormSubmitParams) => {
     setNetworkData(chainId)
-
+    setReceipt(receipt)
     history.push(`/${chainId}/${txHash}`)
   }
 
@@ -72,10 +73,16 @@ export const MainPage = () => {
         </HeaderContainer>
       </Header>
       <div className="container">
-        <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} lastUsedChain={selectedChainId} />} />
+        <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />
         <Route
           path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']}
-          children={<StatusContainer onBackToMain={resetNetworkHeader} setNetworkFromParams={setNetworkFromParams} />}
+          children={
+            <StatusContainer
+              onBackToMain={resetNetworkHeader}
+              setNetworkFromParams={setNetworkFromParams}
+              receiptParam={receipt}
+            />
+          }
         />
       </div>
     </StyledMainPage>
