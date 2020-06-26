@@ -38,7 +38,7 @@ export const MessageSelector = ({ messages, onMessageSelected }: MessageSelector
         ))}
       </div>
       <div className="col-1-lg col-12 is-marginless">
-        <Button className="button dark" onClick={onSelect}>
+        <Button className="button outline" onClick={onSelect}>
           Select
         </Button>
       </div>

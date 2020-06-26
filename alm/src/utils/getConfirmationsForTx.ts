@@ -190,11 +190,10 @@ export const getConfirmationsForTx = async (
   setPendingConfirmations: Function,
   getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
 ) => {
-  if (!web3 || !validatorList || !bridgeContract || !waitingBlocksResolved) return
+  if (!web3 || !validatorList || !validatorList.length || !bridgeContract || !waitingBlocksResolved) return
 
   // If all the information was not collected, then it should retry
   let shouldRetry = false
-
   const hashMsg = web3.utils.soliditySha3Raw(messageData)
   let validatorConfirmations = await Promise.all(
     validatorList.map(getValidatorConfirmation(web3, hashMsg, bridgeContract, confirmationContractMethod))

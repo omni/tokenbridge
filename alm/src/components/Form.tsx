@@ -12,27 +12,39 @@ const LabelText = styled.label`
 `
 
 const Input = styled.input`
-  background-color: var(--color-primary);
+  background-color: var(--bg-color);
   color: var(--font-color);
   max-width: 100%;
+  border-color: var(--color-primary) !important;
+  &:hover,
+  &:active,
+  &:focus {
+    border-color: var(--button-color) !important;
+  }
 `
 
-export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitParams) => void }) => {
+export const Form = ({
+  onSubmit,
+  lastUsedChain
+}: {
+  onSubmit: ({ chainId, txHash }: FormSubmitParams) => void
+  lastUsedChain: number
+}) => {
   const { home, foreign, loading } = useStateProvider()
   const { chainId: paramChainId, txHash: paramTxHash } = useParams()
-  const [chainId, setChainId] = useState(0)
+  const [chainId, setChainId] = useState(lastUsedChain)
   const [txHash, setTxHash] = useState('')
 
   useEffect(
     () => {
       if (!paramChainId) {
-        setChainId(foreign.chainId)
+        setChainId(lastUsedChain > 0 ? lastUsedChain : foreign.chainId)
       } else {
         setChainId(parseInt(paramChainId))
         setTxHash(paramTxHash)
       }
     },
-    [foreign.chainId, paramChainId, paramTxHash]
+    [foreign.chainId, paramChainId, paramTxHash, lastUsedChain]
   )
 
   const formSubmit = (e: FormEvent) => {
@@ -55,7 +67,7 @@ export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash }: FormSubmitP
           />
         </div>
         <div className="col-1">
-          <Button className="button dark" type="submit">
+          <Button className="button outline" type="submit">
             Check
           </Button>
         </div>

@@ -1,6 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
 
-import theme from './Dark'
+import theme from './Light'
 
 type ThemeType = typeof theme
 
@@ -17,6 +17,7 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   :root {
     --bg-color: ${props => props.theme.backgroundColor};
     --font-color: ${props => props.theme.fontColor};
+    --button-color: ${props => props.theme.buttonColor};
     --color-primary: ${props => props.theme.colorPrimary};
     --color-grey: ${props => props.theme.colorGrey};
     --color-lightGrey: ${props => props.theme.colorLightGrey};

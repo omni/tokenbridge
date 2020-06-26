@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Route, useHistory, Link } from 'react-router-dom'
+import { Route, useHistory } from 'react-router-dom'
 import { Form } from './Form'
 import { StatusContainer } from './StatusContainer'
-import { StateProvider } from '../state/StateProvider'
+import { useStateProvider } from '../state/StateProvider'
 
 const StyledMainPage = styled.div`
   text-align: center;
@@ -11,15 +11,24 @@ const StyledMainPage = styled.div`
 `
 
 const Header = styled.header`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  background-color: #001529;
+  color: #ffffff;
+  margin-bottom: 50px;
 `
 
-const Title = styled.p`
-  color: var(--font-color);
+const HeaderContainer = styled.header`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+  height: 64px;
+  line-height: 64px;
+  padding: 0 50px;
+
+  @media (max-width: 600px) {
+    padding: 0 20px;
+  }
 `
 
 export interface FormSubmitParams {
@@ -29,23 +38,46 @@ export interface FormSubmitParams {
 
 export const MainPage = () => {
   const history = useHistory()
+  const { home, foreign } = useStateProvider()
+  const [selectedChainId, setSelectedChainId] = useState(0)
+  const [networkName, setNetworkName] = useState('')
+
+  const setNetworkData = (chainId: number) => {
+    const network = chainId === home.chainId ? home.name : foreign.name
+
+    setNetworkName(network)
+    setSelectedChainId(chainId)
+  }
+
   const onFormSubmit = ({ chainId, txHash }: FormSubmitParams) => {
+    setNetworkData(chainId)
+
     history.push(`/${chainId}/${txHash}`)
   }
 
+  const resetNetworkHeader = () => {
+    setNetworkName('')
+  }
+
+  const setNetworkFromParams = (chainId: number) => {
+    setNetworkData(chainId)
+  }
+
   return (
-    <StateProvider>
-      <StyledMainPage>
-        <Header>
-          <Link to="/">
-            <Title>AMB Live Monitoring</Title>
-          </Link>
-        </Header>
-        <div className="container">
-          <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />
-          <Route path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']} children={<StatusContainer />} />
-        </div>
-      </StyledMainPage>
-    </StateProvider>
+    <StyledMainPage>
+      <Header>
+        <HeaderContainer>
+          <span>AMB Live Monitoring</span>
+          <span>{networkName}</span>
+        </HeaderContainer>
+      </Header>
+      <div className="container">
+        <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} lastUsedChain={selectedChainId} />} />
+        <Route
+          path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']}
+          children={<StatusContainer onBackToMain={resetNetworkHeader} setNetworkFromParams={setNetworkFromParams} />}
+        />
+      </div>
+    </StyledMainPage>
   )
 }

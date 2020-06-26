@@ -23,7 +23,7 @@ const StatusResultLabel = styled.label`
 `
 
 const StyledConfirmationContainer = styled.div`
-  background-color: var(--color-primary);
+  background-color: var(--bg-color);
   padding: 10px;
   border-radius: 4px;
 `

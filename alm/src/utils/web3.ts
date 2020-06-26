@@ -4,7 +4,7 @@ import { TransactionReceipt } from 'web3-eth'
 import { AbiItem } from 'web3-utils'
 import memoize from 'fast-memoize'
 import promiseRetry from 'promise-retry'
-import { HOME_AMB_ABI, FOREIGN_AMB_ABI } from '../../../commons'
+import { HOME_AMB_ABI, FOREIGN_AMB_ABI } from '../abis'
 
 export interface MessageObject {
   id: string
