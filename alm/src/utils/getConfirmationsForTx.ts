@@ -53,7 +53,7 @@ export const getValidatorSuccessTransaction = (
   getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
 ) => async (validatorData: BasicConfirmationParam): Promise<ConfirmationParam> => {
   const { validator } = validatorData
-  const validatorCacheKey = `${CACHE_KEY_SUCCESS}${validatorData.validator}`
+  const validatorCacheKey = `${CACHE_KEY_SUCCESS}${validatorData.validator}-${messageData}`
   const fromCache = validatorsCache.getData(validatorCacheKey)
 
   if (fromCache && fromCache.txHash) {
@@ -100,7 +100,7 @@ export const getValidatorFailedTransaction = (
   timestamp: number,
   getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
 ) => async (validatorData: BasicConfirmationParam): Promise<ConfirmationParam> => {
-  const validatorCacheKey = `${CACHE_KEY_FAILED}${validatorData.validator}`
+  const validatorCacheKey = `${CACHE_KEY_FAILED}${validatorData.validator}-${messageData}`
   const failedFromCache = validatorsCache.getData(validatorCacheKey)
 
   if (failedFromCache && failedFromCache.txHash) {
