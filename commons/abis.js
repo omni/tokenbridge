@@ -53,6 +53,36 @@ const ERC20_BYTES32_ABI = [
   }
 ]
 
+const OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        name: 'encodedData',
+        type: 'bytes'
+      }
+    ],
+    name: 'UserRequestForSignature',
+    type: 'event'
+  }
+]
+
+const OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        name: 'encodedData',
+        type: 'bytes'
+      }
+    ],
+    name: 'UserRequestForAffirmation',
+    type: 'event'
+  }
+]
+
 function getBridgeABIs(bridgeMode) {
   let HOME_ABI = null
   let FOREIGN_ABI = null
@@ -103,6 +133,8 @@ module.exports = {
   ERC20_BYTES32_ABI,
   HOME_AMB_ABI,
   FOREIGN_AMB_ABI,
+  OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI,
+  OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI,
   BOX_ABI,
   SAI_TOP,
   HOME_STAKE_ERC_TO_ERC_ABI,
