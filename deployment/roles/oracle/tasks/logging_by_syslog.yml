@@ -1,19 +1,5 @@
 ---
-- name: Slurp docker compose file
-  slurp:
-    src: "{{ bridge_path }}/oracle/{{ file }}.yml"
-  register: docker_compose_slurp
-
-- name: Parse docker compose file
-  set_fact:
-    docker_compose_parsed: "{{ docker_compose_slurp['content'] | b64decode | from_yaml }}"
-
-- name: Set logger to remote server
-  set_fact:
-    docker_compose_parsed: "{{ docker_compose_parsed |combine({'services': {item: {'logging': {'driver': 'syslog','options': {'tag': '{{.Name}}/{{.ID}}'}}}}}, recursive=True) }}"
-  with_items: "{{ docker_compose_parsed.services }}"
-
-- name: Write updated docker file
-  copy:
-    content: "{{ docker_compose_parsed | to_yaml }}"
-    dest: "{{ bridge_path }}/oracle/{{ file }}.yml"
+- name: Change logging facility to forward logs to syslog
+  script: modify_to_use_syslog.py "{{ bridge_path }}/oracle/{{ file }}.yml"
+  args:
+    executable: python3
