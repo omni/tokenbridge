@@ -194,7 +194,6 @@ export const getConfirmationsForTx = async (
 
   // If all the information was not collected, then it should retry
   let shouldRetry = false
-
   const hashMsg = web3.utils.soliditySha3Raw(messageData)
   let validatorConfirmations = await Promise.all(
     validatorList.map(getValidatorConfirmation(web3, hashMsg, bridgeContract, confirmationContractMethod))
