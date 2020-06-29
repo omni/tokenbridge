@@ -10,6 +10,7 @@ import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { ConfirmationsContainer } from './ConfirmationsContainer'
 import { LeftArrow } from './commons/LeftArrow'
 import styled from 'styled-components'
+import { TransactionReceipt } from 'web3-eth'
 
 const BackButton = styled.button`
   color: var(--button-color);
@@ -28,9 +29,10 @@ const BackLabel = styled.label`
 export interface StatusContainerParam {
   onBackToMain: () => void
   setNetworkFromParams: (chainId: number) => void
+  receiptParam: Maybe<TransactionReceipt>
 }
 
-export const StatusContainer = ({ onBackToMain, setNetworkFromParams }: StatusContainerParam) => {
+export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptParam }: StatusContainerParam) => {
   const { home, foreign } = useStateProvider()
   const history = useHistory()
   const { chainId, txHash, messageIdParam } = useParams()
@@ -39,7 +41,8 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams }: StatusCo
 
   const { messages, receipt, status, description, timestamp, loading } = useTransactionStatus({
     txHash: validParameters ? txHash : '',
-    chainId: validParameters ? parseInt(chainId) : 0
+    chainId: validParameters ? parseInt(chainId) : 0,
+    receiptParam
   })
 
   const selectedMessageId = messageIdParam === undefined || messages[messageIdParam] === undefined ? -1 : messageIdParam

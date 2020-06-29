@@ -1,10 +1,9 @@
-import React, { useState, FormEvent, useEffect } from 'react'
+import React, { useState, FormEvent } from 'react'
 import styled from 'styled-components'
 import { FormSubmitParams } from './MainPage'
-import { useStateProvider } from '../state/StateProvider'
-import { useParams } from 'react-router-dom'
 import { Button } from './commons/Button'
-import { RadioButtonLabel, RadioButtonContainer } from './commons/RadioButton'
+import { TransactionSelector } from './TransactionSelector'
+import { TransactionReceipt } from 'web3-eth'
 
 const LabelText = styled.label`
   line-height: 36px;
@@ -23,33 +22,21 @@ const Input = styled.input`
   }
 `
 
-export const Form = ({
-  onSubmit,
-  lastUsedChain
-}: {
-  onSubmit: ({ chainId, txHash }: FormSubmitParams) => void
-  lastUsedChain: number
-}) => {
-  const { home, foreign, loading } = useStateProvider()
-  const { chainId: paramChainId, txHash: paramTxHash } = useParams()
-  const [chainId, setChainId] = useState(lastUsedChain)
+export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash, receipt }: FormSubmitParams) => void }) => {
   const [txHash, setTxHash] = useState('')
-
-  useEffect(
-    () => {
-      if (!paramChainId) {
-        setChainId(lastUsedChain > 0 ? lastUsedChain : foreign.chainId)
-      } else {
-        setChainId(parseInt(paramChainId))
-        setTxHash(paramTxHash)
-      }
-    },
-    [foreign.chainId, paramChainId, paramTxHash, lastUsedChain]
-  )
+  const [searchTx, setSearchTx] = useState(false)
 
   const formSubmit = (e: FormEvent) => {
     e.preventDefault()
-    onSubmit({ chainId, txHash })
+    setSearchTx(true)
+  }
+
+  const onSelected = (chainId: number, receipt: TransactionReceipt) => {
+    onSubmit({ chainId, txHash, receipt })
+  }
+
+  if (searchTx) {
+    return <TransactionSelector txHash={txHash} onSelected={onSelected} />
   }
 
   return (
@@ -72,32 +59,6 @@ export const Form = ({
           </Button>
         </div>
       </div>
-      {!loading && (
-        <div className="row is-center">
-          <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(foreign.chainId)}>
-            <input
-              className="is-marginless"
-              type="radio"
-              name="network"
-              value={foreign.name}
-              checked={chainId === foreign.chainId}
-              onChange={() => setChainId(foreign.chainId)}
-            />
-            <RadioButtonLabel htmlFor={foreign.name}>{foreign.name}</RadioButtonLabel>
-          </RadioButtonContainer>
-          <RadioButtonContainer className="is-vertical-align" onClick={() => setChainId(home.chainId)}>
-            <input
-              className="is-marginless"
-              type="radio"
-              name="network"
-              value={home.name}
-              checked={chainId === home.chainId}
-              onChange={() => setChainId(home.chainId)}
-            />
-            <RadioButtonLabel htmlFor={home.name}>{home.name}</RadioButtonLabel>
-          </RadioButtonContainer>
-        </div>
-      )}
     </form>
   )
 }

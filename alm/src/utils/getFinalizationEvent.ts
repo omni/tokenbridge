@@ -80,7 +80,7 @@ export const getFinalizationEvent = async (
         })
         setPendingExecution(true)
       } else {
-        const validatorExecutionCacheKey = `${CACHE_KEY_EXECUTION_FAILED}${validator}`
+        const validatorExecutionCacheKey = `${CACHE_KEY_EXECUTION_FAILED}${validator}-${message.id}`
         const failedFromCache = validatorsCache.get(validatorExecutionCacheKey)
 
         if (!failedFromCache) {
