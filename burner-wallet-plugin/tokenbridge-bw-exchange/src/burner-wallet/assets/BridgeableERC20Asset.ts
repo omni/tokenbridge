@@ -36,7 +36,7 @@ export default class BridgeableERC20Asset extends ERC20Asset {
       }
       const receipt = await this.getBridgeContract()
         .methods.relayTokens(from, value)
-        .send({ from, gas: 200000 })
+        .send({ from })
       return {
         ...receipt,
         txHash: receipt.transactionHash,
