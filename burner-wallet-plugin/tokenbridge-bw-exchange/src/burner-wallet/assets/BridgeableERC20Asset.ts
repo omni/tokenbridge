@@ -31,7 +31,7 @@ export default class BridgeableERC20Asset extends ERC20Asset {
   async _send({ from, to, value }) {
     if (to.toLowerCase() === this.bridgeAddress) {
       const allowance = await this.allowance(from, to)
-      if (toBN(allowance).lt(value)) {
+      if (toBN(allowance).lt(toBN(value))) {
         await this.approve(from, to, value)
       }
       const receipt = await this.getBridgeContract()
