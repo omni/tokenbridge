@@ -32,6 +32,7 @@ export interface useMessageConfirmationsParams {
   timestamp: number
   requiredSignatures: number
   validatorList: string[]
+  blockConfirmations: number
 }
 
 export interface BasicConfirmationParam {
@@ -58,7 +59,8 @@ export const useMessageConfirmations = ({
   fromHome,
   timestamp,
   requiredSignatures,
-  validatorList
+  validatorList,
+  blockConfirmations
 }: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
   const [confirmations, setConfirmations] = useState<Array<ConfirmationParam>>([])
@@ -84,7 +86,7 @@ export const useMessageConfirmations = ({
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
     () => {
-      if (!receipt) return
+      if (!receipt || !blockConfirmations) return
 
       const subscriptions: Array<number> = []
 
@@ -99,8 +101,7 @@ export const useMessageConfirmations = ({
       const web3 = fromHome ? home.web3 : foreign.web3
       blockProvider.start(web3)
 
-      const requiredBlockConfirmations = fromHome ? home.blockConfirmations : foreign.blockConfirmations
-      const targetBlock = receipt.blockNumber + requiredBlockConfirmations
+      const targetBlock = receipt.blockNumber + blockConfirmations
 
       checkSignaturesWaitingForBLocks(
         targetBlock,
@@ -118,7 +119,7 @@ export const useMessageConfirmations = ({
         blockProvider.stop()
       }
     },
-    [foreign.blockConfirmations, foreign.web3, fromHome, home.blockConfirmations, validatorList, home.web3, receipt]
+    [blockConfirmations, foreign.web3, fromHome, validatorList, home.web3, receipt]
   )
 
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
@@ -164,7 +165,7 @@ export const useMessageConfirmations = ({
   // This is executed if the message is in Home to Foreign direction only
   useEffect(
     () => {
-      if (!fromHome || !home.web3 || !receipt || !collectedSignaturesEvent) return
+      if (!fromHome || !home.web3 || !receipt || !collectedSignaturesEvent || !blockConfirmations) return
 
       const subscriptions: Array<number> = []
 
@@ -175,7 +176,7 @@ export const useMessageConfirmations = ({
       }
 
       homeBlockNumberProvider.start(home.web3)
-      const targetBlock = collectedSignaturesEvent.blockNumber + home.blockConfirmations
+      const targetBlock = collectedSignaturesEvent.blockNumber + blockConfirmations
 
       checkWaitingBlocksForExecution(
         homeBlockNumberProvider,
@@ -193,7 +194,7 @@ export const useMessageConfirmations = ({
         homeBlockNumberProvider.stop()
       }
     },
-    [collectedSignaturesEvent, fromHome, home.blockConfirmations, home.web3, receipt]
+    [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, receipt]
   )
 
   // Checks if validators verified the message

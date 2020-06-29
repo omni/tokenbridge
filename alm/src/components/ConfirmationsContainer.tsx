@@ -11,6 +11,7 @@ import { getConfirmationsStatusDescription } from '../utils/networks'
 import { useStateProvider } from '../state/StateProvider'
 import { ExecutionConfirmation } from './ExecutionConfirmation'
 import { useValidatorContract } from '../hooks/useValidatorContract'
+import { useBlockConfirmations } from '../hooks/useBlockConfirmations'
 
 const StatusLabel = styled.label`
   font-weight: bold;
@@ -45,13 +46,15 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
     foreign: { name: foreignName }
   } = useStateProvider()
   const { requiredSignatures, validatorList } = useValidatorContract({ fromHome, receipt })
+  const { blockConfirmations } = useBlockConfirmations({ fromHome, receipt })
   const { confirmations, status, executionData, signatureCollected } = useMessageConfirmations({
     message,
     receipt,
     fromHome,
     timestamp,
     requiredSignatures,
-    validatorList
+    validatorList,
+    blockConfirmations
   })
 
   return (
