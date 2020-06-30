@@ -16,7 +16,7 @@ const {
 const generateSnapshot = async (side, url, bridgeAddress) => {
   const snapshotPath = `../src/snapshots/${side}.json`
   const snapshotFullPath = path.join(__dirname, snapshotPath)
-  const snapshot = require(snapshotPath)
+  const snapshot = {}
 
   const web3 = new Web3(new Web3.providers.HttpProvider(url))
 
