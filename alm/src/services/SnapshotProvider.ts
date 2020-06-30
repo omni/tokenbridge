@@ -34,8 +34,12 @@ export class SnapshotProvider {
     this.data = data
   }
 
-  getChainId() {
+  chainId() {
     return this.data.chainId
+  }
+
+  validatorAddress() {
+    return this.data.validatorAddress
   }
 }
 

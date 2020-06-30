@@ -1,4 +1,5 @@
 import { Contract } from 'web3-eth-contract'
+import { SnapshotProvider } from '../services/SnapshotProvider'
 
 export const getRequiredBlockConfirmations = async (contract: Contract, blockNumber: number) => {
   const events = await contract.getPastEvents('RequiredBlockConfirmationChanged', {
@@ -19,7 +20,13 @@ export const getRequiredBlockConfirmations = async (contract: Contract, blockNum
   return parseInt(blockConfirmations)
 }
 
-export const getValidatorAddress = (contract: Contract) => contract.methods.validatorContract().call()
+export const getValidatorAddress = async (contract: Contract, snapshotProvider: SnapshotProvider) => {
+  let validatorAddress = snapshotProvider.validatorAddress()
+  if (validatorAddress === '') {
+    validatorAddress = await contract.methods.validatorContract().call()
+  }
+  return validatorAddress
+}
 
 export const getRequiredSignatures = async (contract: Contract, blockNumber: number) => {
   const events = await contract.getPastEvents('RequiredSignaturesChanged', {

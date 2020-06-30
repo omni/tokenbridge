@@ -5,6 +5,7 @@ import { getRequiredSignatures, getValidatorAddress, getValidatorList } from '..
 import { BRIDGE_VALIDATORS_ABI } from '../abis'
 import { useStateProvider } from '../state/StateProvider'
 import { TransactionReceipt } from 'web3-eth'
+import { foreignSnapshotProvider, homeSnapshotProvider, SnapshotProvider } from '../services/SnapshotProvider'
 
 export interface useValidatorContractParams {
   fromHome: boolean
@@ -18,9 +19,14 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
 
   const { home, foreign } = useStateProvider()
 
-  const callValidatorContract = async (bridgeContract: Maybe<Contract>, web3: Web3, setValidatorContract: Function) => {
+  const callValidatorContract = async (
+    bridgeContract: Maybe<Contract>,
+    web3: Web3,
+    setValidatorContract: Function,
+    snapshotProvider: SnapshotProvider
+  ) => {
     if (!web3 || !bridgeContract) return
-    const address = await getValidatorAddress(bridgeContract)
+    const address = await getValidatorAddress(bridgeContract, snapshotProvider)
     const contract = new web3.eth.Contract(BRIDGE_VALIDATORS_ABI, address)
     setValidatorContract(contract)
   }
@@ -45,9 +51,10 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
     () => {
       const web3 = fromHome ? home.web3 : foreign.web3
       const bridgeContract = fromHome ? home.bridgeContract : foreign.bridgeContract
+      const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
 
       if (!web3 || !bridgeContract) return
-      callValidatorContract(bridgeContract, web3, setValidatorContract)
+      callValidatorContract(bridgeContract, web3, setValidatorContract, snapshotProvider)
     },
     [home.web3, foreign.web3, home.bridgeContract, foreign.bridgeContract, fromHome]
   )

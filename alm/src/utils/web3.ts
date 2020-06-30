@@ -64,7 +64,7 @@ export const getBlock = async (web3: Web3, blockNumber: number): Promise<BlockTr
   })
 
 export const getChainId = async (web3: Web3, snapshotProvider: SnapshotProvider) => {
-  let id = snapshotProvider.getChainId()
+  let id = snapshotProvider.chainId()
   if (id === 0) {
     id = await web3.eth.getChainId()
   }
