@@ -41,11 +41,23 @@ export const getValidatorAddress = async (contract: Contract, snapshotProvider: 
   return validatorAddress
 }
 
-export const getRequiredSignatures = async (contract: Contract, blockNumber: number) => {
-  const events = await contract.getPastEvents('RequiredSignaturesChanged', {
-    fromBlock: 0,
-    toBlock: blockNumber
-  })
+export const getRequiredSignatures = async (
+  contract: Contract,
+  blockNumber: number,
+  snapshotProvider: SnapshotProvider
+) => {
+  const eventsFromSnapshot = snapshotProvider.requiredSignaturesEvents(blockNumber)
+  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
+
+  let contractEvents: EventData[] = []
+  if (blockNumber > snapshotBlockNumber) {
+    contractEvents = await contract.getPastEvents('RequiredSignaturesChanged', {
+      fromBlock: snapshotBlockNumber + 1,
+      toBlock: blockNumber
+    })
+  }
+
+  const events = [...eventsFromSnapshot, ...contractEvents]
 
   // Use the value form last event before the transaction
   const event = events[events.length - 1]

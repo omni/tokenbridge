@@ -51,6 +51,10 @@ export class SnapshotProvider {
   requiredBlockConfirmationEvents(toBlock: number) {
     return this.data.RequiredBlockConfirmationChanged.filter(e => e.blockNumber < toBlock)
   }
+
+  requiredSignaturesEvents(toBlock: number) {
+    return this.data.RequiredSignaturesChanged.filter(e => e.blockNumber < toBlock)
+  }
 }
 
 export const homeSnapshotProvider = new SnapshotProvider('home')
