@@ -4,7 +4,8 @@ const initialValue = {
   validatorAddress: '',
   RequiredSignaturesChanged: [],
   ValidatorAdded: [],
-  ValidatorRemoved: []
+  ValidatorRemoved: [],
+  snapshotBlockNumber: 0
 }
 
 export interface SnapshotEvent {
@@ -19,6 +20,7 @@ export interface Snapshot {
   RequiredSignaturesChanged: SnapshotEvent[]
   ValidatorAdded: SnapshotEvent[]
   ValidatorRemoved: SnapshotEvent[]
+  snapshotBlockNumber: number
 }
 
 export class SnapshotProvider {
@@ -40,6 +42,14 @@ export class SnapshotProvider {
 
   validatorAddress() {
     return this.data.validatorAddress
+  }
+
+  snapshotBlockNumber() {
+    return this.data.snapshotBlockNumber
+  }
+
+  requiredBlockConfirmationEvents(toBlock: number) {
+    return this.data.RequiredBlockConfirmationChanged.filter(e => e.blockNumber < toBlock)
   }
 }
 

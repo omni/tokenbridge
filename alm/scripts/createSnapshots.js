@@ -21,6 +21,7 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   const web3 = new Web3(new Web3.providers.HttpProvider(url))
 
   const currentBlockNumber = await web3.eth.getBlockNumber()
+  snapshot.snapshotBlockNumber = currentBlockNumber
 
   // Save chainId
   snapshot.chainId = await web3.eth.getChainId()

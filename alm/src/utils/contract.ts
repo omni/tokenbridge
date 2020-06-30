@@ -1,11 +1,24 @@
 import { Contract } from 'web3-eth-contract'
+import { EventData } from 'web3-eth-contract'
 import { SnapshotProvider } from '../services/SnapshotProvider'
 
-export const getRequiredBlockConfirmations = async (contract: Contract, blockNumber: number) => {
-  const events = await contract.getPastEvents('RequiredBlockConfirmationChanged', {
-    fromBlock: 0,
-    toBlock: blockNumber
-  })
+export const getRequiredBlockConfirmations = async (
+  contract: Contract,
+  blockNumber: number,
+  snapshotProvider: SnapshotProvider
+) => {
+  const eventsFromSnapshot = snapshotProvider.requiredBlockConfirmationEvents(blockNumber)
+  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
+
+  let contractEvents: EventData[] = []
+  if (blockNumber > snapshotBlockNumber) {
+    contractEvents = await contract.getPastEvents('RequiredBlockConfirmationChanged', {
+      fromBlock: snapshotBlockNumber + 1,
+      toBlock: blockNumber
+    })
+  }
+
+  const events = [...eventsFromSnapshot, ...contractEvents]
 
   let blockConfirmations
   if (events.length > 0) {
