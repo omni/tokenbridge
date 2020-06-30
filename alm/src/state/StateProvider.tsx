@@ -11,6 +11,7 @@ import {
 import Web3 from 'web3'
 import { useBridgeContracts } from '../hooks/useBridgeContracts'
 import { Contract } from 'web3-eth-contract'
+import { foreignSnapshotProvider, homeSnapshotProvider } from '../services/SnapshotProvider'
 
 export interface BaseNetworkParams {
   chainId: number
@@ -47,8 +48,8 @@ const initialState = {
 const StateContext = createContext<StateContext>(initialState)
 
 export const StateProvider = ({ children }: { children: ReactNode }) => {
-  const homeNetwork = useNetwork(HOME_RPC_URL)
-  const foreignNetwork = useNetwork(FOREIGN_RPC_URL)
+  const homeNetwork = useNetwork(HOME_RPC_URL, homeSnapshotProvider)
+  const foreignNetwork = useNetwork(FOREIGN_RPC_URL, foreignSnapshotProvider)
   const { homeBridge, foreignBridge } = useBridgeContracts({
     homeWeb3: homeNetwork.web3,
     foreignWeb3: foreignNetwork.web3
