@@ -1,7 +1,21 @@
 import { Contract } from 'web3-eth-contract'
 
-export const getRequiredBlockConfirmations = async (contract: Contract) => {
-  const blockConfirmations = await contract.methods.requiredBlockConfirmations().call()
+export const getRequiredBlockConfirmations = async (contract: Contract, blockNumber: number) => {
+  const events = await contract.getPastEvents('RequiredBlockConfirmationChanged', {
+    fromBlock: 0,
+    toBlock: blockNumber
+  })
+
+  let blockConfirmations
+  if (events.length > 0) {
+    // Use the value from last event before the transaction
+    const event = events[events.length - 1]
+    blockConfirmations = event.returnValues.requiredBlockConfirmations
+  } else {
+    // This is a special case where RequiredBlockConfirmationChanged was not emitted during initialization in early versions of AMB
+    // of Sokol - Kovan. In this case the current value is used.
+    blockConfirmations = await contract.methods.requiredBlockConfirmations().call()
+  }
   return parseInt(blockConfirmations)
 }
 
