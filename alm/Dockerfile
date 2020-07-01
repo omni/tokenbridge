@@ -26,4 +26,4 @@ FROM node:12 as alm-production
 RUN yarn global add serve
 WORKDIR /app
 COPY --from=alm-builder /mono/alm/build .
-CMD echo "To start the application run: serve -p 8080 -s ."
+CMD serve -p $PORT -s .
