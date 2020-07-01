@@ -52,27 +52,5 @@ export default [
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function'
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        name: '',
-        type: 'address'
-      },
-      {
-        indexed: true,
-        name: '',
-        type: 'address'
-      },
-      {
-        indexed: false,
-        name: '',
-        type: 'uint256'
-      }
-    ],
-    name: 'Transfer',
-    type: 'event'
   }
 ]

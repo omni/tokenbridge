@@ -1,5 +1,5 @@
 import { ERC20Asset } from '@burner-wallet/assets'
-import { MEDIATOR_ABI } from '../../utils'
+import { MEDIATOR_ABI, constants } from '../../utils'
 import { toBN } from 'web3-utils'
 
 interface BridgeableERC20Constructor {
@@ -37,10 +37,13 @@ export default class BridgeableERC20Asset extends ERC20Asset {
       const receipt = await this.getBridgeContract()
         .methods.relayTokens(from, value)
         .send({ from })
+      const transferLog = Object.values(receipt.events as object).find(
+        e => e.raw.topics[0] === constants.TRANSFER_TOPIC
+      )
       return {
         ...receipt,
         txHash: receipt.transactionHash,
-        id: `${receipt.transactionHash}-${receipt.events.Transfer.logIndex}`
+        id: `${receipt.transactionHash}-${transferLog.logIndex}`
       }
     }
     return super._send({ from, to, value })
