@@ -7,7 +7,11 @@ export const constants = {
   EXCHANGE_TIMEOUT: 300000,
   MAX_FEE: toWei('1', 'ether'),
   ESTIMATE_FEE_MESSAGE: 'Estimation takes fee charges into consideration.',
-  ZERO_ADDRESS: '0x0000000000000000000000000000000000000000'
+  ZERO_ADDRESS: '0x0000000000000000000000000000000000000000',
+  TRANSFER_TOPIC: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+  // fee types are taken from contracts/upgradeable_contracts/amb_erc20_to_native/HomeFeeManagerAMBErc20ToNative.sol
+  HOME_TO_FOREIGN_FEE_TYPE: '0x741ede137d0537e88e0ea0ff25b1f22d837903dbbee8980b4a06e8523247ee26',
+  FOREIGN_TO_HOME_FEE_TYPE: '0x03be2b2875cb41e0e77355e802a16769bb8dfcf825061cde185c73bf94f12625'
 }
 
 export const waitForEvent = async (web3, contract: Contract, event: string, callback: Function) => {
