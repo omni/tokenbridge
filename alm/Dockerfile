@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:12 as alm-builder
 
 WORKDIR /mono
 COPY package.json .
@@ -19,5 +19,11 @@ ARG DOT_ENV_PATH=./alm/.env
 COPY ${DOT_ENV_PATH} ./alm/.env
 
 WORKDIR /mono/alm
-CMD echo "To start the application run:" \
-  "yarn start"
+RUN yarn run build
+
+
+FROM node:12 as alm-production
+RUN yarn global add serve
+WORKDIR /app
+COPY --from=alm-builder /mono/alm/build .
+CMD echo "To start the application run: serve -p 8080 -s ."
