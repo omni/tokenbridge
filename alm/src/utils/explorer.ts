@@ -70,7 +70,7 @@ export const fetchAccountTransactionsFromBlockscout = async ({
 }
 
 export const getBlockByTimestampUrl = (api: string, timestamp: number) =>
-  `${api}?module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before`
+  `${api}&module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before`
 
 export const fetchAccountTransactionsFromEtherscan = async ({
   account,
@@ -101,7 +101,7 @@ export const fetchAccountTransactionsFromEtherscan = async ({
     return []
   }
 
-  const url = `${api}?module=account&action=txlist&address=${account}&startblock=${fromBlock}&endblock=${toBlock}`
+  const url = `${api}&module=account&action=txlist&address=${account}&startblock=${fromBlock}&endblock=${toBlock}`
 
   try {
     const result = await fetch(url).then(res => res.json())
