@@ -65,19 +65,26 @@ export const getRequiredSignatures = async (
   return parseInt(requiredSignatures)
 }
 
-export const getValidatorList = async (contract: Contract, blockNumber: number) => {
-  let currentList: string[] = await contract.methods.validatorList().call()
-  const [added, removed] = await Promise.all([
+export const getValidatorList = async (contract: Contract, blockNumber: number, snapshotProvider: SnapshotProvider) => {
+  const addedEventsFromSnapshot = snapshotProvider.validatorAddedEvents(blockNumber)
+  const removedEventsFromSnapshot = snapshotProvider.validatorRemovedEvents(blockNumber)
+  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
+
+  const fromBlock = snapshotBlockNumber > blockNumber ? snapshotBlockNumber + 1 : blockNumber
+  const [currentList, added, removed] = await Promise.all([
+    contract.methods.validatorList().call(),
     contract.getPastEvents('ValidatorAdded', {
-      fromBlock: blockNumber
+      fromBlock
     }),
     contract.getPastEvents('ValidatorRemoved', {
-      fromBlock: blockNumber
+      fromBlock
     })
   ])
 
   // Ordered desc
-  const orderedEvents = [...added, ...removed].sort(({ blockNumber: prev }, { blockNumber: next }) => next - prev)
+  const orderedEvents = [...addedEventsFromSnapshot, ...added, ...removedEventsFromSnapshot, ...removed].sort(
+    ({ blockNumber: prev }, { blockNumber: next }) => next - prev
+  )
 
   // Stored as a Set to avoid duplicates
   const validatorList = new Set(currentList)

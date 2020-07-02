@@ -83,7 +83,8 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
     blockNumber: e.blockNumber,
     returnValues: {
       validator: e.returnValues.validator
-    }
+    },
+    event: 'ValidatorAdded'
   }))
 
   // Save ValidatorRemoved events
@@ -96,7 +97,8 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
     blockNumber: e.blockNumber,
     returnValues: {
       validator: e.returnValues.validator
-    }
+    },
+    event: 'ValidatorRemoved'
   }))
 
   // Write snapshot
