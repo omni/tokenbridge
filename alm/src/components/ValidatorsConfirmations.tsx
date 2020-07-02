@@ -7,10 +7,7 @@ import styled from 'styled-components'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
-
-const Thead = styled.thead`
-  border-bottom: 2px solid #9e9e9e;
-`
+import { Thead, AgeTd, StatusTd } from './commons/Table'
 
 const RequiredConfirmations = styled.label`
   font-size: 14px;
@@ -70,14 +67,14 @@ export const ValidatorsConfirmations = ({
             return (
               <tr key={i}>
                 <td>{windowWidth < 850 ? formatTxHash(validator) : validator}</td>
-                <td className="text-center">{getValidatorStatusElement(displayedStatus)}</td>
-                <td className="text-center">
+                <StatusTd className="text-center">{getValidatorStatusElement(displayedStatus)}</StatusTd>
+                <AgeTd className="text-center">
                   <ExplorerTxLink href={explorerLink} target="_blank">
                     {confirmation && confirmation.timestamp > 0
                       ? formatTimestamp(confirmation.timestamp)
                       : elementIfNoTimestamp}
                   </ExplorerTxLink>
-                </td>
+                </AgeTd>
               </tr>
             )
           })}
