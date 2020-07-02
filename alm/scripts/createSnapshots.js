@@ -115,6 +115,7 @@ const main = async () => {
 main()
   .then(() => process.exit(0))
   .catch(error => {
+    console.log('Error while creating snapshots')
     console.error(error)
-    process.exit(1)
+    process.exit(0)
   })
