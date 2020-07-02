@@ -5,8 +5,10 @@ services:
     build:
       context: ..
       dockerfile: alm/Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
     env_file: ./.env
     environment: 
       - NODE_ENV=production
     restart: unless-stopped
-    entrypoint: yarn start
+    entrypoint: serve -p ${PORT} -s .

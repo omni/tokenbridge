@@ -3,3 +3,4 @@ export { default as FOREIGN_NATIVE_TO_ERC_ABI } from './abis/ForeignBridgeNative
 export { default as HOME_NATIVE_TO_ERC_ABI } from './abis/HomeBridgeNativeToErc'
 export { default as MEDIATOR_ABI } from './abis/Mediator'
 export { default as MEDIATOR_FEE_MANAGER_ABI } from './abis/MediatorFeeManager'
+export { default as MEDIATOR_ERC_TO_NATIVE_ABI } from './abis/MediatorErcToNative'
