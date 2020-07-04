@@ -6,7 +6,7 @@ require('dotenv').config({
 })
 const { sendRawTxHome, sendRawTxForeign, privateKeyToAddress } = require(`${contractsPath}/deploy/src/deploymentUtils`)
 const { web3Home, web3Foreign, deploymentPrivateKey } = require(`${contractsPath}/deploy/src/web3`)
-const BlockReward = require(`${contractsPath}/build/contracts/BlockReward.json`)
+const BlockReward = require(`${contractsPath}/build/contracts/BlockRewardMock.json`)
 const ERC677BridgeTokenRewardable = require(`${contractsPath}/build/contracts/ERC677BridgeTokenRewardable.json`)
 const ERC677MultiBridgeToken = require(`${contractsPath}/build/contracts/ERC677MultiBridgeToken.json`)
 
