@@ -1,10 +1,24 @@
 import { Contract } from 'web3-eth-contract'
+import { EventData } from 'web3-eth-contract'
+import { SnapshotProvider } from '../services/SnapshotProvider'
 
-export const getRequiredBlockConfirmations = async (contract: Contract, blockNumber: number) => {
-  const events = await contract.getPastEvents('RequiredBlockConfirmationChanged', {
-    fromBlock: 0,
-    toBlock: blockNumber
-  })
+export const getRequiredBlockConfirmations = async (
+  contract: Contract,
+  blockNumber: number,
+  snapshotProvider: SnapshotProvider
+) => {
+  const eventsFromSnapshot = snapshotProvider.requiredBlockConfirmationEvents(blockNumber)
+  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
+
+  let contractEvents: EventData[] = []
+  if (blockNumber > snapshotBlockNumber) {
+    contractEvents = await contract.getPastEvents('RequiredBlockConfirmationChanged', {
+      fromBlock: snapshotBlockNumber + 1,
+      toBlock: blockNumber
+    })
+  }
+
+  const events = [...eventsFromSnapshot, ...contractEvents]
 
   let blockConfirmations
   if (events.length > 0) {
@@ -21,11 +35,23 @@ export const getRequiredBlockConfirmations = async (contract: Contract, blockNum
 
 export const getValidatorAddress = (contract: Contract) => contract.methods.validatorContract().call()
 
-export const getRequiredSignatures = async (contract: Contract, blockNumber: number) => {
-  const events = await contract.getPastEvents('RequiredSignaturesChanged', {
-    fromBlock: 0,
-    toBlock: blockNumber
-  })
+export const getRequiredSignatures = async (
+  contract: Contract,
+  blockNumber: number,
+  snapshotProvider: SnapshotProvider
+) => {
+  const eventsFromSnapshot = snapshotProvider.requiredSignaturesEvents(blockNumber)
+  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
+
+  let contractEvents: EventData[] = []
+  if (blockNumber > snapshotBlockNumber) {
+    contractEvents = await contract.getPastEvents('RequiredSignaturesChanged', {
+      fromBlock: snapshotBlockNumber + 1,
+      toBlock: blockNumber
+    })
+  }
+
+  const events = [...eventsFromSnapshot, ...contractEvents]
 
   // Use the value form last event before the transaction
   const event = events[events.length - 1]
@@ -33,19 +59,26 @@ export const getRequiredSignatures = async (contract: Contract, blockNumber: num
   return parseInt(requiredSignatures)
 }
 
-export const getValidatorList = async (contract: Contract, blockNumber: number) => {
-  let currentList: string[] = await contract.methods.validatorList().call()
-  const [added, removed] = await Promise.all([
+export const getValidatorList = async (contract: Contract, blockNumber: number, snapshotProvider: SnapshotProvider) => {
+  const addedEventsFromSnapshot = snapshotProvider.validatorAddedEvents(blockNumber)
+  const removedEventsFromSnapshot = snapshotProvider.validatorRemovedEvents(blockNumber)
+  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
+
+  const fromBlock = snapshotBlockNumber > blockNumber ? snapshotBlockNumber + 1 : blockNumber
+  const [currentList, added, removed] = await Promise.all([
+    contract.methods.validatorList().call(),
     contract.getPastEvents('ValidatorAdded', {
-      fromBlock: blockNumber
+      fromBlock
     }),
     contract.getPastEvents('ValidatorRemoved', {
-      fromBlock: blockNumber
+      fromBlock
     })
   ])
 
   // Ordered desc
-  const orderedEvents = [...added, ...removed].sort(({ blockNumber: prev }, { blockNumber: next }) => next - prev)
+  const orderedEvents = [...addedEventsFromSnapshot, ...added, ...removedEventsFromSnapshot, ...removed].sort(
+    ({ blockNumber: prev }, { blockNumber: next }) => next - prev
+  )
 
   // Stored as a Set to avoid duplicates
   const validatorList = new Set(currentList)

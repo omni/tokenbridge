@@ -5,6 +5,7 @@ import { getRequiredSignatures, getValidatorAddress, getValidatorList } from '..
 import { BRIDGE_VALIDATORS_ABI } from '../abis'
 import { useStateProvider } from '../state/StateProvider'
 import { TransactionReceipt } from 'web3-eth'
+import { foreignSnapshotProvider, homeSnapshotProvider, SnapshotProvider } from '../services/SnapshotProvider'
 
 export interface useValidatorContractParams {
   fromHome: boolean
@@ -28,16 +29,22 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
   const callRequiredSignatures = async (
     contract: Maybe<Contract>,
     receipt: TransactionReceipt,
-    setResult: Function
+    setResult: Function,
+    snapshotProvider: SnapshotProvider
   ) => {
     if (!contract) return
-    const result = await getRequiredSignatures(contract, receipt.blockNumber)
+    const result = await getRequiredSignatures(contract, receipt.blockNumber, snapshotProvider)
     setResult(result)
   }
 
-  const callValidatorList = async (contract: Maybe<Contract>, receipt: TransactionReceipt, setResult: Function) => {
+  const callValidatorList = async (
+    contract: Maybe<Contract>,
+    receipt: TransactionReceipt,
+    setResult: Function,
+    snapshotProvider: SnapshotProvider
+  ) => {
     if (!contract) return
-    const result = await getValidatorList(contract, receipt.blockNumber)
+    const result = await getValidatorList(contract, receipt.blockNumber, snapshotProvider)
     setResult(result)
   }
 
@@ -55,10 +62,11 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
   useEffect(
     () => {
       if (!receipt) return
-      callRequiredSignatures(validatorContract, receipt, setRequiredSignatures)
-      callValidatorList(validatorContract, receipt, setValidatorList)
+      const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
+      callRequiredSignatures(validatorContract, receipt, setRequiredSignatures, snapshotProvider)
+      callValidatorList(validatorContract, receipt, setValidatorList, snapshotProvider)
     },
-    [validatorContract, receipt]
+    [validatorContract, receipt, fromHome]
   )
 
   return {

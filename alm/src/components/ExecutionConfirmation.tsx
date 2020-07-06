@@ -7,10 +7,7 @@ import styled from 'styled-components'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
 import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
-
-const Thead = styled.thead`
-  border-bottom: 2px solid #9e9e9e;
-`
+import { Thead, AgeTd, StatusTd } from './commons/Table'
 
 const StyledExecutionConfirmation = styled.div`
   margin-top: 30px;
@@ -55,12 +52,12 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
         <tbody>
           <tr>
             <td>{formattedValidator ? formattedValidator : <SimpleLoading />}</td>
-            <td className="text-center">{getExecutionStatusElement(executionData.status)}</td>
-            <td className="text-center">
+            <StatusTd className="text-center">{getExecutionStatusElement(executionData.status)}</StatusTd>
+            <AgeTd className="text-center">
               <ExplorerTxLink href={txExplorerLink} target="_blank">
                 {executionData.timestamp > 0 ? formatTimestamp(executionData.timestamp) : ''}
               </ExplorerTxLink>
-            </td>
+            </AgeTd>
           </tr>
         </tbody>
       </table>

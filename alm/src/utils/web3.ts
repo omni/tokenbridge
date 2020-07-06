@@ -5,6 +5,7 @@ import { AbiItem } from 'web3-utils'
 import memoize from 'fast-memoize'
 import promiseRetry from 'promise-retry'
 import { HOME_AMB_ABI, FOREIGN_AMB_ABI } from '../abis'
+import { SnapshotProvider } from '../services/SnapshotProvider'
 
 export interface MessageObject {
   id: string
@@ -61,3 +62,11 @@ export const getBlock = async (web3: Web3, blockNumber: number): Promise<BlockTr
     }
     return result
   })
+
+export const getChainId = async (web3: Web3, snapshotProvider: SnapshotProvider) => {
+  let id = snapshotProvider.chainId()
+  if (id === 0) {
+    id = await web3.eth.getChainId()
+  }
+  return id
+}
