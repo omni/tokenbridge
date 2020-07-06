@@ -1,7 +1,6 @@
 const initialValue = {
   chainId: 0,
   RequiredBlockConfirmationChanged: [],
-  validatorAddress: '',
   RequiredSignaturesChanged: [],
   ValidatorAdded: [],
   ValidatorRemoved: [],
@@ -22,7 +21,6 @@ export interface SnapshotValidatorEvent {
 export interface Snapshot {
   chainId: number
   RequiredBlockConfirmationChanged: SnapshotEvent[]
-  validatorAddress: string
   RequiredSignaturesChanged: SnapshotEvent[]
   ValidatorAdded: SnapshotValidatorEvent[]
   ValidatorRemoved: SnapshotValidatorEvent[]
@@ -44,10 +42,6 @@ export class SnapshotProvider {
 
   chainId() {
     return this.data.chainId
-  }
-
-  validatorAddress() {
-    return this.data.validatorAddress
   }
 
   snapshotBlockNumber() {

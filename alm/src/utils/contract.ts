@@ -33,13 +33,7 @@ export const getRequiredBlockConfirmations = async (
   return parseInt(blockConfirmations)
 }
 
-export const getValidatorAddress = async (contract: Contract, snapshotProvider: SnapshotProvider) => {
-  let validatorAddress = snapshotProvider.validatorAddress()
-  if (validatorAddress === '') {
-    validatorAddress = await contract.methods.validatorContract().call()
-  }
-  return validatorAddress
-}
+export const getValidatorAddress = (contract: Contract) => contract.methods.validatorContract().call()
 
 export const getRequiredSignatures = async (
   contract: Contract,

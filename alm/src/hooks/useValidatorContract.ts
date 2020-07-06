@@ -19,14 +19,9 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
 
   const { home, foreign } = useStateProvider()
 
-  const callValidatorContract = async (
-    bridgeContract: Maybe<Contract>,
-    web3: Web3,
-    setValidatorContract: Function,
-    snapshotProvider: SnapshotProvider
-  ) => {
+  const callValidatorContract = async (bridgeContract: Maybe<Contract>, web3: Web3, setValidatorContract: Function) => {
     if (!web3 || !bridgeContract) return
-    const address = await getValidatorAddress(bridgeContract, snapshotProvider)
+    const address = await getValidatorAddress(bridgeContract)
     const contract = new web3.eth.Contract(BRIDGE_VALIDATORS_ABI, address)
     setValidatorContract(contract)
   }
@@ -57,10 +52,9 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
     () => {
       const web3 = fromHome ? home.web3 : foreign.web3
       const bridgeContract = fromHome ? home.bridgeContract : foreign.bridgeContract
-      const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
 
       if (!web3 || !bridgeContract) return
-      callValidatorContract(bridgeContract, web3, setValidatorContract, snapshotProvider)
+      callValidatorContract(bridgeContract, web3, setValidatorContract)
     },
     [home.web3, foreign.web3, home.bridgeContract, foreign.bridgeContract, fromHome]
   )

@@ -55,10 +55,7 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
     }
   }))
 
-  // Save validatorAddress
   const validatorAddress = await bridgeContract.methods.validatorContract().call()
-  snapshot.validatorAddress = validatorAddress
-
   const validatorContract = new web3.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorAddress)
 
   // Save RequiredSignaturesChanged events
