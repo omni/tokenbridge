@@ -34,10 +34,22 @@ export const waitForEvent = async (web3, contract: Contract, event: string, call
   }
 }
 
-export const isBridgeContract = async (contract: Contract): Promise<boolean> => {
+export const isVanillaBridgeContract = async (contract: Contract): Promise<boolean> => {
   try {
     await contract.methods.deployedAtBlock().call()
     return true
+  } catch (e) {
+    return false
+  }
+}
+
+export const isBridgeContract = async (contract: Contract, allowedModes?: string[]): Promise<boolean> => {
+  try {
+    const mode = await contract.methods.getBridgeMode().call()
+    if (typeof allowedModes === 'undefined') {
+      return true
+    }
+    return allowedModes.includes(mode)
   } catch (e) {
     return false
   }
