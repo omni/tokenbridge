@@ -5,7 +5,6 @@ import { InjectedSigner, LocalSigner } from '@burner-wallet/core/signers'
 import { XDaiBridge } from '@burner-wallet/exchange'
 import { xdai } from '@burner-wallet/assets'
 import { InfuraGateway, InjectedGateway, XDaiGateway } from '@burner-wallet/core/gateways'
-import { dai } from '@burner-wallet/assets'
 import Exchange from '@burner-wallet/exchange'
 import ModernUI from '@burner-wallet/modern-ui'
 import {
@@ -30,7 +29,7 @@ const core = new BurnerCore({
     new InfuraGateway(process.env.REACT_APP_INFURA_KEY),
     new TokenBridgeGateway()
   ],
-  assets: [xdai, Wetc, dai, Etc, Dai, qDai, MOON, xMOON]
+  assets: [xdai, Wetc, Etc, Dai, qDai, MOON, xMOON]
 })
 
 const exchange = new Exchange([new XDaiBridge(), new WETCBridge(), new QDAIBridge(), new MOONBridge()])
