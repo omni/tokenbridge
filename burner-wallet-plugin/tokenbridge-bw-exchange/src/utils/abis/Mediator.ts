@@ -34,5 +34,23 @@ export default [
     payable: false,
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '',
+        type: 'address'
+      },
+      {
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    name: 'relayTokens',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function'
   }
 ]

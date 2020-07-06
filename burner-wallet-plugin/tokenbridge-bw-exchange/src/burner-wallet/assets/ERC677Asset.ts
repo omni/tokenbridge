@@ -1,7 +1,6 @@
 import { ERC20Asset } from '@burner-wallet/assets'
-import { ERC677_ABI } from '../../utils'
+import { ERC677_ABI, constants } from '../../utils'
 
-const TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 const BLOCK_LOOKBACK = 250
 
 interface ERC677Constructor {
@@ -45,7 +44,7 @@ export default class ERC677Asset extends ERC20Asset {
       const allTransferEvents = await this.getContract().getPastEvents('allEvents', {
         fromBlock: block,
         toBlock: currentBlock,
-        topics: [TRANSFER_TOPIC]
+        topics: [constants.TRANSFER_TOPIC]
       })
       // Manually filter `to` parameter because `filter` option does not work with allEvents
       const events = allTransferEvents.filter(e => e.returnValues.to.toLowerCase() === address.toLowerCase())
