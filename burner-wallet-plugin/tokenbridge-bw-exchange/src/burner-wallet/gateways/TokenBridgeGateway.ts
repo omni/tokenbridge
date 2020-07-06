@@ -9,7 +9,8 @@ export default class TokenBridgeGateway extends Gateway {
     this.providerStrings = {
       '61': `https://www.ethercluster.com/etc`,
       '77': 'https://sokol.poa.network',
-      '99': 'https://core.poa.network'
+      '99': 'https://core.poa.network',
+      '181': 'http://quorum.tokenbridge.net:8545/'
     }
     this.providers = {}
   }
@@ -19,7 +20,7 @@ export default class TokenBridgeGateway extends Gateway {
   }
 
   getNetworks() {
-    return ['61', '77', '99']
+    return ['61', '77', '99', '181']
   }
 
   _provider(network) {
