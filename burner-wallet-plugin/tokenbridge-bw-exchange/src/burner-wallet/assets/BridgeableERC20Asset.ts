@@ -1,13 +1,11 @@
 import { ERC20Asset } from '@burner-wallet/assets'
+import { AssetConstructor } from '@burner-wallet/assets/Asset'
 import { MEDIATOR_ABI, constants } from '../../utils'
 import { toBN } from 'web3-utils'
 
-interface BridgeableERC20Constructor {
+interface BridgeableERC20Constructor extends AssetConstructor {
   abi?: object
   address: string
-  id: string
-  name: string
-  network: string
   bridgeAddress: string
 }
 

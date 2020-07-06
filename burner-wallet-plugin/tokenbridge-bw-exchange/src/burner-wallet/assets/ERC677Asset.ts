@@ -1,14 +1,12 @@
 import { ERC20Asset } from '@burner-wallet/assets'
+import { AssetConstructor } from '@burner-wallet/assets/Asset'
 import { ERC677_ABI, constants } from '../../utils'
 
 const BLOCK_LOOKBACK = 250
 
-interface ERC677Constructor {
+interface ERC677Constructor extends AssetConstructor {
   abi?: object
   address: string
-  id: string
-  name: string
-  network: string
 }
 
 export default class ERC677Asset extends ERC20Asset {
