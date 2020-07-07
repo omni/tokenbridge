@@ -10,7 +10,7 @@ export default class TokenBridgeGateway extends Gateway {
       '61': `https://www.ethercluster.com/etc`,
       '77': 'https://sokol.poa.network',
       '99': 'https://core.poa.network',
-      '181': 'http://quorum.tokenbridge.net:8545/'
+      '181': 'https://quorum-rpc.tokenbridge.net'
     }
     this.providers = {}
   }
