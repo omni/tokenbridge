@@ -6,7 +6,7 @@ import { toBN, soliditySha3 } from 'web3-utils'
 interface BridgeableERC20Constructor extends AssetConstructor {
   abi?: object
   address: string
-  bridgeModes?: string[]
+  bridgeModes: string[]
 }
 
 export default class BridgeableERC20Asset extends ERC20Asset {
@@ -22,7 +22,7 @@ export default class BridgeableERC20Asset extends ERC20Asset {
   }
 
   constructor({
-    bridgeModes = ['erc-to-native-core', 'erc-to-native-amd', 'erc-to-erc-core', 'erc-to-erc-amb'],
+    bridgeModes = ['erc-to-native-core', 'erc-to-native-amb', 'erc-to-erc-core', 'erc-to-erc-amb'],
     ...params
   }: BridgeableERC20Constructor) {
     super(params)
