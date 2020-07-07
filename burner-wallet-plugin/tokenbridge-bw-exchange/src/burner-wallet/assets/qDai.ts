@@ -5,5 +5,5 @@ export default new NativeMediatorAsset({
   name: 'qDai',
   network: '181',
   usdPrice: 1,
-  mediatorAddress: '0xD4075FB57fCf038bFc702c915Ef9592534bED5c1'
+  mediatorAddress: '0xFEaB457D95D9990b7eb6c943c839258245541754'
 })
