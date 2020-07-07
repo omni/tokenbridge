@@ -1,6 +1,6 @@
 import { Mediator } from '../burner-wallet'
 import { HOME_NATIVE_TO_ERC_ABI, FOREIGN_NATIVE_TO_ERC_ABI } from '../utils'
-import { waitForEvent, isBridgeContract, constants } from '../utils'
+import { waitForEvent, isVanillaBridgeContract, constants } from '../utils'
 import { ValueTypes } from '@burner-wallet/exchange'
 import { toBN, fromWei } from 'web3-utils'
 
@@ -19,7 +19,7 @@ export default class WETCBridge extends Mediator {
       .getAsset(this.assetA)
       .getWeb3()
     const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.assetABridge)
-    const listenToBridgeEvent = await isBridgeContract(contract)
+    const listenToBridgeEvent = await isVanillaBridgeContract(contract)
     if (listenToBridgeEvent) {
       await waitForEvent(web3, contract, 'AffirmationCompleted', this.processBridgeEvents(sendResult.txHash))
     } else {
@@ -32,7 +32,7 @@ export default class WETCBridge extends Mediator {
       .getAsset(this.assetB)
       .getWeb3()
     const contract = new web3.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, this.assetBBridge)
-    const listenToBridgeEvent = await isBridgeContract(contract)
+    const listenToBridgeEvent = await isVanillaBridgeContract(contract)
     if (listenToBridgeEvent) {
       await waitForEvent(web3, contract, 'RelayedMessage', this.processBridgeEvents(sendResult.txHash))
     } else {
@@ -53,7 +53,7 @@ export default class WETCBridge extends Mediator {
       .getWeb3()
     const contract = new web3.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, this.assetBBridge)
 
-    const useBridgeContract = await isBridgeContract(contract)
+    const useBridgeContract = await isVanillaBridgeContract(contract)
 
     if (useBridgeContract) {
       const fee = toBN(await contract.methods.getHomeFee().call())
@@ -79,7 +79,7 @@ export default class WETCBridge extends Mediator {
       .getWeb3()
     const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.assetABridge)
 
-    const useBridgeContract = await isBridgeContract(contract)
+    const useBridgeContract = await isVanillaBridgeContract(contract)
 
     if (useBridgeContract) {
       const fee = toBN(await contract.methods.getForeignFee().call())

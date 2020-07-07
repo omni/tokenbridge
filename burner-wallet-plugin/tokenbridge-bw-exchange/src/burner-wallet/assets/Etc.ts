@@ -1,5 +1,5 @@
 import NativeMediatorAsset from './NativeMediatorAsset'
-import { isBridgeContract, HOME_NATIVE_TO_ERC_ABI } from '../../utils'
+import { isVanillaBridgeContract, HOME_NATIVE_TO_ERC_ABI } from '../../utils'
 
 class EtcNativeAsset extends NativeMediatorAsset {
   constructor(props) {
@@ -9,7 +9,7 @@ class EtcNativeAsset extends NativeMediatorAsset {
   async scanMediatorEvents(address, fromBlock, toBlock) {
     const web3 = this.getWeb3()
     const contract = new web3.eth.Contract(HOME_NATIVE_TO_ERC_ABI, this.mediatorAddress)
-    const listenToBridgeEvent = await isBridgeContract(contract)
+    const listenToBridgeEvent = await isVanillaBridgeContract(contract)
     if (listenToBridgeEvent && this.mediatorAddress != '') {
       const events = await contract.getPastEvents('AffirmationCompleted', {
         fromBlock,

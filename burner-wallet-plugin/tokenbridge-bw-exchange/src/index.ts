@@ -5,8 +5,12 @@ export {
   sPOA,
   Etc,
   Wetc,
+  qDai,
+  Dai,
+  MOON,
+  xMOON,
   TokenBridgeGateway,
   Mediator,
   MediatorErcToNative
 } from './burner-wallet'
-export { WETCBridge } from './wetc-bridge'
+export { WETCBridge, QDAIBridge, MOONBridge } from './bridges'
