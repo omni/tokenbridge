@@ -1,7 +1,11 @@
-const _ = require('lodash')
 const promiseRetry = require('promise-retry')
 const tryEach = require('../utils/tryEach')
 const { RETRY_CONFIG } = require('../utils/constants')
+
+// Promise.all rejects on the first rejected Promise or fulfills with the list of results
+// inverted Promise.all fulfills with the first obtained result or rejects with the list of errors
+const invert = p => new Promise((res, rej) => p.then(rej, res))
+const promiseAny = ps => invert(Promise.all(ps.map(invert)))
 
 function RpcUrlsManager(homeUrls, foreignUrls) {
   if (!homeUrls) {
@@ -15,19 +19,22 @@ function RpcUrlsManager(homeUrls, foreignUrls) {
   this.foreignUrls = foreignUrls.split(',')
 }
 
-RpcUrlsManager.prototype.tryEach = async function(chain, f) {
+RpcUrlsManager.prototype.tryEach = async function(chain, f, redundant = false) {
   if (chain !== 'home' && chain !== 'foreign') {
     throw new Error(`Invalid argument chain: '${chain}'`)
   }
 
-  // save homeUrls to avoid race condition
-  const urls = chain === 'home' ? _.cloneDeep(this.homeUrls) : _.cloneDeep(this.foreignUrls)
+  // save urls to avoid race condition
+  const urls = chain === 'home' ? [...this.homeUrls] : [...this.foreignUrls]
 
-  const [result, index] = await promiseRetry(retry =>
-    tryEach(urls, f).catch(() => {
-      retry()
-    }, RETRY_CONFIG)
-  )
+  if (redundant) {
+    // result from first responded node will be returned immediately
+    // remaining nodes will continue to retry queries in separate promises
+    // promiseAny will throw only if all urls reached max retry number
+    return promiseAny(urls.map(url => promiseRetry(retry => f(url).catch(retry), RETRY_CONFIG)))
+  }
+
+  const [result, index] = await promiseRetry(retry => tryEach(urls, f).catch(retry), RETRY_CONFIG)
 
   if (index > 0) {
     // rotate urls

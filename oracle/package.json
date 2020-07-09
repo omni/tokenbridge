@@ -30,7 +30,6 @@
     "dotenv": "^5.0.1",
     "http-list-provider": "0.0.5",
     "ioredis": "^3.2.2",
-    "lodash": "^4.17.10",
     "node-fetch": "^2.1.2",
     "pino": "^4.17.3",
     "pino-pretty": "^2.0.1",
