@@ -3,13 +3,13 @@ cd $(dirname $0)
 set -e # exit when any command fails
 
 ./down.sh
-docker-compose build
+./build.sh $@
 docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
 
 startValidator () {
     # make sure that old image tags are not cached
-    docker-compose $1 build
+    docker-compose $1 build oracle oracle-erc20 oracle-erc20-native oracle-amb
 
     docker-compose $1 run -d --name $4 redis
     docker-compose $1 run -d --name $5 rabbit
