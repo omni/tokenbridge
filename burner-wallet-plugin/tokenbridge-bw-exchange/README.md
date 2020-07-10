@@ -24,7 +24,9 @@ yarn add @poanet/tokenbridge-bw-exchange
 
 #### WETCBridge example
 In this example, we use `TokenBridgeGateway` for connecting to the Ethereum Classic and `InfuraGateway` for connecting to the Ethereum Mainnet.
+
 `WETCBridge` operates with two assets: `WETC` (Ethereum Mainnet) and `ETC` (Ethereum Classic), they should be added in the assets list.
+
 ```javascript
 import BurnerCore from '@burner-wallet/core'
 import Exchange from '@burner-wallet/exchange'
@@ -45,9 +47,13 @@ const exchange = new Exchange({
 
 ### Using several exchanges simultaneously
 In this example, we use `TokenBridgeGateway` for connecting to the qDAI chain, `XDaiGatewai` for connecting to the xDAI chain and `InfuraGateway` for connecting to the Ethereum Mainnet and Rinkeby Network.
+
 `QDAIBridge` operates with two assets: `qDAI` (qDAI chain) and `DAI` (Ethereum Mainnet). Note that we use a custom DAI token from the `@poanet/tokenbridge-bw-exchange`, this is necessary for allowing bridge operations on this token.
+
 `MOONBridge` operates with two assets: `MOON` (Rinkeby network) and `xMOON` (xDAI chain).
+
 All four assets should be added to the assets list.
+
 ```javascript
 import BurnerCore from '@burner-wallet/core'
 import Exchange from '@burner-wallet/exchange'
