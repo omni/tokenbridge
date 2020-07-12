@@ -27,7 +27,7 @@ services:
     networks:
       - ultimate
   oracle:
-    image: ${DOCKER_USER}/tokenbridge-e2e/oracle:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -38,7 +38,7 @@ services:
     networks:
       - ultimate
   oracle-erc20:
-    image: ${DOCKER_USER}/tokenbridge-e2e/oracle:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -49,7 +49,7 @@ services:
     networks:
       - ultimate
   oracle-erc20-native:
-    image: ${DOCKER_USER}/tokenbridge-e2e/oracle:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -60,7 +60,7 @@ services:
     networks:
       - ultimate
   oracle-amb:
-    image: ${DOCKER_USER}/tokenbridge-e2e/oracle:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -71,7 +71,7 @@ services:
     networks:
       - ultimate
   ui:
-    image: ${DOCKER_USER}/tokenbridge-e2e/ui:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile
@@ -81,7 +81,7 @@ services:
     networks:
       - ultimate
   ui-erc20:
-    image: ${DOCKER_USER}/tokenbridge-e2e/ui:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile
@@ -91,7 +91,7 @@ services:
     networks:
       - ultimate
   ui-erc20-native:
-    image: ${DOCKER_USER}/tokenbridge-e2e/ui:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile
@@ -101,7 +101,7 @@ services:
     networks:
       - ultimate
   ui-amb-stake-erc20-erc20:
-    image: ${DOCKER_USER}/tokenbridge-e2e/ui:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile
@@ -111,7 +111,7 @@ services:
     networks:
       - ultimate
   monitor:
-    image: ${DOCKER_USER}/tokenbridge-e2e/monitor:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -122,7 +122,7 @@ services:
     networks:
       - ultimate
   monitor-erc20:
-    image: ${DOCKER_USER}/tokenbridge-e2e/monitor:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -133,7 +133,7 @@ services:
     networks:
       - ultimate
   monitor-erc20-native:
-    image: ${DOCKER_USER}/tokenbridge-e2e/monitor:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -144,7 +144,7 @@ services:
     networks:
       - ultimate
   monitor-amb:
-    image: ${DOCKER_USER}/tokenbridge-e2e/monitor:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -155,7 +155,7 @@ services:
     networks:
       - ultimate
   e2e:
-    image: ${DOCKER_USER}/tokenbridge-e2e/e2e:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-e2e:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: Dockerfile.e2e
@@ -170,7 +170,7 @@ services:
     networks:
       - ultimate
   molecule_runner:
-    image: ${DOCKER_USER}/tokenbridge-e2e/molecule_runner:${CIRCLE_BRANCH}
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-molecule_runner:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: deployment-e2e/Dockerfile

@@ -144,11 +144,11 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - run: docker login -u {{ .Environment.DOCKER_LOGIN }} -p {{ .Environment.DOCKER_PASSWORD }}
       - run:
           command: |
+            docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
             cd e2e-commons
-            docker-compose pull oracle monitor ui e2e molecule_runner
+            docker-compose pull --ignore-pull-failures oracle monitor ui e2e molecule_runner
             docker-compose build oracle monitor ui e2e molecule_runner
             docker-compose push oracle monitor ui e2e molecule_runner
   oracle-e2e:
