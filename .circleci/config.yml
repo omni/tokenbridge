@@ -144,7 +144,6 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - setup_remote_docker
       - run: docker login -u {{ .Environment.DOCKER_LOGIN }} -p {{ .Environment.DOCKER_PASSWORD }}
       - run:
           command: |
