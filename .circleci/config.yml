@@ -77,10 +77,9 @@ orbs:
       docker-node:
         docker:
           - image: circleci/node:10.15
-      machine-with-docker-caching:
+      machine-without-dlc:
         machine:
           image: circleci/classic:latest
-          docker_layer_caching: true
 
 jobs:
   initialize:
@@ -140,16 +139,28 @@ jobs:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run test
+  build-e2e-images:
+    executor: tokenbridge-orb/machine-without-dlc
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - setup_remote_docker
+      - run: docker login -u {{ .Environment.DOCKER_LOGIN }} -p {{ .Environment.DOCKER_PASSWORD }}
+      - run:
+          command: |
+            cd e2e-commons
+            docker-compose pull oracle monitor ui e2e molecule_runner
+            docker-compose build oracle monitor ui e2e molecule_runner
+            docker-compose push oracle monitor ui e2e molecule_runner
   oracle-e2e:
     executor: tokenbridge-orb/docker-node
     steps:
       - checkout
       - run: git submodule update --init
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - run: yarn run oracle-e2e
   ui-e2e:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
       - checkout
       - tokenbridge-orb/install-node
@@ -159,7 +170,7 @@ jobs:
       - tokenbridge-orb/yarn-install-cached-on-machine
       - run: yarn run ui-e2e
   monitor-e2e:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
       - checkout
       - run: git submodule update --init
@@ -172,7 +183,7 @@ jobs:
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
   deployment-oracle:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
       - checkout
       - run: git submodule update --init
@@ -181,7 +192,7 @@ jobs:
           command: deployment-e2e/molecule.sh oracle
           no_output_timeout: 40m
   deployment-ui:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
       - checkout
       - run: git submodule update --init
@@ -190,7 +201,7 @@ jobs:
           command: deployment-e2e/molecule.sh ui
           no_output_timeout: 40m
   deployment-monitor:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
       - checkout
       - run: git submodule update --init
@@ -199,7 +210,7 @@ jobs:
           command: deployment-e2e/molecule.sh monitor
           no_output_timeout: 40m
   deployment-repo:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
       - checkout
       - run: git submodule update --init
@@ -211,7 +222,7 @@ jobs:
           command: deployment-e2e/molecule.sh repo
           no_output_timeout: 40m
   deployment-multiple:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
       - checkout
       - run: git submodule update --init
@@ -220,7 +231,7 @@ jobs:
           command: deployment-e2e/molecule.sh multiple
           no_output_timeout: 40m
   ultimate:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     parameters:
       scenario-name:
         description: "Molecule scenario name used to create the infrastructure"
@@ -286,35 +297,62 @@ workflows:
           filters:
             branches:
               only: master
-      - oracle-e2e
-      - ui-e2e
-      - monitor-e2e
-      - deployment-oracle
-      - deployment-ui
-      - deployment-monitor
-      - deployment-repo
-      - deployment-multiple
+      - build-e2e-images
+      - oracle-e2e:
+          requires:
+            - build-e2e-images
+      - ui-e2e:
+          requires:
+            - build-e2e-images
+      - monitor-e2e:
+          requires:
+            - build-e2e-images
+      - deployment-oracle:
+          requires:
+            - build-e2e-images
+      - deployment-ui:
+          requires:
+            - build-e2e-images
+      - deployment-monitor:
+          requires:
+            - build-e2e-images
+      - deployment-repo:
+          requires:
+            - build-e2e-images
+      - deployment-multiple:
+          requires:
+            - build-e2e-images
       - ultimate:
+          requires:
+            - build-e2e-images
           name: "ultimate: native to erc"
           scenario-name: native-to-erc
           redis-key: native-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "NATIVE TO ERC"
       - ultimate:
+          requires:
+            - build-e2e-images
           name: "ultimate: erc to native"
           scenario-name: erc-to-native
           redis-key: erc-native-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO NATIVE"
       - ultimate:
+          requires:
+            - build-e2e-images
           name: "ultimate: erc to erc"
           scenario-name: erc-to-erc
           redis-key: erc-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO ERC"
       - ultimate:
+          requires:
+            - build-e2e-images
           name: "ultimate: amb"
           scenario-name: amb
           redis-key: amb-collected-signatures:lastProcessedBlock
           oracle-e2e-script: "amb"
       - ultimate:
+          requires:
+            - build-e2e-images
           name: "ultimate: amb stake erc to erc"
           scenario-name: ultimate-amb-stake-erc-to-erc
           redis-key: amb-collected-signatures:lastProcessedBlock
