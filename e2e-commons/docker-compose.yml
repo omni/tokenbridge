@@ -163,6 +163,7 @@ services:
     networks:
       - ultimate
   blocks:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-e2e:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: Dockerfile.e2e

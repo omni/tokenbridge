@@ -2,8 +2,9 @@
 cd $(dirname $0)
 set -e # exit when any command fails
 
-docker-compose build parity1 parity2 blocks e2e
+docker-compose build parity1 parity2
 
+docker-compose pull e2e
 while [ "$1" != "" ]; do
   if [ "$1" == "oracle" ]; then
     docker-compose pull oracle

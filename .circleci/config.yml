@@ -77,6 +77,10 @@ orbs:
       docker-node:
         docker:
           - image: circleci/node:10.15
+      machine-with-dlc:
+        machine:
+          image: circleci/classic:latest
+          docker_layer_caching: true
       machine-without-dlc:
         machine:
           image: circleci/classic:latest
@@ -140,7 +144,7 @@ jobs:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run test
   build-e2e-images:
-    executor: tokenbridge-orb/machine-without-dlc
+    executor: tokenbridge-orb/machine-with-dlc
     steps:
       - checkout
       - run: git submodule update --init
@@ -148,7 +152,6 @@ jobs:
           command: |
             docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
             cd e2e-commons
-            docker-compose pull --ignore-pull-failures oracle monitor ui e2e molecule_runner
             docker-compose build oracle monitor ui e2e molecule_runner
             docker-compose push oracle monitor ui e2e molecule_runner
   oracle-e2e:
