@@ -164,12 +164,14 @@ jobs:
   ui-e2e:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
+      # - checkout
       - tokenbridge-orb/install-node
       - tokenbridge-orb/install-yarn
       - tokenbridge-orb/install-chrome
-      - run: git submodule update --init
-      - tokenbridge-orb/yarn-install-cached-on-machine
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
+      # - run: git submodule update --init
+      # - tokenbridge-orb/yarn-install-cached-on-machine
       - run: yarn run ui-e2e
   monitor-e2e:
     executor: tokenbridge-orb/machine-without-dlc
@@ -216,9 +218,9 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      - tokenbridge-orb/install-node
-      - tokenbridge-orb/install-yarn
-      - tokenbridge-orb/yarn-install-cached-on-machine
+      # - tokenbridge-orb/install-node
+      # - tokenbridge-orb/install-yarn
+      # - tokenbridge-orb/yarn-install-cached-on-machine
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh repo
@@ -250,12 +252,19 @@ jobs:
         default: ''
         type: string
     steps:
-      - checkout
-      - run: git submodule update --init
-      - tokenbridge-orb/install-node
-      - tokenbridge-orb/install-chrome
-      - tokenbridge-orb/install-yarn
-      - tokenbridge-orb/yarn-install-cached-on-machine
+      - when:
+          condition: << parameters.ui-e2e-grep >>
+          steps:
+            - tokenbridge-orb/install-node
+            - tokenbridge-orb/install-chrome
+            - tokenbridge-orb/install-yarn
+            - restore_cache:
+                key: initialize-{{ .Environment.CIRCLE_SHA1 }}
+      - when:
+          condition: << parameters.oracle-e2e-script >>
+          steps:
+            - checkout
+            - run: git submodule update --init
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy << parameters.scenario-name >> blocks
