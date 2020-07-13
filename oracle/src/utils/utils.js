@@ -100,6 +100,11 @@ function nonceError(e) {
   )
 }
 
+// Promise.all rejects on the first rejected Promise or fulfills with the list of results
+// inverted Promise.all fulfills with the first obtained result or rejects with the list of errors
+const invert = p => new Promise((res, rej) => p.then(rej, res))
+const promiseAny = ps => invert(Promise.all(ps.map(invert)))
+
 module.exports = {
   syncForEach,
   checkHTTPS,
@@ -109,5 +114,6 @@ module.exports = {
   watchdog,
   privateKeyToAddress,
   nonceError,
-  getRetrySequence
+  getRetrySequence,
+  promiseAny
 }

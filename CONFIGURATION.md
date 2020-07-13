@@ -36,6 +36,7 @@ ORACLE_LOG_LEVEL | Set the level of details in the logs. | `trace` / `debug` / `
 ORACLE_MAX_PROCESSING_TIME | The workers processes will be killed if this amount of time (in milliseconds) is elapsed before they finish processing. It is recommended to set this value to 4 times the value of the longest polling time (set with the `HOME_POLLING_INTERVAL` and `FOREIGN_POLLING_INTERVAL` variables). To disable this, set the time to 0. | integer
 ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY | The private key of the bridge validator used to sign confirmations before sending transactions to the bridge contracts. The validator account is calculated automatically from the private key. Every bridge instance (set of watchers and senders) must have its own unique private key. The specified private key is used to sign transactions on both sides of the bridge. | hexidecimal without "0x"
 ORACLE_VALIDATOR_ADDRESS | The public address of the bridge validator | hexidecimal with "0x"
+ORACLE_TX_REDUNDANCY | If set to `true`, instructs oracle to send `eth_sendRawTransaction` requests through all available RPC urls defined in `COMMON_HOME_RPC_URL` and `COMMON_FOREIGN_RPC_URL` variables instead of using first available one
 
 
 ## UI configuration
