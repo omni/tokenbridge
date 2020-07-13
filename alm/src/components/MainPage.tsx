@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Route, useHistory } from 'react-router-dom'
 import { Form } from './Form'
@@ -63,6 +63,13 @@ export const MainPage = () => {
   const setNetworkFromParams = (chainId: number) => {
     setNetworkData(chainId)
   }
+
+  useEffect(() => {
+    const w = window as any
+    if (w.ethereum) {
+      w.ethereum.autoRefreshOnNetworkChange = false
+    }
+  }, [])
 
   return (
     <StyledMainPage>
