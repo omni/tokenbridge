@@ -81,7 +81,6 @@ services:
     networks:
       - ultimate
   ui-erc20:
-    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile
@@ -91,7 +90,6 @@ services:
     networks:
       - ultimate
   ui-erc20-native:
-    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile
@@ -101,7 +99,6 @@ services:
     networks:
       - ultimate
   ui-amb-stake-erc20-erc20:
-    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile

@@ -23,10 +23,10 @@ function main() {
   setTimeout(async () => {
     try {
       generateNewBlock(homeWeb3, blockGenerator.address)
-    } catch {} // in case of Transaction with the same hash was already imported.
+    } catch (_) {} // in case of Transaction with the same hash was already imported.
     try {
       generateNewBlock(foreignWeb3, blockGenerator.address)
-    } catch {} // in case of Transaction with the same hash was already imported.
+    } catch (_) {} // in case of Transaction with the same hash was already imported.
     main()
   }, 1000)
 }
