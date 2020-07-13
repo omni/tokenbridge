@@ -81,6 +81,9 @@ orbs:
         machine:
           image: ubuntu-1604:202007-01
           docker_layer_caching: true
+      classic-machine-without-dlc:
+        machine:
+          image: circleci/classic:latest
       machine-without-dlc:
         machine:
           image: ubuntu-1604:202007-01
@@ -235,7 +238,7 @@ jobs:
           command: deployment-e2e/molecule.sh multiple
           no_output_timeout: 40m
   ultimate:
-    executor: tokenbridge-orb/machine-without-dlc
+    executor: tokenbridge-orb/classic-machine-without-dlc
     parameters:
       scenario-name:
         description: "Molecule scenario name used to create the infrastructure"
@@ -252,19 +255,11 @@ jobs:
         default: ''
         type: string
     steps:
-      - when:
-          condition: << parameters.ui-e2e-grep >>
-          steps:
-            - tokenbridge-orb/install-node
-            - tokenbridge-orb/install-chrome
-            - tokenbridge-orb/install-yarn
-            - restore_cache:
-                key: initialize-{{ .Environment.CIRCLE_SHA1 }}
-      - when:
-          condition: << parameters.oracle-e2e-script >>
-          steps:
-            - checkout
-            - run: git submodule update --init
+      - tokenbridge-orb/install-node
+      - tokenbridge-orb/install-chrome
+      - tokenbridge-orb/install-yarn
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy << parameters.scenario-name >> blocks
@@ -315,6 +310,7 @@ workflows:
       - ui-e2e:
           requires:
             - build-e2e-images
+            - initialize
       - monitor-e2e:
           requires:
             - build-e2e-images
@@ -336,6 +332,7 @@ workflows:
       - ultimate:
           requires:
             - build-e2e-images
+            - initialize
           name: "ultimate: native to erc"
           scenario-name: native-to-erc
           redis-key: native-erc-collected-signatures:lastProcessedBlock
@@ -343,6 +340,7 @@ workflows:
       - ultimate:
           requires:
             - build-e2e-images
+            - initialize
           name: "ultimate: erc to native"
           scenario-name: erc-to-native
           redis-key: erc-native-collected-signatures:lastProcessedBlock
@@ -350,6 +348,7 @@ workflows:
       - ultimate:
           requires:
             - build-e2e-images
+            - initialize
           name: "ultimate: erc to erc"
           scenario-name: erc-to-erc
           redis-key: erc-erc-collected-signatures:lastProcessedBlock
@@ -357,6 +356,7 @@ workflows:
       - ultimate:
           requires:
             - build-e2e-images
+            - initialize
           name: "ultimate: amb"
           scenario-name: amb
           redis-key: amb-collected-signatures:lastProcessedBlock
@@ -364,6 +364,7 @@ workflows:
       - ultimate:
           requires:
             - build-e2e-images
+            - initialize
           name: "ultimate: amb stake erc to erc"
           scenario-name: ultimate-amb-stake-erc-to-erc
           redis-key: amb-collected-signatures:lastProcessedBlock
