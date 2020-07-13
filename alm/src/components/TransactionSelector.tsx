@@ -8,6 +8,11 @@ import { NetworkTransactionSelector } from './NetworkTransactionSelector'
 import { BackButton } from './commons/BackButton'
 import { TRANSACTION_STATUS_DESCRIPTION } from '../config/descriptions'
 import { MultiLine } from './commons/MultiLine'
+import styled from 'styled-components'
+
+const StyledMultiLine = styled(MultiLine)`
+  margin-bottom: 40px;
+`
 
 export const TransactionSelector = ({
   txHash,
@@ -52,7 +57,7 @@ export const TransactionSelector = ({
     const message = TRANSACTION_STATUS_DESCRIPTION[TRANSACTION_STATUS.NOT_FOUND]
     return (
       <div>
-        <MultiLine>{message}</MultiLine>
+        <StyledMultiLine>{message}</StyledMultiLine>
         <BackButton onBackToMain={onBack} />
       </div>
     )
