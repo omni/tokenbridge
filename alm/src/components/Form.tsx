@@ -35,8 +35,13 @@ export const Form = ({ onSubmit }: { onSubmit: ({ chainId, txHash, receipt }: Fo
     onSubmit({ chainId, txHash, receipt })
   }
 
+  const onBack = () => {
+    setTxHash('')
+    setSearchTx(false)
+  }
+
   if (searchTx) {
-    return <TransactionSelector txHash={txHash} onSelected={onSelected} />
+    return <TransactionSelector txHash={txHash} onSelected={onSelected} onBack={onBack} />
   }
 
   return (

@@ -4,7 +4,8 @@ export const TRANSACTION_STATUS_DESCRIPTION: { [key: string]: string } = {
   SUCCESS_ONE_MESSAGE: 'was initiated %t',
   SUCCESS_NO_MESSAGES: 'execution succeeded %t but it does not contain any bridge messages',
   FAILED: 'failed %t',
-  NOT_FOUND: 'was not found'
+  NOT_FOUND:
+    'Transaction not found. \n1. Check that the transaction hash is correct. \n2. Wait several blocks for the transaction to be\nmined, gas price affects mining speed.'
 }
 
 export const CONFIRMATIONS_STATUS_LABEL: { [key: string]: string } = {
