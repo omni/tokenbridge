@@ -83,8 +83,10 @@ services:
   ui-erc20:
     build:
       context: ..
-      dockerfile: ui/Dockerfile
+      dockerfile: e2e-commons/Dockerfile.ui
       args:
+        DOCKER_LOGIN: ${DOCKER_LOGIN}
+        CIRCLE_BRANCH: ${CIRCLE_BRANCH}
         DOT_ENV_PATH: e2e-commons/components-envs/ui-erc20.env
     command: "true"
     networks:
@@ -92,8 +94,10 @@ services:
   ui-erc20-native:
     build:
       context: ..
-      dockerfile: ui/Dockerfile
+      dockerfile: e2e-commons/Dockerfile.ui
       args:
+        DOCKER_LOGIN: ${DOCKER_LOGIN}
+        CIRCLE_BRANCH: ${CIRCLE_BRANCH}
         DOT_ENV_PATH: e2e-commons/components-envs/ui-erc20-native.env
     command: "true"
     networks:
@@ -101,8 +105,10 @@ services:
   ui-amb-stake-erc20-erc20:
     build:
       context: ..
-      dockerfile: ui/Dockerfile
+      dockerfile: e2e-commons/Dockerfile.ui
       args:
+        DOCKER_LOGIN: ${DOCKER_LOGIN}
+        CIRCLE_BRANCH: ${CIRCLE_BRANCH}
         DOT_ENV_PATH: e2e-commons/components-envs/ui-amb-stake-erc20-erc20.env
     command: "true"
     networks:
