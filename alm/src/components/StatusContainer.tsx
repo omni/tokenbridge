@@ -81,7 +81,7 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
         <p>
           The request{' '}
           {displayExplorerLink && (
-            <ExplorerTxLink href={txExplorerLink} target="blank">
+            <ExplorerTxLink href={txExplorerLink} target="_blank">
               {formattedMessageId}
             </ExplorerTxLink>
           )}

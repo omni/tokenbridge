@@ -14,8 +14,8 @@ export const checkSignaturesWaitingForBLocks = async (
   const currentBlock = blockProvider.get()
 
   if (currentBlock && currentBlock >= targetBlock) {
-    setWaitingStatus(false)
     setWaitingBlocksResolved(true)
+    setWaitingStatus(false)
     blockProvider.stop()
   } else {
     let nextInterval = interval

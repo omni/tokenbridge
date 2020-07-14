@@ -83,6 +83,13 @@ export const useMessageConfirmations = ({
   const [pendingConfirmations, setPendingConfirmations] = useState(false)
   const [pendingExecution, setPendingExecution] = useState(false)
 
+  const existsConfirmation = (confirmationArray: ConfirmationParam[]) => {
+    const filteredList = confirmationArray.filter(
+      c => c.status !== VALIDATOR_CONFIRMATION_STATUS.UNDEFINED && c.status !== VALIDATOR_CONFIRMATION_STATUS.WAITING
+    )
+    return filteredList.length > 0
+  }
+
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
     () => {
@@ -319,6 +326,8 @@ export const useMessageConfirmations = ({
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_FAILED)
           } else if (pendingExecution) {
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_PENDING)
+          } else if (waitingBlocksForExecutionResolved) {
+            setStatus(CONFIRMATIONS_STATUS.EXECUTION_WAITING)
           } else {
             setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
           }
@@ -326,11 +335,13 @@ export const useMessageConfirmations = ({
           setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
         }
       } else if (waitingBlocks) {
-        setStatus(CONFIRMATIONS_STATUS.WAITING)
+        setStatus(CONFIRMATIONS_STATUS.WAITING_CHAIN)
       } else if (failedConfirmations) {
         setStatus(CONFIRMATIONS_STATUS.FAILED)
       } else if (pendingConfirmations) {
         setStatus(CONFIRMATIONS_STATUS.PENDING)
+      } else if (waitingBlocksResolved && existsConfirmation(confirmations)) {
+        setStatus(CONFIRMATIONS_STATUS.WAITING_VALIDATORS)
       } else {
         setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
       }
@@ -344,7 +355,10 @@ export const useMessageConfirmations = ({
       failedConfirmations,
       failedExecution,
       pendingConfirmations,
-      pendingExecution
+      pendingExecution,
+      waitingBlocksResolved,
+      confirmations,
+      waitingBlocksForExecutionResolved
     ]
   )
 
