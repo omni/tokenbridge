@@ -4,7 +4,7 @@ import { useMessageConfirmations } from '../hooks/useMessageConfirmations'
 import { MessageObject } from '../utils/web3'
 import styled from 'styled-components'
 import { CONFIRMATIONS_STATUS } from '../config/constants'
-import { CONFIRMATIONS_STATUS_LABEL } from '../config/descriptions'
+import { CONFIRMATIONS_STATUS_LABEL, CONFIRMATIONS_STATUS_LABEL_HOME } from '../config/descriptions'
 import { SimpleLoading } from './commons/Loading'
 import { ValidatorsConfirmations } from './ValidatorsConfirmations'
 import { getConfirmationsStatusDescription } from '../utils/networks'
@@ -12,6 +12,8 @@ import { useStateProvider } from '../state/StateProvider'
 import { ExecutionConfirmation } from './ExecutionConfirmation'
 import { useValidatorContract } from '../hooks/useValidatorContract'
 import { useBlockConfirmations } from '../hooks/useBlockConfirmations'
+import { MultiLine } from './commons/MultiLine'
+import { ExplorerTxLink } from './commons/ExplorerTxLink'
 
 const StatusLabel = styled.label`
   font-weight: bold;
@@ -57,21 +59,42 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
     blockConfirmations
   })
 
+  const statusLabel = fromHome ? CONFIRMATIONS_STATUS_LABEL_HOME : CONFIRMATIONS_STATUS_LABEL
+
+  const parseDescription = () => {
+    let description = getConfirmationsStatusDescription(status, homeName, foreignName, fromHome)
+    let link
+    const descArray = description.split('%link')
+    if (descArray.length > 1) {
+      description = descArray[0]
+      link = (
+        <ExplorerTxLink href={descArray[1]} target="_blank" rel="noopener noreferrer">
+          {descArray[1]}
+        </ExplorerTxLink>
+      )
+    }
+
+    return (
+      <div>
+        {description}
+        {link}
+      </div>
+    )
+  }
+
   return (
     <div className="row is-center">
       <StyledConfirmationContainer className="col-9">
         <div className="row is-center">
           <StatusLabel>Status:</StatusLabel>
           <StatusResultLabel>
-            {status !== CONFIRMATIONS_STATUS.UNDEFINED ? CONFIRMATIONS_STATUS_LABEL[status] : <SimpleLoading />}
+            {status !== CONFIRMATIONS_STATUS.UNDEFINED ? statusLabel[status] : <SimpleLoading />}
           </StatusResultLabel>
         </div>
         <StatusDescription className="row is-center">
-          <p className="col-10">
-            {status !== CONFIRMATIONS_STATUS.UNDEFINED
-              ? getConfirmationsStatusDescription(status, homeName, foreignName)
-              : ''}
-          </p>
+          <MultiLine className="col-10">
+            {status !== CONFIRMATIONS_STATUS.UNDEFINED ? parseDescription() : ''}
+          </MultiLine>
         </StatusDescription>
         <ValidatorsConfirmations
           confirmations={confirmations}

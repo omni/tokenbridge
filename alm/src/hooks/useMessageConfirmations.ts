@@ -319,6 +319,8 @@ export const useMessageConfirmations = ({
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_FAILED)
           } else if (pendingExecution) {
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_PENDING)
+          } else if (waitingBlocksForExecutionResolved) {
+            setStatus(CONFIRMATIONS_STATUS.EXECUTION_WAITING)
           } else {
             setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
           }
@@ -326,11 +328,13 @@ export const useMessageConfirmations = ({
           setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
         }
       } else if (waitingBlocks) {
-        setStatus(CONFIRMATIONS_STATUS.WAITING)
+        setStatus(CONFIRMATIONS_STATUS.WAITING_CHAIN)
       } else if (failedConfirmations) {
         setStatus(CONFIRMATIONS_STATUS.FAILED)
       } else if (pendingConfirmations) {
         setStatus(CONFIRMATIONS_STATUS.PENDING)
+      } else if (waitingBlocksResolved && confirmations.length) {
+        setStatus(CONFIRMATIONS_STATUS.WAITING_VALIDATORS)
       } else {
         setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
       }
@@ -344,7 +348,10 @@ export const useMessageConfirmations = ({
       failedConfirmations,
       failedExecution,
       pendingConfirmations,
-      pendingExecution
+      pendingExecution,
+      waitingBlocksResolved,
+      confirmations,
+      waitingBlocksForExecutionResolved
     ]
   )
 

@@ -1,5 +1,9 @@
 import { formatDistance } from 'date-fns'
-import { CONFIRMATIONS_STATUS_DESCRIPTION, TRANSACTION_STATUS_DESCRIPTION } from '../config/descriptions'
+import {
+  CONFIRMATIONS_STATUS_DESCRIPTION,
+  CONFIRMATIONS_STATUS_DESCRIPTION_HOME,
+  TRANSACTION_STATUS_DESCRIPTION
+} from '../config/descriptions'
 import { FOREIGN_EXPLORER_TX_TEMPLATE, HOME_EXPLORER_TX_TEMPLATE } from '../config/constants'
 
 export const validTxHash = (txHash: string) => /^0x[a-fA-F0-9]{64}$/.test(txHash)
@@ -31,11 +35,8 @@ export const getTransactionStatusDescription = (status: string, timestamp: Maybe
   return description
 }
 
-export const getConfirmationsStatusDescription = (status: string, home: string, foreign: string) => {
-  let description = CONFIRMATIONS_STATUS_DESCRIPTION[status]
+export const getConfirmationsStatusDescription = (status: string, home: string, foreign: string, fromHome: boolean) => {
+  const statusDescription = fromHome ? CONFIRMATIONS_STATUS_DESCRIPTION_HOME : CONFIRMATIONS_STATUS_DESCRIPTION
 
-  description = description.replace('%homeChain', home)
-  description = description.replace('%foreignChain', foreign)
-
-  return description
+  return statusDescription[status]
 }
