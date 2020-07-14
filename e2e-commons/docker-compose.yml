@@ -27,6 +27,7 @@ services:
     networks:
       - ultimate
   oracle:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -37,6 +38,7 @@ services:
     networks:
       - ultimate
   oracle-erc20:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -47,6 +49,7 @@ services:
     networks:
       - ultimate
   oracle-erc20-native:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -57,6 +60,7 @@ services:
     networks:
       - ultimate
   oracle-amb:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-oracle:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: oracle/Dockerfile
@@ -67,6 +71,7 @@ services:
     networks:
       - ultimate
   ui:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-ui:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: ui/Dockerfile
@@ -78,8 +83,10 @@ services:
   ui-erc20:
     build:
       context: ..
-      dockerfile: ui/Dockerfile
+      dockerfile: e2e-commons/Dockerfile.ui
       args:
+        DOCKER_LOGIN: ${DOCKER_LOGIN}
+        CIRCLE_BRANCH: ${CIRCLE_BRANCH}
         DOT_ENV_PATH: e2e-commons/components-envs/ui-erc20.env
     command: "true"
     networks:
@@ -87,8 +94,10 @@ services:
   ui-erc20-native:
     build:
       context: ..
-      dockerfile: ui/Dockerfile
+      dockerfile: e2e-commons/Dockerfile.ui
       args:
+        DOCKER_LOGIN: ${DOCKER_LOGIN}
+        CIRCLE_BRANCH: ${CIRCLE_BRANCH}
         DOT_ENV_PATH: e2e-commons/components-envs/ui-erc20-native.env
     command: "true"
     networks:
@@ -96,13 +105,16 @@ services:
   ui-amb-stake-erc20-erc20:
     build:
       context: ..
-      dockerfile: ui/Dockerfile
+      dockerfile: e2e-commons/Dockerfile.ui
       args:
+        DOCKER_LOGIN: ${DOCKER_LOGIN}
+        CIRCLE_BRANCH: ${CIRCLE_BRANCH}
         DOT_ENV_PATH: e2e-commons/components-envs/ui-amb-stake-erc20-erc20.env
     command: "true"
     networks:
       - ultimate
   monitor:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -113,6 +125,7 @@ services:
     networks:
       - ultimate
   monitor-erc20:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -123,6 +136,7 @@ services:
     networks:
       - ultimate
   monitor-erc20-native:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -133,6 +147,7 @@ services:
     networks:
       - ultimate
   monitor-amb:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: monitor/Dockerfile
@@ -143,6 +158,7 @@ services:
     networks:
       - ultimate
   e2e:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-e2e:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: Dockerfile.e2e
@@ -150,9 +166,20 @@ services:
     networks:
       - ultimate
   blocks:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-e2e:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: Dockerfile.e2e
     entrypoint: node e2e-commons/scripts/blocks.js
     networks:
       - ultimate
+  molecule_runner:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-molecule_runner:${CIRCLE_BRANCH}
+    build:
+      context: ..
+      dockerfile: deployment-e2e/Dockerfile
+    restart: 'no'
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ..:/mono

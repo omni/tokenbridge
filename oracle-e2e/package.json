@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "mocha": "^5.2.0",
     "chalk": "^2.4.1",
     "dotenv": "^6.0.0",
     "promise-retry": "^1.1.1",

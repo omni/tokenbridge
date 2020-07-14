@@ -36,20 +36,6 @@ orbs:
                 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
                 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
                 sudo apt-get update && sudo apt-get -y install yarn
-      yarn-install-cached-on-machine:
-        steps:
-          - restore_cache:
-              name: Restore Machine Yarn Package Cache
-              keys:
-                - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-          - run:
-              name: Install npm dependencies using Yarn
-              command: nvm use default; yarn install --frozen-lockfile
-          - save_cache:
-              name: Save Machine Yarn Package Cache
-              key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-              paths:
-                - ~/.cache/yarn
       wait-for-oracle:
         parameters:
           redis-key:
@@ -73,21 +59,30 @@ orbs:
                   echo "Sleeping..."
                   sleep 3
                 done
+      init-repo:
+        steps:
+          - checkout
+          - run: git submodule update --init
     executors:
       docker-node:
         docker:
           - image: circleci/node:10.15
-      machine-with-docker-caching:
+      machine-with-dlc:
+        machine:
+          image: ubuntu-1604:202007-01
+          docker_layer_caching: true
+      classic-machine-without-dlc:
         machine:
           image: circleci/classic:latest
-          docker_layer_caching: true
+      machine-without-dlc:
+        machine:
+          image: ubuntu-1604:202007-01
 
 jobs:
   initialize:
     executor: tokenbridge-orb/docker-node
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
@@ -140,29 +135,34 @@ jobs:
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run test
+  build-e2e-images:
+    executor: tokenbridge-orb/machine-without-dlc
+    steps:
+      - tokenbridge-orb/init-repo
+      - run:
+          command: |
+            docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+            cd e2e-commons
+            docker-compose build oracle monitor ui e2e molecule_runner
+            docker-compose push oracle monitor ui e2e molecule_runner
   oracle-e2e:
-    executor: tokenbridge-orb/docker-node
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run: yarn run oracle-e2e
+      - tokenbridge-orb/init-repo
+      - run: ./oracle-e2e/run-tests.sh
   ui-e2e:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
       - tokenbridge-orb/install-node
       - tokenbridge-orb/install-yarn
       - tokenbridge-orb/install-chrome
-      - run: git submodule update --init
-      - tokenbridge-orb/yarn-install-cached-on-machine
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run: yarn run ui-e2e
   monitor-e2e:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run: ./monitor-e2e/run-tests.sh
   cover:
     executor: tokenbridge-orb/docker-node
@@ -172,55 +172,47 @@ jobs:
       - run: yarn workspace ui run coverage
       - run: yarn workspace ui run coveralls
   deployment-oracle:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh oracle
           no_output_timeout: 40m
   deployment-ui:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh ui
           no_output_timeout: 40m
   deployment-monitor:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh monitor
           no_output_timeout: 40m
   deployment-repo:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
-      - tokenbridge-orb/install-node
-      - tokenbridge-orb/install-yarn
-      - tokenbridge-orb/yarn-install-cached-on-machine
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh repo
           no_output_timeout: 40m
   deployment-multiple:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh multiple
           no_output_timeout: 40m
   ultimate:
-    executor: tokenbridge-orb/machine-with-docker-caching
+    executor: tokenbridge-orb/classic-machine-without-dlc
     parameters:
       scenario-name:
         description: "Molecule scenario name used to create the infrastructure"
@@ -237,12 +229,11 @@ jobs:
         default: ''
         type: string
     steps:
-      - checkout
-      - run: git submodule update --init
       - tokenbridge-orb/install-node
       - tokenbridge-orb/install-chrome
       - tokenbridge-orb/install-yarn
-      - tokenbridge-orb/yarn-install-cached-on-machine
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           name: Prepare the infrastructure
           command: e2e-commons/up.sh deploy << parameters.scenario-name >> blocks
@@ -286,35 +277,93 @@ workflows:
           filters:
             branches:
               only: master
-      - oracle-e2e
-      - ui-e2e
-      - monitor-e2e
-      - deployment-oracle
-      - deployment-ui
-      - deployment-monitor
-      - deployment-repo
-      - deployment-multiple
+      - build-e2e-images
+      - oracle-e2e:
+          requires:
+            - build-e2e-images
+      - ui-e2e:
+          requires:
+            - build-e2e-images
+            - initialize
+      - monitor-e2e:
+          requires:
+            - build-e2e-images
+      - deployment-oracle:
+          requires:
+            - build-e2e-images
+      - deployment-ui:
+          requires:
+            - build-e2e-images
+      - deployment-monitor:
+          requires:
+            - build-e2e-images
+      - deployment-repo:
+          requires:
+            - build-e2e-images
+      - deployment-multiple:
+          requires:
+            - build-e2e-images
       - ultimate:
+          requires:
+            - build-e2e-images
+            - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: native to erc"
           scenario-name: native-to-erc
           redis-key: native-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "NATIVE TO ERC"
       - ultimate:
+          requires:
+            - build-e2e-images
+            - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: erc to native"
           scenario-name: erc-to-native
           redis-key: erc-native-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO NATIVE"
       - ultimate:
+          requires:
+            - build-e2e-images
+            - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: erc to erc"
           scenario-name: erc-to-erc
           redis-key: erc-erc-collected-signatures:lastProcessedBlock
           ui-e2e-grep: "ERC TO ERC"
       - ultimate:
+          requires:
+            - build-e2e-images
+            - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: amb"
           scenario-name: amb
           redis-key: amb-collected-signatures:lastProcessedBlock
           oracle-e2e-script: "amb"
       - ultimate:
+          requires:
+            - build-e2e-images
+            - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: amb stake erc to erc"
           scenario-name: ultimate-amb-stake-erc-to-erc
           redis-key: amb-collected-signatures:lastProcessedBlock

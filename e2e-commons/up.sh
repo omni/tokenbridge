@@ -3,14 +3,12 @@ cd $(dirname $0)
 set -e # exit when any command fails
 
 ./down.sh
-docker-compose build
+docker-compose build parity1 parity2
+test -n "$NODOCKERPULL" || ./pull.sh $@
 docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
 
 startValidator () {
-    # make sure that old image tags are not cached
-    docker-compose $1 build
-
     docker-compose $1 run -d --name $4 redis
     docker-compose $1 run -d --name $5 rabbit
     docker-compose $1 run $2 $3 -d oracle yarn watcher:signature-request
@@ -36,7 +34,7 @@ startValidator () {
 
 while [ "$1" != "" ]; do
   if [ "$1" == "oracle" ]; then
-    docker-compose up -d redis rabbit oracle oracle-erc20 oracle-erc20-native oracle-amb
+    docker-compose up -d redis rabbit
 
     docker-compose run -d oracle yarn watcher:signature-request
     docker-compose run -d oracle yarn watcher:collected-signatures
@@ -74,6 +72,9 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "ui" ]; then
+    # this should only rebuild last 3 steps from ui/Dockerfile
+    docker-compose build ui-erc20 ui-erc20-native ui-amb-stake-erc20-erc20
+
     docker-compose up -d ui ui-erc20 ui-erc20-native ui-amb-stake-erc20-erc20
 
     docker-compose run -d -p 3000:3000 ui yarn start
