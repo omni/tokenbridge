@@ -33,7 +33,7 @@ export const CONFIRMATIONS_STATUS_LABEL_HOME: { [key: string]: string } = {
 export const CONFIRMATIONS_STATUS_DESCRIPTION: { [key: string]: string } = {
   SUCCESS: '',
   SUCCESS_MESSAGE_FAILED:
-    'The specified transaction was included in a block,\nthe validators collected signatures and the cross-chain relay was executed correctly,\nbut the contained message execution failed.',
+    'The specified transaction was included in a block,\nthe validators collected signatures and the cross-chain relay was executed correctly,\nbut the contained message execution failed.\nContact the support of the application you used to produce the transaction for the clarifications.',
   FAILED:
     'The specified transaction was included in a block,\nbut confirmations sent by a majority of validators\nfailed. The cross-chain relay request will not be\nprocessed. Contact to the validators by\nmessaging on %linkhttps://forum.poa.network/c/support',
   PENDING:
@@ -48,7 +48,7 @@ export const CONFIRMATIONS_STATUS_DESCRIPTION: { [key: string]: string } = {
 export const CONFIRMATIONS_STATUS_DESCRIPTION_HOME: { [key: string]: string } = {
   SUCCESS: '',
   SUCCESS_MESSAGE_FAILED:
-    'The specified transaction was included in a block,\nthe validators collected signatures and the cross-chain relay was executed correctly,\nbut the contained message execution failed.',
+    'The specified transaction was included in a block,\nthe validators collected signatures and the cross-chain relay was executed correctly,\nbut the contained message execution failed.\nContact the support of the application you used to produce the transaction for the clarifications.',
   EXECUTION_FAILED:
     'The specified transaction was included in a block\nand the validators collected signatures. The\nvalidator’s transaction with collected signatures was\nsent but did not succeed. Contact to the validators by messaging\non %linkhttps://forum.poa.network/c/support',
   EXECUTION_PENDING:
