@@ -24,3 +24,10 @@
   copy:
     content: "{{ docker_compose_parsed | to_yaml }}"
     dest: "/home/poadocker/bridge/oracle/{{ file }}.yml"
+
+- name: Get updated docker file
+  shell: cat "/home/poadocker/bridge/oracle/{{ file }}.yml"
+  register: catout
+
+- debug: var=catout.stdout_lines
+
