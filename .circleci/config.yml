@@ -307,6 +307,11 @@ workflows:
           requires:
             - build-e2e-images
             - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: native to erc"
           scenario-name: native-to-erc
           redis-key: native-erc-collected-signatures:lastProcessedBlock
@@ -315,6 +320,11 @@ workflows:
           requires:
             - build-e2e-images
             - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: erc to native"
           scenario-name: erc-to-native
           redis-key: erc-native-collected-signatures:lastProcessedBlock
@@ -323,6 +333,11 @@ workflows:
           requires:
             - build-e2e-images
             - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: erc to erc"
           scenario-name: erc-to-erc
           redis-key: erc-erc-collected-signatures:lastProcessedBlock
@@ -331,6 +346,11 @@ workflows:
           requires:
             - build-e2e-images
             - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: amb"
           scenario-name: amb
           redis-key: amb-collected-signatures:lastProcessedBlock
@@ -339,6 +359,11 @@ workflows:
           requires:
             - build-e2e-images
             - initialize
+          filters:
+            branches:
+              only:
+                - master
+                - develop
           name: "ultimate: amb stake erc to erc"
           scenario-name: ultimate-amb-stake-erc-to-erc
           redis-key: amb-collected-signatures:lastProcessedBlock
