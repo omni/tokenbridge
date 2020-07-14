@@ -36,20 +36,6 @@ orbs:
                 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
                 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
                 sudo apt-get update && sudo apt-get -y install yarn
-      yarn-install-cached-on-machine:
-        steps:
-          - restore_cache:
-              name: Restore Machine Yarn Package Cache
-              keys:
-                - yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-          - run:
-              name: Install npm dependencies using Yarn
-              command: nvm use default; yarn install --frozen-lockfile
-          - save_cache:
-              name: Save Machine Yarn Package Cache
-              key: yarn-machine-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
-              paths:
-                - ~/.cache/yarn
       wait-for-oracle:
         parameters:
           redis-key:
@@ -167,14 +153,11 @@ jobs:
   ui-e2e:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      # - checkout
       - tokenbridge-orb/install-node
       - tokenbridge-orb/install-yarn
       - tokenbridge-orb/install-chrome
       - restore_cache:
           key: initialize-{{ .Environment.CIRCLE_SHA1 }}
-      # - run: git submodule update --init
-      # - tokenbridge-orb/yarn-install-cached-on-machine
       - run: yarn run ui-e2e
   monitor-e2e:
     executor: tokenbridge-orb/machine-without-dlc
@@ -221,9 +204,6 @@ jobs:
     steps:
       - checkout
       - run: git submodule update --init
-      # - tokenbridge-orb/install-node
-      # - tokenbridge-orb/install-yarn
-      # - tokenbridge-orb/yarn-install-cached-on-machine
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh repo
