@@ -59,6 +59,10 @@ orbs:
                   echo "Sleeping..."
                   sleep 3
                 done
+      init-repo:
+        steps:
+          - checkout
+          - run: git submodule update --init
     executors:
       docker-node:
         docker:
@@ -78,8 +82,7 @@ jobs:
   initialize:
     executor: tokenbridge-orb/docker-node
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
@@ -135,8 +138,7 @@ jobs:
   build-e2e-images:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           command: |
             docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
@@ -144,12 +146,10 @@ jobs:
             docker-compose build oracle monitor ui e2e molecule_runner
             docker-compose push oracle monitor ui e2e molecule_runner
   oracle-e2e:
-    executor: tokenbridge-orb/docker-node
+    executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
-      - setup_remote_docker
-      - run: yarn run oracle-e2e
+      - tokenbridge-orb/init-repo
+      - run: ./oracle-e2e/run-tests.sh
   ui-e2e:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
@@ -162,8 +162,7 @@ jobs:
   monitor-e2e:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run: ./monitor-e2e/run-tests.sh
   cover:
     executor: tokenbridge-orb/docker-node
@@ -175,8 +174,7 @@ jobs:
   deployment-oracle:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh oracle
@@ -184,8 +182,7 @@ jobs:
   deployment-ui:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh ui
@@ -193,8 +190,7 @@ jobs:
   deployment-monitor:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh monitor
@@ -202,8 +198,7 @@ jobs:
   deployment-repo:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh repo
@@ -211,8 +206,7 @@ jobs:
   deployment-multiple:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
-      - checkout
-      - run: git submodule update --init
+      - tokenbridge-orb/init-repo
       - run:
           name: Run the scenario
           command: deployment-e2e/molecule.sh multiple
