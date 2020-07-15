@@ -33,7 +33,7 @@ export class BlockNumberProvider {
   }
 
   stop() {
-    this.running = this.running - 1
+    this.running = this.running > 0 ? this.running - 1 : 0
 
     if (!this.running) {
       clearTimeout(this.ref)
