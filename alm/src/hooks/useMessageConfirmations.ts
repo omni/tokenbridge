@@ -313,7 +313,7 @@ export const useMessageConfirmations = ({
   // Sets the message status based in the collected information
   useEffect(
     () => {
-      if (executionData.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS) {
+      if (executionData.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS && existsConfirmation(confirmations)) {
         const newStatus = executionData.executionResult
           ? CONFIRMATIONS_STATUS.SUCCESS
           : CONFIRMATIONS_STATUS.SUCCESS_MESSAGE_FAILED
