@@ -13,6 +13,7 @@ import {
   getValidatorPendingTransaction,
   getValidatorSuccessTransaction
 } from './validatorConfirmationHelpers'
+import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
 export const getConfirmationsForTx = async (
   messageData: string,
@@ -43,9 +44,21 @@ export const getConfirmationsForTx = async (
 
   const successConfirmations = validatorConfirmations.filter(c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
 
+  setResult((prevConfirmations: ConfirmationParam[]) => {
+    if (prevConfirmations && prevConfirmations.length) {
+      successConfirmations.forEach(validatorData => {
+        const index = prevConfirmations.findIndex(e => e.validator === validatorData.validator)
+        validatorConfirmations[index] = validatorData
+      })
+      return prevConfirmations
+    } else {
+      return validatorConfirmations
+    }
+  })
+
   const notSuccessConfirmations = validatorConfirmations.filter(c => c.status !== VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
 
-  // If signatures not collected, it needs to retry in the next blocks
+  // If signatures not collected, look for pending transactions
   if (successConfirmations.length !== requiredSignatures) {
     // Check if confirmation is pending
     const validatorPendingConfirmationsChecks = await Promise.all(
@@ -63,48 +76,48 @@ export const getConfirmationsForTx = async (
     if (validatorPendingConfirmations.length > 0) {
       setPendingConfirmations(true)
     }
+  }
 
-    const undefinedConfirmations = validatorConfirmations.filter(
-      c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
-    )
-    // Check if confirmation failed
-    const validatorFailedConfirmationsChecks = await Promise.all(
-      undefinedConfirmations.map(
-        getValidatorFailedTransaction(bridgeContract, messageData, timestamp, getFailedTransactions)
-      )
-    )
-    const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
-      c => c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED
-    )
-    validatorFailedConfirmations.forEach(validatorData => {
-      const index = validatorConfirmations.findIndex(e => e.validator === validatorData.validator)
-      validatorConfirmations[index] = validatorData
-    })
-    const messageConfirmationsFailed = validatorFailedConfirmations.length > validatorList.length - requiredSignatures
-    if (messageConfirmationsFailed) {
-      setFailedConfirmations(true)
-    }
+  const undefinedConfirmations = validatorConfirmations.filter(
+    c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+  )
 
-    const missingConfirmations = validatorConfirmations.filter(
-      c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED || c.status === VALIDATOR_CONFIRMATION_STATUS.PENDING
+  // Check if confirmation failed
+  const validatorFailedConfirmationsChecks = await Promise.all(
+    undefinedConfirmations.map(
+      getValidatorFailedTransaction(bridgeContract, messageData, timestamp, getFailedTransactions)
     )
+  )
+  const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
+    c => c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED
+  )
+  validatorFailedConfirmations.forEach(validatorData => {
+    const index = validatorConfirmations.findIndex(e => e.validator === validatorData.validator)
+    validatorConfirmations[index] = validatorData
+  })
+  const messageConfirmationsFailed = validatorFailedConfirmations.length > validatorList.length - requiredSignatures
+  if (messageConfirmationsFailed) {
+    setFailedConfirmations(true)
+  }
 
-    if (missingConfirmations.length > 0) {
-      shouldRetry = true
-    }
-  } else {
-    // If signatures collected, it should set other signatures as not required
-    const notRequiredConfirmations = notSuccessConfirmations.map(c => ({
+  const missingConfirmations = validatorConfirmations.filter(
+    c => c.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED || c.status === VALIDATOR_CONFIRMATION_STATUS.PENDING
+  )
+
+  if (successConfirmations.length !== requiredSignatures && missingConfirmations.length > 0) {
+    shouldRetry = true
+  }
+
+  if (successConfirmations.length === requiredSignatures) {
+    // If signatures collected, it should set other signatures not found as not required
+    const notRequiredConfirmations = missingConfirmations.map(c => ({
       validator: c.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED
     }))
 
-    validatorConfirmations = [...successConfirmations, ...notRequiredConfirmations]
+    validatorConfirmations = [...validatorConfirmations, ...notRequiredConfirmations]
     setSignatureCollected(true)
   }
-
-  // Set confirmations to update UI and continue requesting the transactions for the signatures
-  setResult(validatorConfirmations)
 
   // get transactions from success signatures
   const successConfirmationWithData = await Promise.all(
