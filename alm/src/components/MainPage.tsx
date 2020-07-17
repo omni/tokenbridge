@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import styled from 'styled-components'
 import { Route, useHistory } from 'react-router-dom'
 import { Form } from './Form'
 import { StatusContainer } from './StatusContainer'
 import { useStateProvider } from '../state/StateProvider'
 import { TransactionReceipt } from 'web3-eth'
+import { InfoAlert } from './commons/InfoAlert'
+import { ExplorerTxLink } from './commons/ExplorerTxLink'
 
 const StyledMainPage = styled.div`
   text-align: center;
@@ -43,6 +45,27 @@ export const MainPage = () => {
   const { home, foreign } = useStateProvider()
   const [networkName, setNetworkName] = useState('')
   const [receipt, setReceipt] = useState<Maybe<TransactionReceipt>>(null)
+  const [showInfoAlert, setShowInfoAlert] = useState(false)
+
+  const loadFromStorage = useCallback(() => {
+    const hideAlert = window.localStorage.getItem('hideInfoAlert')
+    setShowInfoAlert(!hideAlert)
+  }, [])
+
+  useEffect(
+    () => {
+      loadFromStorage()
+    },
+    [loadFromStorage]
+  )
+
+  const onAlertClose = useCallback(
+    () => {
+      window.localStorage.setItem('hideInfoAlert', 'true')
+      loadFromStorage()
+    },
+    [loadFromStorage]
+  )
 
   const setNetworkData = (chainId: number) => {
     const network = chainId === home.chainId ? home.name : foreign.name
@@ -80,6 +103,19 @@ export const MainPage = () => {
         </HeaderContainer>
       </Header>
       <div className="container">
+        {showInfoAlert && (
+          <InfoAlert onClick={onAlertClose}>
+            Read the&nbsp;
+            <ExplorerTxLink
+              href="https://docs.tokenbridge.net/amb-bridge/about-amb-bridge"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              docs
+            </ExplorerTxLink>
+            &nbsp;to know how AMB Live Monitoring works
+          </InfoAlert>
+        )}
         <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />
         <Route
           path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']}
