@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useWindowWidth } from '@react-hook/window-size'
-import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
@@ -35,7 +35,11 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
       case VALIDATOR_CONFIRMATION_STATUS.WAITING:
         return <GreyLabel>{validatorStatus}</GreyLabel>
       default:
-        return <SimpleLoading />
+        return executionData.validator ? (
+          <GreyLabel>{VALIDATOR_CONFIRMATION_STATUS.WAITING}</GreyLabel>
+        ) : (
+          <SimpleLoading />
+        )
     }
   }
 
@@ -54,9 +58,15 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
             <td>{formattedValidator ? formattedValidator : <SimpleLoading />}</td>
             <StatusTd className="text-center">{getExecutionStatusElement(executionData.status)}</StatusTd>
             <AgeTd className="text-center">
-              <ExplorerTxLink href={txExplorerLink} target="_blank">
-                {executionData.timestamp > 0 ? formatTimestamp(executionData.timestamp) : ''}
-              </ExplorerTxLink>
+              {executionData.timestamp > 0 ? (
+                <ExplorerTxLink href={txExplorerLink} target="_blank">
+                  {formatTimestamp(executionData.timestamp)}
+                </ExplorerTxLink>
+              ) : executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ? (
+                ''
+              ) : (
+                SEARCHING_TX
+              )}
             </AgeTd>
           </tr>
         </tbody>

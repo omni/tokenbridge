@@ -59,6 +59,7 @@ export const getConfirmationsForTx = async (
   const notSuccessConfirmations = validatorConfirmations.filter(c => c.status !== VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
 
   // If signatures not collected, look for pending transactions
+  let pendingConfirmationsResult = false
   if (successConfirmations.length !== requiredSignatures) {
     // Check if confirmation is pending
     const validatorPendingConfirmationsChecks = await Promise.all(
@@ -74,7 +75,7 @@ export const getConfirmationsForTx = async (
     })
 
     if (validatorPendingConfirmations.length > 0) {
-      setPendingConfirmations(true)
+      pendingConfirmationsResult = true
     }
   }
 
@@ -83,6 +84,7 @@ export const getConfirmationsForTx = async (
   )
 
   // Check if confirmation failed
+  let failedConfirmationsResult = false
   const validatorFailedConfirmationsChecks = await Promise.all(
     undefinedConfirmations.map(
       getValidatorFailedTransaction(bridgeContract, messageData, timestamp, getFailedTransactions)
@@ -97,7 +99,7 @@ export const getConfirmationsForTx = async (
   })
   const messageConfirmationsFailed = validatorFailedConfirmations.length > validatorList.length - requiredSignatures
   if (messageConfirmationsFailed) {
-    setFailedConfirmations(true)
+    failedConfirmationsResult = true
   }
 
   const missingConfirmations = validatorConfirmations.filter(
@@ -108,6 +110,7 @@ export const getConfirmationsForTx = async (
     shouldRetry = true
   }
 
+  let signatureCollectedResult = false
   if (successConfirmations.length === requiredSignatures) {
     // If signatures collected, it should set other signatures not found as not required
     const notRequiredConfirmations = missingConfirmations.map(c => ({
@@ -116,7 +119,7 @@ export const getConfirmationsForTx = async (
     }))
 
     validatorConfirmations = [...validatorConfirmations, ...notRequiredConfirmations]
-    setSignatureCollected(true)
+    signatureCollectedResult = true
   }
 
   // get transactions from success signatures
@@ -137,7 +140,11 @@ export const getConfirmationsForTx = async (
     })
   }
 
+  // Set results
   setResult(updatedValidatorConfirmations)
+  setFailedConfirmations(failedConfirmationsResult)
+  setPendingConfirmations(pendingConfirmationsResult)
+  setSignatureCollected(signatureCollectedResult)
 
   // Retry if not all transaction were found for validator confirmations
   if (successConfirmationWithTxFound.length < successConfirmationWithData.length) {

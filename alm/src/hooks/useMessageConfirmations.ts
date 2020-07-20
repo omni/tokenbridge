@@ -329,7 +329,7 @@ export const useMessageConfirmations = ({
           } else if (waitingBlocksForExecutionResolved) {
             setStatus(CONFIRMATIONS_STATUS.EXECUTION_WAITING)
           } else {
-            setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
+            setStatus(CONFIRMATIONS_STATUS.EXECUTION_WAITING)
           }
         } else {
           setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
@@ -342,6 +342,8 @@ export const useMessageConfirmations = ({
         setStatus(CONFIRMATIONS_STATUS.PENDING)
       } else if (waitingBlocksResolved && existsConfirmation(confirmations)) {
         setStatus(CONFIRMATIONS_STATUS.WAITING_VALIDATORS)
+      } else if (waitingBlocksResolved) {
+        setStatus(CONFIRMATIONS_STATUS.SEARCHING)
       } else {
         setStatus(CONFIRMATIONS_STATUS.UNDEFINED)
       }
@@ -366,6 +368,7 @@ export const useMessageConfirmations = ({
     confirmations,
     status,
     signatureCollected,
-    executionData
+    executionData,
+    waitingBlocksResolved
   }
 }

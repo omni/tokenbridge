@@ -14,6 +14,7 @@ export const CONFIRMATIONS_STATUS_LABEL: { [key: string]: string } = {
   FAILED: 'Failed',
   PENDING: 'Pending',
   WAITING_VALIDATORS: 'Waiting',
+  SEARCHING: 'Waiting',
   WAITING_CHAIN: 'Waiting'
 }
 
@@ -26,6 +27,7 @@ export const CONFIRMATIONS_STATUS_LABEL_HOME: { [key: string]: string } = {
   FAILED: 'Confirmation Failed',
   PENDING: 'Confirmation Pending',
   WAITING_VALIDATORS: 'Confirmation Waiting',
+  SEARCHING: 'Confirmation Waiting',
   WAITING_CHAIN: 'Confirmation Waiting'
 }
 
@@ -39,7 +41,9 @@ export const CONFIRMATIONS_STATUS_DESCRIPTION: { [key: string]: string } = {
   PENDING:
     'The specified transaction was included in a block. A\nmajority of validators sent confirmations which have\nnot yet been added to a block.',
   WAITING_VALIDATORS:
-    'The specified transaction was included in a block.\nSome validators have sent confirmations, others are\nwaiting for chain finalization.',
+    'The specified transaction was included in a block.\nSome validators have sent confirmations, others are\nwaiting for chain finalization.\nCheck status again after a few blocks. If the issue still persists contact to the validators by messaging on %linkhttps://forum.poa.network/c/support',
+  SEARCHING:
+    'The specified transaction was included in a block. The app is looking for confirmations. Either\n1. Validators are waiting for chain finalization before sending their signatures.\n2. Validators are not active.\n3. The bridge was stopped.\nCheck status again after a few blocks. If the issue still persists contact to the validators by messaging on %linkhttps://forum.poa.network/c/support',
   WAITING_CHAIN:
     'The specified transaction was included in a block.\nValidators are waiting for chain finalization before\nsending their confirmations.'
 }
@@ -60,7 +64,9 @@ export const CONFIRMATIONS_STATUS_DESCRIPTION_HOME: { [key: string]: string } = 
   PENDING:
     'The specified transaction was included in a block.\nA majority of validators sent signatures which have not\nyet been added to a block.',
   WAITING_VALIDATORS:
-    'The specified transaction was included in a block.\nSome validators have sent signatures, others are\nwaiting for chain finalization.',
+    'The specified transaction was included in a block.\nSome validators have sent signatures, others are\nwaiting for chain finalization.\nCheck status again after a few blocks. If the issue still persists contact to the validators by messaging on %linkhttps://forum.poa.network/c/support',
+  SEARCHING:
+    'The specified transaction was included in a block. The app is looking for confirmations. Either\n1. Validators are waiting for chain finalization before sending their signatures.\n2. Validators are not active.\n3. The bridge was stopped.\nCheck status again after a few blocks. If the issue still persists contact to the validators by messaging on %linkhttps://forum.poa.network/c/support',
   WAITING_CHAIN:
     'The specified transaction was included in a block.\nValidators are waiting for chain finalization\nbefore sending their signatures.'
 }
