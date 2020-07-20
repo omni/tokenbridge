@@ -35,7 +35,11 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
       case VALIDATOR_CONFIRMATION_STATUS.WAITING:
         return <GreyLabel>{validatorStatus}</GreyLabel>
       default:
-        return <SimpleLoading />
+        return executionData.validator ? (
+          <GreyLabel>{VALIDATOR_CONFIRMATION_STATUS.WAITING}</GreyLabel>
+        ) : (
+          <SimpleLoading />
+        )
     }
   }
 

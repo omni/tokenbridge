@@ -39,7 +39,11 @@ export const ValidatorsConfirmations = ({
       case VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED:
         return <GreyLabel>{validatorStatus}</GreyLabel>
       default:
-        return <SimpleLoading />
+        return waitingBlocksResolved ? (
+          <GreyLabel>{VALIDATOR_CONFIRMATION_STATUS.WAITING}</GreyLabel>
+        ) : (
+          <SimpleLoading />
+        )
     }
   }
 
