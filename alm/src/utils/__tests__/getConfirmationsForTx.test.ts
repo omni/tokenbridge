@@ -104,12 +104,15 @@ describe('getConfirmationsForTx', () => {
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
-    expect(setFailedConfirmations).toBeCalledTimes(0)
+    expect(setFailedConfirmations).toBeCalledTimes(1)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorPendingTransaction).toBeCalledTimes(0)
-    expect(setPendingConfirmations).toBeCalledTimes(0)
+    expect(setPendingConfirmations).toBeCalledTimes(1)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(setResult.mock.calls[0][0]()).toEqual(
       expect.arrayContaining([
@@ -179,13 +182,16 @@ describe('getConfirmationsForTx', () => {
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
-    expect(setSignatureCollected).toBeCalledTimes(0)
+    expect(setSignatureCollected).toBeCalledTimes(1)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
-    expect(setFailedConfirmations).toBeCalledTimes(0)
+    expect(setFailedConfirmations).toBeCalledTimes(1)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorPendingTransaction).toBeCalledTimes(1)
-    expect(setPendingConfirmations).toBeCalledTimes(0)
+    expect(setPendingConfirmations).toBeCalledTimes(1)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
   })
   test('should set validator confirmations status, validator transactions and not retry', async () => {
     getValidatorConfirmation.mockImplementation(() => async (validator: string) => ({
@@ -242,12 +248,15 @@ describe('getConfirmationsForTx', () => {
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
-    expect(setFailedConfirmations).toBeCalledTimes(0)
+    expect(setFailedConfirmations).toBeCalledTimes(1)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorPendingTransaction).toBeCalledTimes(0)
-    expect(setPendingConfirmations).toBeCalledTimes(0)
+    expect(setPendingConfirmations).toBeCalledTimes(1)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(setResult.mock.calls[0][0]()).toEqual(
       expect.arrayContaining([
@@ -327,12 +336,15 @@ describe('getConfirmationsForTx', () => {
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
-    expect(setFailedConfirmations).toBeCalledTimes(0)
+    expect(setFailedConfirmations).toBeCalledTimes(1)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorPendingTransaction).toBeCalledTimes(0)
-    expect(setPendingConfirmations).toBeCalledTimes(0)
+    expect(setPendingConfirmations).toBeCalledTimes(1)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(setResult.mock.calls[0][0]()).toEqual(
       expect.arrayContaining([
@@ -414,13 +426,16 @@ describe('getConfirmationsForTx', () => {
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
-    expect(setSignatureCollected).toBeCalledTimes(0)
+    expect(setSignatureCollected).toBeCalledTimes(1)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
-    expect(setFailedConfirmations).toBeCalledTimes(0)
+    expect(setFailedConfirmations).toBeCalledTimes(1)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorPendingTransaction).toBeCalledTimes(1)
     expect(setPendingConfirmations).toBeCalledTimes(1)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(true)
 
     expect(setResult.mock.calls[0][0]()).toEqual(
       expect.arrayContaining([
@@ -498,13 +513,16 @@ describe('getConfirmationsForTx', () => {
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
-    expect(setSignatureCollected).toBeCalledTimes(0)
+    expect(setSignatureCollected).toBeCalledTimes(1)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
     expect(setFailedConfirmations).toBeCalledTimes(1)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(true)
 
     expect(getValidatorPendingTransaction).toBeCalledTimes(1)
-    expect(setPendingConfirmations).toBeCalledTimes(0)
+    expect(setPendingConfirmations).toBeCalledTimes(1)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
     expect(setResult.mock.calls[0][0]()).toEqual(
       expect.arrayContaining([
@@ -518,6 +536,169 @@ describe('getConfirmationsForTx', () => {
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 }
+      ])
+    )
+  })
+  test('should remove pending state after transaction mined', async () => {
+    // Validator1 success
+    // Validator2 failed
+    // Validator3 Pending
+
+    getValidatorConfirmation
+      .mockImplementationOnce(() => async (validator: string) => ({
+        validator,
+        status:
+          validator === validator1 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+      }))
+      .mockImplementation(() => async (validator: string) => ({
+        validator,
+        status:
+          validator !== validator2 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+      }))
+    getValidatorSuccessTransaction
+      .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
+        validator: validatorData.validator,
+        status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
+        txHash: validatorData.validator === validator1 ? '0x123' : '',
+        timestamp: validatorData.validator === validator1 ? 123 : 0
+      }))
+      .mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+        validator: validatorData.validator,
+        status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
+        txHash: validatorData.validator !== validator2 ? '0x123' : '',
+        timestamp: validatorData.validator !== validator2 ? 123 : 0
+      }))
+    getValidatorFailedTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+      validator: validatorData.validator,
+      status:
+        validatorData.validator === validator2
+          ? VALIDATOR_CONFIRMATION_STATUS.FAILED
+          : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+      txHash: validatorData.validator === validator2 ? '0x123' : '',
+      timestamp: validatorData.validator === validator2 ? 123 : 0
+    }))
+    getValidatorPendingTransaction
+      .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
+        validator: validatorData.validator,
+        status:
+          validatorData.validator === validator3
+            ? VALIDATOR_CONFIRMATION_STATUS.PENDING
+            : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+        txHash: validatorData.validator === validator3 ? '0x123' : '',
+        timestamp: validatorData.validator === validator3 ? 123 : 0
+      }))
+      .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
+        validator: validatorData.validator,
+        status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+        txHash: '',
+        timestamp: 0
+      }))
+
+    const setResult = jest.fn()
+    const setSignatureCollected = jest.fn()
+    const setFailedConfirmations = jest.fn()
+    const setPendingConfirmations = jest.fn()
+
+    await getConfirmationsForTx(
+      messageData,
+      web3,
+      validatorList,
+      bridgeContract,
+      confirmationContractMethod,
+      setResult,
+      requiredSignatures,
+      setSignatureCollected,
+      waitingBlocksResolved,
+      subscriptions,
+      timestamp,
+      getFailedTransactions,
+      setFailedConfirmations,
+      getPendingTransactions,
+      setPendingConfirmations,
+      getSuccessTransactions
+    )
+
+    unsubscribe()
+
+    expect(setResult).toBeCalledTimes(2)
+    expect(getValidatorConfirmation).toBeCalledTimes(1)
+    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(setSignatureCollected).toBeCalledTimes(1)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
+
+    expect(getValidatorFailedTransaction).toBeCalledTimes(1)
+    expect(setFailedConfirmations).toBeCalledTimes(1)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(false)
+
+    expect(getValidatorPendingTransaction).toBeCalledTimes(1)
+    expect(setPendingConfirmations).toBeCalledTimes(1)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(true)
+
+    expect(setResult.mock.calls[0][0]()).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+      ])
+    )
+    expect(setResult.mock.calls[1][0]).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+      ])
+    )
+
+    await getConfirmationsForTx(
+      messageData,
+      web3,
+      validatorList,
+      bridgeContract,
+      confirmationContractMethod,
+      setResult,
+      requiredSignatures,
+      setSignatureCollected,
+      waitingBlocksResolved,
+      subscriptions,
+      timestamp,
+      getFailedTransactions,
+      setFailedConfirmations,
+      getPendingTransactions,
+      setPendingConfirmations,
+      getSuccessTransactions
+    )
+
+    unsubscribe()
+
+    expect(setResult).toBeCalledTimes(4)
+    expect(getValidatorConfirmation).toBeCalledTimes(2)
+    expect(getValidatorSuccessTransaction).toBeCalledTimes(2)
+    expect(setSignatureCollected).toBeCalledTimes(2)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
+    expect(setSignatureCollected.mock.calls[1][0]).toEqual(true)
+
+    expect(getValidatorFailedTransaction).toBeCalledTimes(2)
+    expect(setFailedConfirmations).toBeCalledTimes(2)
+    expect(setFailedConfirmations.mock.calls[0][0]).toEqual(false)
+    expect(setFailedConfirmations.mock.calls[1][0]).toEqual(false)
+
+    expect(getValidatorPendingTransaction).toBeCalledTimes(1)
+    expect(setPendingConfirmations).toBeCalledTimes(2)
+    expect(setPendingConfirmations.mock.calls[0][0]).toEqual(true)
+    expect(setPendingConfirmations.mock.calls[1][0]).toEqual(false)
+
+    expect(setResult.mock.calls[2][0]()).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS }
+      ])
+    )
+    expect(setResult.mock.calls[3][0]).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 }
       ])
     )
   })
