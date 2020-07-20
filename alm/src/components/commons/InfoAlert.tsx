@@ -14,11 +14,15 @@ const CloseIconContainer = styled.div`
   cursor: pointer;
 `
 
+const TextContainer = styled.div`
+  flex-direction: column;
+`
+
 export const InfoAlert = ({ onClick, children }: { onClick: () => void; children: React.ReactChild[] }) => (
   <div className="row is-center">
-    <StyledInfoAlert className="col-10 is-vertical-align">
+    <StyledInfoAlert className="col-10 is-vertical-align row">
       <InfoIcon />
-      <div className="col-10 is-left">{children}</div>
+      <TextContainer className="col-10">{children}</TextContainer>
       <CloseIconContainer className="col-1 is-vertical-align is-center" onClick={onClick}>
         <CloseIcon />
       </CloseIconContainer>

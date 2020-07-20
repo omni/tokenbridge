@@ -7,6 +7,7 @@ import { useStateProvider } from '../state/StateProvider'
 import { TransactionReceipt } from 'web3-eth'
 import { InfoAlert } from './commons/InfoAlert'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
+import { FOREIGN_NETWORK_NAME, HOME_NETWORK_NAME } from '../config/constants'
 
 const StyledMainPage = styled.div`
   text-align: center;
@@ -31,6 +32,14 @@ const HeaderContainer = styled.header`
 
   @media (max-width: 600px) {
     padding: 0 20px;
+  }
+`
+
+const AlertP = styled.p`
+  align-items: start;
+  margin-bottom: 0;
+  @media (max-width: 600px) {
+    flex-direction: column;
   }
 `
 
@@ -105,15 +114,21 @@ export const MainPage = () => {
       <div className="container">
         {showInfoAlert && (
           <InfoAlert onClick={onAlertClose}>
-            Read the&nbsp;
-            <ExplorerTxLink
-              href="https://docs.tokenbridge.net/amb-bridge/about-amb-bridge"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              docs
-            </ExplorerTxLink>
-            &nbsp;to know how AMB Live Monitoring works
+            <p className="is-left text-left">
+              The Arbitrary Message Bridge Live Monitoring application provides real-time status updates for messages
+              bridged between {HOME_NETWORK_NAME} and {FOREIGN_NETWORK_NAME}. You can check current tx status, view
+              validator info, and troubleshoot potential issues with bridge transfers.
+            </p>
+            <AlertP className="is-left text-left">
+              For more information refer to&nbsp;
+              <ExplorerTxLink
+                href="https://docs.tokenbridge.net/about-tokenbridge/components/amb-live-monitoring-application"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                the ALM documentation
+              </ExplorerTxLink>
+            </AlertP>
           </InfoAlert>
         )}
         <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />
