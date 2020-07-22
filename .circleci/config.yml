@@ -164,6 +164,14 @@ jobs:
     steps:
       - tokenbridge-orb/init-repo
       - run: ./monitor-e2e/run-tests.sh
+  alm-e2e:
+    executor: tokenbridge-orb/machine-without-dlc
+    steps:
+      - tokenbridge-orb/install-node
+      - tokenbridge-orb/install-yarn
+      - restore_cache:
+          key: initialize-{{ .Environment.CIRCLE_SHA1 }}
+      - run: yarn run alm-e2e
   cover:
     executor: tokenbridge-orb/docker-node
     steps:

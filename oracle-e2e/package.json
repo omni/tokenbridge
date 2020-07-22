@@ -6,7 +6,8 @@
   "scripts": {
     "start": "mocha",
     "lint": "eslint . --ignore-path ../.eslintignore",
-    "amb": "ULTIMATE=true mocha test/amb.js"
+    "amb": "ULTIMATE=true mocha test/amb.js",
+    "alm": "mocha test/amb.js"
   },
   "author": "",
   "license": "ISC",

@@ -113,6 +113,15 @@ services:
     command: "true"
     networks:
       - ultimate
+  alm:
+    build:
+      context: ..
+      dockerfile: alm/Dockerfile
+      args:
+        DOT_ENV_PATH: e2e-commons/components-envs/alm.env
+    command: "true"
+    networks:
+      - ultimate
   monitor:
     image: ${DOCKER_LOGIN}/tokenbridge-e2e-monitor:${CIRCLE_BRANCH}
     build:
