@@ -1,4 +1,4 @@
-export { constants, wait, waitForEvent, isBridgeContract } from './utils'
+export { constants, wait, waitForEvent, isVanillaBridgeContract, isBridgeContract } from './utils'
 export {
   ERC677_ABI,
   FOREIGN_NATIVE_TO_ERC_ABI,

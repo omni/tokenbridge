@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Link, useHistory, useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { useTransactionStatus } from '../hooks/useTransactionStatus'
 import { formatTxHash, getExplorerTxUrl, getTransactionStatusDescription, validTxHash } from '../utils/networks'
 import { TRANSACTION_STATUS } from '../config/constants'
@@ -8,23 +8,8 @@ import { Loading } from './commons/Loading'
 import { useStateProvider } from '../state/StateProvider'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { ConfirmationsContainer } from './ConfirmationsContainer'
-import { LeftArrow } from './commons/LeftArrow'
-import styled from 'styled-components'
 import { TransactionReceipt } from 'web3-eth'
-
-const BackButton = styled.button`
-  color: var(--button-color);
-  border-color: var(--font-color);
-  margin-top: 10px;
-  &:focus {
-    outline: var(--button-color);
-  }
-`
-
-const BackLabel = styled.label`
-  margin-left: 5px;
-  cursor: pointer;
-`
+import { BackButton } from './commons/BackButton'
 
 export interface StatusContainerParam {
   onBackToMain: () => void
@@ -96,7 +81,7 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
         <p>
           The request{' '}
           {displayExplorerLink && (
-            <ExplorerTxLink href={txExplorerLink} target="blank">
+            <ExplorerTxLink href={txExplorerLink} target="_blank">
               {formattedMessageId}
             </ExplorerTxLink>
           )}
@@ -107,16 +92,7 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
       {displayConfirmations && (
         <ConfirmationsContainer message={messageToConfirm} receipt={receipt} fromHome={isHome} timestamp={timestamp} />
       )}
-      <div className="row is-center">
-        <div className="col-9">
-          <Link to="/" onClick={onBackToMain}>
-            <BackButton className="button outline is-left">
-              <LeftArrow />
-              <BackLabel>Search another transaction</BackLabel>
-            </BackButton>
-          </Link>
-        </div>
-      </div>
+      <BackButton onBackToMain={onBackToMain} />
     </div>
   )
 }

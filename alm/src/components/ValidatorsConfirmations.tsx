@@ -1,16 +1,13 @@
 import React from 'react'
 import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useWindowWidth } from '@react-hook/window-size'
-import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
-
-const Thead = styled.thead`
-  border-bottom: 2px solid #9e9e9e;
-`
+import { Thead, AgeTd, StatusTd } from './commons/Table'
 
 const RequiredConfirmations = styled.label`
   font-size: 14px;
@@ -20,12 +17,14 @@ export interface ValidatorsConfirmationsParams {
   confirmations: Array<ConfirmationParam>
   requiredSignatures: number
   validatorList: string[]
+  waitingBlocksResolved: boolean
 }
 
 export const ValidatorsConfirmations = ({
   confirmations,
   requiredSignatures,
-  validatorList
+  validatorList,
+  waitingBlocksResolved
 }: ValidatorsConfirmationsParams) => {
   const windowWidth = useWindowWidth()
 
@@ -40,7 +39,11 @@ export const ValidatorsConfirmations = ({
       case VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED:
         return <GreyLabel>{validatorStatus}</GreyLabel>
       default:
-        return <SimpleLoading />
+        return waitingBlocksResolved ? (
+          <GreyLabel>{VALIDATOR_CONFIRMATION_STATUS.WAITING}</GreyLabel>
+        ) : (
+          <SimpleLoading />
+        )
     }
   }
 
@@ -63,21 +66,28 @@ export const ValidatorsConfirmations = ({
             const elementIfNoTimestamp =
               displayedStatus !== VALIDATOR_CONFIRMATION_STATUS.WAITING &&
               displayedStatus !== VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED ? (
-                <SimpleLoading />
+                (displayedStatus === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED || displayedStatus === '') &&
+                waitingBlocksResolved ? (
+                  SEARCHING_TX
+                ) : (
+                  <SimpleLoading />
+                )
               ) : (
                 ''
               )
             return (
               <tr key={i}>
                 <td>{windowWidth < 850 ? formatTxHash(validator) : validator}</td>
-                <td className="text-center">{getValidatorStatusElement(displayedStatus)}</td>
-                <td className="text-center">
-                  <ExplorerTxLink href={explorerLink} target="_blank">
-                    {confirmation && confirmation.timestamp > 0
-                      ? formatTimestamp(confirmation.timestamp)
-                      : elementIfNoTimestamp}
-                  </ExplorerTxLink>
-                </td>
+                <StatusTd className="text-center">{getValidatorStatusElement(displayedStatus)}</StatusTd>
+                <AgeTd className="text-center">
+                  {confirmation && confirmation.timestamp > 0 ? (
+                    <ExplorerTxLink href={explorerLink} target="_blank">
+                      {formatTimestamp(confirmation.timestamp)}
+                    </ExplorerTxLink>
+                  ) : (
+                    elementIfNoTimestamp
+                  )}
+                </AgeTd>
               </tr>
             )
           })}

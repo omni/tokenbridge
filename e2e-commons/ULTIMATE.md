@@ -15,13 +15,13 @@ It runs the e2e tests on components deployed using the deployment playbooks.
 Run the Parity nodes, deploy the bridge contracts, deploy Oracle using the deployment playbook.
 
 ```bash
-./up.sh deploy native-to-erc
+./up.sh deploy native-to-erc blocks
 ```
 
 ### 2. Run the E2E tests
 
 ```
-docker-compose run e2e yarn workspace oracle-e2e run native-to-erc
+cd ui-e2e; yarn mocha -g "NATIVE_TO_ERC" -b ./test.js
 ```
 
 ## Diagram

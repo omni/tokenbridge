@@ -93,8 +93,7 @@ if (process.env.REACT_APP_MODE === 'AMB_NATIVE_TO_ERC677') {
     network: process.env.REACT_APP_FOREIGN_NETWORK,
     // @ts-ignore
     address: process.env.REACT_APP_FOREIGN_TOKEN_ADDRESS,
-    // @ts-ignore
-    bridgeAddress: process.env.REACT_APP_FOREIGN_MEDIATOR_ADDRESS
+    bridgeModes: ['erc-to-native-amb']
   })
 
   testBridge = new MediatorErcToNative({

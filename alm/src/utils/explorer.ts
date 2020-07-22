@@ -217,14 +217,11 @@ export const getValidatorSuccessTransactionsForMessage = async ({
   return filterValidatorSignatureTransaction(transactions, messageData)
 }
 
-export const getExecutionFailedTransactionForMessage = async ({
-  account,
-  to,
-  messageData,
-  startTimestamp,
-  endTimestamp
-}: GetFailedTransactionParams): Promise<APITransaction[]> => {
-  const failedTransactions = await getFailedTransactions(
+export const getExecutionFailedTransactionForMessage = async (
+  { account, to, messageData, startTimestamp, endTimestamp }: GetFailedTransactionParams,
+  getFailedTransactionsMethod = getFailedTransactions
+): Promise<APITransaction[]> => {
+  const failedTransactions = await getFailedTransactionsMethod(
     account,
     to,
     startTimestamp,
@@ -237,12 +234,11 @@ export const getExecutionFailedTransactionForMessage = async ({
   return failedTransactions.filter(t => t.input.includes(EXECUTE_SIGNATURES_HASH) && t.input.includes(messageDataValue))
 }
 
-export const getValidatorPendingTransactionsForMessage = async ({
-  account,
-  to,
-  messageData
-}: GetPendingTransactionParams): Promise<APIPendingTransaction[]> => {
-  const pendingTransactions = await fetchPendingTransactions({
+export const getValidatorPendingTransactionsForMessage = async (
+  { account, to, messageData }: GetPendingTransactionParams,
+  fetchPendingTransactionsMethod = fetchPendingTransactions
+): Promise<APIPendingTransaction[]> => {
+  const pendingTransactions = await fetchPendingTransactionsMethod({
     account,
     api: HOME_EXPLORER_API
   })
@@ -258,12 +254,11 @@ export const getValidatorPendingTransactionsForMessage = async ({
   )
 }
 
-export const getExecutionPendingTransactionsForMessage = async ({
-  account,
-  to,
-  messageData
-}: GetPendingTransactionParams): Promise<APIPendingTransaction[]> => {
-  const pendingTransactions = await fetchPendingTransactions({
+export const getExecutionPendingTransactionsForMessage = async (
+  { account, to, messageData }: GetPendingTransactionParams,
+  fetchPendingTransactionsMethod = fetchPendingTransactions
+): Promise<APIPendingTransaction[]> => {
+  const pendingTransactions = await fetchPendingTransactionsMethod({
     account,
     api: FOREIGN_EXPLORER_API
   })

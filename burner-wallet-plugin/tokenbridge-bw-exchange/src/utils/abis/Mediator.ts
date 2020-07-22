@@ -52,5 +52,19 @@ export default [
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'getBridgeMode',
+    outputs: [
+      {
+        name: '',
+        type: 'bytes4'
+      }
+    ],
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function'
   }
 ]

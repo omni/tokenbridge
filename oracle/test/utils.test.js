@@ -3,9 +3,10 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const BigNumber = require('bignumber.js')
 const proxyquire = require('proxyquire')
-const { addExtraGas, syncForEach } = require('../src/utils/utils')
+const { addExtraGas, syncForEach, promiseAny } = require('../src/utils/utils')
 
 chai.use(chaiAsPromised)
+chai.should()
 const { expect } = chai
 
 describe('utils', () => {
@@ -132,6 +133,36 @@ describe('utils', () => {
       return expect(promise).to.be.fulfilled.then(() => {
         expect(xs).to.deep.equal([])
       })
+    })
+  })
+
+  describe('promiseAny', () => {
+    const f = x => new Promise((res, rej) => setTimeout(() => (x > 0 ? res : rej)(x), 10 * x))
+
+    it('should return first obtained result', async () => {
+      const array = [2, 1, 3]
+      const result = await promiseAny(array.map(f))
+
+      expect(result).to.equal(1)
+    })
+
+    it('should return first obtained result with one reject', async () => {
+      const array = [2, -1, 3]
+      const result = await promiseAny(array.map(f))
+
+      expect(result).to.equal(2)
+    })
+
+    it('should return first obtained result with several rejects', async () => {
+      const array = [2, -1, -3]
+      const result = await promiseAny(array.map(f))
+
+      expect(result).to.equal(2)
+    })
+
+    it('should reject if all functions failed', async () => {
+      const array = [-2, -1, -3]
+      await promiseAny(array.map(f)).should.be.rejected
     })
   })
 })
