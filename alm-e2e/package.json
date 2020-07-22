@@ -8,13 +8,12 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "jest": "^26.1.0",
+    "jest": "24.7.1",
     "jest-puppeteer": "^4.4.0",
     "puppeteer": "^5.2.1"
   },
   "jest": {
-    "preset": "jest-puppeteer",
-    "testTimeout": 60000
+    "preset": "jest-puppeteer"
   },
   "devDependencies": {
     "eslint-plugin-jest": "^23.18.0"
