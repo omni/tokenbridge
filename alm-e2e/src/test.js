@@ -14,7 +14,7 @@ describe('ALM', () => {
   let page
 
   beforeAll(async () => {
-    browser = await puppeteer.launch({ headless: false, defaultViewport: null }) // { headless: false, defaultViewport: null }
+    browser = await puppeteer.launch()
     page = await browser.newPage()
   })
 
