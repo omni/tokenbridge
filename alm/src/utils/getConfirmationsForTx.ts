@@ -118,7 +118,10 @@ export const getConfirmationsForTx = async (
       status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED
     }))
 
-    validatorConfirmations = [...validatorConfirmations, ...notRequiredConfirmations]
+    notRequiredConfirmations.forEach(validatorData => {
+      const index = validatorConfirmations.findIndex(e => e.validator === validatorData.validator)
+      validatorConfirmations[index] = validatorData
+    })
     signatureCollectedResult = true
   }
 
