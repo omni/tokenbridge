@@ -143,8 +143,8 @@ jobs:
           command: |
             docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
             cd e2e-commons
-            docker-compose build oracle monitor ui e2e molecule_runner
-            docker-compose push oracle monitor ui e2e molecule_runner
+            docker-compose build oracle monitor ui alm e2e molecule_runner
+            docker-compose push oracle monitor ui alm e2e molecule_runner
   oracle-e2e:
     executor: tokenbridge-orb/machine-without-dlc
     steps:
@@ -296,6 +296,10 @@ workflows:
       - monitor-e2e:
           requires:
             - build-e2e-images
+      - alm-e2e:
+          requires:
+            - build-e2e-images
+            - initialize
       - deployment-oracle:
           requires:
             - build-e2e-images

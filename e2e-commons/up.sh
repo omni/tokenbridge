@@ -94,7 +94,6 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "alm" ]; then
-    docker-compose build alm
     docker-compose up -d alm
 
     docker-compose run -d -p 3004:3000 alm serve -p 3000 -s .

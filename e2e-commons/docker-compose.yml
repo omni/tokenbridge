@@ -114,6 +114,7 @@ services:
     networks:
       - ultimate
   alm:
+    image: ${DOCKER_LOGIN}/tokenbridge-e2e-alm:${CIRCLE_BRANCH}
     build:
       context: ..
       dockerfile: alm/Dockerfile
