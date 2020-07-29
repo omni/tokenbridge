@@ -87,7 +87,7 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
       <StyledConfirmationContainer className="col-9">
         <div className="row is-center">
           <StatusLabel>Status:</StatusLabel>
-          <StatusResultLabel>
+          <StatusResultLabel data-id="status">
             {status !== CONFIRMATIONS_STATUS.UNDEFINED ? statusLabel[status] : <SimpleLoading />}
           </StatusResultLabel>
         </div>

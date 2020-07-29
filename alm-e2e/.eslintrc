@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "plugin:node/recommended",
+    "airbnb-base",
+    "../.eslintrc"
+  ],
+  "plugins": ["node", "jest"],
+  "env": {
+    "jest/globals": true
+  },
+  "globals": {
+    "page": true,
+    "browser": true
+  }
+}
