@@ -34,6 +34,14 @@ describe('utils', () => {
 
       expect(result.toString()).to.equal('225')
     })
+
+    it('should handle maxGasLimit', () => {
+      const result1 = addExtraGas(new BigNumber(100), 0.25, 110)
+      const result2 = addExtraGas(new BigNumber(100), 0.25, 150)
+
+      expect(result1.toString()).to.equal('110')
+      expect(result2.toString()).to.equal('125')
+    })
   })
 
   describe('checkHTTPS', () => {

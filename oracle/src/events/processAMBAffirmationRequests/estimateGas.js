@@ -3,14 +3,16 @@ const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = req
 const logger = require('../../services/logger').child({
   module: 'processAffirmationRequests:estimateGas'
 })
+const { parseAMBHeader } = require('../../utils/message')
 
 async function estimateGas({ web3, homeBridge, validatorContract, message, address }) {
   try {
     const gasEstimate = await homeBridge.methods.executeAffirmation(message).estimateGas({
       from: address
     })
+    const msgGasLimit = parseAMBHeader(message).gasLimit
 
-    return gasEstimate
+    return gasEstimate + (gasEstimate > msgGasLimit ? 0 : msgGasLimit)
   } catch (e) {
     if (e instanceof HttpListProviderError) {
       throw e

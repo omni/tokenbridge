@@ -7,7 +7,7 @@ const rpcUrlsManager = require('./services/getRpcUrlsManager')
 const { getNonce, getChainId, getEventsFromTx } = require('./tx/web3')
 const { sendTx } = require('./tx/sendTx')
 const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
-const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
+const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
 const { ORACLE_VALIDATOR_ADDRESS, ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_ALLOW_HTTP_FOR_RPC } = process.env
 
@@ -143,7 +143,7 @@ async function sendJobTx(jobs) {
   let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
 
   await syncForEach(jobs, async job => {
-    const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE)
+    const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT)
 
     try {
       logger.info(`Sending transaction with nonce ${nonce}`)
