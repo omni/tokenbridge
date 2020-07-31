@@ -145,7 +145,7 @@ async function sendJobTx(jobs) {
   await syncForEach(jobs, async job => {
     let gasLimit
     if (typeof job.extraGas === 'number') {
-      gasLimit = job.gasEstimate + job.extraGas
+      gasLimit = addExtraGas(job.gasEstimate + job.extraGas, 0, MAX_GAS_LIMIT)
     } else {
       gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT)
     }
