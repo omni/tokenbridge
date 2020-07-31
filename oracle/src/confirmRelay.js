@@ -143,7 +143,12 @@ async function sendJobTx(jobs) {
   let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
 
   await syncForEach(jobs, async job => {
-    const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT)
+    let gasLimit
+    if (typeof job.extraGas === 'number') {
+      gasLimit = job.gasEstimate + job.extraGas
+    } else {
+      gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT)
+    }
 
     try {
       logger.info(`Sending transaction with nonce ${nonce}`)

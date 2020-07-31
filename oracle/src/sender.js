@@ -106,7 +106,12 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
 
     logger.debug(`Sending ${txArray.length} transactions`)
     await syncForEach(txArray, async job => {
-      const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT)
+      let gasLimit
+      if (typeof job.extraGas === 'number') {
+        gasLimit = job.gasEstimate + job.extraGas
+      } else {
+        gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT)
+      }
 
       try {
         logger.info(`Sending transaction with nonce ${nonce}`)

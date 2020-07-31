@@ -27,7 +27,7 @@ async function estimateGas({
     })
     const msgGasLimit = parseAMBHeader(message).gasLimit
 
-    return gasEstimate + (gasEstimate > msgGasLimit ? 0 : msgGasLimit)
+    return gasEstimate + msgGasLimit
   } catch (e) {
     if (e instanceof HttpListProviderError) {
       throw e

@@ -75,6 +75,7 @@ function processAffirmationRequestsBuilder(config) {
         txToSend.push({
           data,
           gasEstimate,
+          extraGas: 200000,
           transactionReference: affirmationRequest.transactionHash,
           to: config.homeBridgeAddress
         })

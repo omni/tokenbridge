@@ -107,6 +107,7 @@ function processCollectedSignaturesBuilder(config) {
         txToSend.push({
           data,
           gasEstimate,
+          extraGas: 200000,
           transactionReference: colSignature.transactionHash,
           to: config.foreignBridgeAddress
         })
