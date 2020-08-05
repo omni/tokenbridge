@@ -7,6 +7,7 @@ import { MessageSelector } from './MessageSelector'
 import { Loading } from './commons/Loading'
 import { useStateProvider } from '../state/StateProvider'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
+import { MultiLine } from './commons/MultiLine'
 import { ConfirmationsContainer } from './ConfirmationsContainer'
 import { TransactionReceipt } from 'web3-eth'
 import { BackButton } from './commons/BackButton'
@@ -64,10 +65,6 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
   const displayReference = multiMessageSelected ? messages[selectedMessageId].id : txHash
   const formattedMessageId = formatTxHash(displayReference)
 
-  const displayedDescription = multiMessageSelected
-    ? getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE, timestamp)
-    : description
-
   const isHome = chainId === home.chainId.toString()
   const txExplorerLink = getExplorerTxUrl(txHash, isHome)
   const displayExplorerLink = status !== TRANSACTION_STATUS.NOT_FOUND
@@ -75,17 +72,32 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
   const displayConfirmations = status === TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE || multiMessageSelected
   const messageToConfirm =
     messages.length > 1 ? messages[selectedMessageId] : messages.length > 0 ? messages[0] : { id: '', data: '' }
+
+  let displayedDescription:string = multiMessageSelected
+      ? getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE, timestamp)
+      : description
+  let link
+  const descArray = displayedDescription.split('%link')
+  if (descArray.length > 1) {
+    displayedDescription = descArray[0]
+    link = (
+      <ExplorerTxLink href={descArray[1]} target="_blank" rel="noopener noreferrer">
+        {descArray[1]}
+      </ExplorerTxLink>
+    )
+  }
+
   return (
     <div>
       {status && (
         <p>
-          The request{' '}
+          The transaction{' '}
           {displayExplorerLink && (
             <ExplorerTxLink href={txExplorerLink} target="_blank">
               {formattedMessageId}
             </ExplorerTxLink>
           )}
-          {!displayExplorerLink && <label>{formattedMessageId}</label>} {displayedDescription}
+          {!displayExplorerLink && <label>{formattedMessageId}</label>} {displayedDescription} {link}
         </p>
       )}
       {displayMessageSelector && <MessageSelector messages={messages} onMessageSelected={onMessageSelected} />}
