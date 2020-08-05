@@ -4,6 +4,11 @@ const logger = require('../../services/logger').child({
   module: 'processAffirmationRequests:estimateGas'
 })
 const { parseAMBHeader } = require('../../utils/message')
+const { strip0x } = require('../../../../commons')
+const {
+  AMB_AFFIRMATION_REQUEST_EXTRA_GAS_ESTIMATOR: estimateExtraGas,
+  MIN_AMB_HEADER_LENGTH
+} = require('../../utils/constants')
 
 async function estimateGas({ web3, homeBridge, validatorContract, message, address }) {
   try {
@@ -11,8 +16,10 @@ async function estimateGas({ web3, homeBridge, validatorContract, message, addre
       from: address
     })
     const msgGasLimit = parseAMBHeader(message).gasLimit
+    // message length in bytes
+    const len = strip0x(message).length / 2 - MIN_AMB_HEADER_LENGTH
 
-    return gasEstimate + msgGasLimit
+    return gasEstimate + msgGasLimit + estimateExtraGas(len)
   } catch (e) {
     if (e instanceof HttpListProviderError) {
       throw e
