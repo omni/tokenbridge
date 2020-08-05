@@ -16,7 +16,7 @@ const {
   watchdog,
   nonceError
 } = require('./utils/utils')
-const { EXIT_CODES, EXTRA_GAS_PERCENTAGE } = require('./utils/constants')
+const { EXIT_CODES, EXTRA_GAS_ABSOLUTE } = require('./utils/constants')
 
 const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
@@ -106,7 +106,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
 
     logger.debug(`Sending ${txArray.length} transactions`)
     await syncForEach(txArray, async job => {
-      const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_PERCENTAGE)
+      const gasLimit = addExtraGas(job.gasEstimate, EXTRA_GAS_ABSOLUTE, logger)
 
       try {
         logger.info(`Sending transaction with nonce ${nonce}`)

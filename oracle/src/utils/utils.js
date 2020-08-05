@@ -48,11 +48,11 @@ async function waitForFunds(web3, address, minimumBalance, cb, logger) {
   )
 }
 
-function addExtraGas(gas, extraPercentage) {
+function addExtraGas(gas, extra, logger) {
   gas = BigNumber(gas)
-  extraPercentage = BigNumber(1 + extraPercentage)
+  const gasWithExtra = gas.plus(extra).toFixed(0)
 
-  const gasWithExtra = gas.multipliedBy(extraPercentage).toFixed(0)
+  logger.info({ gasEstimated: gasWithExtra }, 'Gas Limit used')
 
   return BigNumber(gasWithExtra)
 }

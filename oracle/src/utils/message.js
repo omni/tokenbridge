@@ -73,9 +73,37 @@ function packSignatures(array) {
   return `0x${msgLength}${v}${r}${s}`
 }
 
+function parseAMBHeader(message) {
+  message = strip0x(message)
+
+  const messageIdStart = 0
+  const messageIdLength = 32 * 2
+  const messageId = `0x${message.slice(messageIdStart, messageIdStart + messageIdLength)}`
+
+  const senderStart = messageIdStart + messageIdLength
+  const senderLength = 20 * 2
+  const sender = `0x${message.slice(senderStart, senderStart + senderLength)}`
+
+  const executorStart = senderStart + senderLength
+  const executorLength = 20 * 2
+  const executor = `0x${message.slice(executorStart, executorStart + executorLength)}`
+
+  const gasLimitStart = executorStart + executorLength
+  const gasLimitLength = 4 * 2
+  const gasLimit = parseInt(message.slice(gasLimitStart, gasLimitStart + gasLimitLength), 16)
+
+  return {
+    messageId,
+    sender,
+    executor,
+    gasLimit
+  }
+}
+
 module.exports = {
   createMessage,
   parseMessage,
   signatureToVRS,
-  packSignatures
+  packSignatures,
+  parseAMBHeader
 }
