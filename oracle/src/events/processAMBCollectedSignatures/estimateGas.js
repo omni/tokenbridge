@@ -27,6 +27,9 @@ async function estimateGas({
     })
     const msgGasLimit = parseAMBHeader(message).gasLimit
 
+    // + estimateExtraGas(len)
+    // is not needed here, since estimateGas will already take into account gas
+    // needed for memory expansion, message processing, etc.
     return gasEstimate + msgGasLimit
   } catch (e) {
     if (e instanceof HttpListProviderError) {
