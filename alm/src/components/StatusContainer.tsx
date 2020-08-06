@@ -7,7 +7,6 @@ import { MessageSelector } from './MessageSelector'
 import { Loading } from './commons/Loading'
 import { useStateProvider } from '../state/StateProvider'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
-import { MultiLine } from './commons/MultiLine'
 import { ConfirmationsContainer } from './ConfirmationsContainer'
 import { TransactionReceipt } from 'web3-eth'
 import { BackButton } from './commons/BackButton'
@@ -73,9 +72,9 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
   const messageToConfirm =
     messages.length > 1 ? messages[selectedMessageId] : messages.length > 0 ? messages[0] : { id: '', data: '' }
 
-  let displayedDescription:string = multiMessageSelected
-      ? getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE, timestamp)
-      : description
+  let displayedDescription: string = multiMessageSelected
+    ? getTransactionStatusDescription(TRANSACTION_STATUS.SUCCESS_ONE_MESSAGE, timestamp)
+    : description
   let link
   const descArray = displayedDescription.split('%link')
   if (descArray.length > 1) {
