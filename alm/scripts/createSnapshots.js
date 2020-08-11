@@ -1,4 +1,4 @@
-const { BRIDGE_VALIDATORS_ABI, HOME_AMB_ABI } = require('commons')
+  const { BRIDGE_VALIDATORS_ABI, HOME_AMB_ABI } = require('commons')
 
 const path = require('path')
 require('dotenv').config()
@@ -28,16 +28,24 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
 
   const bridgeContract = new web3.eth.Contract(HOME_AMB_ABI, bridgeAddress)
 
+  console.log('Getting the block to start looking for the bridge events for', side)
+
+  let deployedAtBlock = await bridgeContract.methods.deployedAtBlock().call()
+
+  console.log('Getting events to track changes of required block confirmations for', side)
   // Save RequiredBlockConfirmationChanged events
-  let requiredBlockConfirmationChangedEvents = await bridgeContract.getPastEvents('RequiredBlockConfirmationChanged', {
-    fromBlock: 0,
+  let requiredBlockConfirmationChangedEvents = []
+  requiredBlockConfirmationChangedEvents = await bridgeContract.getPastEvents('RequiredBlockConfirmationChanged', {
+    fromBlock: deployedAtBlock,
     toBlock: currentBlockNumber
+  }).catch(error => {
+    console.log('Cannot get required block confirmations for', side)
   })
 
   // In case RequiredBlockConfirmationChanged was not emitted during initialization in early versions of AMB
   // manually generate an event for this. Example Sokol - Kovan bridge
   if (requiredBlockConfirmationChangedEvents.length === 0) {
-    const deployedAtBlock = await bridgeContract.methods.deployedAtBlock().call()
+    console.log('Getting required block confirmations from the contract storage for', side)
     const blockConfirmations = await bridgeContract.methods.requiredBlockConfirmations().call()
 
     requiredBlockConfirmationChangedEvents.push({
@@ -58,9 +66,14 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   const validatorAddress = await bridgeContract.methods.validatorContract().call()
   const validatorContract = new web3.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorAddress)
 
+  console.log('Getting the block to start looking for the validators events for', side)
+
+  deployedAtBlock = await validatorContract.methods.deployedAtBlock().call()
+
+  console.log('Getting events to track changes of required signatures for', side)
   // Save RequiredSignaturesChanged events
   const RequiredSignaturesChangedEvents = await validatorContract.getPastEvents('RequiredSignaturesChanged', {
-    fromBlock: 0,
+    fromBlock: deployedAtBlock,
     toBlock: currentBlockNumber
   })
   snapshot.RequiredSignaturesChanged = RequiredSignaturesChangedEvents.map(e => ({
@@ -70,9 +83,10 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
     }
   }))
 
+  console.log('Getting events to track changes of validators added for', side)
   // Save ValidatorAdded events
   const validatorAddedEvents = await validatorContract.getPastEvents('ValidatorAdded', {
-    fromBlock: 0,
+    fromBlock: deployedAtBlock,
     toBlock: currentBlockNumber
   })
 
@@ -84,9 +98,10 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
     event: 'ValidatorAdded'
   }))
 
+  console.log('Getting events to track changes of validators removed for', side)
   // Save ValidatorRemoved events
   const validatorRemovedEvents = await validatorContract.getPastEvents('ValidatorRemoved', {
-    fromBlock: 0,
+    fromBlock: deployedAtBlock,
     toBlock: currentBlockNumber
   })
 
@@ -114,5 +129,5 @@ main()
   .catch(error => {
     console.log('Error while creating snapshots')
     console.error(error)
-    process.exit(0)
+    process.exit(1)
   })
