@@ -31,12 +31,7 @@ const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, CO
 const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 
 describe('erc to native', () => {
-  let halfDuplexTokenAddress
-  let halfDuplexToken
   before(async () => {
-    halfDuplexTokenAddress = await foreignBridge.methods.halfDuplexErc20token().call()
-    halfDuplexToken = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, halfDuplexTokenAddress)
-
     // Set 2 required signatures for home bridge
     await setRequiredSignatures({
       bridgeContract: homeBridge,
@@ -56,85 +51,6 @@ describe('erc to native', () => {
       options: {
         from: validator.address,
         gas: '4000000'
-      }
-    })
-  })
-  it('should not convert half duplex tokens to native tokens in home', async () => {
-    const originalBalanceOnHome = await homeWeb3.eth.getBalance(user.address)
-
-    const transferValue = homeWeb3.utils.toWei('0.01')
-
-    // send tokens to foreign bridge
-    await halfDuplexToken.methods
-      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, transferValue)
-      .send({
-        from: user.address,
-        gas: '1000000'
-      })
-      .catch(e => {
-        console.error(e)
-      })
-
-    // check that balance does not increases
-    await promiseRetry(async (retry, number) => {
-      const balance = await homeWeb3.eth.getBalance(user.address)
-      // retry at least 4 times to check transfer is not processed
-      if (toBN(balance).eq(toBN(originalBalanceOnHome)) && number < 4) {
-        retry()
-      } else {
-        assert(toBN(balance).eq(toBN(originalBalanceOnHome)), 'User balance should not be increased')
-      }
-    })
-
-    // send tokens to foreign bridge
-    await erc20Token.methods
-      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, transferValue)
-      .send({
-        from: user.address,
-        gas: '1000000'
-      })
-      .catch(e => {
-        console.error(e)
-      })
-
-    // check that balance increases
-    await promiseRetry(async (retry, number) => {
-      const balance = await homeWeb3.eth.getBalance(user.address)
-      // retry at least 4 times to check transfer is not double processed by the two watchers
-      if (toBN(balance).lte(toBN(originalBalanceOnHome)) || number < 4) {
-        retry()
-      } else {
-        assert(
-          toBN(balance).eq(toBN(originalBalanceOnHome).add(toBN(transferValue))),
-          'User balance should be increased only by second transfer'
-        )
-      }
-    })
-
-    const afterTransferBalance = await homeWeb3.eth.getBalance(user.address)
-
-    // send tokens to foreign bridge
-    await erc20Token.methods
-      .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, transferValue)
-      .send({
-        from: user.address,
-        gas: '1000000'
-      })
-      .catch(e => {
-        console.error(e)
-      })
-
-    // check that balance increases
-    await promiseRetry(async (retry, number) => {
-      const balance = await homeWeb3.eth.getBalance(user.address)
-      // retry at least 4 times to check transfer is not double processed by the two watchers
-      if (toBN(balance).lte(toBN(afterTransferBalance)) || number < 4) {
-        retry()
-      } else {
-        assert(
-          toBN(balance).eq(toBN(afterTransferBalance).add(toBN(transferValue))),
-          'User balance should be increased'
-        )
       }
     })
   })
