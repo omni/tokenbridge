@@ -4,7 +4,7 @@ const promiseLimit = require('promise-limit')
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
-const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
+const { EXIT_CODES, MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
 const { parseAMBMessage } = require('../../../../commons')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
@@ -75,6 +75,7 @@ function processAffirmationRequestsBuilder(config) {
         txToSend.push({
           data,
           gasEstimate,
+          extraGas: EXTRA_GAS_ABSOLUTE,
           transactionReference: affirmationRequest.transactionHash,
           to: config.homeBridgeAddress
         })

@@ -48,13 +48,13 @@ async function waitForFunds(web3, address, minimumBalance, cb, logger) {
   )
 }
 
-function addExtraGas(gas, extraPercentage) {
+function addExtraGas(gas, extraPercentage, maxGasLimit = Infinity) {
   gas = BigNumber(gas)
   extraPercentage = BigNumber(1 + extraPercentage)
 
   const gasWithExtra = gas.multipliedBy(extraPercentage).toFixed(0)
 
-  return BigNumber(gasWithExtra)
+  return BigNumber.min(maxGasLimit, gasWithExtra)
 }
 
 function setIntervalAndRun(f, interval) {

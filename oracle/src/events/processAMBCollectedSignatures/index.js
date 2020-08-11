@@ -8,7 +8,7 @@ const { signatureToVRS, packSignatures } = require('../../utils/message')
 const { parseAMBMessage } = require('../../../../commons')
 const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
-const { MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
+const { MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/constants')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
@@ -107,6 +107,7 @@ function processCollectedSignaturesBuilder(config) {
         txToSend.push({
           data,
           gasEstimate,
+          extraGas: EXTRA_GAS_ABSOLUTE,
           transactionReference: colSignature.transactionHash,
           to: config.foreignBridgeAddress
         })
