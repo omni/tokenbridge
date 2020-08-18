@@ -22,5 +22,6 @@ module.exports = {
   GAS_PRICE_BOUNDARIES: {
     MIN: 1,
     MAX: 250
-  }
+  },
+  FALLBACK_GAS_ESTIMATE: 600000
 }

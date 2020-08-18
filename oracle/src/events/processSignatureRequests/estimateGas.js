@@ -14,6 +14,14 @@ async function estimateGas({ web3, homeBridge, validatorContract, signature, mes
     if (e instanceof HttpListProviderError) {
       throw e
     }
+    if (e.message.includes('method handler crashed')){
+      logger.debug('Method handler crashed error. Return constant estimateGas')
+      const msgGasLimit = parseAMBHeader(message).gasLimit
+      // message length in bytes
+      const len = strip0x(message).length / 2 - MIN_AMB_HEADER_LENGTH
+
+      return FALLBACK_GAS_ESTIMATE + msgGasLimit + estimateExtraGas(len)
+    }
 
     // Check if minimum number of validations was already reached
     logger.debug('Check if minimum number of validations was reached')

@@ -7,7 +7,8 @@ const { parseAMBHeader } = require('../../utils/message')
 const { strip0x } = require('../../../../commons')
 const {
   AMB_AFFIRMATION_REQUEST_EXTRA_GAS_ESTIMATOR: estimateExtraGas,
-  MIN_AMB_HEADER_LENGTH
+  MIN_AMB_HEADER_LENGTH,
+  FALLBACK_GAS_ESTIMATE
 } = require('../../utils/constants')
 
 async function estimateGas({ web3, homeBridge, validatorContract, message, address }) {
@@ -23,6 +24,14 @@ async function estimateGas({ web3, homeBridge, validatorContract, message, addre
   } catch (e) {
     if (e instanceof HttpListProviderError) {
       throw e
+    }
+    if (e.message.includes('method handler crashed')){
+      logger.debug('Method handler crashed error. Return constant estimateGas')
+      const msgGasLimit = parseAMBHeader(message).gasLimit
+      // message length in bytes
+      const len = strip0x(message).length / 2 - MIN_AMB_HEADER_LENGTH
+
+      return FALLBACK_GAS_ESTIMATE + msgGasLimit + estimateExtraGas(len)
     }
 
     const messageHash = web3.utils.soliditySha3(message)
