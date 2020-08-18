@@ -3,6 +3,9 @@ const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = req
 const logger = require('../../services/logger').child({
   module: 'processSignatureRequests:estimateGas'
 })
+const {
+  FALLBACK_GAS_ESTIMATE
+} = require('../../utils/constants')
 
 async function estimateGas({ web3, homeBridge, validatorContract, signature, message, address }) {
   try {
@@ -16,11 +19,7 @@ async function estimateGas({ web3, homeBridge, validatorContract, signature, mes
     }
     if (e.message.includes('method handler crashed')){
       logger.debug('Method handler crashed error. Return constant estimateGas')
-      const msgGasLimit = parseAMBHeader(message).gasLimit
-      // message length in bytes
-      const len = strip0x(message).length / 2 - MIN_AMB_HEADER_LENGTH
-
-      return FALLBACK_GAS_ESTIMATE + msgGasLimit + estimateExtraGas(len)
+      return FALLBACK_GAS_ESTIMATE
     }
 
     // Check if minimum number of validations was already reached
