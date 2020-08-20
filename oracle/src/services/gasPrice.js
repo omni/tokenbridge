@@ -73,13 +73,14 @@ async function start(chainId, fetchOnce) {
     throw new Error(`Unrecognized chainId '${chainId}'`)
   }
 
+  const fetchFn = gasPriceSupplierUrl === 'gas-price-oracle' ? null : () => fetch(gasPriceSupplierUrl)
   if (fetchOnce) {
-    await fetchGasPrice(speedType, factor, bridgeContract, () => fetch(gasPriceSupplierUrl))
+    await fetchGasPrice(speedType, factor, bridgeContract, fetchFn)
     return getPrice()
   }
 
   fetchGasPriceInterval = setIntervalAndRun(
-    () => fetchGasPrice(speedType, factor, bridgeContract, () => fetch(gasPriceSupplierUrl)),
+    () => fetchGasPrice(speedType, factor, bridgeContract, fetchFn),
     updateInterval
   )
   return null

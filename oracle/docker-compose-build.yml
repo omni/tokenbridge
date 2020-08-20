@@ -3,4 +3,6 @@ version: '2.4'
 services:
   oracle:
     image: poanetwork/tokenbridge-oracle
-    build: .
+    build:
+      context: ..
+      dockerfile: ./oracle/Dockerfile

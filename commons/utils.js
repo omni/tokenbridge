@@ -1,6 +1,9 @@
 const { toWei, toBN } = require('web3-utils')
+const { GasPriceOracle } = require('gas-price-oracle')
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
+
+const gasPriceOracle = new GasPriceOracle()
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
@@ -235,8 +238,14 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
 // we use built-in 'fetch' on browser side, and `node-fetch` package in Node.
 const gasPriceFromSupplier = async (fetchFn, options = {}) => {
   try {
-    const response = await fetchFn()
-    const json = await response.json()
+    let json
+    if (fetchFn) {
+      const response = await fetchFn()
+      json = await response.json()
+    } else {
+      json = await gasPriceOracle.fetchGasPricesOffChain()
+      console.log(json)
+    }
     const oracleGasPrice = json[options.speedType]
 
     if (!oracleGasPrice) {
