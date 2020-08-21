@@ -244,7 +244,6 @@ const gasPriceFromSupplier = async (fetchFn, options = {}) => {
       json = await response.json()
     } else {
       json = await gasPriceOracle.fetchGasPricesOffChain()
-      console.log(json)
     }
     const oracleGasPrice = json[options.speedType]
 
