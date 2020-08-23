@@ -13,7 +13,6 @@ const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/Rewardab
 const HOME_AMB_ABI = require('../contracts/build/contracts/HomeAMB').abi
 const FOREIGN_AMB_ABI = require('../contracts/build/contracts/ForeignAMB').abi
 const BOX_ABI = require('../contracts/build/contracts/Box').abi
-const SAI_TOP = require('../contracts/build/contracts/SaiTopMock').abi
 const HOME_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeAMBErc677ToErc677').abi
 const FOREIGN_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignAMBErc677ToErc677').abi
 const HOME_STAKE_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeStakeTokenMediator').abi
@@ -136,7 +135,6 @@ module.exports = {
   OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI,
   OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI,
   BOX_ABI,
-  SAI_TOP,
   HOME_STAKE_ERC_TO_ERC_ABI,
   FOREIGN_STAKE_ERC_TO_ERC_ABI
 }

@@ -53,7 +53,8 @@ class GasPriceStore {
     }
 
     const oracleOptions = { speedType: this.speedType, factor: this.factor, logger: console }
-    this.gasPrice = (await gasPriceFromSupplier(() => fetch(this.gasPriceSupplierUrl), oracleOptions)) || this.gasPrice
+    const fetchFn = this.gasPriceSupplierUrl === 'gas-price-oracle' ? null : () => fetch(this.gasPriceSupplierUrl)
+    this.gasPrice = (await gasPriceFromSupplier(fetchFn, oracleOptions)) || this.gasPrice
 
     setTimeout(() => this.updateGasPrice(), this.updateInterval)
   }
