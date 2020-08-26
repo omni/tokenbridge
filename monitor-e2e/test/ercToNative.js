@@ -37,6 +37,9 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
+      if (!data.foreign) {
+        return false
+      }
       const { erc20Balance, investedErc20Balance } = data.foreign
       return data.balanceDiff === 0.01 && erc20Balance === '0.01' && investedErc20Balance === undefined
     })
@@ -58,6 +61,9 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
       const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
+      if (!data.foreign) {
+        return false
+      }
       return (
         data.balanceDiff === 0.02 &&
         erc20Balance === '0.02' &&
@@ -72,6 +78,9 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
       const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
+      if (!data.foreign) {
+        return false
+      }
       return (
         data.balanceDiff === 0.02 &&
         erc20Balance === '0.01' &&
@@ -86,6 +95,9 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
       const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
+      if (!data.foreign) {
+        return false
+      }
       return (
         data.balanceDiff === 0.02 &&
         erc20Balance === '0.005' &&

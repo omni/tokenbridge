@@ -8,7 +8,7 @@ const {
 } = require('../commons')
 const { validator } = require('../e2e-commons/constants')
 
-const waitUntil = async (predicate, step = 100, timeout = 20000) => {
+const waitUntil = async (predicate, step = 100, timeout = 60000) => {
   const stopTime = Date.now() + timeout
   while (Date.now() <= stopTime) {
     const result = await predicate()

@@ -6,12 +6,10 @@
   - name: stop the service
     shell: service poabridge stop
 
-  - name: Build current oracle image
-    shell: docker build -t oracle:ultimate-testing --file oracle/Dockerfile .
+  - name: ReTag current oracle image
+    shell: docker tag $(docker images --format '{{ '{{' }}.Repository{{ '}}' }}:{{ '{{' }}.Tag{{ '}}' }}' | grep -m 1 tokenbridge-e2e-oracle) oracle:ultimate-testing
     delegate_to: 127.0.0.1
     become: false
-    args:
-      chdir: "{{ lookup('env', 'PWD') }}/.."
 
   - name: Replace oracle image
     replace:
