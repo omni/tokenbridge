@@ -11,8 +11,8 @@ function RpcUrlsManager(homeUrls, foreignUrls) {
     throw new Error(`Invalid foreignUrls: '${foreignUrls}'`)
   }
 
-  this.homeUrls = homeUrls.split(',')
-  this.foreignUrls = foreignUrls.split(',')
+  this.homeUrls = homeUrls.split(' ')
+  this.foreignUrls = foreignUrls.split(' ')
 }
 
 RpcUrlsManager.prototype.tryEach = async function(chain, f, redundant = false) {
