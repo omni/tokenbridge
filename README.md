@@ -110,4 +110,4 @@ This project is licensed under the GNU Lesser General Public License v3.0. See t
 
 ## References
 
-* [TokenBridge Documentation](http://www.tokenbridge.net/)
+* [TokenBridge Documentation](https://docs.tokenbridge.net/)
