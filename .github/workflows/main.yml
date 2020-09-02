@@ -107,9 +107,9 @@ jobs:
           if [ ${#updated[@]} -gt 0 ]; then
             echo "Updated services: ${updated[@]}"
             cd e2e-commons
-            # docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
-            # docker-compose build ${updated[@]}
-            # docker-compose push ${updated[@]}
+            docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
+            docker-compose build ${updated[@]}
+            docker-compose push ${updated[@]}
           else
             echo "Nothing relevant was changed in the source"
           fi
