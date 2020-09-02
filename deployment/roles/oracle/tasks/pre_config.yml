@@ -9,7 +9,8 @@
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/oracle/.env"
-    mode: '0666'
+    owner: "{{ compose_service_user }}"
+    mode: '0640'
 
 - name: Copy docker-compose files
   copy:
