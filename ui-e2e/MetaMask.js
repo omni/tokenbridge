@@ -3,7 +3,7 @@ const { By } = require('selenium-webdriver/lib/by')
 const { Page } = require('./Page.js')
 const { homeRPC, foreignRPC } = require('../e2e-commons/constants.json')
 
-const IDMetaMask = 'dapggmdndodedfoaljbglbkaicfpmkkm'
+const IDMetaMask = 'hccmbhdehlhjhkenmcjnbcahkmljpife'
 const URL = 'chrome-extension://' + IDMetaMask + '//popup.html'
 const buttonSubmit = By.className('confirm btn-green')
 const buttonAccept = By.xpath('//*[@id="app-content"]/div/div[4]/div/button')

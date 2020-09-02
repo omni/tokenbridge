@@ -43,6 +43,7 @@
     "test": "yarn wsrun --exclude oracle-e2e --exclude ui-e2e --exclude monitor-e2e --exclude alm-e2e test",
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
     "ui-e2e": "./ui-e2e/run-tests.sh",
+    "ui-e2e:ci": "xvfb-run yarn ui-e2e",
     "monitor-e2e": "./monitor-e2e/run-tests.sh",
     "alm-e2e": "./alm-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build ./**/**/dist",

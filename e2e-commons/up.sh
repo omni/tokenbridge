@@ -4,7 +4,13 @@ set -e # exit when any command fails
 
 ./down.sh
 docker-compose build parity1 parity2
-test -n "$NODOCKERPULL" || ./pull.sh $@
+
+if [ -z "$CI" ]; then
+  ./build.sh $@
+else
+  ./pull.sh $@
+fi
+
 docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
 
@@ -105,26 +111,6 @@ while [ "$1" != "" ]; do
 
   if [ "$1" == "monitor" ]; then
     docker-compose up -d monitor monitor-erc20 monitor-erc20-native monitor-amb
-  fi
-
-  if [ "$1" == "native-to-erc" ]; then
-    ../deployment-e2e/molecule.sh ultimate-native-to-erc
-  fi
-
-  if [ "$1" == "erc-to-native" ]; then
-    ../deployment-e2e/molecule.sh ultimate-erc-to-native
-  fi
-
-  if [ "$1" == "erc-to-erc" ]; then
-    ../deployment-e2e/molecule.sh ultimate-erc-to-erc
-  fi
-
-  if [ "$1" == "amb" ]; then
-    ../deployment-e2e/molecule.sh ultimate-amb
-  fi
-
-  if [ "$1" == "ultimate-amb-stake-erc-to-erc" ]; then
-    ../deployment-e2e/molecule.sh ultimate-amb-stake-erc-to-erc
   fi
 
   if [ "$1" == "alm-e2e" ]; then

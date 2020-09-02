@@ -1,0 +1,231 @@
+name: tokenbridge
+
+on: [push]
+
+env:
+  DOCKER_REGISTRY: docker.pkg.github.com
+  DOCKER_REPO: poanetwork/tokenbridge
+  DOCKER_IMAGE_BASE: docker.pkg.github.com/poanetwork/tokenbridge
+
+jobs:
+  initialize:
+    runs-on: ubuntu-latest
+    outputs:
+      cache_key: ${{ steps.get_cache_key.outputs.cache_key }}
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 10
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: git submodule status > submodule.status
+      - id: get_cache_key
+        run: echo "::set-output name=cache_key::cache-repo-${{ hashFiles('yarn.lock', 'package.json', 'submodule.status') }}"
+      - uses: actions/cache@v2
+        id: cache-repo
+        with:
+          path: |
+            **/node_modules
+            contracts/build
+          key: ${{ steps.get_cache_key.outputs.cache_key }}
+      - if: ${{ !steps.cache-repo.outputs.cache-hit }}
+        run: |
+          yarn install --frozen-lockfile
+          yarn run install:deploy
+          yarn run compile:contracts
+  validate:
+    runs-on: ubuntu-latest
+    needs:
+      - initialize
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [build, lint, test]
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 10
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/cache@v2
+        id: cache-repo
+        with:
+          path: |
+            **/node_modules
+            contracts/build
+          key: ${{ needs.initialize.outputs.cache_key }}
+      - run: ${{ steps.cache-repo.outputs.cache-hit }} && yarn run ${{ matrix.task }}
+  ui-coverage:
+    runs-on: ubuntu-latest
+    needs:
+      - initialize
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 10
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/cache@v2
+        id: cache-repo
+        with:
+          path: |
+            **/node_modules
+            contracts/build
+          key: ${{ needs.initialize.outputs.cache_key }}
+      - run: ${{ steps.cache-repo.outputs.cache-hit }} && yarn workspace ui run coverage
+      - uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ github.token }}
+          path-to-lcov: ./ui/coverage/lcov.info
+  build-e2e-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: |
+          git submodule status > submodule.status
+          echo "::set-env name=E2E_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}"
+          echo "::set-env name=ORACLE_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}"
+          echo "::set-env name=MONITOR_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}"
+          echo "::set-env name=UI_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'ui') }}"
+          echo "::set-env name=ALM_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}"
+      - run: |
+          function check_if_image_exists() {
+            curl -fsSlL -H 'Authorization: bearer ${{ github.token }}' "https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-$1/manifests/$2" > /dev/null
+          }
+          updated=()
+          if ! check_if_image_exists e2e ${E2E_TAG};         then updated+=("e2e"); fi
+          if ! check_if_image_exists oracle ${ORACLE_TAG};   then updated+=("oracle"); fi
+          if ! check_if_image_exists monitor ${MONITOR_TAG}; then updated+=("monitor"); fi
+          if ! check_if_image_exists ui ${UI_TAG};           then updated+=("ui"); fi
+          if ! check_if_image_exists alm ${ALM_TAG};         then updated+=("alm"); fi
+          if [ ${#updated[@]} -gt 0 ]; then
+            echo "Updated services: ${updated[@]}"
+            cd e2e-commons
+            docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
+            docker-compose build ${updated[@]}
+            docker-compose push ${updated[@]}
+          else
+            echo "Nothing relevant was changed in the source"
+          fi
+  build-molecule-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: echo "::set-env name=MOLECULE_RUNNER_TAG::${{ hashFiles('./deployment-e2e/Dockerfile') }}"
+      - run: |
+          function check_if_image_exists() {
+            curl -fsSlL -H 'Authorization: bearer ${{ github.token }}' "https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-$1/manifests/$2" > /dev/null
+          }
+          if check_if_image_exists molecule_runner ${MOLECULE_RUNNER_TAG}; then
+            echo "Image already exists"
+          else
+            cd e2e-commons
+            docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
+            docker-compose build molecule_runner
+            docker-compose push molecule_runner
+          fi
+  e2e:
+    runs-on: ubuntu-latest
+    needs:
+      - initialize
+      - build-e2e-images
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [oracle-e2e, monitor-e2e, alm-e2e, 'ui-e2e:ci']
+        include:
+          - task: alm-e2e
+            use-cache: true
+          - task: 'ui-e2e:ci'
+            use-cache: true
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: |
+          git submodule status > submodule.status
+          echo "::set-env name=E2E_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}"
+          echo "::set-env name=ORACLE_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}"
+          echo "::set-env name=MONITOR_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}"
+          echo "::set-env name=UI_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'ui') }}"
+          echo "::set-env name=ALM_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}"
+      - if: ${{ matrix.use-cache }} 
+        uses: actions/cache@v2
+        id: cache-repo
+        with:
+          path: |
+            **/node_modules
+            contracts/build
+          key: ${{ needs.initialize.outputs.cache_key }}
+      - run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
+      - run: ${{ !matrix.use-cache || steps.cache-repo.outputs.cache-hit }} && yarn run ${{ matrix.task }}
+  deployment:
+    runs-on: ubuntu-latest
+    needs:
+      - build-molecule-runner
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [oracle, ui, monitor, multiple, repo]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: echo "::set-env name=MOLECULE_RUNNER_TAG::${{ hashFiles('./deployment-e2e/Dockerfile') }}"
+      - run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
+      - run: deployment-e2e/molecule.sh ${{ matrix.task }}
+  ultimate:
+    runs-on: ubuntu-latest
+    needs:
+      - initialize
+      - build-e2e-images
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags')
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [amb, erc-to-erc, erc-to-native, native-to-erc, amb-stake-erc-to-erc]
+        include:
+          - task: erc-to-erc
+            ui-e2e-grep: 'ERC TO ERC'
+          - task: erc-to-native
+            ui-e2e-grep: 'ERC TO NATIVE'
+          - task: native-to-erc
+            ui-e2e-grep: 'NATIVE TO ERC'
+          - task: amb-stake-erc-to-erc
+            ui-e2e-grep: 'AMB-STAKE-ERC-TO-ERC'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - run: |
+          git submodule status > submodule.status
+          echo "::set-env name=E2E_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}"
+          echo "::set-env name=ORACLE_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}"
+          echo "::set-env name=MONITOR_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}"
+          echo "::set-env name=UI_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'ui') }}"
+          echo "::set-env name=ALM_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}"
+          echo "::set-env name=MOLECULE_RUNNER_TAG::${{ hashFiles('./deployment-e2e/Dockerfile') }}"
+      - uses: actions/cache@v2
+        id: cache-repo
+        with:
+          path: |
+            **/node_modules
+            contracts/build
+          key: ${{ needs.initialize.outputs.cache_key }}
+      - run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
+      - run: ${{ steps.cache-repo.outputs.cache-hit }} && e2e-commons/up.sh deploy blocks
+      - run: docker-compose -f ./e2e-commons/docker-compose.yml pull oracle
+      - run: deployment-e2e/molecule.sh ultimate-${{ matrix.task }}
+      - run: sudo chown -R $USER:docker /var/run/docker.sock
+      - if: ${{ matrix.ui-e2e-grep }}
+        run: cd ui-e2e && xvfb-run yarn mocha -g "${{ matrix.ui-e2e-grep }}" -b ./test.js
+      - if: ${{ !matrix.ui-e2e-grep }}
+        run: docker-compose -f ./e2e-commons/docker-compose.yml run e2e yarn workspace oracle-e2e run ${{ matrix.task }}
