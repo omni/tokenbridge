@@ -3,7 +3,8 @@ name: tokenbridge
 on: [push]
 
 env:
-  DOCKER_REPO: poanetwork
+  DOCKER_REGISTRY: docker.pkg.github.com
+  DOCKER_REPO: kirill-org/tokenbridge-ci
 
 jobs:
   initialize:
@@ -93,22 +94,22 @@ jobs:
           echo "::set-env name=UI_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'ui') }}"
           echo "::set-env name=ALM_TAG::${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}"
       - run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
           cd e2e-commons
           updated=()
-          if ! curl --silent -f -lSL https://index.docker.io/v1/repositories/${DOCKER_REPO}/tokenbridge-e2e-e2e/tags/${E2E_TAG} > /dev/null; then
+          if ! curl --silent -f -lSL -H 'Authorization: bearer ${{ github.token }}' https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-e2e/manifests/${E2E_TAG} > /dev/null; then
             updated+=("e2e")
           fi
-          if ! curl --silent -f -lSL https://index.docker.io/v1/repositories/${DOCKER_REPO}/tokenbridge-e2e-oracle/tags/${ORACLE_TAG} > /dev/null; then
+          if ! curl --silent -f -lSL -H 'Authorization: bearer ${{ github.token }}' https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-oracle/manifests/${ORACLE_TAG} > /dev/null; then
             updated+=("oracle")
           fi
-          if ! curl --silent -f -lSL https://index.docker.io/v1/repositories/${DOCKER_REPO}/tokenbridge-e2e-monitor/tags/${MONITOR_TAG} > /dev/null; then
+          if ! curl --silent -f -lSL -H 'Authorization: bearer ${{ github.token }}' https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-monitor/manifests/${MONITOR_TAG} > /dev/null; then
             updated+=("monitor")
           fi
-          if ! curl --silent -f -lSL https://index.docker.io/v1/repositories/${DOCKER_REPO}/tokenbridge-e2e-ui/tags/${UI_TAG} > /dev/null; then
+          if ! curl --silent -f -lSL -H 'Authorization: bearer ${{ github.token }}' https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-ui/manifests/${UI_TAG} > /dev/null; then
             updated+=("ui")
           fi
-          if ! curl --silent -f -lSL https://index.docker.io/v1/repositories/${DOCKER_REPO}/tokenbridge-e2e-alm/tags/${ALM_TAG} > /dev/null; then
+          if ! curl --silent -f -lSL -H 'Authorization: bearer ${{ github.token }}' https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-alm/manifests/${ALM_TAG} > /dev/null; then
             updated+=("alm")
           fi
           if [ ${#updated[@]} -gt 0 ]; then
@@ -126,10 +127,10 @@ jobs:
           submodules: true
       - run: echo "::set-env name=MOLECULE_RUNNER_TAG::${{ hashFiles('./deployment-e2e/Dockerfile') }}"
       - run: |
-          if curl --silent -f -lSL https://index.docker.io/v1/repositories/${DOCKER_REPO}/tokenbridge-e2e-molecule_runner/tags/${MOLECULE_RUNNER_TAG} > /dev/null; then
+          if curl --silent -f -lSL -H 'Authorization: bearer ${{ github.token }}' https://${DOCKER_REGISTRY}/v2/${DOCKER_REPO}/tokenbridge-e2e-molecule_runner/manifests/${MOLECULE_RUNNER_TAG} > /dev/null; then
             echo "Image already exists"
           else
-            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
             cd e2e-commons
             docker-compose build molecule_runner
             docker-compose push molecule_runner
@@ -167,6 +168,7 @@ jobs:
             **/node_modules
             contracts/build
           key: ${{ needs.initialize.outputs.cache_key }}
+      - run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
       - run: ${{ !matrix.use-cache || steps.cache-repo.outputs.cache-hit }} && yarn run ${{ matrix.task }}
   deployment:
     runs-on: ubuntu-latest
@@ -181,6 +183,7 @@ jobs:
         with:
           submodules: true
       - run: echo "::set-env name=MOLECULE_RUNNER_TAG::${{ hashFiles('./deployment-e2e/Dockerfile') }}"
+      - run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
       - run: deployment-e2e/molecule.sh ${{ matrix.task }}
   ultimate:
     runs-on: ubuntu-latest
@@ -220,6 +223,7 @@ jobs:
             **/node_modules
             contracts/build
           key: ${{ needs.initialize.outputs.cache_key }}
+      - run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
       - run: ${{ steps.cache-repo.outputs.cache-hit }} && e2e-commons/up.sh deploy blocks
       - run: docker-compose -f ./e2e-commons/docker-compose.yml pull oracle
       - run: deployment-e2e/molecule.sh ultimate-${{ matrix.task }}
