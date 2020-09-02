@@ -4,6 +4,7 @@ const dns = require('dns')
 const connection = require('amqp-connection-manager').connect(process.env.ORACLE_QUEUE_URL)
 const logger = require('./logger')
 const { getRetrySequence } = require('../utils/utils')
+const { TRANSACTION_RESEND_TIMEOUT } = require('../utils/constants')
 
 connection.on('connect', () => {
   logger.info('Connected to amqp Broker')
@@ -68,6 +69,15 @@ function connectSenderToQueue({ queueName, cb }) {
               queueName,
               deadLetterExchange
             })
+          },
+          scheduleTransactionResend: async(data) => {
+            await generateTransactionResend({
+              data,
+              channelWrapper,
+              channel,
+              queueName,
+              deadLetterExchange
+            })
           }
         })
       )
@@ -115,6 +125,11 @@ function connectWorkerToQueue({ queueName, senderQueue, cb }) {
 async function generateRetry({ data, msgRetries, channelWrapper, channel, queueName, deadLetterExchange }) {
   const retries = msgRetries + 1
   const delay = getRetrySequence(retries) * 1000
+
+  // New retry queue is created, and one message is send to it.
+  // Nobody consumes messages from this queue, so eventually the message will be dropped.
+  // `messageTtl` defines a timeout after which the message will be dropped out of the queue.
+  // When message is dropped, it will be resend into the specified `deadLetterExchange` with the updated `x-retries` header.
   const retryQueue = `${queueName}-retry-${delay}`
   await channel.assertQueue(retryQueue, {
     durable: true,
@@ -125,6 +140,19 @@ async function generateRetry({ data, msgRetries, channelWrapper, channel, queueN
   await channelWrapper.sendToQueue(retryQueue, data, {
     persistent: true,
     headers: { 'x-retries': retries }
+  })
+}
+
+async function generateTransactionResend({ data, channelWrapper, channel, queueName, deadLetterExchange }) {
+  const retryQueue = `${queueName}-check-tx-status`
+  await channel.assertQueue(retryQueue, {
+    durable: true,
+    deadLetterExchange,
+    messageTtl: TRANSACTION_RESEND_TIMEOUT,
+    expires: TRANSACTION_RESEND_TIMEOUT * 10
+  })
+  await channelWrapper.sendToQueue(retryQueue, data, {
+    persistent: true
   })
 }
 

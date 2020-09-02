@@ -22,5 +22,6 @@ module.exports = {
   GAS_PRICE_BOUNDARIES: {
     MIN: 1,
     MAX: 250
-  }
+  },
+  TRANSACTION_RESEND_TIMEOUT: 20 * 60 * 1000
 }

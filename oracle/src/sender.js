@@ -88,7 +88,7 @@ function updateNonce(nonce) {
   return redis.set(nonceKey, nonce)
 }
 
-async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
+async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleTransactionResend }) {
   try {
     if (redis.status !== 'ready') {
       nackMsg(msg)
@@ -103,8 +103,15 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     let insufficientFunds = false
     let minimumBalance = null
     const failedTx = []
+    const sentTx = []
 
-    logger.debug(`Sending ${txArray.length} transactions`)
+    const isResend = !!txArray[0].txHash
+
+    if (isResend) {
+      logger.debug(`Checking status of ${txArray.length} transactions`)
+    } else {
+      logger.debug(`Sending ${txArray.length} transactions`)
+    }
     await syncForEach(txArray, async job => {
       let gasLimit
       if (typeof job.extraGas === 'number') {
@@ -114,11 +121,24 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
       }
 
       try {
-        logger.info(`Sending transaction with nonce ${nonce}`)
+        let txNonce
+        if (isResend) {
+          const tx = await web3Instance.eth.getTransaction(job.txHash)
+          if (tx.blockNumber !== null) {
+            // if the associated tx was already mined, nothing needs to be done
+            logger.info(`Transaction ${job.txHash} was successfully mined`)
+            return null;
+          }
+          logger.info(`Previously sent transaction is stuck, updating gasPrice: ${tx.gasPrice} -> ${gasPrice.toString(10)}`)
+          txNonce = tx.nonce
+        } else {
+          txNonce = nonce++
+        }
+        logger.info(`Sending transaction with nonce ${txNonce}`)
         const txHash = await sendTx({
           chain: config.id,
           data: job.data,
-          nonce,
+          nonce: txNonce,
           gasPrice: gasPrice.toString(10),
           amount: '0',
           gasLimit,
@@ -127,8 +147,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
           chainId,
           web3: web3Instance
         })
+        sentTx.push({
+          ...job,
+          txHash
+        })
 
-        nonce++
         logger.info(
           { eventTransactionHash: job.transactionReference, generatedTransactionHash: txHash },
           `Tx generated ${txHash} for event Tx ${job.transactionReference}`
@@ -162,6 +185,10 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     if (failedTx.length) {
       logger.info(`Sending ${failedTx.length} Failed Tx to Queue`)
       await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
+    }
+    if (sentTx.length) {
+      logger.info(`Sending ${sentTx.length} Tx Delayed Resend Requests to Queue`)
+      await scheduleTransactionResend(sentTx)
     }
     ackMsg(msg)
     logger.debug(`Finished processing msg`)
