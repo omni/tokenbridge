@@ -1,5 +1,6 @@
 require('../env')
 const path = require('path')
+const { toBN } = require('web3-utils')
 const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
@@ -105,7 +106,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
     const failedTx = []
     const sentTx = []
 
-    const isResend = !!txArray[0].txHash
+    const isResend = txArray.length > 0 && !!txArray[0].txHash
 
     if (isResend) {
       logger.debug(`Checking status of ${txArray.length} transactions`)
@@ -124,12 +125,25 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         let txNonce
         if (isResend) {
           const tx = await web3Instance.eth.getTransaction(job.txHash)
-          if (tx.blockNumber !== null) {
-            // if the associated tx was already mined, nothing needs to be done
-            logger.info(`Transaction ${job.txHash} was successfully mined`)
-            return null;
+
+          if (tx === null) {
+            logger.info(`Transaction ${job.txHash} was not found, dropping it`)
+            return
           }
-          logger.info(`Previously sent transaction is stuck, updating gasPrice: ${tx.gasPrice} -> ${gasPrice.toString(10)}`)
+          if (tx.blockNumber !== null) {
+            logger.info(`Transaction ${job.txHash} was successfully mined`)
+            return
+          }
+
+          logger.info(
+            `Previously sent transaction is stuck, updating gasPrice: ${tx.gasPrice} -> ${gasPrice.toString(10)}`
+          )
+          if (toBN(tx.gasPrice).gte(toBN(gasPrice))) {
+            logger.info("Gas price returned from the oracle didn't increase, will reinspect this transaction later")
+            sentTx.push(job)
+            return
+          }
+
           txNonce = tx.nonce
         } else {
           txNonce = nonce++

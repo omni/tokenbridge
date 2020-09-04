@@ -70,7 +70,7 @@ function connectSenderToQueue({ queueName, cb }) {
               deadLetterExchange
             })
           },
-          scheduleTransactionResend: async(data) => {
+          scheduleTransactionResend: async data => {
             await generateTransactionResend({
               data,
               channelWrapper,
