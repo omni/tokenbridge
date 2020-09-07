@@ -33,7 +33,7 @@ function connectWatcherToQueue({ queueName, workerQueue, cb }) {
     async setup(channel) {
       await channel.assertQueue(queueName, { durable: true, maxPriority: SENDER_QUEUE_MAX_PRIORITY })
       if (workerQueue) {
-        await channel.assertQueue(queueName, { durable: true })
+        await channel.assertQueue(workerQueue, { durable: true })
       }
     }
   })
