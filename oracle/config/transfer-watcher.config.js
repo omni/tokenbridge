@@ -41,7 +41,7 @@ module.exports = {
   eventContractAddress: initialChecks.bridgeableTokenAddress,
   eventAbi: ERC20_ABI,
   eventFilter: { to: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS },
-  queue: 'home',
+  queue: 'home-prioritized',
   ...workerQueueConfig,
   name: `watcher-${id}`,
   id

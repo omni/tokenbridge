@@ -46,6 +46,7 @@ async function initialize() {
     chainId = await getChainId(config.id)
     connectSenderToQueue({
       queueName: config.queue,
+      oldQueueName: config.oldQueue,
       cb: options => {
         if (config.maxProcessingTime) {
           return watchdog(() => main(options), config.maxProcessingTime, () => {

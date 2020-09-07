@@ -14,7 +14,7 @@ module.exports = {
   ...baseConfig.bridgeConfig,
   ...baseConfig.foreignConfig,
   workerQueue: 'convert-to-chai',
-  senderQueue: 'foreign',
+  senderQueue: 'foreign-prioritized',
   name: `worker-${id}`,
   id
 }
