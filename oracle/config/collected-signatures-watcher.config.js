@@ -6,7 +6,7 @@ module.exports = {
   ...baseConfig.bridgeConfig,
   ...baseConfig.homeConfig,
   event: 'CollectedSignatures',
-  queue: 'foreign',
+  queue: 'foreign-prioritized',
   name: `watcher-${id}`,
   id
 }

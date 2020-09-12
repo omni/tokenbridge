@@ -1,5 +1,6 @@
 require('../env')
 const path = require('path')
+const { toBN } = require('web3-utils')
 const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
@@ -45,6 +46,7 @@ async function initialize() {
     chainId = await getChainId(config.id)
     connectSenderToQueue({
       queueName: config.queue,
+      oldQueueName: config.oldQueue,
       cb: options => {
         if (config.maxProcessingTime) {
           return watchdog(() => main(options), config.maxProcessingTime, () => {
@@ -88,7 +90,7 @@ function updateNonce(nonce) {
   return redis.set(nonceKey, nonce)
 }
 
-async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
+async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleTransactionResend }) {
   try {
     if (redis.status !== 'ready') {
       nackMsg(msg)
@@ -103,8 +105,15 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     let insufficientFunds = false
     let minimumBalance = null
     const failedTx = []
+    const sentTx = []
 
-    logger.debug(`Sending ${txArray.length} transactions`)
+    const isResend = txArray.length > 0 && !!txArray[0].txHash
+
+    if (isResend) {
+      logger.debug(`Checking status of ${txArray.length} transactions`)
+    } else {
+      logger.debug(`Sending ${txArray.length} transactions`)
+    }
     await syncForEach(txArray, async job => {
       let gasLimit
       if (typeof job.extraGas === 'number') {
@@ -114,11 +123,37 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
       }
 
       try {
-        logger.info(`Sending transaction with nonce ${nonce}`)
+        let txNonce
+        if (isResend) {
+          const tx = await web3Instance.eth.getTransaction(job.txHash)
+
+          if (tx === null) {
+            logger.info(`Transaction ${job.txHash} was not found, dropping it`)
+            return
+          }
+          if (tx.blockNumber !== null) {
+            logger.info(`Transaction ${job.txHash} was successfully mined`)
+            return
+          }
+
+          logger.info(
+            `Previously sent transaction is stuck, updating gasPrice: ${tx.gasPrice} -> ${gasPrice.toString(10)}`
+          )
+          if (toBN(tx.gasPrice).gte(toBN(gasPrice))) {
+            logger.info("Gas price returned from the oracle didn't increase, will reinspect this transaction later")
+            sentTx.push(job)
+            return
+          }
+
+          txNonce = tx.nonce
+        } else {
+          txNonce = nonce++
+        }
+        logger.info(`Sending transaction with nonce ${txNonce}`)
         const txHash = await sendTx({
           chain: config.id,
           data: job.data,
-          nonce,
+          nonce: txNonce,
           gasPrice: gasPrice.toString(10),
           amount: '0',
           gasLimit,
@@ -127,8 +162,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
           chainId,
           web3: web3Instance
         })
+        sentTx.push({
+          ...job,
+          txHash
+        })
 
-        nonce++
         logger.info(
           { eventTransactionHash: job.transactionReference, generatedTransactionHash: txHash },
           `Tx generated ${txHash} for event Tx ${job.transactionReference}`
@@ -162,6 +200,10 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry }) {
     if (failedTx.length) {
       logger.info(`Sending ${failedTx.length} Failed Tx to Queue`)
       await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
+    }
+    if (sentTx.length) {
+      logger.info(`Sending ${sentTx.length} Tx Delayed Resend Requests to Queue`)
+      await scheduleTransactionResend(sentTx)
     }
     ackMsg(msg)
     logger.debug(`Finished processing msg`)
