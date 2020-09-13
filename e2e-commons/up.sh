@@ -4,7 +4,13 @@ set -e # exit when any command fails
 
 ./down.sh
 docker-compose build parity1 parity2
-test -n "$NODOCKERPULL" || ./pull.sh $@
+
+if [ -z "$CI" ]; then
+  ./build.sh $@
+else
+  ./pull.sh $@
+fi
+
 docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
 
@@ -22,8 +28,6 @@ startValidator () {
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:collected-signatures
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:affirmation-request
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:transfer
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:half-duplex-transfer
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn worker:swap-tokens
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn worker:convert-to-chai
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:signature-request
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:collected-signatures
@@ -57,8 +61,6 @@ while [ "$1" != "" ]; do
     docker-compose run -d oracle-erc20-native yarn watcher:collected-signatures
     docker-compose run -d oracle-erc20-native yarn watcher:affirmation-request
     docker-compose run -d oracle-erc20-native yarn watcher:transfer
-    docker-compose run -d oracle-erc20-native yarn watcher:half-duplex-transfer
-    docker-compose run -d oracle-erc20-native yarn worker:swap-tokens
     docker-compose run -d oracle-erc20-native yarn worker:convert-to-chai
     docker-compose run -d oracle-amb yarn watcher:signature-request
     docker-compose run -d oracle-amb yarn watcher:collected-signatures
@@ -109,26 +111,6 @@ while [ "$1" != "" ]; do
 
   if [ "$1" == "monitor" ]; then
     docker-compose up -d monitor monitor-erc20 monitor-erc20-native monitor-amb
-  fi
-
-  if [ "$1" == "native-to-erc" ]; then
-    ../deployment-e2e/molecule.sh ultimate-native-to-erc
-  fi
-
-  if [ "$1" == "erc-to-native" ]; then
-    ../deployment-e2e/molecule.sh ultimate-erc-to-native
-  fi
-
-  if [ "$1" == "erc-to-erc" ]; then
-    ../deployment-e2e/molecule.sh ultimate-erc-to-erc
-  fi
-
-  if [ "$1" == "amb" ]; then
-    ../deployment-e2e/molecule.sh ultimate-amb
-  fi
-
-  if [ "$1" == "ultimate-amb-stake-erc-to-erc" ]; then
-    ../deployment-e2e/molecule.sh ultimate-amb-stake-erc-to-erc
   fi
 
   if [ "$1" == "alm-e2e" ]; then

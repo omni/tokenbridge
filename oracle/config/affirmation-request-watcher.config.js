@@ -24,7 +24,7 @@ module.exports = {
   ...baseConfig.bridgeConfig,
   ...baseConfig.foreignConfig,
   event: 'UserRequestForAffirmation',
-  queue: 'home',
+  queue: 'home-prioritized',
   name: `watcher-${id}`,
   id
 }

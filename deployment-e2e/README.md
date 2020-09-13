@@ -13,7 +13,7 @@ git push
 Alternatively, if there are no changes except the playbooks, you can use the `master` branch:
 
 ```
-CIRCLE_BRANCH=master ./molecule.sh <scenario_name>
+./molecule.sh <scenario_name>
 ```
 
 In this case `master` branch will be used as a codebase for Monitor, UI, Oracle and Contracts deployed by your local playbook.
@@ -21,7 +21,7 @@ In this case `master` branch will be used as a codebase for Monitor, UI, Oracle 
 ## Run the tests
 
 ```
-CIRCLE_BRANCH=master ./molecule.sh <scenario_name>
+./molecule.sh <scenario_name>
 ```
 
 Available scenarios:

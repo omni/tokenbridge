@@ -22,7 +22,6 @@ const processSignatureRequests = require('./events/processSignatureRequests')(co
 const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
 const processAffirmationRequests = require('./events/processAffirmationRequests')(config)
 const processTransfers = require('./events/processTransfers')(config)
-const processHalfDuplexTransfers = require('./events/processHalfDuplexTransfers')(config)
 const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
@@ -36,7 +35,6 @@ const web3Instance = config.web3
 const bridgeContract = new web3Instance.eth.Contract(config.bridgeAbi, config.bridgeContractAddress)
 let { eventContractAddress } = config
 let eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
-let skipEvents = config.idle
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
 let lastProcessedBlock = BN.max(config.startBlock.sub(ONE), ZERO)
 
@@ -91,7 +89,7 @@ function updateLastProcessedBlock(lastBlockNumber) {
   return redis.set(lastBlockRedisKey, lastProcessedBlock.toString())
 }
 
-function processEvents(events, blockNumber) {
+function processEvents(events) {
   switch (config.id) {
     case 'native-erc-signature-request':
     case 'erc-erc-signature-request':
@@ -109,8 +107,6 @@ function processEvents(events, blockNumber) {
     case 'erc-erc-transfer':
     case 'erc-native-transfer':
       return processTransfers(events)
-    case 'erc-native-half-duplex-transfer':
-      return processHalfDuplexTransfers(events, blockNumber)
     case 'amb-signature-request':
       return processAMBSignatureRequests(events)
     case 'amb-collected-signatures':
@@ -129,12 +125,6 @@ async function checkConditions() {
       logger.debug('Getting token address to listen Transfer events')
       state = await getTokensState(bridgeContract, logger)
       updateEventContract(state.bridgeableTokenAddress)
-      break
-    case 'erc-native-half-duplex-transfer':
-      logger.debug('Getting Half Duplex token address to listen Transfer events')
-      state = await getTokensState(bridgeContract, logger)
-      skipEvents = state.idle
-      updateEventContract(state.halfDuplexTokenAddress)
       break
     default:
   }
@@ -171,11 +161,6 @@ async function main({ sendToQueue, sendToWorker }) {
   try {
     await checkConditions()
 
-    if (skipEvents) {
-      logger.debug('Watcher in idle mode, skipping getting events')
-      return
-    }
-
     const lastBlockToProcess = await getLastBlockToProcess()
 
     if (lastBlockToProcess.lte(lastProcessedBlock)) {
@@ -200,7 +185,7 @@ async function main({ sendToQueue, sendToWorker }) {
         await sendToWorker({ blockNumber: toBlock.toString() })
       }
 
-      const job = await processEvents(events, toBlock.toString())
+      const job = await processEvents(events)
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {

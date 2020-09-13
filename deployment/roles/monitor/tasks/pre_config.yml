@@ -24,6 +24,8 @@
   template:
     src: .env.j2
     dest: "{{ bridge_path }}/monitor/.env"
+    owner: "{{ compose_service_user }}"
+    mode: '0640'
   when: skip_task != true
 
 - name: Copy docker-compose file
@@ -45,3 +47,5 @@
   template:
     src: config.env.j2
     dest: "{{ bridge_path }}/monitor/configs/{{ MONITOR_BRIDGE_NAME }}.env"
+    owner: "{{ compose_service_user }}"
+    mode: '0640'

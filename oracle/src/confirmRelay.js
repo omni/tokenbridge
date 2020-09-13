@@ -138,8 +138,8 @@ async function main({ sendJob, txHash }) {
 }
 
 async function sendJobTx(jobs) {
-  const gasPrice = await GasPrice.start(config.queue, true)
-  const chainId = await getChainId(config.queue)
+  const gasPrice = await GasPrice.start(config.chain, true)
+  const chainId = await getChainId(config.chain)
   let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
 
   await syncForEach(jobs, async job => {
@@ -153,7 +153,7 @@ async function sendJobTx(jobs) {
     try {
       logger.info(`Sending transaction with nonce ${nonce}`)
       const txHash = await sendTx({
-        chain: config.queue,
+        chain: config.chain,
         data: job.data,
         nonce,
         gasPrice: gasPrice.toString(10),

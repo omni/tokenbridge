@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "mocha --timeout 30000",
+    "start": "mocha --timeout 120000",
     "lint": "eslint . --ignore-path ../.eslintignore"
   },
   "author": "",

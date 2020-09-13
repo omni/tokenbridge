@@ -3,4 +3,6 @@ version: '2.4'
 services:
   monitor:
     image: poanetwork/tokenbridge-monitor
-    build: .
+    build:
+      context: ..
+      dockerfile: ./monitor/Dockerfile

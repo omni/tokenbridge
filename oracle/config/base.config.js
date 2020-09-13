@@ -73,6 +73,7 @@ const bridgeConfig = {
 }
 
 const homeConfig = {
+  chain: 'home',
   eventContractAddress: process.env.COMMON_HOME_BRIDGE_ADDRESS,
   eventAbi: homeAbi,
   bridgeContractAddress: process.env.COMMON_HOME_BRIDGE_ADDRESS,
@@ -83,6 +84,7 @@ const homeConfig = {
 }
 
 const foreignConfig = {
+  chain: 'foreign',
   eventContractAddress: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS,
   eventAbi: foreignAbi,
   bridgeContractAddress: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS,

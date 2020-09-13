@@ -46,8 +46,11 @@ class Utils {
   static async startBrowserWithMetamask() {
     const source = './MetaMask.crx'
     const options = new chrome.Options()
-    await options.addExtensions(source)
+    await options.addArguments('--no-sandbox')
+    await options.addArguments('--disable-gpu')
+    await options.addArguments('--disable-dev-shm-usage')
     await options.addArguments('disable-popup-blocking')
+    await options.addExtensions(source)
     const driver = await new webdriver.Builder().withCapabilities(options.toCapabilities()).build()
     await driver.sleep(5000)
     return driver

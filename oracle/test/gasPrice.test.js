@@ -73,7 +73,7 @@ describe('gasPrice', () => {
       await gasPrice.start('home')
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, null, null)
+      await gasPrice.fetchGasPrice('standard', 1, null, () => null)
 
       // then
       expect(gasPrice.getPrice()).to.equal('101000000000')
@@ -113,7 +113,7 @@ describe('gasPrice', () => {
       }
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, null)
+      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, () => {})
 
       // then
       expect(gasPrice.getPrice().toString()).to.equal('102000000000')
@@ -156,7 +156,7 @@ describe('gasPrice', () => {
       await gasPrice.start('home')
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, null, null)
+      await gasPrice.fetchGasPrice('standard', 1, null, () => {})
 
       // then
       expect(fakeLogger.error.calledTwice).to.equal(true) // two errors

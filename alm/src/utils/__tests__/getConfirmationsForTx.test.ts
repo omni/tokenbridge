@@ -351,7 +351,7 @@ describe('getConfirmationsForTx', () => {
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED }
       ])
     )
     expect(setResult.mock.calls[1][0]).toEqual(

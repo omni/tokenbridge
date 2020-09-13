@@ -100,8 +100,13 @@ async function main(bridgeMode) {
 
   if (MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) {
     logger.debug('calling foreign getGasPrices')
+    const fetchFn =
+      COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL === 'gas-price-oracle'
+        ? null
+        : () => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL)
+
     foreignGasPrice =
-      (await gasPriceFromSupplier(() => fetch(COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL), foreignGasPriceSupplierOpts)) ||
+      (await gasPriceFromSupplier(fetchFn, foreignGasPriceSupplierOpts)) ||
       Web3Utils.toBN(COMMON_FOREIGN_GAS_PRICE_FALLBACK)
     foreignGasPriceGwei = Web3Utils.fromWei(foreignGasPrice.toString(), 'gwei')
     foreignTxCost = foreignGasPrice.mul(Web3Utils.toBN(MONITOR_VALIDATOR_FOREIGN_TX_LIMIT))

@@ -1,4 +1,4 @@
-FROM node:8 as contracts
+FROM node:10 as contracts
 
 WORKDIR /mono
 
@@ -11,11 +11,12 @@ COPY ./contracts/truffle-config.js ./
 COPY ./contracts/contracts ./contracts
 RUN npm run compile
 
-FROM node:8
+FROM node:10
 
 WORKDIR /mono
 COPY package.json .
 COPY --from=contracts /mono/contracts/build ./contracts/build
+COPY commons/package.json ./commons/
 COPY oracle-e2e/package.json ./oracle-e2e/
 COPY monitor-e2e/package.json ./monitor-e2e/
 
