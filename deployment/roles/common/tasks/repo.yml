@@ -12,6 +12,7 @@
   copy:
     src: ../../../../{{ item }}
     dest: "{{ bridge_path }}/"
+    mode: '0640'
   with_items:
     - monorepo.tar.gz
     - contracts.tar.gz

@@ -6,7 +6,7 @@ module.exports = {
   ...baseConfig.bridgeConfig,
   ...baseConfig.homeConfig,
   event: 'UserRequestForSignature',
-  queue: 'home',
+  queue: 'home-prioritized',
   name: `watcher-${id}`,
   id
 }

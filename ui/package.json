@@ -5,7 +5,6 @@
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.4.0",
     "bignumber.js": "^6.0.0",
-    "coveralls": "^3.0.0",
     "customize-cra": "^0.2.12",
     "date-fns": "^2.13.0",
     "dotenv": "^7.0.0",
@@ -37,7 +36,6 @@
     "test": "react-app-rewired test --env=jsdom --no-watch",
     "test:watch": "react-app-rewired test --env=jsdom",
     "coverage": "react-app-rewired test --env=jsdom --coverage",
-    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "eject": "react-app-rewired eject",
     "postinstall": "(cp lib/web3-eth/index.js ../node_modules/web3-eth/src; cp lib/web3-eth/index.js ./node_modules/web3-eth/src) || :"
   },

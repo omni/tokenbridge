@@ -11,6 +11,9 @@
 contracts/test
 contracts/build
 oracle/test
+monitor/test
+monitor/responses
+commons/test
 oracle/**/*.png
 oracle/**/*.jpg
 audit
