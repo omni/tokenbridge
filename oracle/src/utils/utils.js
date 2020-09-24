@@ -1,3 +1,4 @@
+const fs = require('fs')
 const BigNumber = require('bignumber.js')
 const promiseRetry = require('promise-retry')
 const Web3 = require('web3')
@@ -105,6 +106,19 @@ function nonceError(e) {
 const invert = p => new Promise((res, rej) => p.then(rej, res))
 const promiseAny = ps => invert(Promise.all(ps.map(invert)))
 
+async function readAccessListFile(fileName) {
+  try {
+    const data = await fs.promises.readFile(fileName)
+    return data
+      .toString()
+      .split('\n')
+      .map(addr => addr.trim().toLowerCase())
+      .filter(addr => addr.length === 42)
+  } catch (_) {
+    return []
+  }
+}
+
 module.exports = {
   syncForEach,
   checkHTTPS,
@@ -115,5 +129,6 @@ module.exports = {
   privateKeyToAddress,
   nonceError,
   getRetrySequence,
-  promiseAny
+  promiseAny,
+  readAccessListFile
 }

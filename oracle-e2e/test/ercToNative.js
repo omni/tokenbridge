@@ -4,13 +4,14 @@ const promiseRetry = require('promise-retry')
 const {
   user,
   secondUser,
+  blockedUser,
   validator,
   ercToNativeBridge,
   homeRPC,
   foreignRPC
 } = require('../../e2e-commons/constants.json')
 const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, HOME_ERC_TO_NATIVE_ABI } = require('../../commons')
-const { uniformRetry } = require('../../e2e-commons/utils')
+const { uniformRetry, sleep } = require('../../e2e-commons/utils')
 const { setRequiredSignatures } = require('./utils')
 
 const homeWeb3 = new Web3(new Web3.providers.HttpProvider(homeRPC.URL))
@@ -22,6 +23,7 @@ const COMMON_FOREIGN_BRIDGE_ADDRESS = ercToNativeBridge.foreign
 const { toBN } = foreignWeb3.utils
 
 homeWeb3.eth.accounts.wallet.add(user.privateKey)
+homeWeb3.eth.accounts.wallet.add(blockedUser.privateKey)
 homeWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
@@ -141,6 +143,47 @@ describe('erc to native', () => {
         retry()
       }
     })
+  })
+  it('should not process transaction from blocked users', async () => {
+    const originalBalance1 = await erc20Token.methods.balanceOf(user.address).call()
+    const originalBalance2 = await erc20Token.methods.balanceOf(blockedUser.address).call()
+
+    // check that account has tokens in home chain
+    const balance1 = await homeWeb3.eth.getBalance(user.address)
+    const balance2 = await homeWeb3.eth.getBalance(blockedUser.address)
+    assert(!toBN(balance1).isZero(), 'Account should have tokens')
+    assert(!toBN(balance2).isZero(), 'Account should have tokens')
+
+    // send transaction to home bridge
+    await homeWeb3.eth.sendTransaction({
+      from: user.address,
+      to: COMMON_HOME_BRIDGE_ADDRESS,
+      gasPrice: '1',
+      gas: '1000000',
+      value: homeWeb3.utils.toWei('0.01')
+    })
+
+    // send transaction to home bridge
+    await homeWeb3.eth.sendTransaction({
+      from: blockedUser.address,
+      to: COMMON_HOME_BRIDGE_ADDRESS,
+      gasPrice: '1',
+      gas: '1000000',
+      value: homeWeb3.utils.toWei('0.01')
+    })
+
+    // check that balance increases
+    await uniformRetry(async retry => {
+      const balance = await erc20Token.methods.balanceOf(user.address).call()
+      if (toBN(balance).lte(toBN(originalBalance1))) {
+        retry()
+      }
+    })
+
+    await sleep(3000)
+
+    const balance = await erc20Token.methods.balanceOf(blockedUser.address).call()
+    assert(toBN(balance).eq(toBN(originalBalance2)), 'Bridge should not process collected signatures from blocked user')
   })
   it('should not invest dai when chai token is disabled', async () => {
     const bridgeDaiTokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()

@@ -4,7 +4,8 @@ const { HttpListProviderError } = require('http-list-provider')
 const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
 const { web3Home, web3Foreign } = require('../../services/web3')
-const { signatureToVRS, packSignatures } = require('../../utils/message')
+const { signatureToVRS, packSignatures, parseMessage } = require('../../utils/message')
+const { readAccessListFile } = require('../../utils/utils')
 const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
 const { MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
@@ -45,6 +46,34 @@ function processCollectedSignaturesBuilder(config) {
 
         logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
         const message = await homeBridge.methods.message(messageHash).call()
+
+        if (config.accessLists) {
+          const parsedMessage = parseMessage(message)
+          const recipient = parsedMessage.recipient.toLowerCase()
+          const originalTxHash = parsedMessage.txHash
+          const allowanceList = await readAccessListFile(config.accessLists.allowanceList)
+          const blockList = await readAccessListFile(config.accessLists.blockList)
+
+          if (allowanceList.length > 0) {
+            const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+            if (allowanceList.indexOf(recipient) === -1 && allowanceList.indexOf(sender) === -1) {
+              logger.info(
+                'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.',
+                { sender, recipient }
+              )
+              return
+            }
+          } else if (blockList.length > 0) {
+            const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+            if (blockList.indexOf(recipient) > -1 || blockList.indexOf(sender) > -1) {
+              logger.info(
+                'Validator skips a transaction. Neither sender nor recipient addresses are in the block list.',
+                { sender, recipient }
+              )
+              return
+            }
+          }
+        }
 
         logger.debug({ NumberOfCollectedSignatures }, 'Number of signatures to get')
 
