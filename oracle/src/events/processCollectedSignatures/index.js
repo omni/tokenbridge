@@ -10,6 +10,8 @@ const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
 const { MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 
+const { ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST, ORACLE_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
+
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
 let validatorContract = null
@@ -47,33 +49,33 @@ function processCollectedSignaturesBuilder(config) {
         logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
         const message = await homeBridge.methods.message(messageHash).call()
 
-        if (config.accessLists) {
+        if (ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST || ORACLE_HOME_TO_FOREIGN_BLOCK_LIST) {
           const parsedMessage = parseMessage(message)
           const recipient = parsedMessage.recipient.toLowerCase()
           const originalTxHash = parsedMessage.txHash
-          const allowanceList = await readAccessListFile(config.accessLists.allowanceList)
-          const blockList = await readAccessListFile(config.accessLists.blockList)
 
-          if (blockList.length > 0) {
-            if (blockList.indexOf(recipient) > -1) {
-              logger.info('Validator skips a transaction. Recipient address is in the block list.', { recipient })
-              return
-            }
-            const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
-            if (blockList.indexOf(sender) > -1) {
-              logger.info('Validator skips a transaction. Sender address is in the block list.', { sender })
-              return
-            }
-          } else if (allowanceList.length > 0) {
+          if (ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST) {
+            const allowanceList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST)
             if (allowanceList.indexOf(recipient) === -1) {
               const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
               if (allowanceList.indexOf(sender) === -1) {
                 logger.info(
-                  'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.',
-                  { sender, recipient }
+                  { sender, recipient },
+                  'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.'
                 )
                 return
               }
+            }
+          } else if (ORACLE_HOME_TO_FOREIGN_BLOCK_LIST) {
+            const blockList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_BLOCK_LIST)
+            if (blockList.indexOf(recipient) > -1) {
+              logger.info({ recipient }, 'Validator skips a transaction. Recipient address is in the block list.')
+              return
+            }
+            const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+            if (blockList.indexOf(sender) > -1) {
+              logger.info({ sender }, 'Validator skips a transaction. Sender address is in the block list.')
+              return
             }
           }
         }
