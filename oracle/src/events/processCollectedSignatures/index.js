@@ -55,12 +55,13 @@ function processCollectedSignaturesBuilder(config) {
           const blockList = await readAccessListFile(config.accessLists.blockList)
 
           if (blockList.length > 0) {
+            if (blockList.indexOf(recipient) > -1) {
+              logger.info('Validator skips a transaction. Recipient address is in the block list.', { recipient })
+              return
+            }
             const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
-            if (blockList.indexOf(recipient) > -1 || blockList.indexOf(sender) > -1) {
-              logger.info(
-                'Validator skips a transaction. Either sender or recipient addresses are in the block list.',
-                { sender, recipient }
-              )
+            if (blockList.indexOf(sender) > -1) {
+              logger.info('Validator skips a transaction. Sender address is in the block list.', { sender })
               return
             }
           } else if (allowanceList.length > 0) {
