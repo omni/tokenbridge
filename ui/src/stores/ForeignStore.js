@@ -232,7 +232,7 @@ class ForeignStore {
   }
 
   @action
-  async getTokenBalance(withTotalSupply=true) {
+  async getTokenBalance(withTotalSupply = true) {
     try {
       if (withTotalSupply) {
         this.totalSupply = await getTotalSupply(this.tokenContract)

@@ -266,7 +266,7 @@ class HomeStore {
   }
 
   @action
-  async getBalance(withTotalSupply=true) {
+  async getBalance(withTotalSupply = true) {
     try {
       if (isErcToErcMode(this.rootStore.bridgeMode)) {
         if (withTotalSupply) {
@@ -406,14 +406,17 @@ class HomeStore {
 
   @action
   async filterByTxHashInReturnValues(transactionHash) {
-    const { blockNumber } = await this.homeWeb3.eth.getTransaction(transactionHash)
-    const events = await this.getEvents(blockNumber, blockNumber)
+    const events = await this.getEvents(1, 'latest')
     this.events = events.filter(event => event.returnValues.transactionHash === transactionHash)
   }
   @action
   async filterByTxHash(transactionHash) {
-    const { blockNumber } = await this.homeWeb3.eth.getTransaction(transactionHash)
-    const events = await this.getEvents(blockNumber, blockNumber)
+    const txReceipt = await this.homeWeb3.eth.getTransactionReceipt(transactionHash)
+    if (!txReceipt) {
+      this.events = []
+      return
+    }
+    const events = await this.getEvents(txReceipt.blockNumber, txReceipt.blockNumber)
     this.events = events.filter(event => event.transactionHash === transactionHash)
     if (this.events.length > 0 && this.events[0].returnValues && this.events[0].returnValues.transactionHash) {
       await this.rootStore.foreignStore.filterByTxHashInReturnValues(this.events[0].returnValues.transactionHash)
