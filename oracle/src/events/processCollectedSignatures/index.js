@@ -54,23 +54,25 @@ function processCollectedSignaturesBuilder(config) {
           const allowanceList = await readAccessListFile(config.accessLists.allowanceList)
           const blockList = await readAccessListFile(config.accessLists.blockList)
 
-          if (allowanceList.length > 0) {
+          if (blockList.length > 0) {
             const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
-            if (allowanceList.indexOf(recipient) === -1 && allowanceList.indexOf(sender) === -1) {
+            if (blockList.indexOf(recipient) > -1 || blockList.indexOf(sender) > -1) {
               logger.info(
-                'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.',
+                'Validator skips a transaction. Either sender or recipient addresses are in the block list.',
                 { sender, recipient }
               )
               return
             }
-          } else if (blockList.length > 0) {
-            const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
-            if (blockList.indexOf(recipient) > -1 || blockList.indexOf(sender) > -1) {
-              logger.info(
-                'Validator skips a transaction. Neither sender nor recipient addresses are in the block list.',
-                { sender, recipient }
-              )
-              return
+          } else if (allowanceList.length > 0) {
+            if (allowanceList.indexOf(recipient) === -1) {
+              const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+              if (allowanceList.indexOf(sender) === -1) {
+                logger.info(
+                  'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.',
+                  { sender, recipient }
+                )
+                return
+              }
             }
           }
         }

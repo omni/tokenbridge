@@ -106,17 +106,21 @@ function nonceError(e) {
 const invert = p => new Promise((res, rej) => p.then(rej, res))
 const promiseAny = ps => invert(Promise.all(ps.map(invert)))
 
+const readAccessLists = {}
 async function readAccessListFile(fileName) {
-  try {
-    const data = await fs.promises.readFile(fileName)
-    return data
-      .toString()
-      .split('\n')
-      .map(addr => addr.trim().toLowerCase())
-      .filter(addr => addr.length === 42)
-  } catch (_) {
-    return []
+  if (!readAccessLists[fileName]) {
+    try {
+      const data = await fs.promises.readFile(fileName)
+      readAccessLists[fileName] = data
+        .toString()
+        .split('\n')
+        .map(addr => addr.trim().toLowerCase())
+        .filter(addr => addr.length === 42)
+    } catch (_) {
+      readAccessLists[fileName] = []
+    }
   }
+  return readAccessLists[fileName]
 }
 
 module.exports = {
