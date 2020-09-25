@@ -210,7 +210,7 @@ class HomeStore {
       this.getBalance()
       this.getBlockNumber()
       this.getCurrentLimit()
-    }, 15000)
+    }, 30000)
   }
 
   @action
@@ -403,12 +403,14 @@ class HomeStore {
 
   @action
   async filterByTxHashInReturnValues(transactionHash) {
-    const events = await this.getEvents(1, 'latest')
+    const { blockNumber } = await this.homeWeb3.eth.getTransaction(transactionHash)
+    const events = await this.getEvents(blockNumber, blockNumber)
     this.events = events.filter(event => event.returnValues.transactionHash === transactionHash)
   }
   @action
   async filterByTxHash(transactionHash) {
-    const events = await this.getEvents(1, 'latest')
+    const { blockNumber } = await this.homeWeb3.eth.getTransaction(transactionHash)
+    const events = await this.getEvents(blockNumber, blockNumber)
     this.events = events.filter(event => event.transactionHash === transactionHash)
     if (this.events.length > 0 && this.events[0].returnValues && this.events[0].returnValues.transactionHash) {
       await this.rootStore.foreignStore.filterByTxHashInReturnValues(this.events[0].returnValues.transactionHash)
@@ -487,7 +489,14 @@ class HomeStore {
         const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
         const abi = [...HOME_V1_ABI, ...HOME_ABI]
         const contract = new this.homeWeb3.eth.Contract(abi, this.COMMON_HOME_BRIDGE_ADDRESS)
-        const events = await getPastEvents(contract, deployedAtBlock, 'latest')
+        const events = await getPastEvents(contract, deployedAtBlock, 'latest', [
+          'UserRequestForSignature',
+          'Deposit',
+          'AffirmationCompleted',
+          'Withdraw',
+          'FeeDistributedFromSignatures',
+          'FeeDistributedFromAffirmation'
+        ])
         processLargeArrayAsync(events, this.processEvent, () => {
           this.statistics.finished = true
           this.statistics.totalBridged = this.statistics.totalBridged.plus(this.statistics.depositsValue)

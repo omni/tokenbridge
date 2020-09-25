@@ -33,8 +33,17 @@ export const getCurrentLimit = async (contract, decimals) => {
   }
 }
 
-export const getPastEvents = (contract, fromBlock, toBlock, event = 'allEvents', options = {}) =>
-  commonGetPastEvents(contract, { fromBlock, toBlock, event, options })
+export const getPastEvents = async function(contract, fromBlock, toBlock, event = 'allEvents', options = {}) {
+  if (Array.isArray(event)) {
+    const eventArrays = await Promise.all(
+      event.map(
+        event => (contract.events[event] ? commonGetPastEvents(contract, { fromBlock, toBlock, event, options }) : [])
+      )
+    )
+    return Array.prototype.concat(...eventArrays)
+  }
+  return commonGetPastEvents(contract, { fromBlock, toBlock, event, options })
+}
 
 export const getErc677TokenAddress = contract => contract.methods.erc677token().call()
 

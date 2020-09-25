@@ -170,7 +170,7 @@ class ForeignStore {
       this.getEvents()
       this.getTokenBalance()
       this.getCurrentLimit()
-    }, 15000)
+    }, 30000)
   }
 
   @action
@@ -483,7 +483,10 @@ class ForeignStore {
     if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
-        const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
+        const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest', [
+          'FeeDistributedFromSignatures',
+          'FeeDistributedFromAffirmation'
+        ])
 
         processLargeArrayAsync(events, this.processEvent, () => {
           this.feeEventsFinished = true
