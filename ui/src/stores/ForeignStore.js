@@ -42,6 +42,7 @@ import {
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
+import yn from '../components/utils/yn'
 import BN from 'bignumber.js'
 import { processLargeArrayAsync } from './utils/array'
 import { fromDecimals } from './utils/decimals'
@@ -445,6 +446,10 @@ class ForeignStore {
   }
 
   async getStatistics() {
+    if (yn(process.env.REACT_APP_UI_FOREIGN_WITHOUT_EVENTS)) {
+      this.statistics.finished = true
+      return
+    }
     try {
       if (isMediatorMode(this.rootStore.bridgeMode)) {
         const events = await getPastEvents(this.foreignBridge, 0, 'latest', 'TokensBridged')
@@ -480,6 +485,10 @@ class ForeignStore {
   }
 
   async getFeeEvents() {
+    if (yn(process.env.REACT_APP_UI_FOREIGN_WITHOUT_EVENTS)) {
+      this.feeEventsFinished = true
+      return
+    }
     if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
         const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)

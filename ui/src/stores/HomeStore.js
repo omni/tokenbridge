@@ -50,6 +50,7 @@ import {
 } from './utils/contract'
 import { balanceLoaded, removePendingTransaction } from './utils/testUtils'
 import sleep from './utils/sleep'
+import yn from '../components/utils/yn'
 import BN from 'bignumber.js'
 import { processLargeArrayAsync } from './utils/array'
 import { getRewardableData } from './utils/rewardable'
@@ -483,6 +484,10 @@ class HomeStore {
   }
 
   async getStatistics() {
+    if (yn(process.env.REACT_APP_UI_HOME_WITHOUT_EVENTS)) {
+      this.statistics.finished = true
+      return
+    }
     try {
       if (!isMediatorMode(this.rootStore.bridgeMode)) {
         const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
@@ -556,6 +561,10 @@ class HomeStore {
   }
 
   async getFeeEvents() {
+    if (yn(process.env.REACT_APP_UI_HOME_WITHOUT_EVENTS)) {
+      this.feeEventsFinished = true
+      return
+    }
     try {
       if (this.rootStore.bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
         const blockRewardAddress = await getBlockRewardContract(this.homeBridge)
