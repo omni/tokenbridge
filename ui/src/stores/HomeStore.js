@@ -198,7 +198,7 @@ class HomeStore {
     this.getMinPerTxLimit()
     this.getMaxPerTxLimit()
     this.getEvents()
-    this.getBalance()
+    this.getBalance(true)
     this.getCurrentLimit()
     this.getFee()
     this.getRequiredBlockConfirmations()
@@ -208,7 +208,7 @@ class HomeStore {
     this.calculateCollectedFees()
     setInterval(() => {
       this.getEvents()
-      this.getBalance()
+      this.getBalance(false)
       this.getBlockNumber()
       this.getCurrentLimit()
     }, 30000)
@@ -266,10 +266,12 @@ class HomeStore {
   }
 
   @action
-  async getBalance() {
+  async getBalance(withTotalSupply=true) {
     try {
       if (isErcToErcMode(this.rootStore.bridgeMode)) {
-        this.balance = await getTotalSupply(this.tokenContract)
+        if (withTotalSupply) {
+          this.balance = await getTotalSupply(this.tokenContract)
+        }
         this.web3Store.getWeb3Promise.then(async () => {
           this.userBalance = await getBalanceOf(this.tokenContract, this.web3Store.defaultAccount.address)
           balanceLoaded()

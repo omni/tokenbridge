@@ -159,7 +159,7 @@ class ForeignStore {
     this.getMinPerTxLimit()
     this.getMaxPerTxLimit()
     this.getEvents()
-    this.getTokenBalance()
+    this.getTokenBalance(true)
     this.getCurrentLimit()
     this.getFee()
     this.getRequiredBlockConfirmations()
@@ -169,7 +169,7 @@ class ForeignStore {
     setInterval(() => {
       this.getBlockNumber()
       this.getEvents()
-      this.getTokenBalance()
+      this.getTokenBalance(false)
       this.getCurrentLimit()
     }, 30000)
   }
@@ -232,9 +232,11 @@ class ForeignStore {
   }
 
   @action
-  async getTokenBalance() {
+  async getTokenBalance(withTotalSupply=true) {
     try {
-      this.totalSupply = await getTotalSupply(this.tokenContract)
+      if (withTotalSupply) {
+        this.totalSupply = await getTotalSupply(this.tokenContract)
+      }
       this.web3Store.getWeb3Promise.then(async () => {
         this.balance = await getBalanceOf(this.tokenContract, this.web3Store.defaultAccount.address)
         balanceLoaded()
