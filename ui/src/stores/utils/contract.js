@@ -21,14 +21,17 @@ export const getMinPerTxLimit = async (contract, decimals) => {
   return fromDecimals(minPerTx, decimals)
 }
 
-export const getCurrentLimit = async (contract, decimals) => {
-  const currentDay = await contract.methods.getCurrentDay().call()
+export const getDailyLimit = async (contract, decimals) => {
   const dailyLimit = await contract.methods.dailyLimit().call()
+  return fromDecimals(dailyLimit, decimals)
+}
+
+export const getCurrentSpentAmount = async (contract, dailyLimit, decimals) => {
+  const currentDay = await contract.methods.getCurrentDay().call()
   const totalSpentPerDay = await contract.methods.totalSpentPerDay(currentDay).call()
   const maxCurrentDeposit = new BN(dailyLimit).minus(new BN(totalSpentPerDay)).toString(10)
   return {
     maxCurrentDeposit: fromDecimals(maxCurrentDeposit, decimals),
-    dailyLimit: fromDecimals(dailyLimit, decimals),
     totalSpentPerDay: fromDecimals(totalSpentPerDay, decimals)
   }
 }
@@ -37,7 +40,10 @@ export const getPastEvents = async function(contract, fromBlock, toBlock, event 
   if (Array.isArray(event)) {
     const eventArrays = await Promise.all(
       event.map(
-        event => (contract.events[event] ? commonGetPastEvents(contract, { fromBlock, toBlock, event, options }) : [])
+        event =>
+          contract.events[event]
+            ? commonGetPastEvents(contract, { fromBlock, toBlock, event, options })
+            : Promise.resolve([])
       )
     )
     return Array.prototype.concat(...eventArrays)
@@ -55,15 +61,13 @@ export const getDecimals = contract => contract.methods.decimals().call()
 
 export const getMessage = (contract, messageHash) => contract.methods.message(messageHash).call()
 
-export const getTotalSupply = async contract => {
+export const getTotalSupply = async (contract, decimals) => {
   const totalSupply = await contract.methods.totalSupply().call()
-  const decimals = await contract.methods.decimals().call()
   return fromDecimals(totalSupply, decimals)
 }
 
-export const getBalanceOf = async (contract, address) => {
+export const getBalanceOf = async (contract, address, decimals) => {
   const balance = await contract.methods.balanceOf(address).call()
-  const decimals = await contract.methods.decimals().call()
   return fromDecimals(balance, decimals)
 }
 

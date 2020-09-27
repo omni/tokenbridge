@@ -21,7 +21,8 @@ import {
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
-  getCurrentLimit,
+  getDailyLimit,
+  getCurrentSpentAmount,
   getPastEvents,
   getMessage,
   getErc677TokenAddress,
@@ -189,11 +190,10 @@ class HomeStore {
       await this.getBlockRewardContract()
     }
     await this.getBlockNumber()
-    this.getMinPerTxLimit()
-    this.getMaxPerTxLimit()
+    await this.getLimits()
     this.getEvents(this.latestBlockNumber - 100, 'latest', 'allEvents')
     this.getBalance()
-    this.getCurrentLimit()
+    this.getCurrentSpentAmount()
     this.getFee()
     this.getRequiredBlockConfirmations()
     this.getValidators()
@@ -201,10 +201,10 @@ class HomeStore {
     this.getFeeEvents()
     this.calculateCollectedFees()
     setInterval(() => {
+      this.getBlockNumber()
       this.getConfirmationEvents()
       this.getBalance()
-      this.getBlockNumber()
-      this.getCurrentLimit()
+      this.getCurrentSpentAmount()
     }, 30000)
   }
 
@@ -233,27 +233,18 @@ class HomeStore {
   }
 
   @action
+  async getLimits() {
+    ;[this.minPerTx, this.maxPerTx, this.dailyLimit] = await Promise.all([
+      getMinPerTxLimit(this.homeBridge, this.tokenDecimals),
+      getMaxPerTxLimit(this.homeBridge, this.tokenDecimals),
+      getDailyLimit(this.homeBridge, this.tokenDecimals)
+    ])
+  }
+
+  @action
   async getBlockNumber() {
     try {
       this.latestBlockNumber = await getBlockNumber(this.homeWeb3)
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  @action
-  async getMaxPerTxLimit() {
-    try {
-      this.maxPerTx = await getMaxPerTxLimit(this.homeBridge, this.tokenDecimals)
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  @action
-  async getMinPerTxLimit() {
-    try {
-      this.minPerTx = await getMinPerTxLimit(this.homeBridge, this.tokenDecimals)
     } catch (e) {
       console.error(e)
     }
@@ -462,11 +453,10 @@ class HomeStore {
   }
 
   @action
-  async getCurrentLimit() {
+  async getCurrentSpentAmount() {
     try {
-      const result = await getCurrentLimit(this.homeBridge, this.tokenDecimals)
+      const result = await getCurrentSpentAmount(this.homeBridge, this.dailyLimit, this.tokenDecimals)
       this.maxCurrentDeposit = result.maxCurrentDeposit
-      this.dailyLimit = result.dailyLimit
       this.totalSpentPerDay = result.totalSpentPerDay
     } catch (e) {
       console.error(e)

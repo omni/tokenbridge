@@ -18,7 +18,8 @@ import {
 import {
   getMaxPerTxLimit,
   getMinPerTxLimit,
-  getCurrentLimit,
+  getDailyLimit,
+  getCurrentSpentAmount,
   getPastEvents,
   getTotalSupply,
   getBalanceOf,
@@ -155,11 +156,10 @@ class ForeignStore {
     this.foreignBridge = new this.foreignWeb3.eth.Contract(FOREIGN_ABI, this.COMMON_FOREIGN_BRIDGE_ADDRESS)
     await this.getBlockNumber()
     await this.getTokenInfo()
-    this.getMinPerTxLimit()
-    this.getMaxPerTxLimit()
+    await this.getLimits()
     this.getEvents(this.latestBlockNumber - 100, 'latest', 'allEvents')
     this.getTokenBalance()
-    this.getCurrentLimit()
+    this.getCurrentSpentAmount()
     this.getFee()
     this.getRequiredBlockConfirmations()
     this.getValidators()
@@ -169,7 +169,7 @@ class ForeignStore {
       this.getBlockNumber()
       this.getConfirmationEvents()
       this.getTokenBalance()
-      this.getCurrentLimit()
+      this.getCurrentSpentAmount()
     }, 30000)
   }
 
@@ -177,24 +177,6 @@ class ForeignStore {
   async getBlockNumber() {
     try {
       this.latestBlockNumber = await getBlockNumber(this.foreignWeb3)
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  @action
-  async getMaxPerTxLimit() {
-    try {
-      this.maxPerTx = await getMaxPerTxLimit(this.foreignBridge, this.tokenDecimals)
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  @action
-  async getMinPerTxLimit() {
-    try {
-      this.minPerTx = await getMinPerTxLimit(this.foreignBridge, this.tokenDecimals)
     } catch (e) {
       console.error(e)
     }
@@ -231,11 +213,20 @@ class ForeignStore {
   }
 
   @action
+  async getLimits() {
+    ;[this.minPerTx, this.maxPerTx, this.dailyLimit] = await Promise.all([
+      getMinPerTxLimit(this.foreignBridge, this.tokenDecimals),
+      getMaxPerTxLimit(this.foreignBridge, this.tokenDecimals),
+      getDailyLimit(this.foreignBridge, this.tokenDecimals)
+    ])
+  }
+
+  @action
   async getTokenBalance() {
     try {
-      this.totalSupply = await getTotalSupply(this.tokenContract)
+      this.totalSupply = await getTotalSupply(this.tokenContract, this.tokenDecimals)
       this.web3Store.getWeb3Promise.then(async () => {
-        this.balance = await getBalanceOf(this.tokenContract, this.web3Store.defaultAccount.address)
+        this.balance = await getBalanceOf(this.tokenContract, this.web3Store.defaultAccount.address, this.tokenDecimals)
         balanceLoaded()
       })
     } catch (e) {
@@ -340,11 +331,10 @@ class ForeignStore {
   }
 
   @action
-  async getCurrentLimit() {
+  async getCurrentSpentAmount() {
     try {
-      const result = await getCurrentLimit(this.foreignBridge, this.tokenDecimals)
+      const result = await getCurrentSpentAmount(this.foreignBridge, this.dailyLimit, this.tokenDecimals)
       this.maxCurrentDeposit = result.maxCurrentDeposit
-      this.dailyLimit = result.dailyLimit
       this.totalSpentPerDay = result.totalSpentPerDay
     } catch (e) {
       console.error(e)
