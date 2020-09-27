@@ -10,7 +10,11 @@ const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
 const { MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 
-const { ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST, ORACLE_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
+const {
+  ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST,
+  ORACLE_HOME_TO_FOREIGN_BLOCK_LIST,
+  ORACLE_HOME_TO_FOREIGN_CHECK_SENDER
+} = process.env
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
@@ -55,27 +59,35 @@ function processCollectedSignaturesBuilder(config) {
           const originalTxHash = parsedMessage.txHash
 
           if (ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST) {
-            const allowanceList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST)
+            const allowanceList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST, logger)
             if (allowanceList.indexOf(recipient) === -1) {
-              const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
-              if (allowanceList.indexOf(sender) === -1) {
-                logger.info(
-                  { sender, recipient },
-                  'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.'
-                )
+              if (ORACLE_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
+                logger.debug({ txHash: originalTxHash }, 'Requested sender of an original withdrawal transaction')
+                const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+                if (allowanceList.indexOf(sender) === -1) {
+                  logger.info(
+                    { sender, recipient },
+                    'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.'
+                  )
+                  return
+                }
+              } else {
                 return
               }
             }
           } else if (ORACLE_HOME_TO_FOREIGN_BLOCK_LIST) {
-            const blockList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_BLOCK_LIST)
+            const blockList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_BLOCK_LIST, logger)
             if (blockList.indexOf(recipient) > -1) {
               logger.info({ recipient }, 'Validator skips a transaction. Recipient address is in the block list.')
               return
             }
-            const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
-            if (blockList.indexOf(sender) > -1) {
-              logger.info({ sender }, 'Validator skips a transaction. Sender address is in the block list.')
-              return
+            if (ORACLE_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
+              logger.debug({ txHash: originalTxHash }, 'Requested sender of an original withdrawal transaction')
+              const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+              if (blockList.indexOf(sender) > -1) {
+                logger.info({ sender }, 'Validator skips a transaction. Sender address is in the block list.')
+                return
+              }
             }
           }
         }

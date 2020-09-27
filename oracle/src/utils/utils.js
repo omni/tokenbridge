@@ -107,7 +107,8 @@ const invert = p => new Promise((res, rej) => p.then(rej, res))
 const promiseAny = ps => invert(Promise.all(ps.map(invert)))
 
 const readAccessLists = {}
-async function readAccessListFile(fileName) {
+async function readAccessListFile(fileName, logger) {
+  logger.debug({ fileName }, 'Access list file read requested')
   if (!readAccessLists[fileName]) {
     try {
       const data = await fs.promises.readFile(fileName)
@@ -116,8 +117,11 @@ async function readAccessListFile(fileName) {
         .split('\n')
         .map(addr => addr.trim().toLowerCase())
         .filter(addr => addr.length === 42)
-    } catch (_) {
+      logger.info({ fileName }, `Access list was read successfully, ${data.length} addresses found`)
+      logger.debug({ addresses: readAccessLists[fileName] }, `Read addresses from the file`)
+    } catch (e) {
       readAccessLists[fileName] = []
+      logger.error({ fileName, error: e }, `Failed to read access list from the file`)
     }
   }
   return readAccessLists[fileName]
