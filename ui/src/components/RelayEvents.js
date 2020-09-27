@@ -118,16 +118,14 @@ export class RelayEvents extends React.Component {
   }
 
   getForeignEvents = foreignStore => {
-    return foreignStore.events.slice().map(({ event, transactionHash, signedTxHash, blockNumber, returnValues }) => {
-      return {
-        color: this.colors[event],
-        eventName: event,
-        transactionHash,
-        recipient: returnValues.recipient,
-        value: returnValues.value,
-        blockNumber
-      }
-    })
+    return foreignStore.events.slice().map(({ event, transactionHash, blockNumber, returnValues }) => ({
+      color: this.colors[event],
+      eventName: event,
+      transactionHash,
+      recipient: returnValues.recipient,
+      value: returnValues.value,
+      blockNumber
+    }))
   }
 
   onChangeList = e => {
