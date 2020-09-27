@@ -70,10 +70,10 @@ export const NetworkDetails = ({
         {displayBridgeLimits && (
           <p className="details-data-container">
             <span className="details-label">Remaining Daily {currency} Quota</span>
-            <div className="details-description-black">
+            <span className="details-description-black">
               {numeral(maxCurrentLimit).format('0,0.0', Math.floor)}
               <span className={`details-description-currency-${REACT_APP_UI_STYLES}`}>{' ' + currency}</span>
-            </div>
+            </span>
           </p>
         )}
         {displayBridgeLimits && (
