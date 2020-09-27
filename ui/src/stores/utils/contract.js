@@ -28,12 +28,9 @@ export const getDailyLimit = async (contract, decimals) => {
 
 export const getCurrentSpentAmount = async (contract, dailyLimit, decimals) => {
   const currentDay = await contract.methods.getCurrentDay().call()
-  const totalSpentPerDay = await contract.methods.totalSpentPerDay(currentDay).call()
+  const totalSpentPerDay = fromDecimals(await contract.methods.totalSpentPerDay(currentDay).call(), decimals)
   const maxCurrentDeposit = new BN(dailyLimit).minus(new BN(totalSpentPerDay)).toString(10)
-  return {
-    maxCurrentDeposit: fromDecimals(maxCurrentDeposit, decimals),
-    totalSpentPerDay: fromDecimals(totalSpentPerDay, decimals)
-  }
+  return { maxCurrentDeposit, totalSpentPerDay }
 }
 
 export const getPastEvents = async function(contract, fromBlock, toBlock, event = 'allEvents', options = {}) {
