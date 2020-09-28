@@ -157,7 +157,7 @@ class ForeignStore {
     await this.getBlockNumber()
     await this.getTokenInfo()
     await this.getLimits()
-    this.getEvents(this.latestBlockNumber - 100, 'latest', 'allEvents')
+    this.getEvents(this.latestBlockNumber - 100, 'latest', 'allEvents').then(events => (this.events = events))
     this.getTokenBalance()
     this.getCurrentSpentAmount()
     this.getFee()

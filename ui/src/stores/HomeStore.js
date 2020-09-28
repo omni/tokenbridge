@@ -191,7 +191,7 @@ class HomeStore {
     }
     await this.getBlockNumber()
     await this.getLimits()
-    this.getEvents(this.latestBlockNumber - 100, 'latest', 'allEvents')
+    this.getEvents(this.latestBlockNumber - 100, 'latest', 'allEvents').then(events => (this.events = events))
     this.getBalance()
     this.getCurrentSpentAmount()
     this.getFee()
