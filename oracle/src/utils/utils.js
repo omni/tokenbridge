@@ -108,8 +108,8 @@ const promiseAny = ps => invert(Promise.all(ps.map(invert)))
 
 const readAccessLists = {}
 async function readAccessListFile(fileName, logger) {
-  logger.debug({ fileName }, 'Access list file read requested')
   if (!readAccessLists[fileName]) {
+    logger.debug({ fileName }, 'Access list file read requested')
     try {
       const data = await fs.promises.readFile(fileName)
       readAccessLists[fileName] = data

@@ -72,6 +72,10 @@ function processCollectedSignaturesBuilder(config) {
                   return
                 }
               } else {
+                logger.info(
+                  { recipient },
+                  'Validator skips a transaction. Recipient address is not in the allowance list.'
+                )
                 return
               }
             }
