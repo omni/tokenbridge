@@ -37,6 +37,9 @@ ORACLE_MAX_PROCESSING_TIME | The workers processes will be killed if this amount
 ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY | The private key of the bridge validator used to sign confirmations before sending transactions to the bridge contracts. The validator account is calculated automatically from the private key. Every bridge instance (set of watchers and senders) must have its own unique private key. The specified private key is used to sign transactions on both sides of the bridge. | hexidecimal without "0x"
 ORACLE_VALIDATOR_ADDRESS | The public address of the bridge validator | hexidecimal with "0x"
 ORACLE_TX_REDUNDANCY | If set to `true`, instructs oracle to send `eth_sendRawTransaction` requests through all available RPC urls defined in `COMMON_HOME_RPC_URL` and `COMMON_FOREIGN_RPC_URL` variables instead of using first available one
+ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST | Filename with a list of addresses, separated by newlines. If set, determines the privileged set of accounts whose requests will be automatically processed by the CollectedSignatures watcher. | string
+ORACLE_HOME_TO_FOREIGN_BLOCK_LIST | Filename with a list of addresses, separated by newlines. If set, determines the blocked set of accounts whose requests will not be automatically processed by the CollectedSignatures watcher. Has a lower priority than the `ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST` | string
+ORACLE_HOME_TO_FOREIGN_CHECK_SENDER | If set to `true`, instructs the oracle to do an extra check for transaction origin in the block/allowance list. `false` by default. | `true` / `false`
 
 
 ## UI configuration

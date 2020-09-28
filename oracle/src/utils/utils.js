@@ -1,3 +1,4 @@
+const fs = require('fs')
 const BigNumber = require('bignumber.js')
 const promiseRetry = require('promise-retry')
 const Web3 = require('web3')
@@ -105,6 +106,27 @@ function nonceError(e) {
 const invert = p => new Promise((res, rej) => p.then(rej, res))
 const promiseAny = ps => invert(Promise.all(ps.map(invert)))
 
+const readAccessLists = {}
+async function readAccessListFile(fileName, logger) {
+  if (!readAccessLists[fileName]) {
+    logger.debug({ fileName }, 'Access list file read requested')
+    try {
+      const data = await fs.promises.readFile(fileName)
+      readAccessLists[fileName] = data
+        .toString()
+        .split('\n')
+        .map(addr => addr.trim().toLowerCase())
+        .filter(addr => addr.length === 42)
+      logger.info({ fileName }, `Access list was read successfully, ${data.length} addresses found`)
+      logger.debug({ addresses: readAccessLists[fileName] }, `Read addresses from the file`)
+    } catch (e) {
+      readAccessLists[fileName] = []
+      logger.error({ fileName, error: e }, `Failed to read access list from the file`)
+    }
+  }
+  return readAccessLists[fileName]
+}
+
 module.exports = {
   syncForEach,
   checkHTTPS,
@@ -115,5 +137,6 @@ module.exports = {
   privateKeyToAddress,
   nonceError,
   getRetrySequence,
-  promiseAny
+  promiseAny,
+  readAccessListFile
 }
