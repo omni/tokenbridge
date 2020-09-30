@@ -127,7 +127,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           const tx = await web3Instance.eth.getTransaction(job.txHash)
 
           if (tx && tx.blockNumber !== null) {
-            logger.info(`Transaction ${job.txHash} was successfully mined`)
+            logger.debug(`Transaction ${job.txHash} was successfully mined`)
             return
           }
 
