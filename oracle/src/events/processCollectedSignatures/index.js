@@ -46,13 +46,11 @@ function processCollectedSignaturesBuilder(config) {
           eventTransactionHash: colSignature.transactionHash
         })
 
-        if (ORACLE_ALWAYS_RELAY_SIGNATURES && (ORACLE_ALWAYS_RELAY_SIGNATURES === 'true')) {
-          logger.debug("Validator handles all CollectedSignature requests")
-        } else {
-          if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
+        if (ORACLE_ALWAYS_RELAY_SIGNATURES && ORACLE_ALWAYS_RELAY_SIGNATURES === 'true') {
+          logger.debug('Validator handles all CollectedSignature requests')
+        } else if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
             logger.info(`Validator not responsible for relaying CollectedSignatures ${colSignature.transactionHash}`)
             return
-          }
         }
 
         logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
