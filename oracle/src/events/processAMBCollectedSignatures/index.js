@@ -12,9 +12,7 @@ const { MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/const
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
-const {
-  ORACLE_ALWAYS_RELAY_SIGNATURES
-} = process.env
+const { ORACLE_ALWAYS_RELAY_SIGNATURES } = process.env
 
 let validatorContract = null
 
