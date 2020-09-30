@@ -123,38 +123,32 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       }
 
       try {
-        let txNonce
         if (isResend) {
           const tx = await web3Instance.eth.getTransaction(job.txHash)
 
-          if (tx === null) {
-            logger.info(`Transaction ${job.txHash} was not found, dropping it`)
-            return
-          }
-          if (tx.blockNumber !== null) {
-            logger.info(`Transaction ${job.txHash} was successfully mined`)
+          if (tx && tx.blockNumber !== null) {
+            logger.debug(`Transaction ${job.txHash} was successfully mined`)
             return
           }
 
           logger.info(
-            `Previously sent transaction is stuck, updating gasPrice: ${tx.gasPrice} -> ${gasPrice.toString(10)}`
+            `Previously sent transaction is stuck, updating gasPrice: ${job.gasPrice} -> ${gasPrice.toString(10)}`
           )
-          if (toBN(tx.gasPrice).gte(toBN(gasPrice))) {
+          if (toBN(job.gasPrice).gte(toBN(gasPrice))) {
             logger.info("Gas price returned from the oracle didn't increase, will reinspect this transaction later")
             sentTx.push(job)
             return
           }
-
-          txNonce = tx.nonce
         } else {
-          txNonce = nonce++
+          job.nonce = nonce++
         }
-        logger.info(`Sending transaction with nonce ${txNonce}`)
-        const txHash = await sendTx({
+        logger.info(`Sending transaction with nonce ${job.nonce}`)
+        job.gasPrice = gasPrice.toString(10)
+        job.txHash = await sendTx({
           chain: config.id,
           data: job.data,
-          nonce: txNonce,
-          gasPrice: gasPrice.toString(10),
+          nonce: job.nonce,
+          gasPrice: job.gasPrice,
           amount: '0',
           gasLimit,
           privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
@@ -162,14 +156,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           chainId,
           web3: web3Instance
         })
-        sentTx.push({
-          ...job,
-          txHash
-        })
+        sentTx.push(job)
 
         logger.info(
-          { eventTransactionHash: job.transactionReference, generatedTransactionHash: txHash },
-          `Tx generated ${txHash} for event Tx ${job.transactionReference}`
+          { eventTransactionHash: job.transactionReference, generatedTransactionHash: job.txHash },
+          `Tx generated ${job.txHash} for event Tx ${job.transactionReference}`
         )
       } catch (e) {
         logger.error(
