@@ -140,7 +140,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
             return
           }
         } else {
-          job.nonce = nonce++
+          job.nonce = nonce
         }
         logger.info(`Sending transaction with nonce ${job.nonce}`)
         job.gasPrice = gasPrice.toString(10)
@@ -158,6 +158,9 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         })
         sentTx.push(job)
 
+        if (!isResend) {
+          nonce++
+        }
         logger.info(
           { eventTransactionHash: job.transactionReference, generatedTransactionHash: job.txHash },
           `Tx generated ${job.txHash} for event Tx ${job.transactionReference}`
@@ -172,7 +175,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           failedTx.push(job)
         }
 
-        if (e.message.includes('Insufficient funds')) {
+        if (e.message.toLowerCase().includes('insufficient funds')) {
           insufficientFunds = true
           const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
           minimumBalance = gasLimit.multipliedBy(gasPrice)
