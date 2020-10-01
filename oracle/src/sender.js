@@ -171,7 +171,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           `Tx Failed for event Tx ${job.transactionReference}.`,
           e.message
         )
-        if (!e.message.includes('Transaction with the same hash was already imported')) {
+        if (!e.message.toLowerCase().includes('transaction with the same hash was already imported')) {
           failedTx.push(job)
         }
 
