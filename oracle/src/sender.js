@@ -1,6 +1,5 @@
 require('../env')
 const path = require('path')
-const { toBN } = require('web3-utils')
 const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
@@ -98,10 +97,10 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
     }
 
     const txArray = JSON.parse(msg.content)
-    logger.info(`Msg received with ${txArray.length} Tx to send`)
+    logger.debug(`Msg received with ${txArray.length} Tx to send`)
     const gasPrice = GasPrice.getPrice()
 
-    let nonce = await readNonce()
+    let nonce
     let insufficientFunds = false
     let minimumBalance = null
     const failedTx = []
@@ -110,9 +109,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
     const isResend = txArray.length > 0 && !!txArray[0].txHash
 
     if (isResend) {
-      logger.debug(`Checking status of ${txArray.length} transactions`)
+      logger.info(`Checking status of ${txArray.length} transactions`)
+      nonce = null
     } else {
-      logger.debug(`Sending ${txArray.length} transactions`)
+      logger.info(`Sending ${txArray.length} transactions`)
+      nonce = await readNonce()
     }
     await syncForEach(txArray, async job => {
       let gasLimit
@@ -131,23 +132,20 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
             return
           }
 
-          logger.info(
-            `Previously sent transaction is stuck, updating gasPrice: ${job.gasPrice} -> ${gasPrice.toString(10)}`
-          )
-          if (toBN(job.gasPrice).gte(toBN(gasPrice))) {
-            logger.info("Gas price returned from the oracle didn't increase, will reinspect this transaction later")
-            sentTx.push(job)
-            return
+          if (nonce === null) {
+            nonce = await readNonce(true)
           }
-        } else {
-          job.nonce = nonce++
+
+          logger.info(
+            `Transaction ${job.txHash} was not mined, updating gasPrice: ${job.gasPrice} -> ${gasPrice.toString(10)}`
+          )
         }
-        logger.info(`Sending transaction with nonce ${job.nonce}`)
+        logger.info(`Sending transaction with nonce ${nonce}`)
         job.gasPrice = gasPrice.toString(10)
         job.txHash = await sendTx({
           chain: config.id,
           data: job.data,
-          nonce: job.nonce,
+          nonce,
           gasPrice: job.gasPrice,
           amount: '0',
           gasLimit,
@@ -158,6 +156,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         })
         sentTx.push(job)
 
+        nonce++
         logger.info(
           { eventTransactionHash: job.transactionReference, generatedTransactionHash: job.txHash },
           `Tx generated ${job.txHash} for event Tx ${job.transactionReference}`
@@ -168,11 +167,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           `Tx Failed for event Tx ${job.transactionReference}.`,
           e.message
         )
-        if (!e.message.includes('Transaction with the same hash was already imported')) {
+        if (!e.message.toLowerCase().includes('transaction with the same hash was already imported')) {
           failedTx.push(job)
         }
 
-        if (e.message.includes('Insufficient funds')) {
+        if (e.message.toLowerCase().includes('insufficient funds')) {
           insufficientFunds = true
           const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
           minimumBalance = gasLimit.multipliedBy(gasPrice)

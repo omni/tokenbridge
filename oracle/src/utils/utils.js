@@ -94,10 +94,11 @@ function privateKeyToAddress(privateKey) {
 }
 
 function nonceError(e) {
+  const message = e.message.toLowerCase()
   return (
-    e.message.includes('Transaction nonce is too low') ||
-    e.message.includes('nonce too low') ||
-    e.message.includes('transaction with same nonce in the queue')
+    message.includes('transaction nonce is too low') ||
+    message.includes('nonce too low') ||
+    message.includes('transaction with same nonce in the queue')
   )
 }
 
