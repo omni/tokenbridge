@@ -13,7 +13,8 @@ const { MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const {
   ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST,
   ORACLE_HOME_TO_FOREIGN_BLOCK_LIST,
-  ORACLE_HOME_TO_FOREIGN_CHECK_SENDER
+  ORACLE_HOME_TO_FOREIGN_CHECK_SENDER,
+  ORACLE_ALWAYS_RELAY_SIGNATURES
 } = process.env
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
@@ -45,7 +46,9 @@ function processCollectedSignaturesBuilder(config) {
           eventTransactionHash: colSignature.transactionHash
         })
 
-        if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
+        if (ORACLE_ALWAYS_RELAY_SIGNATURES && ORACLE_ALWAYS_RELAY_SIGNATURES === 'true') {
+          logger.debug('Validator handles all CollectedSignature requests')
+        } else if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
           logger.info(`Validator not responsible for relaying CollectedSignatures ${colSignature.transactionHash}`)
           return
         }
