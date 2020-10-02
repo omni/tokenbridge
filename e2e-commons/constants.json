@@ -15,6 +15,10 @@
     "address": "0x3CC5baAB679eC0732C175760079Bf48F564ad26B",
     "privateKey": "0xedb53ee050631b7914d5f1a66c2f0d2df3ec85a9ed2a9616b16a7b1b7a10b8d1"
   },
+  "blockedUser": {
+    "address": "0xc9e38bfdB9c635F0796ad83CC8705dc379F41c04",
+    "privateKey": "0x65df4ea787916f6ed9660f0b0fe36858a65735ad0dcd34527497f4ce32e53883"
+  },
   "validator": {
     "address": "0xaaB52d66283F7A1D5978bcFcB55721ACB467384b",
     "privateKey": "0x8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"

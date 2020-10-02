@@ -21,10 +21,10 @@ export const getMinPerTxLimit = async (contract, decimals) => {
   return fromDecimals(minPerTx, decimals)
 }
 
-export const getCurrentLimit = async (contract, decimals) => {
+export const getCurrentLimit = async (contract, otherContract, decimals) => {
   const currentDay = await contract.methods.getCurrentDay().call()
   const dailyLimit = await contract.methods.dailyLimit().call()
-  const totalSpentPerDay = await contract.methods.totalSpentPerDay(currentDay).call()
+  const totalSpentPerDay = await otherContract.methods.totalExecutedPerDay(currentDay).call()
   const maxCurrentDeposit = new BN(dailyLimit).minus(new BN(totalSpentPerDay)).toString(10)
   return {
     maxCurrentDeposit: fromDecimals(maxCurrentDeposit, decimals),

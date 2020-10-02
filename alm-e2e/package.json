@@ -19,6 +19,6 @@
     "eslint-plugin-jest": "^23.18.0"
   },
   "engines": {
-    "node": ">= 8.9"
+    "node": ">= 10.18"
   }
 }

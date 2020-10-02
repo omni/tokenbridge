@@ -12,6 +12,8 @@ const { MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/const
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
+const { ORACLE_ALWAYS_RELAY_SIGNATURES } = process.env
+
 let validatorContract = null
 
 function processCollectedSignaturesBuilder(config) {
@@ -39,7 +41,9 @@ function processCollectedSignaturesBuilder(config) {
           eventTransactionHash: colSignature.transactionHash
         })
 
-        if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
+        if (ORACLE_ALWAYS_RELAY_SIGNATURES && ORACLE_ALWAYS_RELAY_SIGNATURES === 'true') {
+          logger.debug('Validator handles all CollectedSignature requests')
+        } else if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
           logger.info(`Validator not responsible for relaying CollectedSignatures ${colSignature.transactionHash}`)
           return
         }

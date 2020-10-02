@@ -11,6 +11,6 @@
     "lint": "eslint . --ignore-path ../.eslintignore"
   },
   "engines": {
-    "node": ">= 8.9"
+    "node": ">= 10.18"
   }
 }

@@ -50,6 +50,9 @@ services:
     environment:
     - NODE_ENV=production
     command: "true"
+    volumes:
+      - '../e2e-commons/access-lists/block_list.txt:/mono/oracle/access-lists/block_list.txt'
+      - '../e2e-commons/access-lists/allowance_list.txt:/mono/oracle/access-lists/allowance_list.txt'
     networks:
       - ultimate
   oracle-amb:

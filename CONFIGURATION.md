@@ -22,7 +22,7 @@ COMMON_FOREIGN_GAS_PRICE_FACTOR | A value that will multiply the gas price of th
 
 name | description | value
 --- | --- | ---
-ORACLE_BRIDGE_MODE | The bridge mode. The bridge starts listening to a different set of events based on this parameter. | NATIVE_TO_ERC / ERC_TO_ERC / ERC_TO_NATIVE
+ORACLE_BRIDGE_MODE | The bridge mode. The bridge starts listening to a different set of events based on this parameter. | NATIVE_TO_ERC / ERC_TO_ERC / ERC_TO_NATIVE / ARBITRARY_MESSAGE
 ORACLE_ALLOW_HTTP_FOR_RPC | **Only use in test environments - must be omitted in production environments.**. If this parameter is specified and set to `yes`, RPC URLs can be specified in form of HTTP links. A warning that the connection is insecure will be written to the logs. | `yes` / `no`
 ORACLE_HOME_RPC_POLLING_INTERVAL | The interval in milliseconds used to request the RPC node in the Home network for new blocks. The interval should match the average production time for a new block. | integer
 ORACLE_FOREIGN_RPC_POLLING_INTERVAL | The interval in milliseconds used to request the RPC node in the Foreign network for new blocks. The interval should match the average production time for a new block. | integer
@@ -37,6 +37,10 @@ ORACLE_MAX_PROCESSING_TIME | The workers processes will be killed if this amount
 ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY | The private key of the bridge validator used to sign confirmations before sending transactions to the bridge contracts. The validator account is calculated automatically from the private key. Every bridge instance (set of watchers and senders) must have its own unique private key. The specified private key is used to sign transactions on both sides of the bridge. | hexidecimal without "0x"
 ORACLE_VALIDATOR_ADDRESS | The public address of the bridge validator | hexidecimal with "0x"
 ORACLE_TX_REDUNDANCY | If set to `true`, instructs oracle to send `eth_sendRawTransaction` requests through all available RPC urls defined in `COMMON_HOME_RPC_URL` and `COMMON_FOREIGN_RPC_URL` variables instead of using first available one
+ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST | Filename with a list of addresses, separated by newlines. If set, determines the privileged set of accounts whose requests will be automatically processed by the CollectedSignatures watcher. | string
+ORACLE_HOME_TO_FOREIGN_BLOCK_LIST | Filename with a list of addresses, separated by newlines. If set, determines the blocked set of accounts whose requests will not be automatically processed by the CollectedSignatures watcher. Has a lower priority than the `ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST` | string
+ORACLE_HOME_TO_FOREIGN_CHECK_SENDER | If set to `true`, instructs the oracle to do an extra check for transaction origin in the block/allowance list. `false` by default. | `true` / `false`
+ORACLE_ALWAYS_RELAY_SIGNATURES | If set to `true`, the oracle will always relay signatures even if it was not the last who finilized the signatures collecting process. The default is `false`. | `true` / `false`
 
 
 ## UI configuration

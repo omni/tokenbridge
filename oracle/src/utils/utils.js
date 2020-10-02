@@ -1,3 +1,4 @@
+const fs = require('fs')
 const BigNumber = require('bignumber.js')
 const promiseRetry = require('promise-retry')
 const Web3 = require('web3')
@@ -93,10 +94,11 @@ function privateKeyToAddress(privateKey) {
 }
 
 function nonceError(e) {
+  const message = e.message.toLowerCase()
   return (
-    e.message.includes('Transaction nonce is too low') ||
-    e.message.includes('nonce too low') ||
-    e.message.includes('transaction with same nonce in the queue')
+    message.includes('transaction nonce is too low') ||
+    message.includes('nonce too low') ||
+    message.includes('transaction with same nonce in the queue')
   )
 }
 
@@ -104,6 +106,27 @@ function nonceError(e) {
 // inverted Promise.all fulfills with the first obtained result or rejects with the list of errors
 const invert = p => new Promise((res, rej) => p.then(rej, res))
 const promiseAny = ps => invert(Promise.all(ps.map(invert)))
+
+const readAccessLists = {}
+async function readAccessListFile(fileName, logger) {
+  if (!readAccessLists[fileName]) {
+    logger.debug({ fileName }, 'Access list file read requested')
+    try {
+      const data = await fs.promises.readFile(fileName)
+      readAccessLists[fileName] = data
+        .toString()
+        .split('\n')
+        .map(addr => addr.trim().toLowerCase())
+        .filter(addr => addr.length === 42)
+      logger.info({ fileName }, `Access list was read successfully, ${data.length} addresses found`)
+      logger.debug({ addresses: readAccessLists[fileName] }, `Read addresses from the file`)
+    } catch (e) {
+      readAccessLists[fileName] = []
+      logger.error({ fileName, error: e }, `Failed to read access list from the file`)
+    }
+  }
+  return readAccessLists[fileName]
+}
 
 module.exports = {
   syncForEach,
@@ -115,5 +138,6 @@ module.exports = {
   privateKeyToAddress,
   nonceError,
   getRetrySequence,
-  promiseAny
+  promiseAny,
+  readAccessListFile
 }

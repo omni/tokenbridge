@@ -177,7 +177,7 @@ async function sendJobTx(jobs) {
         e.message
       )
 
-      if (e.message.includes('Insufficient funds')) {
+      if (e.message.toLowerCase().includes('insufficient funds')) {
         const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
         const minimumBalance = gasLimit.multipliedBy(gasPrice)
         logger.error(
