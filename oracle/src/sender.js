@@ -97,7 +97,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
     }
 
     const txArray = JSON.parse(msg.content)
-    logger.info(`Msg received with ${txArray.length} Tx to send`)
+    logger.debug(`Msg received with ${txArray.length} Tx to send`)
     const gasPrice = GasPrice.getPrice()
 
     let nonce
@@ -109,10 +109,10 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
     const isResend = txArray.length > 0 && !!txArray[0].txHash
 
     if (isResend) {
-      logger.debug(`Checking status of ${txArray.length} transactions`)
+      logger.info(`Checking status of ${txArray.length} transactions`)
       nonce = null
     } else {
-      logger.debug(`Sending ${txArray.length} transactions`)
+      logger.info(`Sending ${txArray.length} transactions`)
       nonce = await readNonce()
     }
     await syncForEach(txArray, async job => {
@@ -133,11 +133,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           }
 
           if (nonce === null) {
-            nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
+            nonce = await readNonce(true)
           }
 
           logger.info(
-            `Previously sent transaction is stuck, updating gasPrice: ${job.gasPrice} -> ${gasPrice.toString(10)}`
+            `Transaction ${job.txHash} was not mined, updating gasPrice: ${job.gasPrice} -> ${gasPrice.toString(10)}`
           )
         }
         logger.info(`Sending transaction with nonce ${nonce}`)
