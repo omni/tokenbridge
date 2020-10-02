@@ -51,6 +51,9 @@ export const isBridgeContract = async (contract: Contract, allowedModes?: string
     }
     return allowedModes.includes(mode)
   } catch (e) {
-    return false
+    if (e.message.includes("Returned values aren't valid")) {
+      return false
+    }
+    throw e
   }
 }
