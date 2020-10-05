@@ -169,13 +169,13 @@ const getPastEvents = async (
       const middlePlusOne = middle.add(toBN(1))
 
       const firstHalfEvents = await getPastEvents(contract, {
-        ...options,
+        options,
         event,
         fromBlock,
         toBlock: middle
       })
       const secondHalfEvents = await getPastEvents(contract, {
-        ...options,
+        options,
         event,
         fromBlock: middlePlusOne,
         toBlock

@@ -74,6 +74,11 @@ async function main(mode) {
 
   logger.debug('getting last block numbers')
   const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
+  const homeConfirmations = toBN(await homeBridge.methods.requiredBlockConfirmations().call())
+  const foreignConfirmations = toBN(await foreignBridge.methods.requiredBlockConfirmations().call())
+  const homeDelayedBlockNumber = homeBlockNumber.sub(homeConfirmations)
+  const foreignDelayedBlockNumber = foreignBlockNumber.sub(foreignConfirmations)
+
   let homeToForeignRequests = []
   let foreignToHomeRequests = []
   let homeMigrationBlock = MONITOR_HOME_START_BLOCK
@@ -90,7 +95,7 @@ async function main(mode) {
     homeToForeignRequests = (await getPastEvents(oldHomeBridge, {
       event: 'UserRequestForSignature',
       fromBlock: MONITOR_HOME_START_BLOCK,
-      toBlock: homeBlockNumber
+      toBlock: homeDelayedBlockNumber
     })).map(normalizeEvent)
     logger.debug(`found ${homeToForeignRequests.length} events`)
     if (homeToForeignRequests.length > 0) {
@@ -101,7 +106,7 @@ async function main(mode) {
     foreignToHomeRequests = (await getPastEvents(oldForeignBridge, {
       event: 'UserRequestForAffirmation',
       fromBlock: MONITOR_FOREIGN_START_BLOCK,
-      toBlock: foreignBlockNumber
+      toBlock: foreignDelayedBlockNumber
     })).map(normalizeEvent)
     logger.debug(`found ${foreignToHomeRequests.length} events`)
     if (foreignToHomeRequests.length > 0) {
@@ -113,7 +118,7 @@ async function main(mode) {
   const homeToForeignRequestsNew = (await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
     fromBlock: homeMigrationBlock,
-    toBlock: homeBlockNumber
+    toBlock: homeDelayedBlockNumber
   })).map(normalizeEvent)
   homeToForeignRequests = [...homeToForeignRequests, ...homeToForeignRequestsNew]
 
@@ -135,7 +140,7 @@ async function main(mode) {
   const foreignToHomeRequestsNew = (await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
     fromBlock: foreignMigrationBlock,
-    toBlock: foreignBlockNumber
+    toBlock: foreignDelayedBlockNumber
   })).map(normalizeEvent)
   foreignToHomeRequests = [...foreignToHomeRequests, ...foreignToHomeRequestsNew]
 
@@ -144,7 +149,7 @@ async function main(mode) {
     let transferEvents = (await getPastEvents(erc20Contract, {
       event: 'Transfer',
       fromBlock: MONITOR_FOREIGN_START_BLOCK,
-      toBlock: foreignBlockNumber,
+      toBlock: foreignDelayedBlockNumber,
       options: {
         filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
       }
@@ -194,7 +199,7 @@ async function main(mode) {
           const halfDuplexTransferEvents = (await getPastEvents(halfDuplexTokenContract, {
             event: 'Transfer',
             fromBlock: MONITOR_FOREIGN_START_BLOCK,
-            toBlock: foreignBlockNumber,
+            toBlock: foreignDelayedBlockNumber,
             options: {
               filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
             }
