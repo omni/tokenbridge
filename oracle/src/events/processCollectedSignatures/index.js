@@ -66,8 +66,12 @@ function processCollectedSignaturesBuilder(config) {
             if (allowanceList.indexOf(recipient) === -1) {
               if (ORACLE_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
                 logger.debug({ txHash: originalTxHash }, 'Requested sender of an original withdrawal transaction')
-                const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
-                if (allowanceList.indexOf(sender) === -1) {
+                const originalTx = await web3Home.eth.getTransaction(originalTxHash)
+                logger.debug(`Tx data of an original withdrawal transaction ${originalTx.input}`)
+                const isRelayTokens = originalTx.input.slice(2, 10) === '5d1e9307'
+                logger.info(`Is the relayTokens method invoked: ${isRelayTokens}`)
+                const sender = originalTx.from.toLowerCase()
+                if ((allowanceList.indexOf(sender) === -1) && (!isRelayTokens)) {
                   logger.info(
                     { sender, recipient },
                     'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.'
