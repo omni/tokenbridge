@@ -80,13 +80,17 @@ async function readNonce(forceUpdate) {
     logger.debug({ nonce }, 'Nonce found in the DB')
     return Number(nonce)
   } else {
-    logger.debug("Nonce wasn't found in the DB")
+    logger.warn("Nonce wasn't found in the DB")
     return getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
   }
 }
 
 function updateNonce(nonce) {
-  return redis.set(nonceKey, nonce)
+  if (typeof nonce !== 'number') {
+    logger.warn('Given nonce value is not a valid number. Nothing will be updated in the DB.')
+  } else {
+    redis.set(nonceKey, nonce)
+  }
 }
 
 async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleTransactionResend }) {
