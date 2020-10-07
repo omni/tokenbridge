@@ -71,7 +71,7 @@ function processCollectedSignaturesBuilder(config) {
                 const isRelayTokens = originalTx.input.slice(2, 10) === '5d1e9307'
                 logger.info(`Is the relayTokens method invoked: ${isRelayTokens}`)
                 const sender = originalTx.from.toLowerCase()
-                if allowanceList.indexOf(sender) === -1 && !isRelayTokens {
+                if (allowanceList.indexOf(sender) === -1 && !isRelayTokens) {
                   logger.info(
                     { sender, recipient },
                     'Validator skips a transaction. Neither sender nor recipient addresses are in the allowance list.'
