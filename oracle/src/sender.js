@@ -194,8 +194,10 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       }
     })
 
-    logger.debug('Updating nonce')
-    await updateNonce(nonce)
+    if (typeof nonce === 'number') {
+      logger.debug('Updating nonce')
+      await updateNonce(nonce)
+    }
 
     if (failedTx.length) {
       logger.info(`Sending ${failedTx.length} Failed Tx to Queue`)
