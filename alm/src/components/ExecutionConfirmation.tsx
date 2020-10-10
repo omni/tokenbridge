@@ -29,11 +29,12 @@ export const ExecutionConfirmation = ({
   requiredSignatures,
   isHome
 }: ExecutionConfirmationParams) => {
+  console.log(executionData.status, executionData.validator)
   const displayManualExecution =
     !isHome &&
     ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION &&
     (executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ||
-      executionData.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED)
+      (executionData.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED && executionData.validator))
   const windowWidth = useWindowWidth()
 
   const txExplorerLink = getExplorerTxUrl(executionData.txHash, isHome)
