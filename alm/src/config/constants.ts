@@ -13,6 +13,8 @@ export const FOREIGN_EXPLORER_TX_TEMPLATE: string = process.env.REACT_APP_ALM_FO
 export const HOME_EXPLORER_API: string = process.env.REACT_APP_ALM_HOME_EXPLORER_API || ''
 export const FOREIGN_EXPLORER_API: string = process.env.REACT_APP_ALM_FOREIGN_EXPLORER_API || ''
 
+export const MANUAL_EXECUTION: boolean = (process.env.REACT_APP_MANUAL_EXECUTION || '').toLowerCase() === 'true'
+
 export const HOME_RPC_POLLING_INTERVAL: number = 5000
 export const FOREIGN_RPC_POLLING_INTERVAL: number = 5000
 export const BLOCK_RANGE: number = 50

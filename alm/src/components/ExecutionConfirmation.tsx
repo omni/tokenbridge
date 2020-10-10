@@ -1,24 +1,28 @@
 import React from 'react'
 import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useWindowWidth } from '@react-hook/window-size'
-import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS, MANUAL_EXECUTION } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
 import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { Thead, AgeTd, StatusTd } from './commons/Table'
+import { ManualExecutionButton } from './ManualExecutionButton'
 
 const StyledExecutionConfirmation = styled.div`
   margin-top: 30px;
 `
 
 export interface ExecutionConfirmationParams {
+  messageData: string
   executionData: ExecutionData
   isHome: boolean
 }
 
-export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfirmationParams) => {
+export const ExecutionConfirmation = ({ messageData, executionData, isHome }: ExecutionConfirmationParams) => {
+  const displayManualExecution =
+    !isHome && MANUAL_EXECUTION && executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING
   const windowWidth = useWindowWidth()
 
   const txExplorerLink = getExplorerTxUrl(executionData.txHash, isHome)
@@ -55,7 +59,15 @@ export const ExecutionConfirmation = ({ executionData, isHome }: ExecutionConfir
         </Thead>
         <tbody>
           <tr>
-            <td>{formattedValidator ? formattedValidator : <SimpleLoading />}</td>
+            <td>
+              {displayManualExecution ? (
+                <ManualExecutionButton messageData={messageData} />
+              ) : formattedValidator ? (
+                formattedValidator
+              ) : (
+                <SimpleLoading />
+              )}
+            </td>
             <StatusTd className="text-center">{getExecutionStatusElement(executionData.status)}</StatusTd>
             <AgeTd className="text-center">
               {executionData.timestamp > 0 ? (

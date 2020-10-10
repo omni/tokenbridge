@@ -43,6 +43,7 @@ export interface BasicConfirmationParam {
 export interface ConfirmationParam extends BasicConfirmationParam {
   txHash: string
   timestamp: number
+  signature?: string
 }
 
 export interface ExecutionData {
@@ -63,7 +64,7 @@ export const useMessageConfirmations = ({
   blockConfirmations
 }: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
-  const [confirmations, setConfirmations] = useState<Array<ConfirmationParam>>([])
+  const { confirmations, setConfirmations } = home
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
   const [waitingBlocks, setWaitingBlocks] = useState(false)
   const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
@@ -126,7 +127,7 @@ export const useMessageConfirmations = ({
         blockProvider.stop()
       }
     },
-    [blockConfirmations, foreign.web3, fromHome, validatorList, home.web3, receipt]
+    [blockConfirmations, foreign.web3, fromHome, validatorList, home.web3, receipt, setConfirmations]
   )
 
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
@@ -251,7 +252,8 @@ export const useMessageConfirmations = ({
       home.bridgeContract,
       requiredSignatures,
       waitingBlocksResolved,
-      timestamp
+      timestamp,
+      setConfirmations
     ]
   )
 
@@ -365,7 +367,6 @@ export const useMessageConfirmations = ({
   )
 
   return {
-    confirmations,
     status,
     signatureCollected,
     executionData,

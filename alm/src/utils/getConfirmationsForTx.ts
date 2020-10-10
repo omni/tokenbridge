@@ -11,7 +11,7 @@ import {
   getValidatorConfirmation,
   getValidatorFailedTransaction,
   getValidatorPendingTransaction,
-  getValidatorSuccessTransaction
+  getSuccessExecutionTransaction
 } from './validatorConfirmationHelpers'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
@@ -129,7 +129,7 @@ export const getConfirmationsForTx = async (
   const successConfirmationWithData = await Promise.all(
     validatorConfirmations
       .filter(c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
-      .map(getValidatorSuccessTransaction(bridgeContract, messageData, timestamp, getSuccessTransactions))
+      .map(getSuccessExecutionTransaction(web3, bridgeContract, messageData, timestamp, getSuccessTransactions))
   )
 
   const successConfirmationWithTxFound = successConfirmationWithData.filter(v => v.txHash !== '')
