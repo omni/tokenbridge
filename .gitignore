@@ -51,3 +51,6 @@ __pycache__
 monitor/responses/*
 monitor/configs/*.env
 !monitor/.gitkeep
+
+# Local Netlify folder
+.netlify
