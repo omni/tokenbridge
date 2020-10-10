@@ -3,7 +3,6 @@ import { TransactionReceipt } from 'web3-eth'
 import { MessageObject } from '../utils/web3'
 import { useEffect, useState } from 'react'
 import { EventData } from 'web3-eth-contract'
-import { getAffirmationsSigned, getMessagesSigned } from '../utils/contract'
 import {
   BLOCK_RANGE,
   CONFIRMATIONS_STATUS,
@@ -219,14 +218,12 @@ export const useMessageConfirmations = ({
         })
       }
 
-      const confirmationContractMethod = fromHome ? getMessagesSigned : getAffirmationsSigned
-
       getConfirmationsForTx(
         message.data,
         home.web3,
         validatorList,
         home.bridgeContract,
-        confirmationContractMethod,
+        fromHome,
         setConfirmations,
         requiredSignatures,
         setSignatureCollected,
@@ -370,6 +367,7 @@ export const useMessageConfirmations = ({
     status,
     signatureCollected,
     executionData,
+    setExecutionData,
     waitingBlocksResolved
   }
 }

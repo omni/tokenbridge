@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useWindowWidth } from '@react-hook/window-size'
-import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS, MANUAL_EXECUTION } from '../config/constants'
+import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS, ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
@@ -17,12 +17,21 @@ const StyledExecutionConfirmation = styled.div`
 export interface ExecutionConfirmationParams {
   messageData: string
   executionData: ExecutionData
+  setExecutionData: Function
   isHome: boolean
 }
 
-export const ExecutionConfirmation = ({ messageData, executionData, isHome }: ExecutionConfirmationParams) => {
+export const ExecutionConfirmation = ({
+  messageData,
+  executionData,
+  setExecutionData,
+  isHome
+}: ExecutionConfirmationParams) => {
   const displayManualExecution =
-    !isHome && MANUAL_EXECUTION && executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING
+    !isHome &&
+    ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION &&
+    (executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ||
+      executionData.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED)
   const windowWidth = useWindowWidth()
 
   const txExplorerLink = getExplorerTxUrl(executionData.txHash, isHome)
@@ -61,7 +70,7 @@ export const ExecutionConfirmation = ({ messageData, executionData, isHome }: Ex
           <tr>
             <td>
               {displayManualExecution ? (
-                <ManualExecutionButton messageData={messageData} />
+                <ManualExecutionButton messageData={messageData} setExecutionData={setExecutionData} />
               ) : formattedValidator ? (
                 formattedValidator
               ) : (

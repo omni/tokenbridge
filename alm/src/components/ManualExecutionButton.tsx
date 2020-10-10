@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { useWeb3React } from '@web3-react/core'
+import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { useStateProvider } from '../state/StateProvider'
 import { signatureToVRS, packSignatures } from '../utils/signatures'
 
@@ -20,9 +21,10 @@ export interface BackButtonParam {
 
 interface ManualExecutionButtonParams {
   messageData: string
+  setExecutionData: Function
 }
 
-export const ManualExecutionButton = ({ messageData }: ManualExecutionButtonParams) => {
+export const ManualExecutionButton = ({ messageData, setExecutionData }: ManualExecutionButtonParams) => {
   const { home, foreign } = useStateProvider()
   const { library, activate, account, active, error, setError } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
@@ -53,7 +55,16 @@ export const ManualExecutionButton = ({ messageData }: ManualExecutionButtonPara
           to: foreign.bridgeAddress,
           data
         })
-        .catch(setError)
+        .on('transactionHash', (txHash: string) =>
+          setExecutionData({
+            status: VALIDATOR_CONFIRMATION_STATUS.PENDING,
+            validator: account,
+            txHash,
+            timestamp: Math.floor(new Date().getTime() / 1000.0),
+            executionResult: false
+          })
+        )
+        .on('error', setError)
     },
     [
       manualExecution,
@@ -63,7 +74,8 @@ export const ManualExecutionButton = ({ messageData }: ManualExecutionButtonPara
       foreign.bridgeContract,
       setError,
       messageData,
-      home.confirmations
+      home.confirmations,
+      setExecutionData
     ]
   )
 

@@ -25,7 +25,6 @@ const validator2 = '0xAe8bFfc8BBc6AAa9E21ED1E4e4957fe798BEA25f'
 const validator3 = '0x285A6eB779be4db94dA65e2F3518B1c5F0f71244'
 const validatorList = [validator1, validator2, validator3]
 const bridgeContract = {} as Contract
-const confirmationContractMethod = () => {}
 const requiredSignatures = 2
 const waitingBlocksResolved = true
 let subscriptions: Array<number> = []
@@ -83,7 +82,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -163,7 +162,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -227,7 +226,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -315,7 +314,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -407,7 +406,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -493,7 +492,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -604,7 +603,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -654,7 +653,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
