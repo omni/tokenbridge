@@ -113,6 +113,7 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
             messageData={message.data}
             executionData={executionData}
             isHome={!fromHome}
+            requiredSignatures={requiredSignatures}
             setExecutionData={setExecutionData}
           />
         )}

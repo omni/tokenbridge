@@ -18,6 +18,7 @@ export interface ExecutionConfirmationParams {
   messageData: string
   executionData: ExecutionData
   setExecutionData: Function
+  requiredSignatures: number
   isHome: boolean
 }
 
@@ -25,6 +26,7 @@ export const ExecutionConfirmation = ({
   messageData,
   executionData,
   setExecutionData,
+  requiredSignatures,
   isHome
 }: ExecutionConfirmationParams) => {
   const displayManualExecution =
@@ -70,7 +72,11 @@ export const ExecutionConfirmation = ({
           <tr>
             <td>
               {displayManualExecution ? (
-                <ManualExecutionButton messageData={messageData} setExecutionData={setExecutionData} />
+                <ManualExecutionButton
+                  messageData={messageData}
+                  setExecutionData={setExecutionData}
+                  requiredSignatures={requiredSignatures}
+                />
               ) : formattedValidator ? (
                 formattedValidator
               ) : (

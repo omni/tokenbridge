@@ -22,12 +22,19 @@ export interface BackButtonParam {
 interface ManualExecutionButtonParams {
   messageData: string
   setExecutionData: Function
+  requiredSignatures: number
 }
 
-export const ManualExecutionButton = ({ messageData, setExecutionData }: ManualExecutionButtonParams) => {
+export const ManualExecutionButton = ({
+  messageData,
+  setExecutionData,
+  requiredSignatures
+}: ManualExecutionButtonParams) => {
   const { home, foreign } = useStateProvider()
   const { library, activate, account, active, error, setError } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
+  const disabled =
+    home.confirmations.filter(({ signature }) => signature && signature.startsWith('0x')).length < requiredSignatures
 
   useEffect(
     () => {
@@ -44,7 +51,7 @@ export const ManualExecutionButton = ({ messageData, setExecutionData }: ManualE
 
       const collectedSignatures = home.confirmations
         .map(confirmation => confirmation.signature!)
-        .filter(signature => signature !== '')
+        .filter(signature => signature && signature.startsWith('0x'))
       const signatures = packSignatures(collectedSignatures.map(signatureToVRS))
       const data = foreign.bridgeContract.methods.executeSignatures(messageData, signatures).encodeABI()
       setManualExecution(false)
@@ -81,7 +88,7 @@ export const ManualExecutionButton = ({ messageData, setExecutionData }: ManualE
 
   return (
     <div>
-      <StyledButton className="button outline is-left" onClick={() => setManualExecution(true)}>
+      <StyledButton disabled={disabled} className="button outline is-left" onClick={() => setManualExecution(true)}>
         Execute signatures
       </StyledButton>
       {error && <span>{error.message}</span>}
