@@ -38,16 +38,17 @@ export const ManualExecutionButton = ({
 
   useEffect(
     () => {
-      if (!manualExecution || active) return
+      if (!manualExecution || !foreign.chainId) return
 
-      activate(new InjectedConnector({ supportedChainIds: [foreign.chainId] }))
-    },
-    [manualExecution, active, foreign.chainId, activate]
-  )
+      if (!active) {
+        activate(new InjectedConnector({ supportedChainIds: [foreign.chainId] }), e => {
+          setError(e)
+          setManualExecution(false)
+        })
+        return
+      }
 
-  useEffect(
-    () => {
-      if (!manualExecution || !library || !foreign.bridgeContract) return
+      if (!library || !foreign.bridgeContract || !home.confirmations) return
 
       const collectedSignatures = home.confirmations
         .map(confirmation => confirmation.signature!)
@@ -76,13 +77,17 @@ export const ManualExecutionButton = ({
     [
       manualExecution,
       library,
+      activate,
+      active,
       account,
+      foreign.chainId,
       foreign.bridgeAddress,
       foreign.bridgeContract,
       setError,
       messageData,
       home.confirmations,
-      setExecutionData
+      setExecutionData,
+      error
     ]
   )
 
