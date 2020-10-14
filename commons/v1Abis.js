@@ -65,6 +65,20 @@ const homeV1Abi = [
     payable: false,
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'requiredBlockConfirmations',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
   }
 ]
 
@@ -149,6 +163,20 @@ const foreignViAbi = [
       {
         name: '',
         type: 'address'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'requiredBlockConfirmations',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256'
       }
     ],
     payable: false,

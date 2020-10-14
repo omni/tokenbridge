@@ -80,13 +80,17 @@ async function readNonce(forceUpdate) {
     logger.debug({ nonce }, 'Nonce found in the DB')
     return Number(nonce)
   } else {
-    logger.debug("Nonce wasn't found in the DB")
+    logger.warn("Nonce wasn't found in the DB")
     return getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
   }
 }
 
 function updateNonce(nonce) {
-  return redis.set(nonceKey, nonce)
+  if (typeof nonce !== 'number') {
+    logger.warn('Given nonce value is not a valid number. Nothing will be updated in the DB.')
+  } else {
+    redis.set(nonceKey, nonce)
+  }
 }
 
 async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleTransactionResend }) {
@@ -98,13 +102,13 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
 
     const txArray = JSON.parse(msg.content)
     logger.debug(`Msg received with ${txArray.length} Tx to send`)
-    const gasPrice = GasPrice.getPrice()
+    const gasPrice = GasPrice.getPrice().toString(10)
 
     let nonce
     let insufficientFunds = false
     let minimumBalance = null
     const failedTx = []
-    const sentTx = []
+    const resendJobs = []
 
     const isResend = txArray.length > 0 && !!txArray[0].txHash
 
@@ -136,17 +140,14 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
             nonce = await readNonce(true)
           }
 
-          logger.info(
-            `Transaction ${job.txHash} was not mined, updating gasPrice: ${job.gasPrice} -> ${gasPrice.toString(10)}`
-          )
+          logger.info(`Transaction ${job.txHash} was not mined, updating gasPrice: ${job.gasPrice} -> ${gasPrice}`)
         }
         logger.info(`Sending transaction with nonce ${nonce}`)
-        job.gasPrice = gasPrice.toString(10)
-        job.txHash = await sendTx({
+        const txHash = await sendTx({
           chain: config.id,
           data: job.data,
           nonce,
-          gasPrice: job.gasPrice,
+          gasPrice,
           amount: '0',
           gasLimit,
           privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
@@ -154,12 +155,17 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           chainId,
           web3: web3Instance
         })
-        sentTx.push(job)
+        const resendJob = {
+          ...job,
+          txHash,
+          gasPrice
+        }
+        resendJobs.push(resendJob)
 
         nonce++
         logger.info(
-          { eventTransactionHash: job.transactionReference, generatedTransactionHash: job.txHash },
-          `Tx generated ${job.txHash} for event Tx ${job.transactionReference}`
+          { eventTransactionHash: job.transactionReference, generatedTransactionHash: txHash },
+          `Tx generated ${txHash} for event Tx ${job.transactionReference}`
         )
       } catch (e) {
         logger.error(
@@ -168,7 +174,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           e.message
         )
         if (!e.message.toLowerCase().includes('transaction with the same hash was already imported')) {
-          failedTx.push(job)
+          if (isResend) {
+            resendJobs.push(job)
+          } else {
+            failedTx.push(job)
+          }
         }
 
         if (e.message.toLowerCase().includes('insufficient funds')) {
@@ -184,16 +194,18 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       }
     })
 
-    logger.debug('Updating nonce')
-    await updateNonce(nonce)
+    if (typeof nonce === 'number') {
+      logger.debug('Updating nonce')
+      await updateNonce(nonce)
+    }
 
     if (failedTx.length) {
       logger.info(`Sending ${failedTx.length} Failed Tx to Queue`)
       await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
     }
-    if (sentTx.length) {
-      logger.info(`Sending ${sentTx.length} Tx Delayed Resend Requests to Queue`)
-      await scheduleTransactionResend(sentTx)
+    if (resendJobs.length) {
+      logger.info(`Sending ${resendJobs.length} Tx Delayed Resend Requests to Queue`)
+      await scheduleTransactionResend(resendJobs)
     }
     ackMsg(msg)
     logger.debug(`Finished processing msg`)

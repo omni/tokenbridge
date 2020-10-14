@@ -1,9 +1,12 @@
 require('dotenv').config()
 const express = require('express')
+const cors = require('cors')
 const { readFile } = require('./utils/file')
 
 const app = express()
 const bridgeRouter = express.Router({ mergeParams: true })
+
+app.use(cors())
 
 app.get('/favicon.ico', (req, res) => res.sendStatus(204))
 app.use('/:bridgeName', bridgeRouter)

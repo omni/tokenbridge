@@ -77,4 +77,4 @@ MONITOR_VALIDATOR_FOREIGN_TX_LIMIT | Average gas usage of a transaction sent by 
 MONITOR_TX_NUMBER_THRESHOLD | If estimated number of transaction is equal to or below this value, the monitor will report that the validator has less funds than it is required. | integer
 MONITOR_PORT | The port for the Monitor. | integer
 MONITOR_BRIDGE_NAME | The name to be used in the url path for the bridge | string
-MONITOR_CACHE_EVENTS | If set to true, monitor will cache obtained events for other workers runs
+MONITOR_CACHE_EVENTS | If set to true, monitor will cache obtained events for other workers runs | `true` / `false`
