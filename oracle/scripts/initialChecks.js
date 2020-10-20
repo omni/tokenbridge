@@ -7,6 +7,7 @@ const {
   FOREIGN_ERC_TO_NATIVE_ABI,
   getTokenType
 } = require('../../commons')
+const rpcUrlsManager = require('../src/services/getRpcUrlsManager')
 
 const emptyLogger = {
   debug: () => {},
@@ -14,9 +15,9 @@ const emptyLogger = {
 }
 
 async function initialChecks() {
-  const { ORACLE_BRIDGE_MODE, COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
+  const { ORACLE_BRIDGE_MODE, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
   let result = {}
-  const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL))
+  const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(rpcUrlsManager.foreignUrls[0]))
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {
     const bridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_ERC_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
