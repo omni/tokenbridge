@@ -1,7 +1,7 @@
 const { expect } = require('chai').use(require('chai-as-promised'))
 const sinon = require('sinon')
 const Web3 = require('web3')
-const { HttpListProviderError } = require('http-list-provider')
+const { HttpListProviderError } = require('../src/services/HttpListProvider')
 const { createMessage, signatureToVRS } = require('../src/utils/message')
 const estimateGas = require('../src/events/processCollectedSignatures/estimateGas')
 const errors = require('../src/utils/errors')

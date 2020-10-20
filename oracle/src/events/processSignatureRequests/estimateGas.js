@@ -1,4 +1,4 @@
-const { HttpListProviderError } = require('http-list-provider')
+const { HttpListProviderError } = require('../../services/HttpListProvider')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 const logger = require('../../services/logger').child({
   module: 'processSignatureRequests:estimateGas'

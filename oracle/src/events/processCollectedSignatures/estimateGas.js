@@ -1,5 +1,5 @@
 const Web3 = require('web3')
-const { HttpListProviderError } = require('http-list-provider')
+const { HttpListProviderError } = require('../../services/HttpListProvider')
 const { AlreadyProcessedError, IncompatibleContractError, InvalidValidatorError } = require('../../utils/errors')
 const { parseMessage } = require('../../utils/message')
 const logger = require('../../services/logger').child({

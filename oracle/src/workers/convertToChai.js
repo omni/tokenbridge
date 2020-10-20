@@ -1,5 +1,5 @@
 require('../../env')
-const { HttpListProviderError } = require('http-list-provider')
+const { HttpListProviderError } = require('../services/HttpListProvider')
 const rootLogger = require('../services/logger')
 const { web3Foreign } = require('../services/web3')
 

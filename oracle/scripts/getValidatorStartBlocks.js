@@ -1,23 +1,20 @@
 require('../env')
-const Web3 = require('web3')
 
 const { BRIDGE_VALIDATORS_ABI } = require('../../commons')
-const rpcUrlsManager = require('../src/services/getRpcUrlsManager')
+const { web3Home, web3Foreign } = require('../src/services/web3')
 const { bridgeConfig } = require('../config/base.config')
 
 const homeABI = bridgeConfig.homeBridgeAbi
 const foreignABI = bridgeConfig.foreignBridgeAbi
 
-async function getStartBlock(rpcUrl, bridgeAddress, bridgeAbi) {
+async function getStartBlock(web3, bridgeAddress, bridgeAbi) {
   try {
-    const web3Provider = new Web3.providers.HttpProvider(rpcUrl)
-    const web3Instance = new Web3(web3Provider)
-    const bridgeContract = new web3Instance.eth.Contract(bridgeAbi, bridgeAddress)
+    const bridgeContract = new web3.eth.Contract(bridgeAbi, bridgeAddress)
 
     const deployedAtBlock = await bridgeContract.methods.deployedAtBlock().call()
 
     const validatorContractAddress = await bridgeContract.methods.validatorContract().call()
-    const validatorContract = new web3Instance.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
+    const validatorContract = new web3.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
 
     const validatorDeployedAtBlock = await validatorContract.methods.deployedAtBlock().call()
 
@@ -35,10 +32,8 @@ async function getStartBlock(rpcUrl, bridgeAddress, bridgeAbi) {
 async function main() {
   const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
 
-  const homeRpcUrl = rpcUrlsManager.homeUrls[0]
-  const foreignRpcUrl = rpcUrlsManager.foreignUrls[0]
-  const homeStartBlock = await getStartBlock(homeRpcUrl, COMMON_HOME_BRIDGE_ADDRESS, homeABI)
-  const foreignStartBlock = await getStartBlock(foreignRpcUrl, COMMON_FOREIGN_BRIDGE_ADDRESS, foreignABI)
+  const homeStartBlock = await getStartBlock(web3Home, COMMON_HOME_BRIDGE_ADDRESS, homeABI)
+  const foreignStartBlock = await getStartBlock(web3Foreign, COMMON_FOREIGN_BRIDGE_ADDRESS, foreignABI)
   const result = {
     homeStartBlock,
     foreignStartBlock

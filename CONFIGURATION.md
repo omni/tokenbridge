@@ -16,6 +16,7 @@ COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL | The URL used to get a JSON response from
 COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE | Assuming the gas price oracle responds with the following JSON structure: `{"fast": 20.0, "block_time": 12.834, "health": true, "standard": 6.0, "block_number": 6470469, "instant": 71.0, "slow": 1.889}`, this parameter specifies the desirable transaction speed. The speed type can be omitted when `COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL`is not used. | `instant` / `fast` / `standard` / `slow`
 COMMON_FOREIGN_GAS_PRICE_FALLBACK | The gas price (in Wei) used if both the oracle and fall back gas price specified in the Foreign Bridge contract are not available. | integer
 COMMON_FOREIGN_GAS_PRICE_FACTOR | A value that will multiply the gas price of the oracle to convert it to gwei. If the oracle API returns gas prices in gwei then this can be set to `1`. Also, it could be used to intentionally pay more gas than suggested by the oracle to guarantee the transaction verification. E.g. `1.25` or `1.5`. | integer
+COMMON_RPC_REQUEST_TIMEOUT | Timeout in milliseconds for a single RPC request. Currently supported only in the oracle. | integer
 
 
 ## Oracle configuration

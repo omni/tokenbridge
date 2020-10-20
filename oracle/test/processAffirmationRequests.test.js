@@ -2,7 +2,7 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const sinon = require('sinon')
 const Web3 = require('web3')
-const { HttpListProviderError } = require('http-list-provider')
+const { HttpListProviderError } = require('../src/services/HttpListProvider')
 const estimateGas = require('../src/events/processAffirmationRequests/estimateGas')
 const errors = require('../src/utils/errors')
 
