@@ -1,7 +1,14 @@
 require('dotenv').config()
 const eventsInfo = require('./utils/events')
-const { processedMsgNotDelivered, deliveredMsgNotProcessed, eventWithoutReference } = require('./utils/message')
+const {
+  processedMsgNotDelivered,
+  deliveredMsgNotProcessed,
+  eventWithoutReference,
+  unclaimedHomeToForeignRequests
+} = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
+
+const { MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST, MONITOR_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
 
 async function main() {
   const {
@@ -33,17 +40,25 @@ async function main() {
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else {
-    const onlyInHomeDeposits = homeToForeignRequests.filter(eventWithoutReference(homeToForeignConfirmations))
+    let onlyInHomeDeposits = homeToForeignRequests.filter(eventWithoutReference(homeToForeignConfirmations))
     const onlyInForeignDeposits = homeToForeignConfirmations.filter(eventWithoutReference(homeToForeignRequests))
 
     const onlyInHomeWithdrawals = foreignToHomeConfirmations.filter(eventWithoutReference(foreignToHomeRequests))
     const onlyInForeignWithdrawals = foreignToHomeRequests.filter(eventWithoutReference(foreignToHomeConfirmations))
+
+    const unclaimedStats = {}
+    if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST || MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
+      const unclaimedFilter = unclaimedHomeToForeignRequests()
+      unclaimedStats.unclaimedHomeDeposits = onlyInHomeDeposits.filter(unclaimedFilter)
+      onlyInHomeDeposits = onlyInHomeDeposits.filter(e => !unclaimedFilter(e))
+    }
 
     return {
       onlyInHomeDeposits,
       onlyInForeignDeposits,
       onlyInHomeWithdrawals,
       onlyInForeignWithdrawals,
+      ...unclaimedStats,
       lastChecked: Math.floor(Date.now() / 1000)
     }
   }

@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bignumber.js": "^6.0.0",
+    "bignumber.js": "^9.0.1",
     "cors": "^2.8.5",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",

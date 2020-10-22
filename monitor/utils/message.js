@@ -1,5 +1,8 @@
 const web3Utils = require('web3').utils
 const { parseAMBMessage } = require('../../commons')
+const { readAccessListFile } = require('./file')
+
+const { MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST, MONITOR_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
 
 function deliveredMsgNotProcessed(processedList) {
   return deliveredMsg => {
@@ -64,9 +67,22 @@ const eventWithoutReference = otherSideEvents => e =>
   otherSideEvents.filter(a => a.referenceTx === e.referenceTx && a.recipient === e.recipient && a.value === e.value)
     .length === 0
 
+const unclaimedHomeToForeignRequests = () => {
+  if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST) {
+    const allowanceList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST)
+    return e => !allowanceList.includes(e.recipient.toLowerCase())
+  } else if (MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
+    const blockList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_BLOCK_LIST)
+    return e => blockList.includes(e.recipient.toLowerCase())
+  } else {
+    return () => false
+  }
+}
+
 module.exports = {
   deliveredMsgNotProcessed,
   processedMsgNotDelivered,
   normalizeEventInformation,
-  eventWithoutReference
+  eventWithoutReference,
+  unclaimedHomeToForeignRequests
 }
