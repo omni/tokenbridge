@@ -29,19 +29,21 @@ async function main(bridgeMode) {
       }
     }
   } else {
-    const unclaimedStats = {}
+    const stats = {
+      depositsDiff: homeToForeignRequests.length - homeToForeignConfirmations.length,
+      withdrawalDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length
+    }
     if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST || MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
       const unclaimedPool = homeToForeignRequests
         .filter(eventWithoutReference(homeToForeignConfirmations))
         .filter(unclaimedHomeToForeignRequests())
 
-      unclaimedStats.unclaimed = unclaimedPool.length
-      unclaimedStats.unclaimedDiff = Web3Utils.fromWei(BN.sum(...unclaimedPool.map(e => e.value)).toFixed())
+      stats.depositsDiff -= unclaimedPool.length
+      stats.unclaimedDiff = unclaimedPool.length
+      stats.unclaimedBalance = Web3Utils.fromWei(BN.sum(...unclaimedPool.map(e => e.value)).toFixed())
     }
     return {
-      depositsDiff: homeToForeignRequests.length - homeToForeignConfirmations.length,
-      withdrawalDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length,
-      ...unclaimedStats,
+      ...stats,
       home: {
         deposits: homeToForeignRequests.length,
         withdrawals: foreignToHomeConfirmations.length

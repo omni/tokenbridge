@@ -1,4 +1,5 @@
 require('dotenv').config()
+const BN = require('bignumber.js')
 const Web3 = require('web3')
 const logger = require('./logger')('checkWorker')
 const { getBridgeMode } = require('../commons')
@@ -31,6 +32,9 @@ async function checkWorker() {
     const home = Object.assign({}, balances.home, events.home)
     const foreign = Object.assign({}, balances.foreign, events.foreign)
     const status = Object.assign({}, balances, events, { home }, { foreign })
+    if (status.balanceDiff && status.unclaimedBalance) {
+      status.balanceDiff = new BN(status.balanceDiff).minus(status.unclaimedBalance).toFixed()
+    }
     if (!status) throw new Error('status is empty: ' + JSON.stringify(status))
     status.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/getBalances.json`, status)
