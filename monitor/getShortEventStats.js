@@ -4,8 +4,13 @@ const Web3Utils = require('web3').utils
 const eventsInfo = require('./utils/events')
 const { eventWithoutReference, unclaimedHomeToForeignRequests } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
+const { getHomeTxSender } = require('./utils/web3Cache')
 
-const { MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST, MONITOR_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
+const {
+  MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST,
+  MONITOR_HOME_TO_FOREIGN_BLOCK_LIST,
+  MONITOR_HOME_TO_FOREIGN_CHECK_SENDER
+} = process.env
 
 async function main(bridgeMode) {
   const {
@@ -34,9 +39,14 @@ async function main(bridgeMode) {
       withdrawalDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length
     }
     if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST || MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
-      const unclaimedPool = homeToForeignRequests
-        .filter(eventWithoutReference(homeToForeignConfirmations))
-        .filter(unclaimedHomeToForeignRequests())
+      const onlyInHomeDeposits = homeToForeignRequests.filter(eventWithoutReference(homeToForeignConfirmations))
+      if (MONITOR_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
+        for (let i = 0; i < onlyInHomeDeposits.length; i++) {
+          onlyInHomeDeposits[i].sender = await getHomeTxSender(onlyInHomeDeposits[i].transactionHash)
+        }
+      }
+
+      const unclaimedPool = onlyInHomeDeposits.filter(unclaimedHomeToForeignRequests())
 
       stats.depositsDiff -= unclaimedPool.length
       stats.unclaimedDiff = unclaimedPool.length

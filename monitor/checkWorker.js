@@ -7,6 +7,7 @@ const getBalances = require('./getBalances')
 const getShortEventStats = require('./getShortEventStats')
 const validators = require('./validators')
 const { writeFile, createDir } = require('./utils/file')
+const { saveCache } = require('./utils/web3Cache')
 
 const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL, MONITOR_BRIDGE_NAME } = process.env
 
@@ -67,6 +68,7 @@ async function checkWorker() {
     vBalances.ok = vBalances.homeOk && vBalances.foreignOk
     vBalances.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/validators.json`, vBalances)
+    saveCache()
     logger.debug('Done')
   } catch (e) {
     logger.error(e)

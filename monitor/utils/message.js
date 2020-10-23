@@ -57,10 +57,10 @@ const eventWithoutReference = otherSideEvents => {
 const unclaimedHomeToForeignRequests = () => {
   if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST) {
     const allowanceList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST)
-    return e => !allowanceList.includes(e.recipient.toLowerCase())
+    return e => !allowanceList.includes(e.recipient.toLowerCase()) && !(e.sender && allowanceList.includes(e.sender))
   } else if (MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
     const blockList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_BLOCK_LIST)
-    return e => blockList.includes(e.recipient.toLowerCase())
+    return e => blockList.includes(e.recipient.toLowerCase()) || (e.sender && blockList.includes(e.sender))
   } else {
     return () => false
   }

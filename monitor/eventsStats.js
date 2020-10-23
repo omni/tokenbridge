@@ -6,9 +6,14 @@ const {
   eventWithoutReference,
   unclaimedHomeToForeignRequests
 } = require('./utils/message')
+const { getHomeTxSender } = require('./utils/web3Cache')
 const { BRIDGE_MODES } = require('../commons')
 
-const { MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST, MONITOR_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
+const {
+  MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST,
+  MONITOR_HOME_TO_FOREIGN_BLOCK_LIST,
+  MONITOR_HOME_TO_FOREIGN_CHECK_SENDER
+} = process.env
 
 async function main() {
   const {
@@ -49,6 +54,11 @@ async function main() {
     const unclaimedStats = {}
     if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST || MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
       const unclaimedFilter = unclaimedHomeToForeignRequests()
+      if (MONITOR_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
+        for (let i = 0; i < onlyInHomeDeposits.length; i++) {
+          onlyInHomeDeposits[i].sender = await getHomeTxSender(onlyInHomeDeposits[i].transactionHash)
+        }
+      }
       unclaimedStats.unclaimedHomeDeposits = onlyInHomeDeposits.filter(unclaimedFilter)
       onlyInHomeDeposits = onlyInHomeDeposits.filter(e => !unclaimedFilter(e))
     }
