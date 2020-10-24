@@ -1,14 +1,11 @@
 require('dotenv').config()
-const Web3 = require('web3')
 const logger = require('./logger')('checkWorker3')
 const stuckTransfers = require('./stuckTransfers')
 const { writeFile, createDir } = require('./utils/file')
+const { web3Home } = require('./utils/web3')
 
-const { MONITOR_BRIDGE_NAME, COMMON_HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL } = process.env
+const { MONITOR_BRIDGE_NAME, COMMON_HOME_BRIDGE_ADDRESS } = process.env
 const { getBridgeMode, HOME_NATIVE_TO_ERC_ABI, BRIDGE_MODES } = require('../commons')
-
-const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
-const web3Home = new Web3(homeProvider)
 
 async function checkWorker3() {
   try {

@@ -1,6 +1,5 @@
 require('dotenv').config()
 const BN = require('bignumber.js')
-const Web3 = require('web3')
 const logger = require('./logger')('checkWorker')
 const { getBridgeMode } = require('../commons')
 const getBalances = require('./getBalances')
@@ -8,15 +7,13 @@ const getShortEventStats = require('./getShortEventStats')
 const validators = require('./validators')
 const { writeFile, createDir } = require('./utils/file')
 const { saveCache } = require('./utils/web3Cache')
+const { web3Home } = require('./utils/web3')
 
-const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_HOME_RPC_URL, MONITOR_BRIDGE_NAME } = process.env
+const { COMMON_HOME_BRIDGE_ADDRESS, MONITOR_BRIDGE_NAME } = process.env
 
 const MONITOR_VALIDATOR_HOME_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_HOME_TX_LIMIT) || 0
 const MONITOR_VALIDATOR_FOREIGN_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) || 0
 const MONITOR_TX_NUMBER_THRESHOLD = Number(process.env.MONITOR_TX_NUMBER_THRESHOLD) || 100
-
-const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
-const web3Home = new Web3(homeProvider)
 
 const { HOME_ERC_TO_ERC_ABI } = require('../commons')
 
