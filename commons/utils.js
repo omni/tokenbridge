@@ -164,7 +164,7 @@ const getPastEvents = async (
   } catch (e) {
     if (e.message.includes('query returned more than') && toBlock !== 'latest') {
       const middle = toBN(fromBlock)
-        .add(toBlock)
+        .add(toBN(toBlock))
         .divRound(toBN(2))
       const middlePlusOne = middle.add(toBN(1))
 

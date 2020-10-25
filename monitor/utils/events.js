@@ -1,5 +1,4 @@
 require('dotenv').config()
-const { toBN } = require('web3').utils
 const logger = require('../logger')('eventsUtils')
 const {
   BRIDGE_MODES,
@@ -10,7 +9,6 @@ const {
   ERC20_ABI,
   ERC677_BRIDGE_TOKEN_ABI,
   getTokenType,
-  getPastEvents,
   ZERO_ADDRESS,
   OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI,
   OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI
@@ -19,10 +17,11 @@ const { normalizeEventInformation } = require('./message')
 const { filterTransferBeforeES } = require('./tokenUtils')
 const { writeFile, readCacheFile } = require('./file')
 const { web3Home, web3Foreign } = require('./web3')
+const { getPastEvents } = require('./web3Cache')
 
 const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS, MONITOR_CACHE_EVENTS } = process.env
-const MONITOR_HOME_START_BLOCK = toBN(Number(process.env.MONITOR_HOME_START_BLOCK) || 0)
-const MONITOR_FOREIGN_START_BLOCK = toBN(Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0)
+const MONITOR_HOME_START_BLOCK = Number(process.env.MONITOR_HOME_START_BLOCK) || 0
+const MONITOR_FOREIGN_START_BLOCK = Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0
 
 const { getBlockNumber } = require('./contract')
 
@@ -61,11 +60,11 @@ async function main(mode) {
   }
 
   logger.debug('getting last block numbers')
-  const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
-  const homeConfirmations = toBN(await homeBridge.methods.requiredBlockConfirmations().call())
-  const foreignConfirmations = toBN(await foreignBridge.methods.requiredBlockConfirmations().call())
-  const homeDelayedBlockNumber = homeBlockNumber.sub(homeConfirmations)
-  const foreignDelayedBlockNumber = foreignBlockNumber.sub(foreignConfirmations)
+  const [homeBlockNumber, foreignBlockNumber] = (await getBlockNumber(web3Home, web3Foreign)).map(x => x.toNumber())
+  const homeConfirmations = await homeBridge.methods.requiredBlockConfirmations().call()
+  const foreignConfirmations = await foreignBridge.methods.requiredBlockConfirmations().call()
+  const homeDelayedBlockNumber = homeBlockNumber - homeConfirmations
+  const foreignDelayedBlockNumber = foreignBlockNumber - foreignConfirmations
 
   let homeToForeignRequests = []
   let foreignToHomeRequests = []
@@ -83,22 +82,24 @@ async function main(mode) {
     homeToForeignRequests = (await getPastEvents(oldHomeBridge, {
       event: 'UserRequestForSignature',
       fromBlock: MONITOR_HOME_START_BLOCK,
-      toBlock: homeDelayedBlockNumber
+      toBlock: homeDelayedBlockNumber,
+      chain: 'home'
     })).map(normalizeEvent)
     logger.debug(`found ${homeToForeignRequests.length} events`)
     if (homeToForeignRequests.length > 0) {
-      homeMigrationBlock = toBN(Math.max(...homeToForeignRequests.map(x => x.blockNumber)))
+      homeMigrationBlock = Math.max(...homeToForeignRequests.map(x => x.blockNumber))
     }
 
     logger.debug("calling oldForeignBridge.getPastEvents('UserRequestForAffirmation(bytes)')")
     foreignToHomeRequests = (await getPastEvents(oldForeignBridge, {
       event: 'UserRequestForAffirmation',
       fromBlock: MONITOR_FOREIGN_START_BLOCK,
-      toBlock: foreignDelayedBlockNumber
+      toBlock: foreignDelayedBlockNumber,
+      chain: 'foreign'
     })).map(normalizeEvent)
     logger.debug(`found ${foreignToHomeRequests.length} events`)
     if (foreignToHomeRequests.length > 0) {
-      foreignMigrationBlock = toBN(Math.max(...foreignToHomeRequests.map(x => x.blockNumber)))
+      foreignMigrationBlock = Math.max(...foreignToHomeRequests.map(x => x.blockNumber))
     }
   }
 
@@ -106,7 +107,8 @@ async function main(mode) {
   const homeToForeignRequestsNew = (await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
     fromBlock: homeMigrationBlock,
-    toBlock: homeDelayedBlockNumber
+    toBlock: homeDelayedBlockNumber,
+    chain: 'home'
   })).map(normalizeEvent)
   homeToForeignRequests = [...homeToForeignRequests, ...homeToForeignRequestsNew]
 
@@ -114,21 +116,26 @@ async function main(mode) {
   const homeToForeignConfirmations = (await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Deposit' : 'RelayedMessage',
     fromBlock: MONITOR_FOREIGN_START_BLOCK,
-    toBlock: foreignBlockNumber
+    toBlock: foreignBlockNumber,
+    chain: 'foreign',
+    safeBlockNumber: foreignDelayedBlockNumber
   })).map(normalizeEvent)
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
   const foreignToHomeConfirmations = (await getPastEvents(homeBridge, {
     event: v1Bridge ? 'Withdraw' : 'AffirmationCompleted',
     fromBlock: MONITOR_HOME_START_BLOCK,
-    toBlock: homeBlockNumber
+    toBlock: homeBlockNumber,
+    chain: 'home',
+    safeBlockNumber: homeDelayedBlockNumber
   })).map(normalizeEvent)
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
   const foreignToHomeRequestsNew = (await getPastEvents(foreignBridge, {
     event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
     fromBlock: foreignMigrationBlock,
-    toBlock: foreignDelayedBlockNumber
+    toBlock: foreignDelayedBlockNumber,
+    chain: 'foreign'
   })).map(normalizeEvent)
   foreignToHomeRequests = [...foreignToHomeRequests, ...foreignToHomeRequestsNew]
 
@@ -140,7 +147,8 @@ async function main(mode) {
       toBlock: foreignDelayedBlockNumber,
       options: {
         filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
-      }
+      },
+      chain: 'foreign'
     })).map(normalizeEvent)
 
     let directTransfers = transferEvents
@@ -151,7 +159,9 @@ async function main(mode) {
       const tokensSwappedEvents = await getPastEvents(foreignBridge, {
         event: 'TokensSwapped',
         fromBlock: MONITOR_FOREIGN_START_BLOCK,
-        toBlock: foreignBlockNumber
+        toBlock: foreignBlockNumber,
+        chain: 'foreign',
+        safeBlockNumber: foreignDelayedBlockNumber
       })
 
       // Get token swap events emitted by foreign bridge
@@ -190,7 +200,8 @@ async function main(mode) {
             toBlock: foreignDelayedBlockNumber,
             options: {
               filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
-            }
+            },
+            chain: 'foreign'
           })).map(normalizeEvent)
 
           // Remove events after the ES
