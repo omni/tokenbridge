@@ -1,7 +1,6 @@
 require('../../env')
-const Web3Utils = require('web3-utils')
 const { web3Home } = require('../../src/services/web3')
-const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
+const { sendTx } = require('../../src/tx/sendTx')
 const { isValidAmount } = require('../utils/utils')
 const { HOME_ERC_TO_NATIVE_ABI } = require('../../../commons')
 
@@ -21,21 +20,11 @@ async function main() {
   try {
     await isValidAmount(HOME_MIN_AMOUNT_PER_TX, bridge)
 
-    const homeChainId = await sendRawTx({
-      chain: 'home',
-      params: [],
-      method: 'net_version'
-    })
-    let nonce = await sendRawTx({
-      chain: 'home',
-      method: 'eth_getTransactionCount',
-      params: [USER_ADDRESS, 'latest']
-    })
-    nonce = Web3Utils.hexToNumber(nonce)
+    const homeChainId = await web3Home.eth.getChainId()
+    let nonce = await web3Home.eth.getTransactionCount(USER_ADDRESS)
     let actualSent = 0
     for (let i = 0; i < Number(NUMBER_OF_DEPOSITS_TO_SEND); i++) {
       const txHash = await sendTx({
-        chain: 'home',
         privateKey: USER_ADDRESS_PRIVATE_KEY,
         data: '0x',
         nonce,

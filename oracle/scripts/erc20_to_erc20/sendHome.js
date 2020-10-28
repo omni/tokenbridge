@@ -1,8 +1,7 @@
 require('../../env')
-const Web3 = require('web3')
-const Web3Utils = require('web3-utils')
-const rpcUrlsManager = require('../../src/services/getRpcUrlsManager')
-const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
+const { toWei } = require('web3').utils
+const { web3Home } = require('../../src/services/web3')
+const { sendTx } = require('../../src/tx/sendTx')
 const { isValidAmount } = require('../utils/utils')
 const { HOME_ERC_TO_ERC_ABI } = require('../../../commons')
 
@@ -46,10 +45,6 @@ const BRIDGEABLE_TOKEN_ABI = [
   }
 ]
 
-const homeRpcUrl = rpcUrlsManager.homeUrls[0]
-const homeProvider = new Web3.providers.HttpProvider(homeRpcUrl)
-const web3Home = new Web3(homeProvider)
-
 async function main() {
   const bridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
   const BRIDGEABLE_TOKEN_ADDRESS = await bridge.methods.erc677token().call()
@@ -58,27 +53,17 @@ async function main() {
   try {
     await isValidAmount(HOME_MIN_AMOUNT_PER_TX, bridge)
 
-    const homeChainId = await sendRawTx({
-      chain: 'home',
-      params: [],
-      method: 'net_version'
-    })
-    let nonce = await sendRawTx({
-      chain: 'home',
-      method: 'eth_getTransactionCount',
-      params: [USER_ADDRESS, 'latest']
-    })
-    nonce = Web3Utils.hexToNumber(nonce)
+    const homeChainId = await web3Home.eth.getChainId()
+    let nonce = await web3Home.eth.getTransactionCount(USER_ADDRESS)
     let actualSent = 0
     for (let i = 0; i < Number(NUMBER_OF_WITHDRAWALS_TO_SEND); i++) {
       const gasLimit = await erc677.methods
-        .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, Web3Utils.toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
+        .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
         .estimateGas({ from: USER_ADDRESS })
       const data = await erc677.methods
-        .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, Web3Utils.toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
+        .transferAndCall(COMMON_HOME_BRIDGE_ADDRESS, toWei(HOME_MIN_AMOUNT_PER_TX), '0x')
         .encodeABI({ from: USER_ADDRESS })
       const txHash = await sendTx({
-        chain: 'home',
         privateKey: USER_ADDRESS_PRIVATE_KEY,
         data,
         nonce,

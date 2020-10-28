@@ -1,8 +1,7 @@
 require('../../env')
-const Web3 = require('web3')
-const Web3Utils = require('web3-utils')
-const rpcUrlsManager = require('../../src/services/getRpcUrlsManager')
-const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
+const { toWei } = require('web3').utils
+const { web3Foreign } = require('../../src/services/web3')
+const { sendTx } = require('../../src/tx/sendTx')
 
 const {
   USER_ADDRESS,
@@ -16,37 +15,23 @@ const NUMBER_OF_DEPOSITS_TO_SEND = process.argv[2] || process.env.NUMBER_OF_DEPO
 
 const { ERC20_ABI, FOREIGN_ERC_TO_NATIVE_ABI } = require('../../../commons')
 
-const foreignRpcUrl = rpcUrlsManager.foreignUrls[0]
-const foreignProvider = new Web3.providers.HttpProvider(foreignRpcUrl)
-const web3Foreign = new Web3(foreignProvider)
-
 async function main() {
   const bridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
   const bridgeableTokenAddress = await bridge.methods.erc20token().call()
   const poa20 = new web3Foreign.eth.Contract(ERC20_ABI, bridgeableTokenAddress)
 
   try {
-    const foreignChainId = await sendRawTx({
-      chain: 'foreign',
-      params: [],
-      method: 'net_version'
-    })
-    let nonce = await sendRawTx({
-      chain: 'foreign',
-      method: 'eth_getTransactionCount',
-      params: [USER_ADDRESS, 'latest']
-    })
-    nonce = Web3Utils.hexToNumber(nonce)
+    const foreignChainId = await web3Foreign.eth.getChainId()
+    let nonce = await web3Foreign.eth.getTransactionCount(USER_ADDRESS)
     let actualSent = 0
     for (let i = 0; i < Number(NUMBER_OF_DEPOSITS_TO_SEND); i++) {
       const gasLimit = await poa20.methods
-        .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX))
+        .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, toWei(FOREIGN_MIN_AMOUNT_PER_TX))
         .estimateGas({ from: USER_ADDRESS })
       const data = await poa20.methods
-        .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX))
+        .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, toWei(FOREIGN_MIN_AMOUNT_PER_TX))
         .encodeABI({ from: USER_ADDRESS })
       const txHash = await sendTx({
-        chain: 'foreign',
         privateKey: USER_ADDRESS_PRIVATE_KEY,
         data,
         nonce,

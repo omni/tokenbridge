@@ -26,15 +26,13 @@
     "amqplib": "^0.5.2",
     "bignumber.js": "^7.2.1",
     "dotenv": "^5.0.1",
-    "http-list-provider": "0.0.5",
     "ioredis": "^3.2.2",
     "node-fetch": "^2.1.2",
     "pino": "^4.17.3",
     "pino-pretty": "^2.0.1",
     "promise-limit": "^2.7.0",
     "promise-retry": "^1.1.1",
-    "web3": "1.0.0-beta.34",
-    "web3-utils": "1.0.0-beta.34"
+    "web3": "^1.3.0"
   },
   "devDependencies": {
     "bn-chai": "^1.0.1",
