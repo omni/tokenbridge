@@ -36,6 +36,7 @@ async function checkWorker() {
     if (!status) throw new Error('status is empty: ' + JSON.stringify(status))
     status.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/getBalances.json`, status)
+    saveCache()
 
     logger.debug('calling validators()')
     const vBalances = await validators(bridgeMode)
@@ -65,7 +66,6 @@ async function checkWorker() {
     vBalances.ok = vBalances.homeOk && vBalances.foreignOk
     vBalances.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/validators.json`, vBalances)
-    saveCache()
     logger.debug('Done')
   } catch (e) {
     logger.error(e)
