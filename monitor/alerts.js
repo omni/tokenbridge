@@ -1,18 +1,11 @@
 require('dotenv').config()
-const Web3 = require('web3')
+const Web3Utils = require('web3').utils
 const logger = require('./logger')('alerts')
 const eventsInfo = require('./utils/events')
 const { getBlockNumber } = require('./utils/contract')
 const { processedMsgNotDelivered, eventWithoutReference } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
-
-const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL } = process.env
-
-const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
-const web3Home = new Web3(homeProvider)
-
-const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
-const web3Foreign = new Web3(foreignProvider)
+const { web3Home, web3Foreign } = require('./utils/web3')
 
 async function main() {
   const {
@@ -77,10 +70,10 @@ async function main() {
  * @returns {function({blockNumber?: *}): boolean[]}
  */
 const findMisbehaviorRange = currentBlockNumber => ({ blockNumber }) => {
-  const minus60 = currentBlockNumber.sub(Web3.utils.toBN(60))
-  const minus180 = currentBlockNumber.sub(Web3.utils.toBN(180))
-  const minus720 = currentBlockNumber.sub(Web3.utils.toBN(720))
-  const minus17280 = currentBlockNumber.sub(Web3.utils.toBN(17280))
+  const minus60 = currentBlockNumber.sub(Web3Utils.toBN(60))
+  const minus180 = currentBlockNumber.sub(Web3Utils.toBN(180))
+  const minus720 = currentBlockNumber.sub(Web3Utils.toBN(720))
+  const minus17280 = currentBlockNumber.sub(Web3Utils.toBN(17280))
 
   return [
     minus60.lte(blockNumber),

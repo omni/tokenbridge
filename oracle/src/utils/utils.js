@@ -118,7 +118,10 @@ async function readAccessListFile(fileName, logger) {
         .split('\n')
         .map(addr => addr.trim().toLowerCase())
         .filter(addr => addr.length === 42)
-      logger.info({ fileName }, `Access list was read successfully, ${data.length} addresses found`)
+      logger.info(
+        { fileName },
+        `Access list was read successfully, ${readAccessLists[fileName].length} addresses found`
+      )
       logger.debug({ addresses: readAccessLists[fileName] }, `Read addresses from the file`)
     } catch (e) {
       readAccessLists[fileName] = []

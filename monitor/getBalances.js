@@ -1,23 +1,11 @@
 require('dotenv').config()
 const BN = require('bignumber.js')
-const Web3 = require('web3')
+const Web3Utils = require('web3').utils
 const logger = require('./logger')('getBalances')
 const { BRIDGE_MODES } = require('../commons')
+const { web3Home, web3Foreign } = require('./utils/web3')
 
-const Web3Utils = Web3.utils
-
-const {
-  COMMON_HOME_RPC_URL,
-  COMMON_FOREIGN_RPC_URL,
-  COMMON_HOME_BRIDGE_ADDRESS,
-  COMMON_FOREIGN_BRIDGE_ADDRESS
-} = process.env
-
-const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
-const web3Home = new Web3(homeProvider)
-
-const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
-const web3Foreign = new Web3(foreignProvider)
+const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
 
 const {
   ERC20_ABI,

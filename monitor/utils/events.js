@@ -1,5 +1,4 @@
 require('dotenv').config()
-const Web3 = require('web3')
 const { toBN } = require('web3').utils
 const logger = require('../logger')('eventsUtils')
 const {
@@ -19,22 +18,11 @@ const {
 const { normalizeEventInformation } = require('./message')
 const { filterTransferBeforeES } = require('./tokenUtils')
 const { writeFile, readCacheFile } = require('./file')
+const { web3Home, web3Foreign } = require('./web3')
 
-const {
-  COMMON_HOME_RPC_URL,
-  COMMON_FOREIGN_RPC_URL,
-  COMMON_HOME_BRIDGE_ADDRESS,
-  COMMON_FOREIGN_BRIDGE_ADDRESS,
-  MONITOR_CACHE_EVENTS
-} = process.env
+const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS, MONITOR_CACHE_EVENTS } = process.env
 const MONITOR_HOME_START_BLOCK = toBN(Number(process.env.MONITOR_HOME_START_BLOCK) || 0)
 const MONITOR_FOREIGN_START_BLOCK = toBN(Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0)
-
-const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
-const web3Home = new Web3(homeProvider)
-
-const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
-const web3Foreign = new Web3(foreignProvider)
 
 const { getBlockNumber } = require('./contract')
 

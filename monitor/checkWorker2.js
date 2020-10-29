@@ -3,6 +3,7 @@ const logger = require('./logger')('checkWorker2')
 const eventsStats = require('./eventsStats')
 const alerts = require('./alerts')
 const { writeFile, createDir } = require('./utils/file')
+const { saveCache } = require('./utils/web3Cache')
 
 const { MONITOR_BRIDGE_NAME } = process.env
 
@@ -26,6 +27,7 @@ async function checkWorker2() {
     _alerts.ok = !_alerts.executeAffirmations.mostRecentTxHash && !_alerts.executeSignatures.mostRecentTxHash
     _alerts.health = true
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/alerts.json`, _alerts)
+    saveCache()
     logger.debug('Done x2')
   } catch (e) {
     logger.error(e)

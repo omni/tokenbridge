@@ -38,9 +38,19 @@ function readCacheFile(filePath) {
   }
 }
 
+function readAccessListFile(filePath) {
+  const data = fs.readFileSync(filePath)
+  return data
+    .toString()
+    .split('\n')
+    .map(addr => addr.trim().toLowerCase())
+    .filter(addr => addr.length === 42)
+}
+
 module.exports = {
   readFile,
   writeFile,
   createDir,
-  readCacheFile
+  readCacheFile,
+  readAccessListFile
 }

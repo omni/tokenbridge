@@ -79,3 +79,6 @@ MONITOR_TX_NUMBER_THRESHOLD | If estimated number of transaction is equal to or 
 MONITOR_PORT | The port for the Monitor. | integer
 MONITOR_BRIDGE_NAME | The name to be used in the url path for the bridge | string
 MONITOR_CACHE_EVENTS | If set to true, monitor will cache obtained events for other workers runs | `true` / `false`
+MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST | File with a list of addresses, separated by newlines. If set, determines the privileged set of accounts whose requests should be automatically processed by the CollectedSignatures watcher. | string
+MONITOR_HOME_TO_FOREIGN_BLOCK_LIST | File with a list of addresses, separated by newlines. If set, determines the set of accounts whose requests should be marked as unclaimed. Has a lower priority than the `MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST`. | string
+MONITOR_HOME_TO_FOREIGN_CHECK_SENDER | If set to `true`, instructs the oracle to do an extra check for transaction origin in the block/allowance list. `false` by default. | `true` / `false`

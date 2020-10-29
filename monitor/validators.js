@@ -1,13 +1,12 @@
 require('dotenv').config()
-const Web3 = require('web3')
+const Web3Utils = require('web3').utils
 const fetch = require('node-fetch')
 const logger = require('./logger')('validators')
 const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, getValidatorList, gasPriceFromSupplier } = require('../commons')
 const { getBlockNumber } = require('./utils/contract')
+const { web3Home, web3Foreign } = require('./utils/web3')
 
 const {
-  COMMON_HOME_RPC_URL,
-  COMMON_FOREIGN_RPC_URL,
   COMMON_HOME_BRIDGE_ADDRESS,
   COMMON_FOREIGN_BRIDGE_ADDRESS,
   COMMON_HOME_GAS_PRICE_SUPPLIER_URL,
@@ -23,14 +22,6 @@ const MONITOR_HOME_START_BLOCK = Number(process.env.MONITOR_HOME_START_BLOCK) ||
 const MONITOR_FOREIGN_START_BLOCK = Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0
 const MONITOR_VALIDATOR_HOME_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_HOME_TX_LIMIT) || 0
 const MONITOR_VALIDATOR_FOREIGN_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) || 0
-
-const Web3Utils = Web3.utils
-
-const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
-const web3Home = new Web3(homeProvider)
-
-const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
-const web3Foreign = new Web3(foreignProvider)
 
 const homeGasPriceSupplierOpts = {
   speedType: COMMON_HOME_GAS_PRICE_SPEED_TYPE,

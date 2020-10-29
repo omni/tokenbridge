@@ -4,11 +4,12 @@ services:
   monitor:
     image: poanetwork/tokenbridge-monitor:latest
     ports:
-    - "${MONITOR_PORT}:${MONITOR_PORT}"
+      - "${MONITOR_PORT}:${MONITOR_PORT}"
     env_file: ./.env
-    environment: 
+    environment:
       - NODE_ENV=production
     volumes:
       - ./responses:/mono/monitor/responses
+      - ./cache:/mono/monitor/cache
     restart: unless-stopped
     entrypoint: "yarn start"
