@@ -16,14 +16,12 @@ const {
 const { normalizeEventInformation } = require('./message')
 const { filterTransferBeforeES } = require('./tokenUtils')
 const { writeFile, readCacheFile } = require('./file')
-const { web3Home, web3Foreign } = require('./web3')
+const { web3Home, web3Foreign, getHomeBlockNumber, getForeignBlockNumber } = require('./web3')
 const { getPastEvents } = require('./web3Cache')
 
 const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS, MONITOR_CACHE_EVENTS } = process.env
 const MONITOR_HOME_START_BLOCK = Number(process.env.MONITOR_HOME_START_BLOCK) || 0
 const MONITOR_FOREIGN_START_BLOCK = Number(process.env.MONITOR_FOREIGN_START_BLOCK) || 0
-
-const { getBlockNumber } = require('./contract')
 
 const cacheFilePath = '/tmp/cachedEvents.json'
 async function main(mode) {
@@ -60,7 +58,8 @@ async function main(mode) {
   }
 
   logger.debug('getting last block numbers')
-  const [homeBlockNumber, foreignBlockNumber] = (await getBlockNumber(web3Home, web3Foreign)).map(x => x.toNumber())
+  const homeBlockNumber = await getHomeBlockNumber()
+  const foreignBlockNumber = await getForeignBlockNumber()
   const homeConfirmations = await homeBridge.methods.requiredBlockConfirmations().call()
   const foreignConfirmations = await foreignBridge.methods.requiredBlockConfirmations().call()
   const homeDelayedBlockNumber = homeBlockNumber - homeConfirmations
@@ -118,7 +117,7 @@ async function main(mode) {
     fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: foreignBlockNumber,
     chain: 'foreign',
-    safeBlockNumber: foreignDelayedBlockNumber
+    safeToBlock: foreignDelayedBlockNumber
   })).map(normalizeEvent)
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
@@ -127,7 +126,7 @@ async function main(mode) {
     fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber,
     chain: 'home',
-    safeBlockNumber: homeDelayedBlockNumber
+    safeToBlock: homeDelayedBlockNumber
   })).map(normalizeEvent)
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
@@ -161,7 +160,7 @@ async function main(mode) {
         fromBlock: MONITOR_FOREIGN_START_BLOCK,
         toBlock: foreignBlockNumber,
         chain: 'foreign',
-        safeBlockNumber: foreignDelayedBlockNumber
+        safeToBlock: foreignDelayedBlockNumber
       })
 
       // Get token swap events emitted by foreign bridge

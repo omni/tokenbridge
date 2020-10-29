@@ -1,7 +1,7 @@
 require('dotenv').config()
 const logger = require('./logger')('stuckTransfers.js')
 const { FOREIGN_V1_ABI } = require('../commons/abis')
-const { web3Foreign } = require('./utils/web3')
+const { web3Foreign, getForeignBlockNumber } = require('./utils/web3')
 const { getPastEvents } = require('./utils/web3Cache')
 
 const { COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
@@ -52,7 +52,7 @@ const ABIWithData = [
         type: 'uint256'
       },
       {
-        indexed: true, // temporary workaround for https://github.com/ethereum/web3.js/issues/3724
+        indexed: false,
         name: 'data',
         type: 'bytes'
       }
@@ -75,7 +75,7 @@ async function main() {
   const tokenContract = new web3Foreign.eth.Contract(ABITransferWithoutData, erc20Address)
   const tokenContractWithData = new web3Foreign.eth.Contract(ABIWithData, erc20Address)
   logger.debug('getting last block number')
-  const foreignBlockNumber = await web3Foreign.eth.getBlockNumber()
+  const foreignBlockNumber = await getForeignBlockNumber()
   const foreignConfirmations = await foreignBridge.methods.requiredBlockConfirmations().call()
   const foreignDelayedBlockNumber = foreignBlockNumber - foreignConfirmations
   logger.debug('calling tokenContract.getPastEvents Transfer')

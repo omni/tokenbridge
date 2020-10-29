@@ -3,8 +3,7 @@ const Web3Utils = require('web3').utils
 const fetch = require('node-fetch')
 const logger = require('./logger')('validators')
 const { getBridgeABIs, BRIDGE_VALIDATORS_ABI, getValidatorList, gasPriceFromSupplier } = require('../commons')
-const { getBlockNumber } = require('./utils/contract')
-const { web3Home, web3Foreign } = require('./utils/web3')
+const { web3Home, web3Foreign, getHomeBlockNumber, getForeignBlockNumber } = require('./utils/web3')
 
 const {
   COMMON_HOME_BRIDGE_ADDRESS,
@@ -49,7 +48,8 @@ async function main(bridgeMode) {
   const homeBridgeValidators = new web3Home.eth.Contract(BRIDGE_VALIDATORS_ABI, homeValidatorsAddress)
 
   logger.debug('getting last block numbers')
-  const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
+  const homeBlockNumber = await getHomeBlockNumber()
+  const foreignBlockNumber = await getForeignBlockNumber()
 
   logger.debug('calling foreignBridge.methods.validatorContract().call()')
   const foreignValidatorsAddress = await foreignBridge.methods.validatorContract().call()
