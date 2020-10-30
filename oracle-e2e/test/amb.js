@@ -3,7 +3,7 @@ const assert = require('assert')
 const { user, homeRPC, foreignRPC, amb, validator } = require('../../e2e-commons/constants.json')
 const { uniformRetry } = require('../../e2e-commons/utils')
 const { BOX_ABI, HOME_AMB_ABI, FOREIGN_AMB_ABI } = require('../../commons')
-const { setRequiredSignatures } = require('./utils')
+const { delay, setRequiredSignatures } = require('./utils')
 
 const { toBN } = Web3.utils
 
@@ -19,14 +19,17 @@ foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 
 const homeBox = new homeWeb3.eth.Contract(BOX_ABI, amb.homeBox)
+const blockHomeBox = new homeWeb3.eth.Contract(BOX_ABI, amb.blockedHomeBox)
 const foreignBox = new foreignWeb3.eth.Contract(BOX_ABI, amb.foreignBox)
 const homeBridge = new homeWeb3.eth.Contract(HOME_AMB_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
 
 describe('arbitrary message bridging', () => {
+  let requiredSignatures = 1
   before(async () => {
     // Only 1 validator is used in ultimate tests
     if (process.env.ULTIMATE !== 'true') {
+      requiredSignatures = 2
       // Set 2 required signatures for home bridge
       await setRequiredSignatures({
         bridgeContract: homeBridge,
@@ -75,6 +78,82 @@ describe('arbitrary message bridging', () => {
             retry()
           }
         })
+      })
+
+      it('should confirm but not relay message from blocked contract', async () => {
+        const newValue = 4
+
+        const initialValue = await foreignBox.methods.value().call()
+        assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
+
+        const signatures = await homeBridge.getPastEvents('SignedForUserRequest', {
+          fromBlock: 0,
+          toBlock: 'latest'
+        })
+
+        await blockHomeBox.methods
+          .setValueOnOtherNetwork(newValue, amb.home, amb.foreignBox)
+          .send({
+            from: user.address,
+            gas: '400000'
+          })
+          .catch(e => {
+            console.error(e)
+          })
+
+        await delay(5000)
+
+        const newSignatures = await homeBridge.getPastEvents('SignedForUserRequest', {
+          fromBlock: 0,
+          toBlock: 'latest'
+        })
+
+        assert(
+          newSignatures.length === signatures.length + requiredSignatures,
+          `Incorrect amount of signatures submitted, got ${newSignatures.length}, expected ${signatures.length +
+            requiredSignatures}`
+        )
+
+        const value = await foreignBox.methods.value().call()
+        assert(!toBN(value).eq(toBN(newValue)), 'Message should not be relayed by oracle automatically')
+      })
+
+      it('should confirm but not relay message from manual lane', async () => {
+        const newValue = 5
+
+        const initialValue = await foreignBox.methods.value().call()
+        assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
+
+        const signatures = await homeBridge.getPastEvents('SignedForUserRequest', {
+          fromBlock: 0,
+          toBlock: 'latest'
+        })
+
+        await homeBox.methods
+          .setValueOnOtherNetworkUsingManualLane(newValue, amb.home, amb.foreignBox)
+          .send({
+            from: user.address,
+            gas: '400000'
+          })
+          .catch(e => {
+            console.error(e)
+          })
+
+        await delay(5000)
+
+        const newSignatures = await homeBridge.getPastEvents('SignedForUserRequest', {
+          fromBlock: 0,
+          toBlock: 'latest'
+        })
+
+        assert(
+          newSignatures.length === signatures.length + requiredSignatures,
+          `Incorrect amount of signatures submitted, got ${newSignatures.length}, expected ${signatures.length +
+            requiredSignatures}`
+        )
+
+        const value = await foreignBox.methods.value().call()
+        assert(!toBN(value).eq(toBN(newValue)), 'Message should not be relayed by oracle automatically')
       })
     })
   })
