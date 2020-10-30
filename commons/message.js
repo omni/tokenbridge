@@ -12,11 +12,13 @@ function parseAMBMessage(message) {
   const messageId = `0x${message.slice(0, 64)}`
   const sender = `0x${message.slice(64, 104)}`
   const executor = `0x${message.slice(104, 144)}`
+  const dataType = parseInt(message.slice(156, 158), 16)
 
   return {
     sender,
     executor,
-    messageId
+    messageId,
+    dataType
   }
 }
 
