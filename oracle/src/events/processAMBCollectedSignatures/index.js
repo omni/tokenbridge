@@ -16,7 +16,6 @@ const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 const {
   ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST,
   ORACLE_HOME_TO_FOREIGN_BLOCK_LIST,
-  ORACLE_HOME_TO_FOREIGN_CHECK_SENDER,
   ORACLE_ALWAYS_RELAY_SIGNATURES
 } = process.env
 
@@ -64,19 +63,12 @@ function processCollectedSignaturesBuilder(config) {
 
           if (ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST) {
             const allowanceList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST, logger)
-            if (!allowanceList.includes(executor)) {
-              if (ORACLE_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
-                if (!allowanceList.includes(sender)) {
-                  logger.info(
-                    { sender, executor },
-                    'Validator skips a message. Neither sender nor executor addresses are in the allowance list.'
-                  )
-                  return
-                }
-              } else {
-                logger.info({ executor }, 'Validator skips a message. Executor address is not in the allowance list.')
-                return
-              }
+            if (!allowanceList.includes(executor) && !allowanceList.includes(sender)) {
+              logger.info(
+                { sender, executor },
+                'Validator skips a message. Neither sender nor executor addresses are in the allowance list.'
+              )
+              return
             }
           } else if (ORACLE_HOME_TO_FOREIGN_BLOCK_LIST) {
             const blockList = await readAccessListFile(ORACLE_HOME_TO_FOREIGN_BLOCK_LIST, logger)
@@ -84,7 +76,7 @@ function processCollectedSignaturesBuilder(config) {
               logger.info({ executor }, 'Validator skips a message. Executor address is in the block list.')
               return
             }
-            if (ORACLE_HOME_TO_FOREIGN_CHECK_SENDER === 'true' && blockList.includes(sender)) {
+            if (blockList.includes(sender)) {
               logger.info({ sender }, 'Validator skips a message. Sender address is in the block list.')
               return
             }
