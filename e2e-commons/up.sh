@@ -17,21 +17,29 @@ docker-compose up -d parity1 parity2 e2e
 startValidator () {
     docker-compose $1 run -d --name $4 redis
     docker-compose $1 run -d --name $5 rabbit
-    docker-compose $1 run $2 $3 -d oracle yarn watcher:signature-request
-    docker-compose $1 run $2 $3 -d oracle yarn watcher:collected-signatures
-    docker-compose $1 run $2 $3 -d oracle yarn watcher:affirmation-request
-    docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:signature-request
-    docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:collected-signatures
-    docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:affirmation-request
-    docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:transfer
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:signature-request
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:collected-signatures
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:affirmation-request
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:transfer
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn worker:convert-to-chai
-    docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:signature-request
-    docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:collected-signatures
-    docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:affirmation-request
+    if [[ -z "$MODE" || "$MODE" == native-to-erc ]]; then
+      docker-compose $1 run $2 $3 -d oracle yarn watcher:signature-request
+      docker-compose $1 run $2 $3 -d oracle yarn watcher:collected-signatures
+      docker-compose $1 run $2 $3 -d oracle yarn watcher:affirmation-request
+    fi
+    if [[ -z "$MODE" || "$MODE" == erc-to-erc ]]; then
+      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:signature-request
+      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:collected-signatures
+      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:affirmation-request
+      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:transfer
+    fi
+    if [[ -z "$MODE" || "$MODE" == erc-to-native ]]; then
+      docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:signature-request
+      docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:collected-signatures
+      docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:affirmation-request
+      docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:transfer
+      docker-compose $1 run $2 $3 -d oracle-erc20-native yarn worker:convert-to-chai
+    fi
+    if [[ -z "$MODE" || "$MODE" == amb ]]; then
+      docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:signature-request
+      docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:collected-signatures
+      docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:affirmation-request
+    fi
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn sender:home
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn sender:foreign
 }
@@ -48,25 +56,7 @@ startAMBValidator () {
 
 while [ "$1" != "" ]; do
   if [ "$1" == "oracle" ]; then
-    docker-compose up -d redis rabbit
-
-    docker-compose run -d oracle yarn watcher:signature-request
-    docker-compose run -d oracle yarn watcher:collected-signatures
-    docker-compose run -d oracle yarn watcher:affirmation-request
-    docker-compose run -d oracle-erc20 yarn watcher:signature-request
-    docker-compose run -d oracle-erc20 yarn watcher:collected-signatures
-    docker-compose run -d oracle-erc20 yarn watcher:affirmation-request
-    docker-compose run -d oracle-erc20 yarn watcher:transfer
-    docker-compose run -d oracle-erc20-native yarn watcher:signature-request
-    docker-compose run -d oracle-erc20-native yarn watcher:collected-signatures
-    docker-compose run -d oracle-erc20-native yarn watcher:affirmation-request
-    docker-compose run -d oracle-erc20-native yarn watcher:transfer
-    docker-compose run -d oracle-erc20-native yarn worker:convert-to-chai
-    docker-compose run -d oracle-amb yarn watcher:signature-request
-    docker-compose run -d oracle-amb yarn watcher:collected-signatures
-    docker-compose run -d oracle-amb yarn watcher:affirmation-request
-    docker-compose run -d oracle yarn sender:home
-    docker-compose run -d oracle yarn sender:foreign
+    startValidator "" "" "" "redis" "rabbit"
   fi
 
   if [ "$1" == "oracle-validator-2" ]; then

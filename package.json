@@ -39,7 +39,7 @@
     "build:ui": "yarn workspace ui run build",
     "build:alm": "yarn workspace alm run build",
     "build:plugin": "yarn workspace burner-wallet-plugin run build",
-    "lint": "yarn wsrun --exclude token-bridge-contracts lint",
+    "lint": "yarn wsrun --exclude tokenbridge-contracts lint",
     "test": "yarn wsrun --exclude oracle-e2e --exclude ui-e2e --exclude monitor-e2e --exclude alm-e2e test",
     "oracle-e2e": "./oracle-e2e/run-tests.sh",
     "ui-e2e": "./ui-e2e/run-tests.sh",
@@ -47,7 +47,7 @@
     "monitor-e2e": "./monitor-e2e/run-tests.sh",
     "alm-e2e": "./alm-e2e/run-tests.sh",
     "clean": "rm -rf ./node_modules ./**/node_modules ./**/**/node_modules ./**/build ./**/**/dist",
-    "compile:contracts": "yarn workspace token-bridge-contracts run compile",
+    "compile:contracts": "yarn workspace tokenbridge-contracts run compile",
     "install:deploy": "cd contracts/deploy && npm install --unsafe-perm --silent",
     "postinstall": "test -n \"$NOYARNPOSTINSTALL\" || ln -sf $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
   }
