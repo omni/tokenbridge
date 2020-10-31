@@ -6,7 +6,6 @@
   ],
   "plugins": ["node"],
   "rules": {
-    "node/no-unpublished-require": "off",
-    "no-bitwise": "off"
+    "node/no-unpublished-require": "off"
   }
 }

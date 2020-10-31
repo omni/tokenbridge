@@ -83,7 +83,7 @@ function processCollectedSignaturesBuilder(config) {
           }
         }
 
-        if (parsedMessage.dataType & 128) {
+        if (parsedMessage.decodedDataType.manualLane) {
           logger.info(
             { dataType: parsedMessage.dataType },
             'Validator skips a message. Message was forwarded to the manual lane by the extension'

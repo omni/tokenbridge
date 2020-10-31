@@ -6,6 +6,16 @@ function addTxHashToData({ encodedData, transactionHash }) {
   return encodedData.slice(0, 2) + strip0x(transactionHash) + encodedData.slice(2)
 }
 
+/**
+ * Decodes the datatype byte from the AMB message.
+ * First (the most significant bit) denotes if the message should be forwarded to the manual lane.
+ * @param dataType: number datatype of the received AMB message.
+ * @return {{manualLane: boolean}}
+ */
+const decodeAMBDataType = dataType => ({
+  manualLane: (dataType & 128) === 128
+})
+
 function parseAMBMessage(message) {
   message = strip0x(message)
 
@@ -18,7 +28,8 @@ function parseAMBMessage(message) {
     sender,
     executor,
     messageId,
-    dataType
+    dataType,
+    decodedDataType: decodeAMBDataType(dataType)
   }
 }
 
