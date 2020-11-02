@@ -25,8 +25,25 @@ async function getPastEvents(contract, options) {
   }
 
   const contractAddr = contract.options.address
-  const eventABI = contract.options.jsonInterface.find(e => e.type === 'event' && e.name === options.event)
-  const eventSignature = `${eventABI.name}(${eventABI.inputs.map(i => i.type).join(',')})`
+
+  let eventSignature
+  if (options.event.includes('(')) {
+    eventSignature = options.event
+    options.event = web3Home.utils.sha3(eventSignature)
+    const eventABI = contract.options.jsonInterface.find(e => e.type === 'event' && e.signature === options.event)
+    if (!eventABI) {
+      throw new Error(`Event ${eventSignature} not found`)
+    }
+  } else {
+    const eventABI = contract.options.jsonInterface.find(
+      e => e.type === 'event' && (e.name === options.event || e.signature === options.event)
+    )
+    if (!eventABI) {
+      throw new Error(`Event ${options.event} not found`)
+    }
+    eventSignature = `${eventABI.name}(${eventABI.inputs.map(i => i.type).join(',')})`
+  }
+
   const cacheFile = `./cache/${MONITOR_BRIDGE_NAME}/${options.chain}/${contractAddr}/${eventSignature}.json`
 
   const { fromBlock, toBlock } = options
