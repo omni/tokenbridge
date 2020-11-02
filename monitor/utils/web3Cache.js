@@ -7,7 +7,7 @@ const { MONITOR_BRIDGE_NAME, MONITOR_CACHE_EVENTS } = process.env
 
 let isDirty = false
 
-const homeTxSendersCacheFile = './cache/homeTxSenders.json'
+const homeTxSendersCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/home/txSenders.json`
 const cachedHomeTxSenders = readCacheFile(homeTxSendersCacheFile) || {}
 
 async function getHomeTxSender(txHash) {

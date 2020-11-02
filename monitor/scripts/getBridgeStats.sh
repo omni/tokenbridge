@@ -12,11 +12,11 @@ cd $(dirname $0)/..
 
 if /usr/local/bin/docker-compose ps | grep -q -i 'monitor'; then
   tstart=`date +"%s"`
-  
+
   for file in ${CONFIGDIR}/*.env
   do
     echo "${file} handling..."
-    
+
     bridgename=`source ${file} && echo ${MONITOR_BRIDGE_NAME}`
     reportdir=${RESPONSESDIR}"/"${bridgename}
     if [ ! -d ${reportdir} ]; then
@@ -38,9 +38,10 @@ if /usr/local/bin/docker-compose ps | grep -q -i 'monitor'; then
     containername=${bridgename}"-checker"
     docker container stats --no-stream ${containername} 2>/dev/null 1>&2
     if [ ! "$?" == "0" ]; then
+      mkdir -p "$(pwd)/$CACHEDIR/$bridgename"
       docker run --rm --env-file $file -v $(pwd)/${RESPONSESDIR}:/mono/monitor/responses \
         ${alist:+"-v"} ${alist:+"$al_param"} ${blist:+"-v"} ${blist:+"$bl_param"} \
-        -v $(pwd)/${CACHEDIR}/${bridgename}:/mono/monitor/cache \
+        -v $(pwd)/${CACHEDIR}/${bridgename}:/mono/monitor/cache/${bridgename} \
         --name ${containername} poanetwork/tokenbridge-monitor:${IMAGETAG} \
         /bin/bash -c 'yarn check-all'
       shasum -a 256 -s -c ${checksumfile}
@@ -57,11 +58,11 @@ if /usr/local/bin/docker-compose ps | grep -q -i 'monitor'; then
     else
       echo "${containername} have not finished yet" >&2
     fi
-    
+
     rm ${checksumfile}
     echo "========================================"
   done
-  
+
   tend=`date +"%s"`
   tdiff=`expr ${tend} - ${tstart}`
   echo "Total time to run: ${tdiff}"
