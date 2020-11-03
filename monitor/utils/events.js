@@ -235,7 +235,9 @@ async function main(mode) {
     foreignToHomeConfirmations,
     foreignToHomeRequests,
     isExternalErc20,
-    bridgeMode
+    bridgeMode,
+    homeDelayedBlockNumber,
+    foreignDelayedBlockNumber
   }
 
   if (MONITOR_CACHE_EVENTS === 'true') {

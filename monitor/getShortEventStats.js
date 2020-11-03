@@ -1,7 +1,6 @@
 require('dotenv').config()
 const BN = require('bignumber.js')
 const Web3Utils = require('web3').utils
-const eventsInfo = require('./utils/events')
 const { eventWithoutReference, unclaimedHomeToForeignRequests } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
 const { getHomeTxSender } = require('./utils/web3Cache')
@@ -12,13 +11,13 @@ const {
   MONITOR_HOME_TO_FOREIGN_CHECK_SENDER
 } = process.env
 
-async function main(bridgeMode) {
+async function main(bridgeMode, eventsInfo) {
   const {
     homeToForeignConfirmations,
     homeToForeignRequests,
     foreignToHomeConfirmations,
     foreignToHomeRequests
-  } = await eventsInfo(bridgeMode)
+  } = eventsInfo
 
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {
@@ -50,7 +49,7 @@ async function main(bridgeMode) {
 
       stats.depositsDiff -= unclaimedPool.length
       stats.unclaimedDiff = unclaimedPool.length
-      stats.unclaimedBalance = Web3Utils.fromWei(BN.sum(...unclaimedPool.map(e => e.value)).toFixed())
+      stats.unclaimedBalance = Web3Utils.fromWei(BN.sum(0, ...unclaimedPool.map(e => e.value)).toFixed())
     }
     return {
       ...stats,
