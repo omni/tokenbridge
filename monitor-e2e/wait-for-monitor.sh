@@ -6,10 +6,18 @@ check_files_exist() {
   rc=0
   for f in "${FILES[@]}"; do
     command="test -f responses/bridge/$f"
-    (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor /bin/bash -c "$command") || rc=1
-    (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor-erc20 /bin/bash -c "$command") || rc=1
-    (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor-erc20-native /bin/bash -c "$command") || rc=1
-    (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor-amb /bin/bash -c "$command") || rc=1
+    if [[ -z "$MODE" || "$MODE" == native-to-erc ]]; then
+      (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor /bin/bash -c "$command") || rc=1
+    fi
+    if [[ -z "$MODE" || "$MODE" == erc-to-erc ]]; then
+      (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor-erc20 /bin/bash -c "$command") || rc=1
+    fi
+    if [[ -z "$MODE" || "$MODE" == erc-to-native ]]; then
+      (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor-erc20-native /bin/bash -c "$command") || rc=1
+    fi
+    if [[ -z "$MODE" || "$MODE" == amb ]]; then
+      (docker-compose -f ../e2e-commons/docker-compose.yml exec -T monitor-amb /bin/bash -c "$command") || rc=1
+    fi
   done
   return $rc
 }

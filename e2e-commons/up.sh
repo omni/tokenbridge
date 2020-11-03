@@ -100,7 +100,23 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "monitor" ]; then
-    docker-compose up -d monitor monitor-erc20 monitor-erc20-native monitor-amb
+    case "$MODE" in
+      amb)
+        docker-compose up -d monitor-amb
+        ;;
+      native-to-erc)
+        docker-compose up -d monitor
+        ;;
+      erc-to-erc)
+        docker-compose up -d monitor-erc20
+        ;;
+      erc-to-native)
+        docker-compose up -d monitor-erc20-native
+        ;;
+      *)
+        docker-compose up -d monitor monitor-erc20 monitor-erc20-native monitor-amb
+        ;;
+    esac
   fi
 
   if [ "$1" == "alm-e2e" ]; then
