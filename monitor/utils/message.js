@@ -66,10 +66,32 @@ const unclaimedHomeToForeignRequests = () => {
   }
 }
 
+const manuallyProcessedAMBHomeToForeignRequests = () => {
+  if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST) {
+    const allowanceList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST)
+    return e => {
+      const { sender, executor, decodedDataType } = normalizeAMBMessage(e)
+      return (
+        decodedDataType.manualLane ||
+        (!allowanceList.includes(sender.toLowerCase()) && !allowanceList.includes(executor))
+      )
+    }
+  } else if (MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
+    const blockList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_BLOCK_LIST)
+    return e => {
+      const { sender, executor, decodedDataType } = normalizeAMBMessage(e)
+      return decodedDataType.manualLane || blockList.includes(sender.toLowerCase()) || blockList.includes(executor)
+    }
+  } else {
+    return e => normalizeAMBMessage(e).decodedDataType.manualLane
+  }
+}
+
 module.exports = {
   deliveredMsgNotProcessed,
   processedMsgNotDelivered,
   normalizeEventInformation,
   eventWithoutReference,
-  unclaimedHomeToForeignRequests
+  unclaimedHomeToForeignRequests,
+  manuallyProcessedAMBHomeToForeignRequests
 }

@@ -2,7 +2,12 @@ require('dotenv').config()
 const BN = require('bignumber.js')
 const Web3Utils = require('web3').utils
 const eventsInfo = require('./utils/events')
-const { eventWithoutReference, unclaimedHomeToForeignRequests } = require('./utils/message')
+const {
+  eventWithoutReference,
+  deliveredMsgNotProcessed,
+  unclaimedHomeToForeignRequests,
+  manuallyProcessedAMBHomeToForeignRequests
+} = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
 const { getHomeTxSender } = require('./utils/web3Cache')
 
@@ -21,8 +26,12 @@ async function main(bridgeMode) {
   } = await eventsInfo(bridgeMode)
 
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    const onlyInHomeRequests = homeToForeignRequests.filter(deliveredMsgNotProcessed(homeToForeignConfirmations))
+    const manuallyProcessedRequests = onlyInHomeRequests.filter(manuallyProcessedAMBHomeToForeignRequests())
     return {
-      fromHomeToForeignDiff: homeToForeignRequests.length - homeToForeignConfirmations.length,
+      fromHomeToForeignDiff:
+        homeToForeignRequests.length - homeToForeignConfirmations.length - manuallyProcessedRequests.length,
+      fromHomeToForeignPBUDiff: manuallyProcessedRequests.length,
       fromForeignToHomeDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length,
       home: {
         toForeign: homeToForeignRequests.length,
