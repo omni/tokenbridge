@@ -37,7 +37,7 @@ async function main(bridgeMode, eventsInfo) {
     0,
     ...homeToForeignConfirmations.filter(e => e.blockNumber > foreignDelayedBlockNumber).map(e => e.value)
   )
-  // Foreign balance should represent all UserRequestForSignature events up to block `M - requiredBlockConfirmation()`
+  // Home balance should represent all UserRequestForSignature events up to block `M - requiredBlockConfirmation()`
   // and all AffirmationCompleted events up to block `M`.
   // This constant tells the difference between bridge balance at block `M - requiredBlockConfirmation() + 1`
   // and the actual value monitor is interested in.
