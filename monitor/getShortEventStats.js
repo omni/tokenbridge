@@ -1,7 +1,6 @@
 require('dotenv').config()
 const BN = require('bignumber.js')
 const Web3Utils = require('web3').utils
-const eventsInfo = require('./utils/events')
 const {
   eventWithoutReference,
   deliveredMsgNotProcessed,
