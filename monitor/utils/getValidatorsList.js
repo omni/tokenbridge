@@ -1,12 +1,12 @@
 const { REWARDABLE_VALIDATORS_ABI, processValidatorsEvents } = require('../../commons')
 const { getPastEvents } = require('./web3Cache')
 
-const VALIDATORS_UNINDEXED_EVENTS_ABI = [
+const VALIDATORS_INDEXED_EVENTS_ABI = [
   {
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         name: 'validator',
         type: 'address'
       }
@@ -18,7 +18,7 @@ const VALIDATORS_UNINDEXED_EVENTS_ABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         name: 'validator',
         type: 'address'
       }
@@ -30,12 +30,12 @@ const VALIDATORS_UNINDEXED_EVENTS_ABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         name: 'validator',
         type: 'address'
       },
       {
-        indexed: false,
+        indexed: true,
         name: 'reward',
         type: 'address'
       }
@@ -68,7 +68,7 @@ const getValidatorList = async (address, eth, options) => {
 
   options.fromBlock = Number(await tryCall(validatorsContract.methods.deployedAtBlock(), 0))
 
-  const contract = new eth.Contract(VALIDATORS_UNINDEXED_EVENTS_ABI, address)
+  const contract = new eth.Contract(VALIDATORS_INDEXED_EVENTS_ABI, address)
 
   const validatorsEvents = [
     ...(await getPastEvents(contract, {
