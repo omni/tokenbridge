@@ -17,7 +17,7 @@ contracts/build
 oracle/test
 monitor/test
 monitor/responses
-monitor/cache
+monitor/cache/*
 commons/test
 oracle/**/*.png
 oracle/**/*.jpg
