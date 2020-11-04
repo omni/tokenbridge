@@ -71,13 +71,13 @@ const manuallyProcessedAMBHomeToForeignRequests = () => {
     const allowanceList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST)
     return e => {
       const { sender, executor, decodedDataType } = normalizeAMBMessage(e)
-      return decodedDataType.manualLane || (!allowanceList.includes(sender) && !allowanceList.includes(executor))
+      return (!allowanceList.includes(sender) && !allowanceList.includes(executor)) || decodedDataType.manualLane
     }
   } else if (MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
     const blockList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_BLOCK_LIST)
     return e => {
       const { sender, executor, decodedDataType } = normalizeAMBMessage(e)
-      return decodedDataType.manualLane || blockList.includes(sender) || blockList.includes(executor)
+      return blockList.includes(sender) || blockList.includes(executor) || decodedDataType.manualLane
     }
   } else {
     return e => normalizeAMBMessage(e).decodedDataType.manualLane
