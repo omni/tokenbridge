@@ -54,16 +54,16 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
   })
 
   it('should consider chai token balance', async function() {
-    this.timeout(60000)
+    this.timeout(120000)
     await initializeChaiToken(foreignRPC.URL, ercToNativeBridge.foreign)
     await sendTokens(foreignRPC.URL, user, ercToNativeBridge.foreignToken, ercToNativeBridge.foreign)
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       if (!data.foreign) {
         return false
       }
+      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.02 &&
         erc20Balance === '0.02' &&
@@ -77,10 +77,10 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       if (!data.foreign) {
         return false
       }
+      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.02 &&
         erc20Balance === '0.01' &&
@@ -94,10 +94,10 @@ describe('ERC TO NATIVE with changing state of contracts', () => {
 
     await waitUntil(async () => {
       ;({ data } = await axios.get(`${baseUrl}`))
-      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       if (!data.foreign) {
         return false
       }
+      const { erc20Balance, investedErc20Balance, accumulatedInterest } = data.foreign
       return (
         data.balanceDiff === 0.02 &&
         erc20Balance === '0.005' &&
