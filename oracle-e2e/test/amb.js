@@ -80,43 +80,46 @@ describe('arbitrary message bridging', () => {
         })
       })
 
-      it('should confirm but not relay message from blocked contract', async () => {
-        const newValue = 4
+      // allowance/block lists files are not mounted to the host during the ultimate test
+      if (process.env.ULTIMATE !== 'true') {
+        it('should confirm but not relay message from blocked contract', async () => {
+          const newValue = 4
 
-        const initialValue = await foreignBox.methods.value().call()
-        assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
+          const initialValue = await foreignBox.methods.value().call()
+          assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
-        const signatures = await homeBridge.getPastEvents('SignedForUserRequest', {
-          fromBlock: 0,
-          toBlock: 'latest'
-        })
-
-        await blockHomeBox.methods
-          .setValueOnOtherNetwork(newValue, amb.home, amb.foreignBox)
-          .send({
-            from: user.address,
-            gas: '400000'
-          })
-          .catch(e => {
-            console.error(e)
+          const signatures = await homeBridge.getPastEvents('SignedForUserRequest', {
+            fromBlock: 0,
+            toBlock: 'latest'
           })
 
-        await delay(5000)
+          await blockHomeBox.methods
+            .setValueOnOtherNetwork(newValue, amb.home, amb.foreignBox)
+            .send({
+              from: user.address,
+              gas: '400000'
+            })
+            .catch(e => {
+              console.error(e)
+            })
 
-        const newSignatures = await homeBridge.getPastEvents('SignedForUserRequest', {
-          fromBlock: 0,
-          toBlock: 'latest'
+          await delay(5000)
+
+          const newSignatures = await homeBridge.getPastEvents('SignedForUserRequest', {
+            fromBlock: 0,
+            toBlock: 'latest'
+          })
+
+          assert(
+            newSignatures.length === signatures.length + requiredSignatures,
+            `Incorrect amount of signatures submitted, got ${newSignatures.length}, expected ${signatures.length +
+              requiredSignatures}`
+          )
+
+          const value = await foreignBox.methods.value().call()
+          assert(!toBN(value).eq(toBN(newValue)), 'Message should not be relayed by oracle automatically')
         })
-
-        assert(
-          newSignatures.length === signatures.length + requiredSignatures,
-          `Incorrect amount of signatures submitted, got ${newSignatures.length}, expected ${signatures.length +
-            requiredSignatures}`
-        )
-
-        const value = await foreignBox.methods.value().call()
-        assert(!toBN(value).eq(toBN(newValue)), 'Message should not be relayed by oracle automatically')
-      })
+      }
 
       it('should confirm but not relay message from manual lane', async () => {
         const newValue = 5
