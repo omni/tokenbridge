@@ -3,7 +3,6 @@ const path = require('path')
 const { isAttached, connectWatcherToQueue, connection } = require('./services/amqpClient')
 const logger = require('./services/logger')
 const GasPrice = require('./services/gasPrice')
-const rpcUrlsManager = require('./services/getRpcUrlsManager')
 const { getNonce, getChainId, getEventsFromTx } = require('./tx/web3')
 const { sendTx } = require('./tx/sendTx')
 const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
@@ -37,8 +36,7 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    rpcUrlsManager.homeUrls.forEach(checkHttps('home'))
-    rpcUrlsManager.foreignUrls.forEach(checkHttps('foreign'))
+    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
 
     attached = await isAttached()
     if (attached) {
@@ -139,7 +137,7 @@ async function main({ sendJob, txHash }) {
 
 async function sendJobTx(jobs) {
   const gasPrice = await GasPrice.start(config.chain, true)
-  const chainId = await getChainId(config.chain)
+  const chainId = await getChainId(web3Instance)
   let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
 
   await syncForEach(jobs, async job => {
@@ -153,7 +151,6 @@ async function sendJobTx(jobs) {
     try {
       logger.info(`Sending transaction with nonce ${nonce}`)
       const txHash = await sendTx({
-        chain: config.chain,
         data: job.data,
         nonce,
         gasPrice: gasPrice.toString(10),

@@ -38,9 +38,25 @@ function readCacheFile(filePath) {
   }
 }
 
+function writeCacheFile(filePath, object) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true })
+  fs.writeFileSync(filePath, JSON.stringify(object))
+}
+
+function readAccessListFile(filePath) {
+  const data = fs.readFileSync(filePath)
+  return data
+    .toString()
+    .split('\n')
+    .map(addr => addr.trim().toLowerCase())
+    .filter(addr => addr.length === 42)
+}
+
 module.exports = {
   readFile,
   writeFile,
   createDir,
-  readCacheFile
+  readCacheFile,
+  writeCacheFile,
+  readAccessListFile
 }

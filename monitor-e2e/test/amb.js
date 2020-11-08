@@ -25,6 +25,7 @@ describe('AMB', () => {
 
     describe('general', async () => {
       it('should contain fromHomeToForeignDiff', () => assert(data.fromHomeToForeignDiff === 0))
+      it('should contain fromHomeToForeignPBUDiff', () => assert(data.fromHomeToForeignPBUDiff === 0))
       it('should contain fromForeignToHomeDiff', () => assert(data.fromForeignToHomeDiff === 0))
       it('should contain lastChecked', () => assert(data.lastChecked >= 0))
       it('should contain timeDiff', () => assert(data.timeDiff >= 0))
@@ -114,7 +115,16 @@ describe('AMB', () => {
 
       await waitUntil(async () => {
         ;({ data } = await axios.get(`${baseUrl}`))
-        return data.fromHomeToForeignDiff !== 0
+        return data.fromHomeToForeignDiff === 1 && data.fromHomeToForeignPBUDiff === 0
+      })
+    })
+    it('should change fromHomeToForeignPBUDiff', async () => {
+      // send message
+      await sendAMBMessage(homeRPC.URL, user, amb.homeBox, amb.home, amb.foreignBox, true)
+
+      await waitUntil(async () => {
+        ;({ data } = await axios.get(`${baseUrl}`))
+        return data.fromHomeToForeignDiff === 1 && data.fromHomeToForeignPBUDiff === 1
       })
     })
     it('should change validatorsMatch', async () => {

@@ -1,18 +1,9 @@
 require('dotenv').config()
-const Web3 = require('web3')
 const logger = require('./logger')('alerts')
 const eventsInfo = require('./utils/events')
-const { getBlockNumber } = require('./utils/contract')
 const { processedMsgNotDelivered, eventWithoutReference } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
-
-const { COMMON_HOME_RPC_URL, COMMON_FOREIGN_RPC_URL } = process.env
-
-const homeProvider = new Web3.providers.HttpProvider(COMMON_HOME_RPC_URL)
-const web3Home = new Web3(homeProvider)
-
-const foreignProvider = new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL)
-const web3Foreign = new Web3(foreignProvider)
+const { web3Home, web3Foreign, getHomeBlockNumber, getForeignBlockNumber } = require('./utils/web3')
 
 async function main() {
   const {
@@ -33,7 +24,8 @@ async function main() {
     xAffirmations = foreignToHomeConfirmations.filter(eventWithoutReference(foreignToHomeRequests))
   }
   logger.debug('building misbehavior blocks')
-  const [homeBlockNumber, foreignBlockNumber] = await getBlockNumber(web3Home, web3Foreign)
+  const homeBlockNumber = await getHomeBlockNumber()
+  const foreignBlockNumber = await getForeignBlockNumber()
 
   const baseRange = [false, false, false, false, false]
   const xSignaturesMisbehavior = buildRangesObject(
@@ -73,21 +65,21 @@ async function main() {
 
 /**
  * Finds the location for the blockNumber in a specific range starting from currentBlockNumber
- * @param {BN} currentBlockNumber
+ * @param {Number} currentBlockNumber
  * @returns {function({blockNumber?: *}): boolean[]}
  */
 const findMisbehaviorRange = currentBlockNumber => ({ blockNumber }) => {
-  const minus60 = currentBlockNumber.sub(Web3.utils.toBN(60))
-  const minus180 = currentBlockNumber.sub(Web3.utils.toBN(180))
-  const minus720 = currentBlockNumber.sub(Web3.utils.toBN(720))
-  const minus17280 = currentBlockNumber.sub(Web3.utils.toBN(17280))
+  const minus60 = currentBlockNumber - 60
+  const minus180 = currentBlockNumber - 180
+  const minus720 = currentBlockNumber - 720
+  const minus17280 = currentBlockNumber - 17280
 
   return [
-    minus60.lte(blockNumber),
-    minus180.lte(blockNumber) && minus60.gt(blockNumber),
-    minus720.lte(blockNumber) && minus180.gt(blockNumber),
-    minus17280.lte(blockNumber) && minus720.gt(blockNumber),
-    minus17280.gt(blockNumber)
+    minus60 <= blockNumber,
+    minus180 <= blockNumber && minus60 > blockNumber,
+    minus720 <= blockNumber && minus180 > blockNumber,
+    minus17280 <= blockNumber && minus720 > blockNumber,
+    minus17280 > blockNumber
   ]
 }
 

@@ -1,5 +1,4 @@
 require('../env')
-const Web3 = require('web3')
 const { getTokensState } = require('../src/utils/tokenState')
 const {
   ERC677_BRIDGE_TOKEN_ABI,
@@ -7,6 +6,7 @@ const {
   FOREIGN_ERC_TO_NATIVE_ABI,
   getTokenType
 } = require('../../commons')
+const { web3Foreign } = require('../src/services/web3')
 
 const emptyLogger = {
   debug: () => {},
@@ -14,26 +14,25 @@ const emptyLogger = {
 }
 
 async function initialChecks() {
-  const { ORACLE_BRIDGE_MODE, COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
+  const { ORACLE_BRIDGE_MODE, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
   let result = {}
-  const foreignWeb3 = new Web3(new Web3.providers.HttpProvider(COMMON_FOREIGN_RPC_URL))
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {
-    const bridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_ERC_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
+    const bridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_ERC_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
     result.bridgeableTokenAddress = await bridge.methods.erc20token().call()
   } else if (ORACLE_BRIDGE_MODE === 'ERC_TO_NATIVE') {
-    const bridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
+    const bridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
     result = await getTokensState(bridge, emptyLogger)
   }
 
   if (ORACLE_BRIDGE_MODE === 'ERC_TO_ERC') {
-    const bridgeTokenContract = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, result.bridgeableTokenAddress)
+    const bridgeTokenContract = new web3Foreign.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, result.bridgeableTokenAddress)
     result.foreignERC = await getTokenType(bridgeTokenContract, COMMON_FOREIGN_BRIDGE_ADDRESS)
   }
   console.log(JSON.stringify(result))
   return result
 }
 
-initialChecks()
+const result = initialChecks()
 
-module.exports = initialChecks
+module.exports = result

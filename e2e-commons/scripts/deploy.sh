@@ -53,3 +53,8 @@ node deploy.js
 cd - > /dev/null
 node setupStakeTokens.js
 cd - > /dev/null
+
+echo -e "\n\n############ Deploying one more test contract for amb ############\n"
+cd "$DEPLOY_PATH"
+node src/utils/deployTestBox.js
+cd - > /dev/null

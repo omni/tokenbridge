@@ -4,7 +4,6 @@ const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
 const logger = require('./services/logger')
-const rpcUrlsManager = require('./services/getRpcUrlsManager')
 const { sendTx } = require('./tx/sendTx')
 const { getNonce, getChainId } = require('./tx/web3')
 const {
@@ -18,7 +17,7 @@ const {
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
-const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
+const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_TX_REDUNDANCY } = process.env
 
 const ORACLE_VALIDATOR_ADDRESS = privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
 
@@ -30,6 +29,7 @@ if (process.argv.length < 3) {
 const config = require(path.join('../config/', process.argv[2]))
 
 const web3Instance = config.web3
+const web3Redundant = ORACLE_TX_REDUNDANCY === 'true' ? config.web3Redundant : config.web3
 const nonceKey = `${config.id}:nonce`
 let chainId = 0
 
@@ -37,12 +37,11 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    rpcUrlsManager.homeUrls.forEach(checkHttps('home'))
-    rpcUrlsManager.foreignUrls.forEach(checkHttps('foreign'))
+    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
 
     GasPrice.start(config.id)
 
-    chainId = await getChainId(config.id)
+    chainId = await getChainId(web3Instance)
     connectSenderToQueue({
       queueName: config.queue,
       oldQueueName: config.oldQueue,
@@ -144,7 +143,6 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         }
         logger.info(`Sending transaction with nonce ${nonce}`)
         const txHash = await sendTx({
-          chain: config.id,
           data: job.data,
           nonce,
           gasPrice,
@@ -153,7 +151,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
           to: job.to,
           chainId,
-          web3: web3Instance
+          web3: web3Redundant
         })
         const resendJob = {
           ...job,
