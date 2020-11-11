@@ -1,6 +1,9 @@
 const fetch = require('node-fetch')
 const promiseRetry = require('promise-retry')
 
+// From EIP-1474 and Infura documentation
+const JSONRPC_ERROR_CODES = [-32603, -32002, -32005]
+
 const defaultOptions = {
   requestTimeout: 0,
   retry: {
@@ -61,6 +64,12 @@ function send(url, payload, options) {
       }
     })
     .then(response => response.json())
+    .then(response => {
+      if (response.error && JSONRPC_ERROR_CODES.includes(response.error.code)) {
+        throw new Error(response.error.message)
+      }
+      return response
+    })
 }
 
 async function trySend(payload, urls, initialIndex, options) {
