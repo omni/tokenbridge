@@ -13,7 +13,6 @@ function RedundantHttpListProvider(urls, options = {}) {
 
   this.urls = urls
   this.options = { ...defaultOptions, ...options }
-  this.currentIndex = 0
 }
 
 RedundantHttpListProvider.prototype.send = async function send(payload, callback) {
