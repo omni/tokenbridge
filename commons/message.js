@@ -2,10 +2,6 @@ function strip0x(input) {
   return input.replace(/^0x/, '')
 }
 
-function addTxHashToData({ encodedData, transactionHash }) {
-  return encodedData.slice(0, 2) + strip0x(transactionHash) + encodedData.slice(2)
-}
-
 /**
  * Decodes the datatype byte from the AMB message.
  * First (the most significant bit) denotes if the message should be forwarded to the manual lane.
@@ -33,8 +29,18 @@ function parseAMBMessage(message) {
   }
 }
 
+const normalizeAMBMessageEvent = e => {
+  let msgData = e.returnValues.encodedData
+  if (!e.returnValues.messageId) {
+    // append tx hash to an old message, where message id was not used
+    // for old messages, e.messageId is a corresponding transactionHash
+    msgData = e.transactionHash + msgData.slice(2)
+  }
+  return parseAMBMessage(msgData)
+}
+
 module.exports = {
-  addTxHashToData,
+  strip0x,
   parseAMBMessage,
-  strip0x
+  normalizeAMBMessageEvent
 }

@@ -1,6 +1,6 @@
 const logger = require('../logger')('web3Cache')
 const { readCacheFile, writeCacheFile } = require('./file')
-const { web3Home } = require('./web3')
+const { web3Home, web3Foreign } = require('./web3')
 const { getPastEvents: commonGetPastEvents } = require('../../commons')
 
 const { MONITOR_BRIDGE_NAME, MONITOR_CACHE_EVENTS } = process.env
@@ -9,6 +9,10 @@ let isDirty = false
 
 const homeTxSendersCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/home/txSenders.json`
 const cachedHomeTxSenders = readCacheFile(homeTxSendersCacheFile) || {}
+const homeIsContractCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/home/isContract.json`
+const cachedHomeIsContract = readCacheFile(homeIsContractCacheFile) || {}
+const foreignIsContractCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/foreign/isContract.json`
+const cachedForeignIsContract = readCacheFile(foreignIsContractCacheFile) || {}
 
 async function getHomeTxSender(txHash) {
   if (!cachedHomeTxSenders[txHash]) {
@@ -17,6 +21,24 @@ async function getHomeTxSender(txHash) {
     isDirty = true
   }
   return cachedHomeTxSenders[txHash]
+}
+
+async function isHomeContract(address) {
+  if (typeof cachedHomeIsContract[address] !== 'boolean') {
+    logger.debug(`Fetching home contract code size for tx ${address}`)
+    cachedHomeIsContract[address] = (await web3Home.eth.getCode(address)).length > 2
+    isDirty = true
+  }
+  return cachedHomeIsContract[address]
+}
+
+async function isForeignContract(address) {
+  if (typeof cachedForeignIsContract[address] !== 'boolean') {
+    logger.debug(`Fetching foreign contract code size for tx ${address}`)
+    cachedForeignIsContract[address] = (await web3Foreign.eth.getCode(address)).length > 2
+    isDirty = true
+  }
+  return cachedForeignIsContract[address]
 }
 
 async function getPastEvents(contract, options) {
@@ -123,11 +145,15 @@ function saveCache() {
   if (isDirty) {
     logger.debug('Saving cache on disk')
     writeCacheFile(homeTxSendersCacheFile, cachedHomeTxSenders)
+    writeCacheFile(homeIsContractCacheFile, cachedHomeIsContract)
+    writeCacheFile(foreignIsContractCacheFile, cachedForeignIsContract)
   }
 }
 
 module.exports = {
   getHomeTxSender,
+  isHomeContract,
+  isForeignContract,
   getPastEvents,
   saveCache
 }
