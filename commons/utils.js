@@ -19,6 +19,8 @@ function decodeBridgeMode(bridgeModeHash) {
       return BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
     case '0x76595b56':
       return BRIDGE_MODES.AMB_ERC_TO_ERC
+    case '0x582ed8fd':
+      return BRIDGE_MODES.AMB_NATIVE_TO_ERC
     default:
       throw new Error(`Unrecognized bridge mode hash: '${bridgeModeHash}'`)
   }
@@ -75,13 +77,14 @@ const isErcToErcMode = bridgeMode => {
 }
 
 const isMediatorMode = bridgeMode => {
-  return bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC || bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
+  return bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC || bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC ||
+    bridgeMode === BRIDGE_MODES.AMB_NATIVE_TO_ERC
 }
 
 const getUnit = bridgeMode => {
   let unitHome = null
   let unitForeign = null
-  if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC) {
+  if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || bridgeMode === BRIDGE_MODES.AMB_NATIVE_TO_ERC) {
     unitHome = 'Native coins'
     unitForeign = 'Tokens'
   } else if (bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {

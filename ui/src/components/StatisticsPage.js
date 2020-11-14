@@ -13,7 +13,7 @@ export class StatisticsPage extends React.Component {
   render() {
     const { homeStore, foreignStore, bridgeMode, web3Store } = this.props.RootStore
     const statisticsReady = homeStore.statistics.finished && foreignStore.statistics.finished
-    const isNativeToErc = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC
+    const isNativeToErc = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || bridgeMode === BRIDGE_MODES.AMB_NATIVE_TO_ERC
     const leftTitle = isNativeToErc ? 'Deposits' : 'Withdrawals'
     const rightTitle = isNativeToErc ? 'Withdrawals' : 'Deposits'
     const { REACT_APP_UI_HOME_WITHOUT_EVENTS: HOME, REACT_APP_UI_FOREIGN_WITHOUT_EVENTS: FOREIGN } = process.env
