@@ -26,86 +26,51 @@ const normalize = event => ({
   logIndex: event.transactionLogIndex
 })
 
+const flat = arrays => Array.prototype.concat.apply([], arrays)
+
 function findPermanentMediators(homeToForeignC2C, foreignToHomeC2C) {
-  const res = []
-  for (const homeMediator of Object.keys(homeToForeignC2C)) {
-    const homeStats = homeToForeignC2C[homeMediator]
-
-    for (const foreignMediator of Object.keys(homeStats)) {
-      const foreignStats = foreignToHomeC2C[foreignMediator]
-
-      if (foreignStats && foreignStats[homeMediator]) {
-        res.push({
+  return flat(
+    Object.entries(homeToForeignC2C).map(([homeMediator, homeStats]) =>
+      Object.entries(foreignToHomeC2C)
+        .map(([foreignMediator, foreignStats]) => ({
           homeMediator,
           foreignMediator,
           homeToForeignRequests: homeStats[foreignMediator],
           foreignToHomeRequests: foreignStats[homeMediator]
-        })
-      }
-    }
-  }
-  return res
+        }))
+        .filter(stats => stats.homeToForeignRequests && stats.foreignToHomeRequests)
+    )
+  )
 }
 
 function findFloatingMediators(homeToForeignC2C, foreignToHomeC2C) {
-  const res = []
-  for (const homeMediator of Object.keys(homeToForeignC2C)) {
-    const homeStats = homeToForeignC2C[homeMediator]
-    for (const foreignMediator of Object.keys(homeStats)) {
-      const foreignStats = foreignToHomeC2C[foreignMediator]
-
-      let stats
-      if (!foreignStats || !foreignStats[homeMediator]) {
-        if (!stats) {
-          stats = {
-            mediator: homeMediator,
-            executors: [],
-            requests: []
-          }
-          res.push(stats)
-        }
-        stats.executors.push(foreignMediator)
-        stats.requests.push(homeStats[foreignMediator])
+  return Object.entries(homeToForeignC2C)
+    .map(([homeMediator, homeStats]) => {
+      const noResponses = ([executor]) => !foreignToHomeC2C[executor] || !foreignToHomeC2C[executor][homeMediator]
+      const executorRequestPairs = Object.entries(homeStats).filter(noResponses)
+      return {
+        mediator: homeMediator,
+        executors: executorRequestPairs.map(pair => pair[0]),
+        requests: executorRequestPairs.map(pair => pair[1])
       }
-    }
-  }
-  return res
+    })
+    .filter(stats => stats.executors.length > 0)
 }
 
-function findRemotelyControlledMediators(homeToForeignU2C) {
-  const res = []
-  for (const homeUser of Object.keys(homeToForeignU2C)) {
-    const homeStats = homeToForeignU2C[homeUser]
-    const stats = {
-      user: homeUser,
-      executors: [],
-      requests: []
-    }
-    res.push(stats)
-    for (const foreignMediator of Object.keys(homeStats)) {
-      stats.executors.push(foreignMediator)
-      stats.requests.push(homeStats[foreignMediator])
-    }
-  }
-  return res
+function findRemotelyControlledMediators(statsU2C) {
+  return Object.entries(statsU2C).map(([user, stats]) => ({
+    user,
+    executors: Object.keys(stats),
+    requests: Object.values(stats)
+  }))
 }
 
-function findUnknown(homeToForeignA2U) {
-  const res = []
-  for (const homeSender of Object.keys(homeToForeignA2U)) {
-    const homeStats = homeToForeignA2U[homeSender]
-    const stats = {
-      sender: homeSender,
-      executors: [],
-      requests: []
-    }
-    res.push(stats)
-    for (const foreignMediator of Object.keys(homeStats)) {
-      stats.executors.push(foreignMediator)
-      stats.requests.push(homeStats[foreignMediator])
-    }
-  }
-  return res
+function findUnknown(statsA2U) {
+  return Object.entries(statsA2U).map(([sender, stats]) => ({
+    sender,
+    executors: Object.keys(stats),
+    requests: Object.values(stats)
+  }))
 }
 
 async function main(mode) {
