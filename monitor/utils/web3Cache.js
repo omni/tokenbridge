@@ -9,6 +9,8 @@ let isDirty = false
 
 const homeTxSendersCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/home/txSenders.json`
 const cachedHomeTxSenders = readCacheFile(homeTxSendersCacheFile) || {}
+const foreignTxSendersCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/foreign/txSenders.json`
+const cachedForeignTxSenders = readCacheFile(foreignTxSendersCacheFile) || {}
 const homeIsContractCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/home/isContract.json`
 const cachedHomeIsContract = readCacheFile(homeIsContractCacheFile) || {}
 const foreignIsContractCacheFile = `./cache/${MONITOR_BRIDGE_NAME}/foreign/isContract.json`
@@ -16,11 +18,20 @@ const cachedForeignIsContract = readCacheFile(foreignIsContractCacheFile) || {}
 
 async function getHomeTxSender(txHash) {
   if (!cachedHomeTxSenders[txHash]) {
-    logger.debug(`Fetching sender for tx ${txHash}`)
+    logger.debug(`Fetching sender for home tx ${txHash}`)
     cachedHomeTxSenders[txHash] = (await web3Home.eth.getTransaction(txHash)).from.toLowerCase()
     isDirty = true
   }
   return cachedHomeTxSenders[txHash]
+}
+
+async function getForeignTxSender(txHash) {
+  if (!cachedForeignTxSenders[txHash]) {
+    logger.debug(`Fetching sender for foreign tx ${txHash}`)
+    cachedForeignTxSenders[txHash] = (await web3Foreign.eth.getTransaction(txHash)).from.toLowerCase()
+    isDirty = true
+  }
+  return cachedForeignTxSenders[txHash]
 }
 
 async function isHomeContract(address) {
@@ -152,6 +163,7 @@ function saveCache() {
 
 module.exports = {
   getHomeTxSender,
+  getForeignTxSender,
   isHomeContract,
   isForeignContract,
   getPastEvents,

@@ -17,6 +17,17 @@ function processedMsgNotDelivered(deliveredList) {
   return processedMsg => !keys.has(keyAMB(processedMsg.returnValues))
 }
 
+function addExecutionStatus(processedList) {
+  const statuses = {}
+  processedList.forEach(processedMsg => {
+    statuses[keyAMB(processedMsg.returnValues)] = processedMsg.returnValues.status
+  })
+  return deliveredMsg => {
+    deliveredMsg.status = statuses[keyAMB(deliveredMsg)]
+    return deliveredMsg
+  }
+}
+
 /**
  * Normalizes the different event objects to facilitate data processing
  * @param {Object} event
@@ -77,6 +88,7 @@ const manuallyProcessedAMBHomeToForeignRequests = () => {
 module.exports = {
   deliveredMsgNotProcessed,
   processedMsgNotDelivered,
+  addExecutionStatus,
   normalizeEventInformation,
   eventWithoutReference,
   unclaimedHomeToForeignRequests,

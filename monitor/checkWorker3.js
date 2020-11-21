@@ -25,10 +25,10 @@ async function checkWorker3() {
     } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
       createDir(`/responses/${MONITOR_BRIDGE_NAME}`)
       logger.debug('calling detectMediators()')
-      const transfers = await detectMediators(bridgeMode)
-      transfers.ok = true
-      transfers.health = true
-      writeFile(`/responses/${MONITOR_BRIDGE_NAME}/mediators.json`, transfers)
+      const mediators = await detectMediators(bridgeMode)
+      mediators.ok = true
+      mediators.health = true
+      writeFile(`/responses/${MONITOR_BRIDGE_NAME}/mediators.json`, mediators)
       saveCache()
       logger.debug('Done')
     }
