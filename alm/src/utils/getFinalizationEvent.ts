@@ -25,7 +25,8 @@ export const getFinalizationEvent = async (
   getFailedExecution: (args: GetFailedTransactionParams) => Promise<APITransaction[]>,
   setFailedExecution: Function,
   getPendingExecution: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>,
-  setPendingExecution: Function
+  setPendingExecution: Function,
+  setExecutionEventsFetched: Function
 ) => {
   if (!contract || !web3 || !waitingBlocksResolved) return
   // Since it filters by the message id, only one event will be fetched
@@ -55,6 +56,7 @@ export const getFinalizationEvent = async (
       executionResult: event.returnValues.status
     })
   } else {
+    setExecutionEventsFetched(true)
     // If event is defined, it means it is a message from Home to Foreign
     if (collectedSignaturesEvent) {
       const validator = collectedSignaturesEvent.returnValues.authorityResponsibleForRelay
@@ -128,7 +130,8 @@ export const getFinalizationEvent = async (
           getFailedExecution,
           setFailedExecution,
           getPendingExecution,
-          setPendingExecution
+          setPendingExecution,
+          setExecutionEventsFetched
         ),
       interval
     )

@@ -20,7 +20,6 @@ export function signatureToVRS(rawSignature: string): Signature {
 
 export function packSignatures(array: Array<Signature>): string {
   const length = strip0x(Web3.utils.toHex(array.length))
-  console.log('length', length)
   const msgLength = length.length === 1 ? `0${length}` : length
   const [v, r, s] = array.reduce(([vs, rs, ss], { v, r, s }) => [vs + v, rs + r, ss + s], ['', '', ''])
   return `0x${msgLength}${v}${r}${s}`

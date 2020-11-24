@@ -68,6 +68,7 @@ export const useMessageConfirmations = ({
   const [waitingBlocks, setWaitingBlocks] = useState(false)
   const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
   const [signatureCollected, setSignatureCollected] = useState(false)
+  const [executionEventsFetched, setExecutionEventsFetched] = useState(false)
   const [collectedSignaturesEvent, setCollectedSignaturesEvent] = useState<Maybe<EventData>>(null)
   const [executionData, setExecutionData] = useState<ExecutionData>({
     status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
@@ -288,7 +289,8 @@ export const useMessageConfirmations = ({
         getExecutionFailedTransactionForMessage,
         setFailedExecution,
         getExecutionPendingTransactionsForMessage,
-        setPendingExecution
+        setPendingExecution,
+        setExecutionEventsFetched
       )
 
       return () => {
@@ -368,6 +370,7 @@ export const useMessageConfirmations = ({
     signatureCollected,
     executionData,
     setExecutionData,
-    waitingBlocksResolved
+    waitingBlocksResolved,
+    executionEventsFetched
   }
 }

@@ -54,7 +54,8 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
     executionData,
     signatureCollected,
     waitingBlocksResolved,
-    setExecutionData
+    setExecutionData,
+    executionEventsFetched
   } = useMessageConfirmations({
     message,
     receipt,
@@ -115,6 +116,7 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
             isHome={!fromHome}
             requiredSignatures={requiredSignatures}
             setExecutionData={setExecutionData}
+            executionEventsFetched={executionEventsFetched}
           />
         )}
       </StyledConfirmationContainer>

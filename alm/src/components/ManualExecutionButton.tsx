@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { useWeb3React } from '@web3-react/core'
-import { VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { FOREIGN_NETWORK_NAME, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { useStateProvider } from '../state/StateProvider'
 import { signatureToVRS, packSignatures } from '../utils/signatures'
 
@@ -15,10 +15,6 @@ const StyledButton = styled.button`
   }
 `
 
-export interface BackButtonParam {
-  onBackToMain: () => void
-}
-
 interface ManualExecutionButtonParams {
   messageData: string
   setExecutionData: Function
@@ -30,8 +26,8 @@ export const ManualExecutionButton = ({
   setExecutionData,
   requiredSignatures
 }: ManualExecutionButtonParams) => {
-  const { home, foreign } = useStateProvider()
-  const { library, activate, account, active, error, setError } = useWeb3React()
+  const { home, foreign, setError } = useStateProvider()
+  const { library, activate, account, active } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
   const disabled =
     home.confirmations.filter(({ signature }) => signature && signature.startsWith('0x')).length < requiredSignatures
@@ -42,7 +38,11 @@ export const ManualExecutionButton = ({
 
       if (!active) {
         activate(new InjectedConnector({ supportedChainIds: [foreign.chainId] }), e => {
-          setError(e)
+          if (e.message.includes('Unsupported chain id')) {
+            setError(`Incorrect chain chosen. Switch to ${FOREIGN_NETWORK_NAME} in the wallet.`)
+          } else {
+            setError(e.message)
+          }
           setManualExecution(false)
         })
         return
@@ -72,7 +72,7 @@ export const ManualExecutionButton = ({
             executionResult: false
           })
         )
-        .on('error', setError)
+        .on('error', (e: Error) => setError(e.message))
     },
     [
       manualExecution,
@@ -86,17 +86,15 @@ export const ManualExecutionButton = ({
       setError,
       messageData,
       home.confirmations,
-      setExecutionData,
-      error
+      setExecutionData
     ]
   )
 
   return (
-    <div>
-      <StyledButton disabled={disabled} className="button outline is-left" onClick={() => setManualExecution(true)}>
-        Execute signatures
+    <div className="is-center">
+      <StyledButton disabled={disabled} className="button outline" onClick={() => setManualExecution(true)}>
+        Execute
       </StyledButton>
-      {error && <span>{error.message}</span>}
     </div>
   )
 }

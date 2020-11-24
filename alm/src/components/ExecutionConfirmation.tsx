@@ -20,6 +20,7 @@ export interface ExecutionConfirmationParams {
   setExecutionData: Function
   requiredSignatures: number
   isHome: boolean
+  executionEventsFetched: boolean
 }
 
 export const ExecutionConfirmation = ({
@@ -27,14 +28,16 @@ export const ExecutionConfirmation = ({
   executionData,
   setExecutionData,
   requiredSignatures,
-  isHome
+  isHome,
+  executionEventsFetched
 }: ExecutionConfirmationParams) => {
-  console.log(executionData.status, executionData.validator)
-  const displayManualExecution =
+  const availableManualExecution =
     !isHome &&
-    ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION &&
     (executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ||
-      (executionData.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED && executionData.validator))
+      (executionData.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED &&
+        executionEventsFetched &&
+        !!executionData.validator))
+  const requiredManualExecution = availableManualExecution && ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION
   const windowWidth = useWindowWidth()
 
   const txExplorerLink = getExplorerTxUrl(executionData.txHash, isHome)
@@ -64,20 +67,17 @@ export const ExecutionConfirmation = ({
       <table>
         <Thead>
           <tr>
-            <th>Executed by</th>
+            <th>{requiredManualExecution ? 'Execution info' : 'Executed by'}</th>
             <th className="text-center">Status</th>
-            <th className="text-center">Age</th>
+            {!requiredManualExecution && <th className="text-center">Age</th>}
+            {availableManualExecution && <th className="text-center">Actions</th>}
           </tr>
         </Thead>
         <tbody>
           <tr>
             <td>
-              {displayManualExecution ? (
-                <ManualExecutionButton
-                  messageData={messageData}
-                  setExecutionData={setExecutionData}
-                  requiredSignatures={requiredSignatures}
-                />
+              {requiredManualExecution ? (
+                'Manual user action is required to complete the operation'
               ) : formattedValidator ? (
                 formattedValidator
               ) : (
@@ -85,17 +85,28 @@ export const ExecutionConfirmation = ({
               )}
             </td>
             <StatusTd className="text-center">{getExecutionStatusElement(executionData.status)}</StatusTd>
-            <AgeTd className="text-center">
-              {executionData.timestamp > 0 ? (
-                <ExplorerTxLink href={txExplorerLink} target="_blank">
-                  {formatTimestamp(executionData.timestamp)}
-                </ExplorerTxLink>
-              ) : executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ? (
-                ''
-              ) : (
-                SEARCHING_TX
-              )}
-            </AgeTd>
+            {!requiredManualExecution && (
+              <AgeTd className="text-center">
+                {executionData.timestamp > 0 ? (
+                  <ExplorerTxLink href={txExplorerLink} target="_blank">
+                    {formatTimestamp(executionData.timestamp)}
+                  </ExplorerTxLink>
+                ) : executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ? (
+                  ''
+                ) : (
+                  SEARCHING_TX
+                )}
+              </AgeTd>
+            )}
+            {availableManualExecution && (
+              <td>
+                <ManualExecutionButton
+                  messageData={messageData}
+                  setExecutionData={setExecutionData}
+                  requiredSignatures={requiredSignatures}
+                />
+              </td>
+            )}
           </tr>
         </tbody>
       </table>
