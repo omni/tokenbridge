@@ -1,8 +1,8 @@
-const Web3Utils = require('web3-utils')
+const { fromWei } = require('web3').utils
 
 async function getMinPerTxLimit(bridge) {
   const minPerTx = await bridge.methods.minPerTx().call()
-  return Web3Utils.fromWei(minPerTx)
+  return fromWei(minPerTx)
 }
 
 async function isValidAmount(amount, bridge) {

@@ -1,6 +1,5 @@
 const path = require('path')
 const logger = require('./services/logger')
-const rpcUrlsManager = require('./services/getRpcUrlsManager')
 const { checkHTTPS, watchdog } = require('./utils/utils')
 const { EXIT_CODES } = require('./utils/constants')
 const { connectWorkerToQueue } = require('./services/amqpClient')
@@ -9,12 +8,13 @@ const config = require(path.join('../config/', process.argv[2]))
 
 const convertToChai = require('./workers/convertToChai')(config)
 
+const web3Instance = config.web3
+
 async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    rpcUrlsManager.homeUrls.forEach(checkHttps('home'))
-    rpcUrlsManager.foreignUrls.forEach(checkHttps('foreign'))
+    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
 
     connectWorkerToQueue({
       queueName: config.workerQueue,

@@ -44,12 +44,16 @@ const sendTokens = async (rpcUrl, account, tokenAddress, recipientAddress) => {
   })
 }
 
-const sendAMBMessage = async (rpcUrl, account, boxAddress, bridgeAddress, boxOtherSideAddress) => {
+const sendAMBMessage = async (rpcUrl, account, boxAddress, bridgeAddress, boxOtherSideAddress, manualLane = false) => {
   const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
   web3.eth.accounts.wallet.add(account.privateKey)
   const homeBox = new web3.eth.Contract(BOX_ABI, boxAddress)
 
-  await homeBox.methods.setValueOnOtherNetwork(3, bridgeAddress, boxOtherSideAddress).send({
+  await homeBox.methods[manualLane ? 'setValueOnOtherNetworkUsingManualLane' : 'setValueOnOtherNetwork'](
+    3,
+    bridgeAddress,
+    boxOtherSideAddress
+  ).send({
     from: account.address,
     gas: '400000'
   })

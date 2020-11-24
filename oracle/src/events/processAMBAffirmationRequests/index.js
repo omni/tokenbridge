@@ -1,6 +1,6 @@
 require('dotenv').config()
-const { HttpListProviderError } = require('http-list-provider')
 const promiseLimit = require('promise-limit')
+const { HttpListProviderError } = require('../../services/HttpListProvider')
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')
 const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi

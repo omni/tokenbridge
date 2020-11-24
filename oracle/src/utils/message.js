@@ -1,13 +1,13 @@
 const assert = require('assert')
-const Web3Utils = require('web3-utils')
+const { toHex, numberToHex, padLeft } = require('web3').utils
 const { strip0x } = require('../../../commons')
 
 function createMessage({ recipient, value, transactionHash, bridgeAddress, expectedMessageLength }) {
   recipient = strip0x(recipient)
   assert.strictEqual(recipient.length, 20 * 2)
 
-  value = Web3Utils.numberToHex(value)
-  value = Web3Utils.padLeft(value, 32 * 2)
+  value = numberToHex(value)
+  value = padLeft(value, 32 * 2)
 
   value = strip0x(value)
   assert.strictEqual(value.length, 64)
@@ -60,7 +60,7 @@ function signatureToVRS(rawSignature) {
 }
 
 function packSignatures(array) {
-  const length = strip0x(Web3Utils.toHex(array.length))
+  const length = strip0x(toHex(array.length))
   const msgLength = length.length === 1 ? `0${length}` : length
   let v = ''
   let r = ''

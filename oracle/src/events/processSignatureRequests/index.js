@@ -1,6 +1,6 @@
 require('../../../env')
 const promiseLimit = require('promise-limit')
-const { HttpListProviderError } = require('http-list-provider')
+const { HttpListProviderError } = require('../../services/HttpListProvider')
 const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
 const { web3Home } = require('../../services/web3')

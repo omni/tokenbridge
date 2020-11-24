@@ -1,7 +1,7 @@
 require('../../env')
-const Web3Utils = require('web3-utils')
+const { toWei } = require('web3').utils
 const { web3Foreign } = require('../../src/services/web3')
-const { sendTx, sendRawTx } = require('../../src/tx/sendTx')
+const { sendTx } = require('../../src/tx/sendTx')
 const { isValidAmount } = require('../utils/utils')
 const { FOREIGN_NATIVE_TO_ERC_ABI } = require('../../../commons')
 
@@ -53,27 +53,17 @@ async function main() {
   try {
     await isValidAmount(FOREIGN_MIN_AMOUNT_PER_TX, bridge)
 
-    const foreignChainId = await sendRawTx({
-      chain: 'foreign',
-      params: [],
-      method: 'net_version'
-    })
-    let nonce = await sendRawTx({
-      chain: 'foreign',
-      method: 'eth_getTransactionCount',
-      params: [USER_ADDRESS, 'latest']
-    })
-    nonce = Web3Utils.hexToNumber(nonce)
+    const foreignChainId = await web3Foreign.eth.getChainId()
+    let nonce = await web3Foreign.eth.getTransactionCount(USER_ADDRESS)
     let actualSent = 0
     for (let i = 0; i < Number(NUMBER_OF_WITHDRAWALS_TO_SEND); i++) {
       const gasLimit = await poa20.methods
-        .transferAndCall(COMMON_FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX), '0x')
+        .transferAndCall(COMMON_FOREIGN_BRIDGE_ADDRESS, toWei(FOREIGN_MIN_AMOUNT_PER_TX), '0x')
         .estimateGas({ from: USER_ADDRESS })
       const data = await poa20.methods
-        .transferAndCall(COMMON_FOREIGN_BRIDGE_ADDRESS, Web3Utils.toWei(FOREIGN_MIN_AMOUNT_PER_TX), '0x')
+        .transferAndCall(COMMON_FOREIGN_BRIDGE_ADDRESS, toWei(FOREIGN_MIN_AMOUNT_PER_TX), '0x')
         .encodeABI({ from: USER_ADDRESS })
       const txHash = await sendTx({
-        chain: 'foreign',
         privateKey: USER_ADDRESS_PRIVATE_KEY,
         data,
         nonce,
