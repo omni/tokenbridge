@@ -45,8 +45,10 @@ export const getValidatorConfirmation = (
   }
 }
 
-export const getValidatorSuccessTransaction = (
+export const getSuccessExecutionTransaction = (
+  web3: Web3,
   bridgeContract: Contract,
+  fromHome: boolean,
   messageData: string,
   timestamp: number,
   getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
@@ -69,18 +71,24 @@ export const getValidatorSuccessTransaction = (
 
   let txHashTimestamp = 0
   let txHash = ''
+  let signature = ''
   const status = VALIDATOR_CONFIRMATION_STATUS.SUCCESS
 
   if (transactions.length > 0) {
     const tx = transactions[0]
     txHashTimestamp = parseInt(tx.timeStamp)
     txHash = tx.hash
+    if (fromHome) {
+      const decoded = web3.eth.abi.decodeParameters(['bytes', 'bytes'], `0x${tx.input.substr(10)}`)
+      signature = decoded[0]
+    }
 
     // cache the result
     validatorsCache.setData(validatorCacheKey, {
       validator,
       status,
       txHash,
+      signature,
       timestamp: txHashTimestamp
     })
   }
@@ -89,6 +97,7 @@ export const getValidatorSuccessTransaction = (
     validator,
     status,
     txHash,
+    signature,
     timestamp: txHashTimestamp
   }
 }

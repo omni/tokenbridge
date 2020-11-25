@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode } from 'react'
+import React, { createContext, ReactNode, useState } from 'react'
 import { useNetwork } from '../hooks/useNetwork'
 import {
   HOME_RPC_URL,
@@ -12,6 +12,7 @@ import Web3 from 'web3'
 import { useBridgeContracts } from '../hooks/useBridgeContracts'
 import { Contract } from 'web3-eth-contract'
 import { foreignSnapshotProvider, homeSnapshotProvider } from '../services/SnapshotProvider'
+import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
 export interface BaseNetworkParams {
   chainId: number
@@ -21,10 +22,17 @@ export interface BaseNetworkParams {
   bridgeContract: Maybe<Contract>
 }
 
+export interface HomeNetworkParams extends BaseNetworkParams {
+  confirmations: Array<ConfirmationParam>
+  setConfirmations: Function
+}
+
 export interface StateContext {
-  home: BaseNetworkParams
+  home: HomeNetworkParams
   foreign: BaseNetworkParams
   loading: boolean
+  error: string
+  setError: Function
 }
 
 const initialState = {
@@ -33,7 +41,9 @@ const initialState = {
     name: '',
     web3: null,
     bridgeAddress: HOME_BRIDGE_ADDRESS,
-    bridgeContract: null
+    bridgeContract: null,
+    confirmations: [],
+    setConfirmations: () => null
   },
   foreign: {
     chainId: 0,
@@ -42,7 +52,9 @@ const initialState = {
     bridgeAddress: FOREIGN_BRIDGE_ADDRESS,
     bridgeContract: null
   },
-  loading: true
+  loading: true,
+  error: '',
+  setError: () => {}
 }
 
 const StateContext = createContext<StateContext>(initialState)
@@ -54,12 +66,16 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
     homeWeb3: homeNetwork.web3,
     foreignWeb3: foreignNetwork.web3
   })
+  const [confirmations, setConfirmations] = useState([])
+  const [error, setError] = useState('')
 
   const value = {
     home: {
       bridgeAddress: HOME_BRIDGE_ADDRESS,
       name: HOME_NETWORK_NAME,
       bridgeContract: homeBridge,
+      confirmations,
+      setConfirmations,
       ...homeNetwork
     },
     foreign: {
@@ -68,7 +84,9 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
       bridgeContract: foreignBridge,
       ...foreignNetwork
     },
-    loading: homeNetwork.loading || foreignNetwork.loading
+    loading: homeNetwork.loading || foreignNetwork.loading,
+    error,
+    setError
   }
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>

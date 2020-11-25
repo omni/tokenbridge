@@ -44,12 +44,19 @@ export interface ConfirmationsContainerParams {
 
 export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }: ConfirmationsContainerParams) => {
   const {
-    home: { name: homeName },
+    home: { name: homeName, confirmations },
     foreign: { name: foreignName }
   } = useStateProvider()
   const { requiredSignatures, validatorList } = useValidatorContract({ fromHome, receipt })
   const { blockConfirmations } = useBlockConfirmations({ fromHome, receipt })
-  const { confirmations, status, executionData, signatureCollected, waitingBlocksResolved } = useMessageConfirmations({
+  const {
+    status,
+    executionData,
+    signatureCollected,
+    waitingBlocksResolved,
+    setExecutionData,
+    executionEventsFetched
+  } = useMessageConfirmations({
     message,
     receipt,
     fromHome,
@@ -102,7 +109,16 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
           validatorList={validatorList}
           waitingBlocksResolved={waitingBlocksResolved}
         />
-        {signatureCollected && <ExecutionConfirmation executionData={executionData} isHome={!fromHome} />}
+        {signatureCollected && (
+          <ExecutionConfirmation
+            messageData={message.data}
+            executionData={executionData}
+            isHome={!fromHome}
+            requiredSignatures={requiredSignatures}
+            setExecutionData={setExecutionData}
+            executionEventsFetched={executionEventsFetched}
+          />
+        )}
       </StyledConfirmationContainer>
     </div>
   )

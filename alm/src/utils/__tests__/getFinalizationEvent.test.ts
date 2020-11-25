@@ -61,6 +61,7 @@ describe('getFinalizationEvent', () => {
     const setFailedExecution = jest.fn()
     const getPendingExecution = jest.fn()
     const setPendingExecution = jest.fn()
+    const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
       contract,
@@ -76,7 +77,8 @@ describe('getFinalizationEvent', () => {
       getFailedExecution,
       setFailedExecution,
       getPendingExecution,
-      setPendingExecution
+      setPendingExecution,
+      setExecutionEventsFetched
     )
 
     unsubscribe()
@@ -110,6 +112,7 @@ describe('getFinalizationEvent', () => {
     const setFailedExecution = jest.fn()
     const getPendingExecution = jest.fn()
     const setPendingExecution = jest.fn()
+    const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
       contract,
@@ -125,7 +128,8 @@ describe('getFinalizationEvent', () => {
       getFailedExecution,
       setFailedExecution,
       getPendingExecution,
-      setPendingExecution
+      setPendingExecution,
+      setExecutionEventsFetched
     )
 
     unsubscribe()
@@ -159,6 +163,7 @@ describe('getFinalizationEvent', () => {
     const setFailedExecution = jest.fn()
     const getPendingExecution = jest.fn().mockResolvedValue([])
     const setPendingExecution = jest.fn()
+    const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
       contract,
@@ -174,7 +179,8 @@ describe('getFinalizationEvent', () => {
       getFailedExecution,
       setFailedExecution,
       getPendingExecution,
-      setPendingExecution
+      setPendingExecution,
+      setExecutionEventsFetched
     )
 
     unsubscribe()
@@ -208,6 +214,7 @@ describe('getFinalizationEvent', () => {
     const setFailedExecution = jest.fn()
     const getPendingExecution = jest.fn().mockResolvedValue([{ hash: txHash }])
     const setPendingExecution = jest.fn()
+    const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
       contract,
@@ -223,7 +230,8 @@ describe('getFinalizationEvent', () => {
       getFailedExecution,
       setFailedExecution,
       getPendingExecution,
-      setPendingExecution
+      setPendingExecution,
+      setExecutionEventsFetched
     )
 
     unsubscribe()
@@ -264,6 +272,7 @@ describe('getFinalizationEvent', () => {
     const setFailedExecution = jest.fn()
     const getPendingExecution = jest.fn().mockResolvedValue([])
     const setPendingExecution = jest.fn()
+    const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
       contract,
@@ -279,7 +288,8 @@ describe('getFinalizationEvent', () => {
       getFailedExecution,
       setFailedExecution,
       getPendingExecution,
-      setPendingExecution
+      setPendingExecution,
+      setExecutionEventsFetched
     )
 
     unsubscribe()

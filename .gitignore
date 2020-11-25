@@ -49,3 +49,6 @@ monitor/responses/*
 monitor/cache/*
 !monitor/cache/.gitkeep
 !monitor/.gitkeep
+
+# Local Netlify folder
+.netlify

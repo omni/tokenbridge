@@ -1,4 +1,6 @@
 // %t will be replaced by the time -> x minutes/hours/days ago
+import { ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION } from './constants'
+
 export const TRANSACTION_STATUS_DESCRIPTION: { [key: string]: string } = {
   SUCCESS_MULTIPLE_MESSAGES: 'was initiated %t and contains several bridge messages. Specify one of them:',
   SUCCESS_ONE_MESSAGE: 'was initiated %t',
@@ -24,7 +26,7 @@ export const CONFIRMATIONS_STATUS_LABEL_HOME: { [key: string]: string } = {
   SUCCESS_MESSAGE_FAILED: 'Success',
   EXECUTION_FAILED: 'Execution failed',
   EXECUTION_PENDING: 'Execution pending',
-  EXECUTION_WAITING: 'Execution waiting',
+  EXECUTION_WAITING: ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION ? 'Manual execution waiting' : 'Execution waiting',
   FAILED: 'Confirmation Failed',
   PENDING: 'Confirmation Pending',
   WAITING_VALIDATORS: 'Confirmation Waiting',
@@ -58,8 +60,9 @@ export const CONFIRMATIONS_STATUS_DESCRIPTION_HOME: { [key: string]: string } = 
     'The specified transaction was included in a block\nand the validators collected signatures. The\nvalidator’s transaction with collected signatures was\nsent but did not succeed. Contact to the validators by messaging\non %linkhttps://forum.poa.network/c/support',
   EXECUTION_PENDING:
     'The specified transaction was included in a block\nand the validators collected signatures. The\nvalidator’s transaction with collected signatures was\nsent but is not yet added to a block.',
-  EXECUTION_WAITING:
-    'The specified transaction was included in a block\nand the validators collected signatures. Either\n1. One of the validators is waiting for chain finalization.\n2. A validator skipped its duty to relay signatures.\n3. The execution transaction is still pending (e.g. due to the gas price spike).\nCheck status again after a few blocks. If the issue still persists contact to the validators by messaging on %linkhttps://forum.poa.network/c/support',
+  EXECUTION_WAITING: ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION
+    ? 'The specified transaction was included in a block\nand the validators collected signatures.\nNow the manual user action is required to complete message execution.\n Please, press the "Execute" button.'
+    : 'The specified transaction was included in a block\nand the validators collected signatures. Either\n1. One of the validators is waiting for chain finalization.\n2. A validator skipped its duty to relay signatures.\n3. The execution transaction is still pending (e.g. due to the gas price spike).\nCheck status again after a few blocks or force execution by pressing the "Execute" button.\nIf the issue still persists contact to the validators by messaging on %linkhttps://forum.poa.network/c/support',
   FAILED:
     'The specified transaction was included in a block,\nbut transactions with signatures sent by a majority of\nvalidators failed. The cross-chain relay request will\nnot be processed. Contact to the validators by\nmessaging on %linkhttps://forum.poa.network/c/support',
   PENDING:

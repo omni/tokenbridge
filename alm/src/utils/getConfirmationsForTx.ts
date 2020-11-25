@@ -7,11 +7,12 @@ import {
   APIPendingTransaction,
   GetPendingTransactionParams
 } from './explorer'
+import { getAffirmationsSigned, getMessagesSigned } from './contract'
 import {
   getValidatorConfirmation,
   getValidatorFailedTransaction,
   getValidatorPendingTransaction,
-  getValidatorSuccessTransaction
+  getSuccessExecutionTransaction
 } from './validatorConfirmationHelpers'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
@@ -20,7 +21,7 @@ export const getConfirmationsForTx = async (
   web3: Maybe<Web3>,
   validatorList: string[],
   bridgeContract: Maybe<Contract>,
-  confirmationContractMethod: Function,
+  fromHome: boolean,
   setResult: Function,
   requiredSignatures: number,
   setSignatureCollected: Function,
@@ -34,6 +35,8 @@ export const getConfirmationsForTx = async (
   getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
 ) => {
   if (!web3 || !validatorList || !validatorList.length || !bridgeContract || !waitingBlocksResolved) return
+
+  const confirmationContractMethod = fromHome ? getMessagesSigned : getAffirmationsSigned
 
   // If all the information was not collected, then it should retry
   let shouldRetry = false
@@ -129,7 +132,9 @@ export const getConfirmationsForTx = async (
   const successConfirmationWithData = await Promise.all(
     validatorConfirmations
       .filter(c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
-      .map(getValidatorSuccessTransaction(bridgeContract, messageData, timestamp, getSuccessTransactions))
+      .map(
+        getSuccessExecutionTransaction(web3, bridgeContract, fromHome, messageData, timestamp, getSuccessTransactions)
+      )
   )
 
   const successConfirmationWithTxFound = successConfirmationWithData.filter(v => v.txHash !== '')
@@ -162,7 +167,7 @@ export const getConfirmationsForTx = async (
           web3,
           validatorList,
           bridgeContract,
-          confirmationContractMethod,
+          fromHome,
           setResult,
           requiredSignatures,
           setSignatureCollected,

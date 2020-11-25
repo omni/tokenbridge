@@ -13,6 +13,9 @@ export const FOREIGN_EXPLORER_TX_TEMPLATE: string = process.env.REACT_APP_ALM_FO
 export const HOME_EXPLORER_API: string = process.env.REACT_APP_ALM_HOME_EXPLORER_API || ''
 export const FOREIGN_EXPLORER_API: string = process.env.REACT_APP_ALM_FOREIGN_EXPLORER_API || ''
 
+export const ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION: boolean =
+  (process.env.REACT_APP_ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION || '').toLowerCase() === 'true'
+
 export const HOME_RPC_POLLING_INTERVAL: number = 5000
 export const FOREIGN_RPC_POLLING_INTERVAL: number = 5000
 export const BLOCK_RANGE: number = 50
@@ -61,3 +64,5 @@ export const VALIDATOR_CONFIRMATION_STATUS = {
 }
 
 export const SEARCHING_TX = 'Searching Transaction...'
+
+export const INCORRECT_CHAIN_ERROR = `Incorrect chain chosen. Switch to ${FOREIGN_NETWORK_NAME} in the wallet.`
