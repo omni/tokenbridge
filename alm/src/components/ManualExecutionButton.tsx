@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { useWeb3React } from '@web3-react/core'
-import { FOREIGN_NETWORK_NAME, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { INCORRECT_CHAIN_ERROR, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { useStateProvider } from '../state/StateProvider'
 import { signatureToVRS, packSignatures } from '../utils/signatures'
 
@@ -39,7 +39,17 @@ export const ManualExecutionButton = ({
       if (!active) {
         activate(new InjectedConnector({ supportedChainIds: [foreign.chainId] }), e => {
           if (e.message.includes('Unsupported chain id')) {
-            setError(`Incorrect chain chosen. Switch to ${FOREIGN_NETWORK_NAME} in the wallet.`)
+            setError(INCORRECT_CHAIN_ERROR)
+            const { ethereum } = window as any
+
+            // remove the error message after chain is correctly changed to the foreign one
+            const listener = (chainId: string) => {
+              if (parseInt(chainId.slice(2), 16) === foreign.chainId) {
+                ethereum.removeListener('chainChanged', listener)
+                setError((error: string) => (error === INCORRECT_CHAIN_ERROR ? '' : error))
+              }
+            }
+            ethereum.on('chainChanged', listener)
           } else {
             setError(e.message)
           }
