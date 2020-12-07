@@ -371,6 +371,7 @@ export const useMessageConfirmations = ({
     executionData,
     setExecutionData,
     waitingBlocksResolved,
-    executionEventsFetched
+    executionEventsFetched,
+    setPendingExecution
   }
 }

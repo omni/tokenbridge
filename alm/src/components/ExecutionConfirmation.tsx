@@ -21,6 +21,7 @@ export interface ExecutionConfirmationParams {
   requiredSignatures: number
   isHome: boolean
   executionEventsFetched: boolean
+  setPendingExecution: Function
 }
 
 export const ExecutionConfirmation = ({
@@ -29,7 +30,8 @@ export const ExecutionConfirmation = ({
   setExecutionData,
   requiredSignatures,
   isHome,
-  executionEventsFetched
+  executionEventsFetched,
+  setPendingExecution
 }: ExecutionConfirmationParams) => {
   const availableManualExecution =
     !isHome &&
@@ -104,6 +106,7 @@ export const ExecutionConfirmation = ({
                   messageData={messageData}
                   setExecutionData={setExecutionData}
                   requiredSignatures={requiredSignatures}
+                  setPendingExecution={setPendingExecution}
                 />
               </td>
             )}
