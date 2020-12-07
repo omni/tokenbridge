@@ -19,12 +19,14 @@ interface ManualExecutionButtonParams {
   messageData: string
   setExecutionData: Function
   requiredSignatures: number
+  setPendingExecution: Function
 }
 
 export const ManualExecutionButton = ({
   messageData,
   setExecutionData,
-  requiredSignatures
+  requiredSignatures,
+  setPendingExecution
 }: ManualExecutionButtonParams) => {
   const { home, foreign, setError } = useStateProvider()
   const { library, activate, account, active } = useWeb3React()
@@ -73,7 +75,7 @@ export const ManualExecutionButton = ({
           to: foreign.bridgeAddress,
           data
         })
-        .on('transactionHash', (txHash: string) =>
+        .on('transactionHash', (txHash: string) => {
           setExecutionData({
             status: VALIDATOR_CONFIRMATION_STATUS.PENDING,
             validator: account,
@@ -81,7 +83,8 @@ export const ManualExecutionButton = ({
             timestamp: Math.floor(new Date().getTime() / 1000.0),
             executionResult: false
           })
-        )
+          setPendingExecution(true)
+        })
         .on('error', (e: Error) => setError(e.message))
     },
     [
@@ -96,7 +99,8 @@ export const ManualExecutionButton = ({
       setError,
       messageData,
       home.confirmations,
-      setExecutionData
+      setExecutionData,
+      setPendingExecution
     ]
   )
 
