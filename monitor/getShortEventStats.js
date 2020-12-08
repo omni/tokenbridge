@@ -8,6 +8,7 @@ const {
   manuallyProcessedAMBHomeToForeignRequests
 } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
+const getRequestsOutOfLimits = require('./getRequestsOutOfLimits')
 const { getHomeTxSender } = require('./utils/web3Cache')
 
 const {
@@ -46,8 +47,11 @@ async function main(bridgeMode, eventsInfo) {
       depositsDiff: homeToForeignRequests.length - homeToForeignConfirmations.length,
       withdrawalDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length
     }
+
+    const onlyInHomeDeposits = homeToForeignRequests.filter(eventWithoutReference(homeToForeignConfirmations))
+    const onlyInForeignWithdrawals = foreignToHomeRequests.filter(eventWithoutReference(foreignToHomeConfirmations))
+
     if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST || MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
-      const onlyInHomeDeposits = homeToForeignRequests.filter(eventWithoutReference(homeToForeignConfirmations))
       if (MONITOR_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
         for (let i = 0; i < onlyInHomeDeposits.length; i++) {
           onlyInHomeDeposits[i].sender = await getHomeTxSender(onlyInHomeDeposits[i].transactionHash)
@@ -60,15 +64,23 @@ async function main(bridgeMode, eventsInfo) {
       stats.unclaimedDiff = unclaimedPool.length
       stats.unclaimedBalance = Web3Utils.fromWei(BN.sum(0, ...unclaimedPool.map(e => e.value)).toFixed())
     }
+
+    const limitsStats = await getRequestsOutOfLimits(bridgeMode, {
+      homeRequests: onlyInHomeDeposits,
+      foreignRequests: onlyInForeignWithdrawals
+    })
+
     return {
       ...stats,
       home: {
         deposits: homeToForeignRequests.length,
-        withdrawals: foreignToHomeConfirmations.length
+        withdrawals: foreignToHomeConfirmations.length,
+        outOfLimits: limitsStats.home
       },
       foreign: {
         deposits: homeToForeignConfirmations.length,
-        withdrawals: foreignToHomeRequests.length
+        withdrawals: foreignToHomeRequests.length,
+        outOfLimits: limitsStats.foreign
       }
     }
   }
