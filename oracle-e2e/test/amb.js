@@ -142,7 +142,7 @@ describe('arbitrary message bridging', () => {
             console.error(e)
           })
 
-        await delay(5000)
+        await delay(10000)
 
         const newSignatures = await homeBridge.getPastEvents('SignedForUserRequest', {
           fromBlock: 0,

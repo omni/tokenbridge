@@ -1,33 +1,22 @@
 ---
-- name: Overwrite Oracle the docker-compose
+- name: Prepare Oracle for ultimate tests
   hosts: oracle
   become: true
   tasks:
-  - name: stop the service
-    shell: service poabridge stop
-
-  - name: ReTag current oracle image
-    shell: docker tag $(docker images --format '{{ '{{' }}.Repository{{ '}}' }}:{{ '{{' }}.Tag{{ '}}' }}' | grep -m 1 tokenbridge-e2e-oracle) oracle:ultimate-testing
+  - name: Connect parity to oracle networks
+    shell: "docker network create {{ item }} && docker network connect {{ item }} parity1 && docker network connect {{ item }} parity2"
+    with_items:
+      - oracle_net_db_bridge_request
+      - oracle_net_db_bridge_collected
+      - oracle_net_db_bridge_affirmation
+      - oracle_net_db_bridge_transfer
+      - oracle_net_db_bridge_senderhome
+      - oracle_net_db_bridge_senderforeign
+      - oracle_net_rabbit_bridge_request
+      - oracle_net_rabbit_bridge_collected
+      - oracle_net_rabbit_bridge_affirmation
+      - oracle_net_rabbit_bridge_transfer
+      - oracle_net_rabbit_bridge_senderhome
+      - oracle_net_rabbit_bridge_senderforeign
     delegate_to: 127.0.0.1
     become: false
-
-  - name: Replace oracle image
-    replace:
-      path: "/home/poadocker/bridge/oracle/{{ item }}.yml"
-      regexp: 'poanetwork/tokenbridge-oracle:latest'
-      replace: "oracle:ultimate-testing"
-    with_items:
-      - docker-compose
-      - docker-compose-transfer
-      - docker-compose-erc-native
-
-  - include_tasks: oracle-add-docker-external-network.yml
-    with_items:
-      - docker-compose
-      - docker-compose-transfer
-      - docker-compose-erc-native
-    loop_control:
-      loop_var: file
-
-  - name: start the service
-    shell: service poabridge start

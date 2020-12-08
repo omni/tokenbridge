@@ -8,7 +8,7 @@ services:
     ports:
     - "${UI_PORT}:${UI_PORT}"
     env_file: ./.env
-    environment: 
+    environment:
       - NODE_ENV=production
     restart: unless-stopped
     entrypoint: yarn start

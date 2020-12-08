@@ -3,3 +3,4 @@
   shell: docker-compose pull
   args:
     chdir: "{{ bridge_path }}/monitor"
+  when: skip_pull is undefined

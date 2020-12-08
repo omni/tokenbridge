@@ -4,12 +4,14 @@ networks:
     external: true
 services:
   parity1:
+    container_name: parity1
     build: ../parity
     ports:
     - "8541:8545"
     networks:
       - ultimate
   parity2:
+    container_name: parity2
     build:
       context: ../parity
       dockerfile: Dockerfile-foreign
