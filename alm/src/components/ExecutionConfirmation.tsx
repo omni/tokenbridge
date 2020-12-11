@@ -18,7 +18,7 @@ export interface ExecutionConfirmationParams {
   messageData: string
   executionData: ExecutionData
   setExecutionData: Function
-  requiredSignatures: number
+  signatureCollected: boolean | string[]
   isHome: boolean
   executionEventsFetched: boolean
   setPendingExecution: Function
@@ -28,7 +28,7 @@ export const ExecutionConfirmation = ({
   messageData,
   executionData,
   setExecutionData,
-  requiredSignatures,
+  signatureCollected,
   isHome,
   executionEventsFetched,
   setPendingExecution
@@ -105,7 +105,7 @@ export const ExecutionConfirmation = ({
                 <ManualExecutionButton
                   messageData={messageData}
                   setExecutionData={setExecutionData}
-                  requiredSignatures={requiredSignatures}
+                  signatureCollected={signatureCollected as string[]}
                   setPendingExecution={setPendingExecution}
                 />
               </td>

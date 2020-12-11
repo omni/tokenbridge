@@ -15,13 +15,19 @@ export const checkWaitingBlocksForExecution = async (
   const currentBlock = blockProvider.get()
 
   if (currentBlock && currentBlock >= targetBlock) {
-    setExecutionData({
+    const undefinedExecutionState = {
       status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
       validator: collectedSignaturesEvent.returnValues.authorityResponsibleForRelay,
       txHash: '',
       timestamp: 0,
       executionResult: false
-    })
+    }
+    setExecutionData(
+      (data: any) =>
+        data.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED || data.status === VALIDATOR_CONFIRMATION_STATUS.WAITING
+          ? undefinedExecutionState
+          : data
+    )
     setWaitingBlocksForExecutionResolved(true)
     setWaitingBlocksForExecution(false)
     blockProvider.stop()
@@ -31,13 +37,20 @@ export const checkWaitingBlocksForExecution = async (
       nextInterval = 500
     } else {
       setWaitingBlocksForExecution(true)
-      setExecutionData({
+      const waitingExecutionState = {
         status: VALIDATOR_CONFIRMATION_STATUS.WAITING,
         validator: collectedSignaturesEvent.returnValues.authorityResponsibleForRelay,
         txHash: '',
         timestamp: 0,
         executionResult: false
-      })
+      }
+      setExecutionData(
+        (data: any) =>
+          data.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED ||
+          data.status === VALIDATOR_CONFIRMATION_STATUS.WAITING
+            ? waitingExecutionState
+            : data
+      )
     }
     const timeoutId = setTimeout(
       () =>

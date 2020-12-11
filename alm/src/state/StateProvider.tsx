@@ -12,7 +12,6 @@ import Web3 from 'web3'
 import { useBridgeContracts } from '../hooks/useBridgeContracts'
 import { Contract } from 'web3-eth-contract'
 import { foreignSnapshotProvider, homeSnapshotProvider } from '../services/SnapshotProvider'
-import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
 export interface BaseNetworkParams {
   chainId: number
@@ -22,13 +21,8 @@ export interface BaseNetworkParams {
   bridgeContract: Maybe<Contract>
 }
 
-export interface HomeNetworkParams extends BaseNetworkParams {
-  confirmations: Array<ConfirmationParam>
-  setConfirmations: Function
-}
-
 export interface StateContext {
-  home: HomeNetworkParams
+  home: BaseNetworkParams
   foreign: BaseNetworkParams
   loading: boolean
   error: string
@@ -41,9 +35,7 @@ const initialState = {
     name: '',
     web3: null,
     bridgeAddress: HOME_BRIDGE_ADDRESS,
-    bridgeContract: null,
-    confirmations: [],
-    setConfirmations: () => null
+    bridgeContract: null
   },
   foreign: {
     chainId: 0,
@@ -66,7 +58,6 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
     homeWeb3: homeNetwork.web3,
     foreignWeb3: foreignNetwork.web3
   })
-  const [confirmations, setConfirmations] = useState([])
   const [error, setError] = useState('')
 
   const value = {
@@ -74,8 +65,6 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
       bridgeAddress: HOME_BRIDGE_ADDRESS,
       name: HOME_NETWORK_NAME,
       bridgeContract: homeBridge,
-      confirmations,
-      setConfirmations,
       ...homeNetwork
     },
     foreign: {

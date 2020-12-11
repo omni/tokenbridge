@@ -44,12 +44,13 @@ export interface ConfirmationsContainerParams {
 
 export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }: ConfirmationsContainerParams) => {
   const {
-    home: { name: homeName, confirmations },
+    home: { name: homeName },
     foreign: { name: foreignName }
   } = useStateProvider()
   const { requiredSignatures, validatorList } = useValidatorContract({ fromHome, receipt })
   const { blockConfirmations } = useBlockConfirmations({ fromHome, receipt })
   const {
+    confirmations,
     status,
     executionData,
     signatureCollected,
@@ -115,7 +116,7 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
             messageData={message.data}
             executionData={executionData}
             isHome={!fromHome}
-            requiredSignatures={requiredSignatures}
+            signatureCollected={signatureCollected}
             setExecutionData={setExecutionData}
             executionEventsFetched={executionEventsFetched}
             setPendingExecution={setPendingExecution}

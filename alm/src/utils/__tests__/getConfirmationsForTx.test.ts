@@ -24,7 +24,15 @@ const validator1 = '0x45b96809336A8b714BFbdAB3E4B5e0fe5d839908'
 const validator2 = '0xAe8bFfc8BBc6AAa9E21ED1E4e4957fe798BEA25f'
 const validator3 = '0x285A6eB779be4db94dA65e2F3518B1c5F0f71244'
 const validatorList = [validator1, validator2, validator3]
-const bridgeContract = {} as Contract
+const signature =
+  '0x519d704bceed17423daa79c20531cc34fc27a4be6e53fc5069a8023019188ca4519d704bceed17423daa79c20531cc34fc27a4be6e53fc5069a8023019188ca4'
+const bridgeContract = {
+  methods: {
+    signature: () => ({
+      call: () => signature
+    })
+  }
+} as Contract
 const requiredSignatures = 2
 const waitingBlocksResolved = true
 let subscriptions: Array<number> = []
@@ -103,7 +111,7 @@ describe('getConfirmationsForTx', () => {
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
-    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
     expect(setFailedConfirmations).toBeCalledTimes(1)
@@ -247,7 +255,7 @@ describe('getConfirmationsForTx', () => {
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
-    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
     expect(setFailedConfirmations).toBeCalledTimes(1)
@@ -335,7 +343,7 @@ describe('getConfirmationsForTx', () => {
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
-    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
     expect(setFailedConfirmations).toBeCalledTimes(1)
@@ -674,7 +682,7 @@ describe('getConfirmationsForTx', () => {
     expect(getSuccessExecutionTransaction).toBeCalledTimes(2)
     expect(setSignatureCollected).toBeCalledTimes(2)
     expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
-    expect(setSignatureCollected.mock.calls[1][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[1][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(2)
     expect(setFailedConfirmations).toBeCalledTimes(2)
