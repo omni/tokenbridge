@@ -1,6 +1,19 @@
 const fetch = require('node-fetch')
 const promiseRetry = require('promise-retry')
 
+let logger
+try {
+  // eslint-disable-next-line global-require
+  logger = require('./logger').child({
+    module: 'HttpListProvider'
+  })
+} catch (e) {
+  logger = {
+    debug: () => {},
+    info: () => {}
+  }
+}
+
 // From EIP-1474 and Infura documentation
 const JSONRPC_ERROR_CODES = [-32603, -32002, -32005]
 
@@ -40,7 +53,13 @@ HttpListProvider.prototype.send = async function send(payload, callback) {
     const [result, index] = await promiseRetry(retry => {
       return trySend(payload, this.urls, currentIndex, this.options).catch(retry)
     }, this.options.retry)
-    this.currentIndex = index
+    if (currentIndex !== index) {
+      logger.info(
+        { index, oldURL: this.urls[currentIndex], newURL: this.urls[index] },
+        'Switching to fallback JSON-RPC URL'
+      )
+      this.currentIndex = index
+    }
     callback(null, result)
   } catch (e) {
     callback(e)
@@ -65,7 +84,10 @@ function send(url, payload, options) {
     })
     .then(response => response.json())
     .then(response => {
-      if (response.error && JSONRPC_ERROR_CODES.includes(response.error.code)) {
+      if (
+        response.error &&
+        (JSONRPC_ERROR_CODES.includes(response.error.code) || response.error.message.includes('ancient block'))
+      ) {
         throw new Error(response.error.message)
       }
       return response
@@ -82,6 +104,7 @@ async function trySend(payload, urls, initialIndex, options) {
       const result = await send(url, payload, options)
       return [result, index]
     } catch (e) {
+      logger.debug({ index, url, error: e.message }, `JSON-RPC has failed to respond`)
       errors.push(e)
     }
     index = (index + 1) % urls.length
