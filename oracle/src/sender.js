@@ -30,6 +30,8 @@ const config = require(path.join('../config/', process.argv[2]))
 
 const web3Instance = config.web3
 const web3Redundant = ORACLE_TX_REDUNDANCY === 'true' ? config.web3Redundant : config.web3
+const { web3Fallback } = config
+
 const nonceKey = `${config.id}:nonce`
 let chainId = 0
 
@@ -128,7 +130,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
 
       try {
         if (isResend) {
-          const tx = await web3Instance.eth.getTransaction(job.txHash)
+          const tx = await web3Fallback.eth.getTransaction(job.txHash)
 
           if (tx && tx.blockNumber !== null) {
             logger.debug(`Transaction ${job.txHash} was successfully mined`)
