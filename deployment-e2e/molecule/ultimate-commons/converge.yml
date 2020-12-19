@@ -1,5 +1,3 @@
 ---
-- import_playbook: ../../../deployment/site.yml
-# The docker-compose files have to be modified, in order to join the docker containers over network with the parity containers
 - import_playbook: ./oracle-docker-compose.yml
-- import_playbook: ./ui-docker-compose.yml
+- import_playbook: ../../../deployment/site.yml

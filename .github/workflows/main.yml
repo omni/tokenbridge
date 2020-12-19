@@ -182,6 +182,7 @@ jobs:
   deployment:
     runs-on: ubuntu-latest
     needs:
+      - build-e2e-images
       - build-molecule-runner
     strategy:
       fail-fast: false
@@ -197,11 +198,11 @@ jobs:
         run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
       - run: deployment-e2e/molecule.sh ${{ matrix.task }}
   ultimate:
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags') || contains(github.event.head_commit.message, 'ultimate')
     runs-on: ubuntu-latest
     needs:
       - initialize
       - build-e2e-images
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags')
     strategy:
       fail-fast: false
       matrix:
@@ -209,12 +210,16 @@ jobs:
         include:
           - task: erc-to-erc
             ui-e2e-grep: 'ERC TO ERC'
+            ui-config: 'e2e-commons/components-envs/ui-erc20.env'
           - task: erc-to-native
             ui-e2e-grep: 'ERC TO NATIVE'
+            ui-config: 'e2e-commons/components-envs/ui-erc20-native.env'
           - task: native-to-erc
             ui-e2e-grep: 'NATIVE TO ERC'
+            ui-config: 'e2e-commons/components-envs/ui.env'
           - task: amb-stake-erc-to-erc
             ui-e2e-grep: 'AMB-STAKE-ERC-TO-ERC'
+            ui-config: 'e2e-commons/components-envs/ui-amb-stake-erc20-erc20.env'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -240,7 +245,20 @@ jobs:
       - name: Deploy contracts
         run: ${{ steps.cache-repo.outputs.cache-hit }} && e2e-commons/up.sh deploy blocks
       - name: Pull e2e oracle image
-        run: docker-compose -f ./e2e-commons/docker-compose.yml pull oracle
+        run: |
+         docker-compose -f ./e2e-commons/docker-compose.yml pull oracle
+         docker tag ${DOCKER_IMAGE_BASE}/tokenbridge-e2e-oracle:${ORACLE_TAG} poanetwork/tokenbridge-oracle:latest
+      - if: ${{ matrix.ui-e2e-grep }}
+        name: Pull e2e ui image
+        run: |
+          docker-compose -f ./e2e-commons/docker-compose.yml pull ui
+          docker build \
+            --build-arg DOCKER_IMAGE_BASE=${DOCKER_IMAGE_BASE} \
+            --build-arg UI_TAG=${UI_TAG} \
+            --build-arg DOT_ENV_PATH=${{ matrix.ui-config }} \
+            -f ./e2e-commons/Dockerfile.ui \
+            -t ui_ui:latest \
+            .
       - name: Deploy oracle and ui
         run: deployment-e2e/molecule.sh ultimate-${{ matrix.task }}
       - name: Reset docker socket permissions
