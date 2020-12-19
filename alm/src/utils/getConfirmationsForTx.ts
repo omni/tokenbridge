@@ -113,7 +113,7 @@ export const getConfirmationsForTx = async (
     shouldRetry = true
   }
 
-  let signatureCollectedResult = false
+  let signatureCollectedResult: boolean | string[] = false
   if (successConfirmations.length === requiredSignatures) {
     // If signatures collected, it should set other signatures not found as not required
     const notRequiredConfirmations = missingConfirmations.map(c => ({
@@ -126,6 +126,12 @@ export const getConfirmationsForTx = async (
       validatorConfirmations[index] = validatorData
     })
     signatureCollectedResult = true
+
+    if (fromHome) {
+      signatureCollectedResult = await Promise.all(
+        Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
+      )
+    }
   }
 
   // get transactions from success signatures

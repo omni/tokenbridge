@@ -63,7 +63,7 @@ export const useMessageConfirmations = ({
   blockConfirmations
 }: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
-  const { confirmations, setConfirmations } = home
+  const [confirmations, setConfirmations] = useState([])
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
   const [waitingBlocks, setWaitingBlocks] = useState(false)
   const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
@@ -94,7 +94,7 @@ export const useMessageConfirmations = ({
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
     () => {
-      if (!receipt || !blockConfirmations) return
+      if (!receipt || !blockConfirmations || waitingBlocksResolved) return
 
       const subscriptions: Array<number> = []
 
@@ -127,7 +127,16 @@ export const useMessageConfirmations = ({
         blockProvider.stop()
       }
     },
-    [blockConfirmations, foreign.web3, fromHome, validatorList, home.web3, receipt, setConfirmations]
+    [
+      blockConfirmations,
+      foreign.web3,
+      fromHome,
+      validatorList,
+      home.web3,
+      receipt,
+      setConfirmations,
+      waitingBlocksResolved
+    ]
   )
 
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
@@ -174,6 +183,7 @@ export const useMessageConfirmations = ({
   useEffect(
     () => {
       if (!fromHome || !home.web3 || !receipt || !collectedSignaturesEvent || !blockConfirmations) return
+      if (waitingBlocksForExecutionResolved) return
 
       const subscriptions: Array<number> = []
 
@@ -202,7 +212,7 @@ export const useMessageConfirmations = ({
         homeBlockNumberProvider.stop()
       }
     },
-    [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, receipt]
+    [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, receipt, waitingBlocksForExecutionResolved]
   )
 
   // Checks if validators verified the message
@@ -366,6 +376,7 @@ export const useMessageConfirmations = ({
   )
 
   return {
+    confirmations,
     status,
     signatureCollected,
     executionData,

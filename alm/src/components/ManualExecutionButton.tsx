@@ -18,21 +18,19 @@ const StyledButton = styled.button`
 interface ManualExecutionButtonParams {
   messageData: string
   setExecutionData: Function
-  requiredSignatures: number
+  signatureCollected: string[]
   setPendingExecution: Function
 }
 
 export const ManualExecutionButton = ({
   messageData,
   setExecutionData,
-  requiredSignatures,
+  signatureCollected,
   setPendingExecution
 }: ManualExecutionButtonParams) => {
-  const { home, foreign, setError } = useStateProvider()
+  const { foreign, setError } = useStateProvider()
   const { library, activate, account, active } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
-  const disabled =
-    home.confirmations.filter(({ signature }) => signature && signature.startsWith('0x')).length < requiredSignatures
 
   useEffect(
     () => {
@@ -60,12 +58,9 @@ export const ManualExecutionButton = ({
         return
       }
 
-      if (!library || !foreign.bridgeContract || !home.confirmations) return
+      if (!library || !foreign.bridgeContract) return
 
-      const collectedSignatures = home.confirmations
-        .map(confirmation => confirmation.signature!)
-        .filter(signature => signature && signature.startsWith('0x'))
-      const signatures = packSignatures(collectedSignatures.map(signatureToVRS))
+      const signatures = packSignatures(signatureCollected.map(signatureToVRS))
       const data = foreign.bridgeContract.methods.executeSignatures(messageData, signatures).encodeABI()
       setManualExecution(false)
 
@@ -98,7 +93,7 @@ export const ManualExecutionButton = ({
       foreign.bridgeContract,
       setError,
       messageData,
-      home.confirmations,
+      signatureCollected,
       setExecutionData,
       setPendingExecution
     ]
@@ -106,7 +101,7 @@ export const ManualExecutionButton = ({
 
   return (
     <div className="is-center">
-      <StyledButton disabled={disabled} className="button outline" onClick={() => setManualExecution(true)}>
+      <StyledButton className="button outline" onClick={() => setManualExecution(true)}>
         Execute
       </StyledButton>
     </div>
