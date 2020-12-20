@@ -15,6 +15,10 @@ function RedundantHttpListProvider(urls, options = {}) {
   this.options = { ...defaultOptions, ...options }
 }
 
+RedundantHttpListProvider.prototype.setLogger = function(logger) {
+  this.logger = logger.child({ module: `RedundantHttpListProvider:${this.options.name}` })
+}
+
 RedundantHttpListProvider.prototype.send = async function send(payload, callback) {
   try {
     const result = await promiseRetry(retry => {
