@@ -41,11 +41,22 @@ bridgeRouter.get('/eventsStats', async (req, res, next) => {
   }
 })
 
+
 bridgeRouter.get('/alerts', async (req, res, next) => {
   try {
     const results = await readFile(`./responses/${req.params.bridgeName}/alerts.json`)
     res.json(results)
   } catch (e) {
+    next(e)
+  }
+})
+
+bridgeRouter.get('/mediators', async (req, res, next) => {
+  try {
+    const results = await readFile(`./responses/${req.params.bridgeName}/mediators.json`)
+    res.json(results)
+  } catch (e) {
+    // this will eventually be handled by your error handling middleware
     next(e)
   }
 })
