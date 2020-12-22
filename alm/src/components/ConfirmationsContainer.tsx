@@ -49,7 +49,16 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
   } = useStateProvider()
   const { requiredSignatures, validatorList } = useValidatorContract({ fromHome, receipt })
   const { blockConfirmations } = useBlockConfirmations({ fromHome, receipt })
-  const { confirmations, status, executionData, signatureCollected, waitingBlocksResolved } = useMessageConfirmations({
+  const {
+    confirmations,
+    status,
+    executionData,
+    signatureCollected,
+    waitingBlocksResolved,
+    setExecutionData,
+    executionEventsFetched,
+    setPendingExecution
+  } = useMessageConfirmations({
     message,
     receipt,
     fromHome,
@@ -102,7 +111,17 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
           validatorList={validatorList}
           waitingBlocksResolved={waitingBlocksResolved}
         />
-        {signatureCollected && <ExecutionConfirmation executionData={executionData} isHome={!fromHome} />}
+        {signatureCollected && (
+          <ExecutionConfirmation
+            messageData={message.data}
+            executionData={executionData}
+            isHome={!fromHome}
+            signatureCollected={signatureCollected}
+            setExecutionData={setExecutionData}
+            executionEventsFetched={executionEventsFetched}
+            setPendingExecution={setPendingExecution}
+          />
+        )}
       </StyledConfirmationContainer>
     </div>
   )

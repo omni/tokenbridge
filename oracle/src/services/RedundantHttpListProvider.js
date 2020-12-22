@@ -13,7 +13,10 @@ function RedundantHttpListProvider(urls, options = {}) {
 
   this.urls = urls
   this.options = { ...defaultOptions, ...options }
-  this.currentIndex = 0
+}
+
+RedundantHttpListProvider.prototype.setLogger = function(logger) {
+  this.logger = logger.child({ module: `RedundantHttpListProvider:${this.options.name}` })
 }
 
 RedundantHttpListProvider.prototype.send = async function send(payload, callback) {

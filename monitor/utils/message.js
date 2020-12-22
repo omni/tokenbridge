@@ -1,30 +1,31 @@
-const { parseAMBMessage } = require('../../commons')
+const { normalizeAMBMessageEvent } = require('../../commons')
 const { readAccessListFile } = require('./file')
 
 const { MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST, MONITOR_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
 
 const keyAMB = e => [e.messageId, e.sender, e.executor].join(',').toLowerCase()
 
-const normalizeAMBMessage = e => {
-  let msgData = e.returnValues.encodedData
-  if (!e.returnValues.messageId) {
-    // append tx hash to an old message, where message id was not used
-    // for old messages, e.messageId is a corresponding transactionHash
-    msgData = e.transactionHash + msgData.slice(2)
-  }
-  return parseAMBMessage(msgData)
-}
-
 function deliveredMsgNotProcessed(processedList) {
   const keys = new Set()
   processedList.forEach(processedMsg => keys.add(keyAMB(processedMsg.returnValues)))
-  return deliveredMsg => !keys.has(keyAMB(normalizeAMBMessage(deliveredMsg)))
+  return deliveredMsg => !keys.has(keyAMB(normalizeAMBMessageEvent(deliveredMsg)))
 }
 
 function processedMsgNotDelivered(deliveredList) {
   const keys = new Set()
-  deliveredList.forEach(deliveredMsg => keys.add(keyAMB(normalizeAMBMessage(deliveredMsg))))
+  deliveredList.forEach(deliveredMsg => keys.add(keyAMB(normalizeAMBMessageEvent(deliveredMsg))))
   return processedMsg => !keys.has(keyAMB(processedMsg.returnValues))
+}
+
+function addExecutionStatus(processedList) {
+  const statuses = {}
+  processedList.forEach(processedMsg => {
+    statuses[keyAMB(processedMsg.returnValues)] = processedMsg.returnValues.status
+  })
+  return deliveredMsg => {
+    deliveredMsg.status = statuses[keyAMB(deliveredMsg)]
+    return deliveredMsg
+  }
 }
 
 /**
@@ -70,23 +71,24 @@ const manuallyProcessedAMBHomeToForeignRequests = () => {
   if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST) {
     const allowanceList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST)
     return e => {
-      const { sender, executor, decodedDataType } = normalizeAMBMessage(e)
+      const { sender, executor, decodedDataType } = normalizeAMBMessageEvent(e)
       return (!allowanceList.includes(sender) && !allowanceList.includes(executor)) || decodedDataType.manualLane
     }
   } else if (MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
     const blockList = readAccessListFile(MONITOR_HOME_TO_FOREIGN_BLOCK_LIST)
     return e => {
-      const { sender, executor, decodedDataType } = normalizeAMBMessage(e)
+      const { sender, executor, decodedDataType } = normalizeAMBMessageEvent(e)
       return blockList.includes(sender) || blockList.includes(executor) || decodedDataType.manualLane
     }
   } else {
-    return e => normalizeAMBMessage(e).decodedDataType.manualLane
+    return e => normalizeAMBMessageEvent(e).decodedDataType.manualLane
   }
 }
 
 module.exports = {
   deliveredMsgNotProcessed,
   processedMsgNotDelivered,
+  addExecutionStatus,
   normalizeEventInformation,
   eventWithoutReference,
   unclaimedHomeToForeignRequests,

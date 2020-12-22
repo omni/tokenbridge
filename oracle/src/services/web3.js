@@ -41,15 +41,37 @@ const web3Home = new Web3(homeProvider)
 const foreignProvider = new HttpListProvider(foreignUrls, foreignOptions)
 const web3Foreign = new Web3(foreignProvider)
 
-const redundantHomeProvider = new RedundantHttpListProvider(homeUrls, homeOptions)
-const web3HomeRedundant = new Web3(redundantHomeProvider)
+// secondary fallback providers are intended to be used in places where
+// it is more likely that RPC calls to the local non-archive nodes can fail
+// e.g. for checking status of the old transaction via eth_getTransactionByHash
+let web3HomeFallback = web3Home
+let web3ForeignFallback = web3Foreign
 
-const redundantForeignProvider = new RedundantHttpListProvider(foreignUrls, foreignOptions)
-const web3ForeignRedundant = new Web3(redundantForeignProvider)
+// secondary redundant providers are intended to be used in places where
+// the result of a single RPC request can be lost
+// e.g. for sending transactions eth_sendRawTransaction
+let web3HomeRedundant = web3Home
+let web3ForeignRedundant = web3Foreign
+
+if (homeUrls.length > 1) {
+  const provider = new HttpListProvider(homeUrls, { ...homeOptions, name: 'fallback' })
+  web3HomeFallback = new Web3(provider)
+  const redundantProvider = new RedundantHttpListProvider(homeUrls, { ...homeOptions, name: 'redundant' })
+  web3HomeRedundant = new Web3(redundantProvider)
+}
+
+if (foreignUrls.length > 1) {
+  const provider = new HttpListProvider(foreignUrls, { ...foreignOptions, name: 'fallback' })
+  web3ForeignFallback = new Web3(provider)
+  const redundantProvider = new RedundantHttpListProvider(foreignUrls, { ...foreignOptions, name: 'redundant' })
+  web3ForeignRedundant = new Web3(redundantProvider)
+}
 
 module.exports = {
   web3Home,
   web3Foreign,
   web3HomeRedundant,
-  web3ForeignRedundant
+  web3ForeignRedundant,
+  web3HomeFallback,
+  web3ForeignFallback
 }

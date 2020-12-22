@@ -3,7 +3,6 @@ import { TransactionReceipt } from 'web3-eth'
 import { MessageObject } from '../utils/web3'
 import { useEffect, useState } from 'react'
 import { EventData } from 'web3-eth-contract'
-import { getAffirmationsSigned, getMessagesSigned } from '../utils/contract'
 import {
   BLOCK_RANGE,
   CONFIRMATIONS_STATUS,
@@ -43,6 +42,7 @@ export interface BasicConfirmationParam {
 export interface ConfirmationParam extends BasicConfirmationParam {
   txHash: string
   timestamp: number
+  signature?: string
 }
 
 export interface ExecutionData {
@@ -63,11 +63,12 @@ export const useMessageConfirmations = ({
   blockConfirmations
 }: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
-  const [confirmations, setConfirmations] = useState<Array<ConfirmationParam>>([])
+  const [confirmations, setConfirmations] = useState([])
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
   const [waitingBlocks, setWaitingBlocks] = useState(false)
   const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
   const [signatureCollected, setSignatureCollected] = useState(false)
+  const [executionEventsFetched, setExecutionEventsFetched] = useState(false)
   const [collectedSignaturesEvent, setCollectedSignaturesEvent] = useState<Maybe<EventData>>(null)
   const [executionData, setExecutionData] = useState<ExecutionData>({
     status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
@@ -93,7 +94,7 @@ export const useMessageConfirmations = ({
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
     () => {
-      if (!receipt || !blockConfirmations) return
+      if (!receipt || !blockConfirmations || waitingBlocksResolved) return
 
       const subscriptions: Array<number> = []
 
@@ -126,7 +127,16 @@ export const useMessageConfirmations = ({
         blockProvider.stop()
       }
     },
-    [blockConfirmations, foreign.web3, fromHome, validatorList, home.web3, receipt]
+    [
+      blockConfirmations,
+      foreign.web3,
+      fromHome,
+      validatorList,
+      home.web3,
+      receipt,
+      setConfirmations,
+      waitingBlocksResolved
+    ]
   )
 
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
@@ -173,6 +183,7 @@ export const useMessageConfirmations = ({
   useEffect(
     () => {
       if (!fromHome || !home.web3 || !receipt || !collectedSignaturesEvent || !blockConfirmations) return
+      if (waitingBlocksForExecutionResolved) return
 
       const subscriptions: Array<number> = []
 
@@ -201,7 +212,7 @@ export const useMessageConfirmations = ({
         homeBlockNumberProvider.stop()
       }
     },
-    [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, receipt]
+    [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, receipt, waitingBlocksForExecutionResolved]
   )
 
   // Checks if validators verified the message
@@ -218,14 +229,12 @@ export const useMessageConfirmations = ({
         })
       }
 
-      const confirmationContractMethod = fromHome ? getMessagesSigned : getAffirmationsSigned
-
       getConfirmationsForTx(
         message.data,
         home.web3,
         validatorList,
         home.bridgeContract,
-        confirmationContractMethod,
+        fromHome,
         setConfirmations,
         requiredSignatures,
         setSignatureCollected,
@@ -251,7 +260,8 @@ export const useMessageConfirmations = ({
       home.bridgeContract,
       requiredSignatures,
       waitingBlocksResolved,
-      timestamp
+      timestamp,
+      setConfirmations
     ]
   )
 
@@ -289,7 +299,8 @@ export const useMessageConfirmations = ({
         getExecutionFailedTransactionForMessage,
         setFailedExecution,
         getExecutionPendingTransactionsForMessage,
-        setPendingExecution
+        setPendingExecution,
+        setExecutionEventsFetched
       )
 
       return () => {
@@ -369,6 +380,9 @@ export const useMessageConfirmations = ({
     status,
     signatureCollected,
     executionData,
-    waitingBlocksResolved
+    setExecutionData,
+    waitingBlocksResolved,
+    executionEventsFetched,
+    setPendingExecution
   }
 }

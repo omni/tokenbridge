@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode } from 'react'
+import React, { createContext, ReactNode, useState } from 'react'
 import { useNetwork } from '../hooks/useNetwork'
 import {
   HOME_RPC_URL,
@@ -25,6 +25,8 @@ export interface StateContext {
   home: BaseNetworkParams
   foreign: BaseNetworkParams
   loading: boolean
+  error: string
+  setError: Function
 }
 
 const initialState = {
@@ -42,7 +44,9 @@ const initialState = {
     bridgeAddress: FOREIGN_BRIDGE_ADDRESS,
     bridgeContract: null
   },
-  loading: true
+  loading: true,
+  error: '',
+  setError: () => {}
 }
 
 const StateContext = createContext<StateContext>(initialState)
@@ -54,6 +58,7 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
     homeWeb3: homeNetwork.web3,
     foreignWeb3: foreignNetwork.web3
   })
+  const [error, setError] = useState('')
 
   const value = {
     home: {
@@ -68,7 +73,9 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
       bridgeContract: foreignBridge,
       ...foreignNetwork
     },
-    loading: homeNetwork.loading || foreignNetwork.loading
+    loading: homeNetwork.loading || foreignNetwork.loading,
+    error,
+    setError
   }
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>

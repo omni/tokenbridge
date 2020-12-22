@@ -45,8 +45,10 @@ export const getValidatorConfirmation = (
   }
 }
 
-export const getValidatorSuccessTransaction = (
+export const getSuccessExecutionTransaction = (
+  web3: Web3,
   bridgeContract: Contract,
+  fromHome: boolean,
   messageData: string,
   timestamp: number,
   getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>

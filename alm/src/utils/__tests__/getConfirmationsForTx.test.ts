@@ -9,7 +9,7 @@ import { BasicConfirmationParam } from '../../hooks/useMessageConfirmations'
 
 jest.mock('../validatorConfirmationHelpers')
 
-const getValidatorSuccessTransaction = helpers.getValidatorSuccessTransaction as jest.Mock<any>
+const getSuccessExecutionTransaction = helpers.getSuccessExecutionTransaction as jest.Mock<any>
 const getValidatorConfirmation = helpers.getValidatorConfirmation as jest.Mock<any>
 const getValidatorFailedTransaction = helpers.getValidatorFailedTransaction as jest.Mock<any>
 const getValidatorPendingTransaction = helpers.getValidatorPendingTransaction as jest.Mock<any>
@@ -24,8 +24,15 @@ const validator1 = '0x45b96809336A8b714BFbdAB3E4B5e0fe5d839908'
 const validator2 = '0xAe8bFfc8BBc6AAa9E21ED1E4e4957fe798BEA25f'
 const validator3 = '0x285A6eB779be4db94dA65e2F3518B1c5F0f71244'
 const validatorList = [validator1, validator2, validator3]
-const bridgeContract = {} as Contract
-const confirmationContractMethod = () => {}
+const signature =
+  '0x519d704bceed17423daa79c20531cc34fc27a4be6e53fc5069a8023019188ca4519d704bceed17423daa79c20531cc34fc27a4be6e53fc5069a8023019188ca4'
+const bridgeContract = {
+  methods: {
+    signature: () => ({
+      call: () => signature
+    })
+  }
+} as Contract
 const requiredSignatures = 2
 const waitingBlocksResolved = true
 let subscriptions: Array<number> = []
@@ -42,7 +49,7 @@ const unsubscribe = () => {
 
 beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
-  getValidatorSuccessTransaction.mockClear()
+  getSuccessExecutionTransaction.mockClear()
   getValidatorConfirmation.mockClear()
   getValidatorFailedTransaction.mockClear()
   getValidatorPendingTransaction.mockClear()
@@ -54,7 +61,7 @@ describe('getConfirmationsForTx', () => {
       validator,
       status: validator !== validator3 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
     }))
-    getValidatorSuccessTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+    getSuccessExecutionTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
       validator: validatorData.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       txHash: '',
@@ -83,7 +90,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -102,9 +109,9 @@ describe('getConfirmationsForTx', () => {
     expect(subscriptions.length).toEqual(1)
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
-    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
     expect(setFailedConfirmations).toBeCalledTimes(1)
@@ -134,7 +141,7 @@ describe('getConfirmationsForTx', () => {
       validator,
       status: validator === validator3 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
     }))
-    getValidatorSuccessTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+    getSuccessExecutionTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
       validator: validatorData.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       txHash: '',
@@ -163,7 +170,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -181,7 +188,7 @@ describe('getConfirmationsForTx', () => {
 
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
     expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
 
@@ -198,7 +205,7 @@ describe('getConfirmationsForTx', () => {
       validator,
       status: validator !== validator3 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
     }))
-    getValidatorSuccessTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+    getSuccessExecutionTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
       validator: validatorData.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       txHash: validatorData.validator !== validator3 ? '0x123' : '',
@@ -227,7 +234,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -246,9 +253,9 @@ describe('getConfirmationsForTx', () => {
     expect(subscriptions.length).toEqual(0)
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
-    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
     expect(setFailedConfirmations).toBeCalledTimes(1)
@@ -283,7 +290,7 @@ describe('getConfirmationsForTx', () => {
           ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS
           : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
     }))
-    getValidatorSuccessTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+    getSuccessExecutionTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
       validator: validatorData.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       txHash: validatorData.validator !== validator3 && validatorData.validator !== validator4 ? '0x123' : '',
@@ -315,7 +322,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -334,9 +341,9 @@ describe('getConfirmationsForTx', () => {
     expect(subscriptions.length).toEqual(0)
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
-    expect(setSignatureCollected.mock.calls[0][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[0][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(1)
     expect(setFailedConfirmations).toBeCalledTimes(1)
@@ -372,7 +379,7 @@ describe('getConfirmationsForTx', () => {
       validator,
       status: validator === validator1 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
     }))
-    getValidatorSuccessTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+    getSuccessExecutionTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
       validator: validatorData.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       txHash: validatorData.validator === validator1 ? '0x123' : '',
@@ -407,7 +414,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -425,7 +432,7 @@ describe('getConfirmationsForTx', () => {
 
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
     expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
 
@@ -461,7 +468,7 @@ describe('getConfirmationsForTx', () => {
       validator,
       status: validator === validator1 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
     }))
-    getValidatorSuccessTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+    getSuccessExecutionTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
       validator: validatorData.validator,
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       txHash: validatorData.validator === validator1 ? '0x123' : '',
@@ -493,7 +500,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -512,7 +519,7 @@ describe('getConfirmationsForTx', () => {
     expect(subscriptions.length).toEqual(0)
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
     expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
 
@@ -555,7 +562,7 @@ describe('getConfirmationsForTx', () => {
         status:
           validator !== validator2 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
       }))
-    getValidatorSuccessTransaction
+    getSuccessExecutionTransaction
       .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
         validator: validatorData.validator,
         status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
@@ -604,7 +611,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -622,7 +629,7 @@ describe('getConfirmationsForTx', () => {
 
     expect(setResult).toBeCalledTimes(2)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(1)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
     expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
 
@@ -654,7 +661,7 @@ describe('getConfirmationsForTx', () => {
       web3,
       validatorList,
       bridgeContract,
-      confirmationContractMethod,
+      true,
       setResult,
       requiredSignatures,
       setSignatureCollected,
@@ -672,10 +679,10 @@ describe('getConfirmationsForTx', () => {
 
     expect(setResult).toBeCalledTimes(4)
     expect(getValidatorConfirmation).toBeCalledTimes(2)
-    expect(getValidatorSuccessTransaction).toBeCalledTimes(2)
+    expect(getSuccessExecutionTransaction).toBeCalledTimes(2)
     expect(setSignatureCollected).toBeCalledTimes(2)
     expect(setSignatureCollected.mock.calls[0][0]).toEqual(false)
-    expect(setSignatureCollected.mock.calls[1][0]).toEqual(true)
+    expect(setSignatureCollected.mock.calls[1][0]).toEqual([signature, signature])
 
     expect(getValidatorFailedTransaction).toBeCalledTimes(2)
     expect(setFailedConfirmations).toBeCalledTimes(2)

@@ -80,9 +80,9 @@ while [ "$1" != "" ]; do
     docker-compose up -d ui ui-erc20 ui-erc20-native ui-amb-stake-erc20-erc20
 
     docker-compose run -d -p 3000:3000 ui yarn start
-    docker-compose run -d -p 3001:3000 ui-erc20 yarn start
-    docker-compose run -d -p 3002:3000 ui-erc20-native yarn start
-    docker-compose run -d -p 3003:3000 ui-amb-stake-erc20-erc20 yarn start
+    docker-compose run -d -p 3001:3001 ui-erc20 yarn start
+    docker-compose run -d -p 3002:3002 ui-erc20-native yarn start
+    docker-compose run -d -p 3003:3003 ui-amb-stake-erc20-erc20 yarn start
   fi
 
   if [ "$1" == "alm" ]; then
