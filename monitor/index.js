@@ -41,7 +41,6 @@ bridgeRouter.get('/eventsStats', async (req, res, next) => {
   }
 })
 
-
 bridgeRouter.get('/alerts', async (req, res, next) => {
   try {
     const results = await readFile(`./responses/${req.params.bridgeName}/alerts.json`)
