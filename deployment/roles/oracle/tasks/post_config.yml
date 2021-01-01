@@ -42,6 +42,10 @@
   set_fact: composefileoverride="-f docker-compose-transfer.yml"
   when: ORACLE_BRIDGE_MODE == "ERC_TO_NATIVE"
 
+- name: Extend docker compose file for amb
+  set_fact: composefileoverride="-f docker-compose-amb.yml"
+  when: ORACLE_BRIDGE_MODE == "ARBITRARY_MESSAGE"
+
 - name: Install .key config
   template:
     src: key.j2
