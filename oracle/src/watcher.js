@@ -1,12 +1,10 @@
 require('../env')
 const path = require('path')
-const { BN, toBN } = require('web3').utils
 const { connectWatcherToQueue, connection } = require('./services/amqpClient')
-const { getBlockNumber } = require('./tx/web3')
 const { redis } = require('./services/redisClient')
 const logger = require('./services/logger')
 const { getShutdownFlag } = require('./services/shutdownState')
-const { getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
+const { getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
 const { EXIT_CODES } = require('./utils/constants')
 
@@ -27,21 +25,15 @@ const processAMBAffirmationRequests = require('./events/processAMBAffirmationReq
 
 const { getTokensState } = require('./utils/tokenState')
 
-const ZERO = toBN(0)
-const ONE = toBN(1)
-
-const web3Instance = config.web3
-const bridgeContract = new web3Instance.eth.Contract(config.bridgeAbi, config.bridgeContractAddress)
-let { eventContractAddress } = config
-let eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+const { web3, bridgeContract, eventContract, startBlock, pollingInterval, chain } = config.main
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
-let lastProcessedBlock = BN.max(config.startBlock.sub(ONE), ZERO)
+let lastProcessedBlock = Math.max(startBlock - 1, 0)
 
 async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
+    web3.currentProvider.urls.forEach(checkHttps(chain))
 
     await getLastProcessedBlock()
     connectWatcherToQueue({
@@ -72,18 +64,18 @@ async function runMain({ sendToQueue }) {
 
   setTimeout(() => {
     runMain({ sendToQueue })
-  }, config.pollingInterval)
+  }, pollingInterval)
 }
 
 async function getLastProcessedBlock() {
   const result = await redis.get(lastBlockRedisKey)
-  logger.debug({ fromRedis: result, fromConfig: lastProcessedBlock.toString() }, 'Last Processed block obtained')
-  lastProcessedBlock = result ? toBN(result) : lastProcessedBlock
+  logger.debug({ fromRedis: result, fromConfig: lastProcessedBlock }, 'Last Processed block obtained')
+  lastProcessedBlock = result ? parseInt(result, 10) : lastProcessedBlock
 }
 
 function updateLastProcessedBlock(lastBlockNumber) {
   lastProcessedBlock = lastBlockNumber
-  return redis.set(lastBlockRedisKey, lastProcessedBlock.toString())
+  return redis.set(lastBlockRedisKey, lastProcessedBlock)
 }
 
 function processEvents(events) {
@@ -113,28 +105,18 @@ async function checkConditions() {
     case 'erc-native-transfer':
       logger.debug('Getting token address to listen Transfer events')
       state = await getTokensState(bridgeContract, logger)
-      updateEventContract(state.bridgeableTokenAddress)
+      eventContract.options.address = state.bridgeableTokenAddress
       break
     default:
   }
 }
 
-function updateEventContract(address) {
-  if (eventContractAddress !== address) {
-    eventContractAddress = address
-    eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
-  }
-}
-
-async function getLastBlockToProcess() {
-  const lastBlockNumberPromise = getBlockNumber(web3Instance).then(toBN)
-  const requiredBlockConfirmationsPromise = getRequiredBlockConfirmations(bridgeContract).then(toBN)
+async function getLastBlockToProcess(web3, bridgeContract) {
   const [lastBlockNumber, requiredBlockConfirmations] = await Promise.all([
-    lastBlockNumberPromise,
-    requiredBlockConfirmationsPromise
+    getBlockNumber(web3),
+    getRequiredBlockConfirmations(bridgeContract)
   ])
-
-  return lastBlockNumber.sub(requiredBlockConfirmations)
+  return lastBlockNumber - requiredBlockConfirmations
 }
 
 async function main({ sendToQueue }) {
@@ -151,16 +133,16 @@ async function main({ sendToQueue }) {
 
     await checkConditions()
 
-    const lastBlockToProcess = await getLastBlockToProcess()
+    const lastBlockToProcess = await getLastBlockToProcess(web3, bridgeContract)
 
-    if (lastBlockToProcess.lte(lastProcessedBlock)) {
+    if (lastBlockToProcess <= lastProcessedBlock) {
       logger.debug('All blocks already processed')
       return
     }
 
-    const fromBlock = lastProcessedBlock.add(ONE)
-    const rangeEndBlock = config.blockPollingLimit ? fromBlock.add(config.blockPollingLimit) : lastBlockToProcess
-    const toBlock = BN.min(lastBlockToProcess, rangeEndBlock)
+    const fromBlock = lastProcessedBlock + 1
+    const rangeEndBlock = config.blockPollingLimit ? fromBlock + config.blockPollingLimit : lastBlockToProcess
+    const toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
 
     const events = await getEvents({
       contract: eventContract,

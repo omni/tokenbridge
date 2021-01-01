@@ -23,11 +23,12 @@ if (baseConfig.id !== 'erc-native') {
 }
 
 module.exports = {
-  ...baseConfig.bridgeConfig,
-  ...baseConfig.foreignConfig,
+  ...baseConfig,
+  main: {
+    ...baseConfig.foreign,
+    eventContract: new baseConfig.foreign.web3.eth.Contract(ERC20_ABI, initialChecks.bridgeableTokenAddress)
+  },
   event: 'Transfer',
-  eventContractAddress: initialChecks.bridgeableTokenAddress,
-  eventAbi: ERC20_ABI,
   eventFilter: { to: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS },
   queue: 'home-prioritized',
   name: `watcher-${id}`,

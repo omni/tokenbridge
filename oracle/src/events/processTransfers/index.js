@@ -1,35 +1,32 @@
 require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('../../services/HttpListProvider')
-const { BRIDGE_VALIDATORS_ABI, ZERO_ADDRESS } = require('../../../../commons')
+const { ZERO_ADDRESS } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
-const { web3Home, web3Foreign } = require('../../services/web3')
+const { getValidatorContract } = require('../../tx/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 const estimateGas = require('../processAffirmationRequests/estimateGas')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
-let validatorContract = null
-
 function processTransfersBuilder(config) {
-  const homeBridge = new web3Home.eth.Contract(config.homeBridgeAbi, config.homeBridgeAddress)
-  const userRequestForAffirmationAbi = config.foreignBridgeAbi.filter(
+  const { bridgeContract, web3 } = config.home
+
+  const userRequestForAffirmationAbi = config.foreign.bridgeABI.find(
     e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
-  )[0]
-  const tokensSwappedAbi = config.foreignBridgeAbi.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
-  const userRequestForAffirmationHash = web3Home.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
-  const tokensSwappedHash = tokensSwappedAbi ? web3Home.eth.abi.encodeEventSignature(tokensSwappedAbi) : '0x'
+  )
+  const tokensSwappedAbi = config.foreign.bridgeABI.find(e => e.type === 'event' && e.name === 'TokensSwapped')
+  const userRequestForAffirmationHash = web3.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
+  const tokensSwappedHash = tokensSwappedAbi ? web3.eth.abi.encodeEventSignature(tokensSwappedAbi) : '0x'
+
+  let validatorContract = null
 
   return async function processTransfers(transfers) {
     const txToSend = []
 
     if (validatorContract === null) {
-      rootLogger.debug('Getting validator contract address')
-      const validatorContractAddress = await homeBridge.methods.validatorContract().call()
-      rootLogger.debug({ validatorContractAddress }, 'Validator contract address obtained')
-
-      validatorContract = new web3Home.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
+      validatorContract = await getValidatorContract(bridgeContract, web3)
     }
 
     rootLogger.debug(`Processing ${transfers.length} Transfer events`)
@@ -43,10 +40,10 @@ function processTransfersBuilder(config) {
 
         logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
 
-        const receipt = await web3Foreign.eth.getTransactionReceipt(transfer.transactionHash)
+        const receipt = await config.foreign.web3.eth.getTransactionReceipt(transfer.transactionHash)
 
         const existsAffirmationEvent = receipt.logs.some(
-          e => e.address === config.foreignBridgeAddress && e.topics[0] === userRequestForAffirmationHash
+          e => e.address === config.foreign.bridgeAddress && e.topics[0] === userRequestForAffirmationHash
         )
 
         if (existsAffirmationEvent) {
@@ -59,7 +56,7 @@ function processTransfersBuilder(config) {
         }
 
         const existsTokensSwappedEvent = tokensSwappedAbi
-          ? receipt.logs.some(e => e.address === config.foreignBridgeAddress && e.topics[0] === tokensSwappedHash)
+          ? receipt.logs.some(e => e.address === config.foreign.bridgeAddress && e.topics[0] === tokensSwappedHash)
           : false
 
         if (from === ZERO_ADDRESS && existsTokensSwappedEvent) {
@@ -73,8 +70,8 @@ function processTransfersBuilder(config) {
         try {
           logger.debug('Estimate gas')
           gasEstimate = await estimateGas({
-            web3: web3Home,
-            homeBridge,
+            web3,
+            homeBridge: bridgeContract,
             validatorContract,
             recipient: from,
             value,
@@ -100,15 +97,12 @@ function processTransfersBuilder(config) {
           }
         }
 
-        const data = await homeBridge.methods
-          .executeAffirmation(from, value, transfer.transactionHash)
-          .encodeABI({ from: config.validatorAddress })
-
+        const data = bridgeContract.methods.executeAffirmation(from, value, transfer.transactionHash).encodeABI()
         txToSend.push({
           data,
           gasEstimate,
           transactionReference: transfer.transactionHash,
-          to: config.homeBridgeAddress
+          to: config.home.bridgeAddress
         })
       })
       .map(promise => limit(promise))

@@ -6,7 +6,7 @@ const { web3Home, web3HomeRedundant, web3HomeFallback } = require('../src/servic
 const { ORACLE_HOME_TX_RESEND_INTERVAL } = process.env
 
 module.exports = {
-  ...baseConfig.bridgeConfig,
+  ...baseConfig,
   queue: 'home-prioritized',
   oldQueue: 'home',
   id: 'home',
