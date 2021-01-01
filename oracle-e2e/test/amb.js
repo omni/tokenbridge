@@ -191,4 +191,30 @@ describe('arbitrary message bridging', () => {
       })
     })
   })
+  describe('Home to Foreign Async Call', () => {
+    it('should request and receive information from the other chain', async () => {
+      const initialHomeValue = await homeBox.methods.value().call()
+      const initialForeignValue = await foreignBox.methods.value().call()
+
+      assert(!toBN(initialHomeValue).eq(toBN(initialForeignValue)), 'initial values should be different')
+
+      await homeBox.methods
+        .getValueFromTheOtherNetwork(amb.foreign, amb.foreignBox)
+        .send({
+          from: user.address,
+          gas: '400000'
+        })
+        .catch(e => {
+          console.error(e)
+        })
+
+      // check that value changed and balance decreased
+      await uniformRetry(async retry => {
+        const value = await homeBox.methods.value().call()
+        if (!toBN(value).eq(toBN(initialForeignValue))) {
+          retry()
+        }
+      })
+    })
+  })
 })

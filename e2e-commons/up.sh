@@ -27,6 +27,7 @@ startValidator () {
       docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:signature-request
       docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:collected-signatures
       docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:affirmation-request
+      docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:information-request
     fi
     docker-compose $1 run $2 $3 -d oracle-amb yarn sender:home
     docker-compose $1 run $2 $3 -d oracle-amb yarn sender:foreign
@@ -39,6 +40,7 @@ startAMBValidator () {
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:signature-request
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:collected-signatures
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:affirmation-request
+    docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:information-request
     docker-compose $1 run $2 $3 -d oracle-amb yarn sender:home
     docker-compose $1 run $2 $3 -d oracle-amb yarn sender:foreign
     docker-compose $1 run $2 $3 -d oracle-amb yarn manager:shutdown
