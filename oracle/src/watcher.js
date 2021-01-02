@@ -159,7 +159,7 @@ async function main({ sendToQueue }) {
     if (events.length) {
       let job
 
-      // for async information requests, requests are processed in batch, only if they are located a single block
+      // for async information requests, requests are processed in batches only if they are located in the same block
       // this brings two benefits:
       // 1) corresponding foreign block for specific timestamp is searched only once per events batch
       // 2) watcher can carefully wait until corresponding foreign block has enough confirmations
@@ -175,10 +175,11 @@ async function main({ sendToQueue }) {
         const lastForeignBlockNumber = await getLastBlockToProcess(foreign.web3, foreign.bridgeContract)
         const lastForeignBlock = await getBlock(foreign.web3, lastForeignBlockNumber)
 
-        const remainingDelay = events[0].timestamp - lastForeignBlock.timestamp
+        const remainingDelay = events[0].returnValues.timestamp - lastForeignBlock.timestamp
         if (remainingDelay > 0) {
           logger.debug(`Not enough foreign block confirmations, waiting ${remainingDelay} seconds`)
           nextPollingInterval = Math.max(pollingInterval, remainingDelay * 1000)
+          return
         }
 
         job = await processAMBInformationRequests(events, lastForeignBlock)
