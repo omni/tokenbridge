@@ -29,7 +29,7 @@ async function getBlockNumber(web3) {
 
 async function getBlock(web3, number) {
   try {
-    logger.debug(`Getting block ${number.toString()}`)
+    logger.debug(`Getting block ${number}`)
     const block = await web3.eth.getBlock(number)
     logger.debug({ number: block.number, timestamp: block.timestamp, hash: block.hash }, 'Block obtained')
     return block

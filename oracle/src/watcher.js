@@ -147,42 +147,52 @@ async function main({ sendToQueue }) {
     const rangeEndBlock = config.blockPollingLimit ? fromBlock + config.blockPollingLimit : lastBlockToProcess
     const toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
 
-    let events = await getEvents({
+    const events = (await getEvents({
       contract: eventContract,
       event: config.event,
       fromBlock,
       toBlock,
       filter: config.eventFilter
-    })
+    })).sort((a, b) => a.blockNumber - b.blockNumber)
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
       let job
 
-      // for async information requests, requests are processed in batches only if they are located in the same block
+      // for async information requests, requests are processed in batches only if they are located in the same block.
       // this brings two benefits:
-      // 1) corresponding foreign block for specific timestamp is searched only once per events batch
-      // 2) watcher can carefully wait until corresponding foreign block has enough confirmations
+      // 1) corresponding foreign block for the specific timestamp is searched only once per events batch
+      // 2) watcher can carefully wait until corresponding foreign block has enough confirmations, without doing extra RPC requests
       if (config.id === 'amb-information-request') {
         const { foreign } = config
 
-        events = events.sort(event => event.blockNumber)
+        // obtain block number and timestamp for events in the earliest block
         const batchBlockNumber = events[0].blockNumber
-        const nextBatchBlockNumber = events.find(event => event.blockNumber > batchBlockNumber)
-        lastBlockToProcess = nextBatchBlockNumber ? nextBatchBlockNumber - 1 : batchBlockNumber
-        events = events.filter(event => event.blockNumber === batchBlockNumber)
+        const batchTimestamp = events[0].returnValues.timestamp
 
+        // obtain block number of the next upcoming batch, if any
+        const nextBatchBlockNumber = events.find(event => event.blockNumber > batchBlockNumber)
+        const batchEvents = events.filter(event => event.blockNumber === batchBlockNumber)
+        // if there are some other events in the later blocks,
+        // adjust lastProcessedBlock so that these events will be processed again on the next iteration
+        if (nextBatchBlockNumber) {
+          lastBlockToProcess = nextBatchBlockNumber - 1
+        }
+
+        // obtain last confirmed block on the foreign side
         const lastForeignBlockNumber = await getLastBlockToProcess(foreign.web3, foreign.bridgeContract)
         const lastForeignBlock = await getBlock(foreign.web3, lastForeignBlockNumber)
 
-        const remainingDelay = events[0].returnValues.timestamp - lastForeignBlock.timestamp
+        const remainingDelay = batchTimestamp - lastForeignBlock.timestamp
+        // if the requested timestamp from UserRequestForInformation events is higher
+        // than the timestamp of the last confirmed foreign block, the watcher process is suspended for X seconds
         if (remainingDelay > 0) {
           logger.debug(`Not enough foreign block confirmations, waiting ${remainingDelay} seconds`)
           nextPollingInterval = Math.max(pollingInterval, remainingDelay * 1000)
           return
         }
 
-        job = await processAMBInformationRequests(events, lastForeignBlock)
+        job = await processAMBInformationRequests(batchEvents, lastForeignBlock)
       } else {
         job = await processEvents(events)
       }

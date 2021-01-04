@@ -3,7 +3,7 @@ const path = require('path')
 const { isAttached, connectWatcherToQueue, connection } = require('./services/amqpClient')
 const logger = require('./services/logger')
 const GasPrice = require('./services/gasPrice')
-const { getNonce, getChainId, getEventsFromTx } = require('./tx/web3')
+const { getNonce, getChainId, getEventsFromTx, getBlock } = require('./tx/web3')
 const { sendTx } = require('./tx/sendTx')
 const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
@@ -25,10 +25,9 @@ const processTransfers = require('./events/processTransfers')(config)
 const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
+const processAMBInformationRequests = require('./events/processAMBInformationRequests')(config)
 
-const web3Instance = config.web3
-const { eventContractAddress } = config
-const eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+const { web3, eventContract } = config.main
 
 let attached
 
@@ -36,7 +35,7 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
+    web3.currentProvider.urls.forEach(checkHttps(config.chain))
 
     attached = await isAttached()
     if (attached) {
@@ -101,7 +100,7 @@ function processEvents(events) {
 async function main({ sendJob, txHash }) {
   try {
     const events = await getEventsFromTx({
-      web3: web3Instance,
+      web3,
       contract: eventContract,
       event: config.event,
       txHash,
@@ -110,7 +109,25 @@ async function main({ sendJob, txHash }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      const job = await processEvents(events)
+      let job
+
+      if (config.id === 'amb-information-request') {
+        const { foreign } = config
+
+        const batchTimestamp = events[0].returnValues.timestamp
+
+        // obtain last block on the foreign side
+        const lastForeignBlock = await getBlock(foreign.web3, 'latest')
+
+        if (batchTimestamp > lastForeignBlock.timestamp) {
+          logger.debug(`Not enough foreign block confirmations`)
+          return
+        }
+
+        job = await processAMBInformationRequests(events, lastForeignBlock)
+      } else {
+        job = await processEvents(events)
+      }
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {
@@ -128,8 +145,8 @@ async function main({ sendJob, txHash }) {
 
 async function sendJobTx(jobs) {
   const gasPrice = await GasPrice.start(config.chain, true)
-  const chainId = await getChainId(web3Instance)
-  let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
+  const chainId = await getChainId(web3)
+  let nonce = await getNonce(web3, ORACLE_VALIDATOR_ADDRESS)
 
   await syncForEach(jobs, async job => {
     let gasLimit
@@ -150,7 +167,7 @@ async function sendJobTx(jobs) {
         privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
         to: job.to,
         chainId,
-        web3: web3Instance
+        web3
       })
 
       nonce++
@@ -166,7 +183,7 @@ async function sendJobTx(jobs) {
       )
 
       if (e.message.toLowerCase().includes('insufficient funds')) {
-        const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
+        const currentBalance = await web3.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
         const minimumBalance = gasLimit.multipliedBy(gasPrice)
         logger.error(
           `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
