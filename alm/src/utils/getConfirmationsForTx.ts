@@ -49,17 +49,22 @@ export const getConfirmationsForTx = async (
 
   setResult((prevConfirmations: ConfirmationParam[]) => {
     if (prevConfirmations && prevConfirmations.length) {
-      successConfirmations.forEach(validatorData => {
+      const newValidatorConfirmations = prevConfirmations
+      validatorConfirmations.forEach(validatorData => {
         const index = prevConfirmations.findIndex(e => e.validator === validatorData.validator)
-        validatorConfirmations[index] = validatorData
+        if (prevConfirmations[index].status === validatorData.status) {
+          newValidatorConfirmations[index] = prevConfirmations[index]
+        }
       })
-      return prevConfirmations
+      return newValidatorConfirmations
     } else {
       return validatorConfirmations
     }
   })
 
   const notSuccessConfirmations = validatorConfirmations.filter(c => c.status !== VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
+
+  setSignatureCollected(successConfirmations.length === requiredSignatures)
 
   // If signatures not collected, look for pending transactions
   let pendingConfirmationsResult = false
@@ -113,7 +118,6 @@ export const getConfirmationsForTx = async (
     shouldRetry = true
   }
 
-  let signatureCollectedResult: boolean | string[] = false
   if (successConfirmations.length === requiredSignatures) {
     // If signatures collected, it should set other signatures not found as not required
     const notRequiredConfirmations = missingConfirmations.map(c => ({
@@ -125,11 +129,12 @@ export const getConfirmationsForTx = async (
       const index = validatorConfirmations.findIndex(e => e.validator === validatorData.validator)
       validatorConfirmations[index] = validatorData
     })
-    signatureCollectedResult = true
 
     if (fromHome) {
-      signatureCollectedResult = await Promise.all(
-        Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
+      setSignatureCollected(
+        await Promise.all(
+          Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
+        )
       )
     }
   }
@@ -158,7 +163,6 @@ export const getConfirmationsForTx = async (
   setResult(updatedValidatorConfirmations)
   setFailedConfirmations(failedConfirmationsResult)
   setPendingConfirmations(pendingConfirmationsResult)
-  setSignatureCollected(signatureCollectedResult)
 
   // Retry if not all transaction were found for validator confirmations
   if (successConfirmationWithTxFound.length < successConfirmationWithData.length) {
