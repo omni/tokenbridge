@@ -58,7 +58,7 @@ export const ManualExecutionButton = ({
         return
       }
 
-      if (!library || !foreign.bridgeContract) return
+      if (!library || !foreign.bridgeContract || !signatureCollected || !signatureCollected.length) return
 
       const signatures = packSignatures(signatureCollected.map(signatureToVRS))
       const data = foreign.bridgeContract.methods.executeSignatures(messageData, signatures).encodeABI()
