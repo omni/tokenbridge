@@ -122,14 +122,16 @@ describe('getConfirmationsForTx', () => {
     expect(setPendingConfirmations).toBeCalledTimes(1)
     expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
-    expect(setResult.mock.calls[0][0]()).toEqual(
+    const res1 = setResult.mock.calls[0][0]()
+    const res2 = setResult.mock.calls[1][0](res1)
+    expect(res1).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED }
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
-    expect(setResult.mock.calls[1][0]).toEqual(
+    expect(res2).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
@@ -187,7 +189,7 @@ describe('getConfirmationsForTx', () => {
 
     unsubscribe()
 
-    expect(setResult).toBeCalledTimes(2)
+    expect(setResult).toBeCalledTimes(1)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
@@ -252,7 +254,7 @@ describe('getConfirmationsForTx', () => {
     unsubscribe()
 
     expect(subscriptions.length).toEqual(0)
-    expect(setResult).toBeCalledTimes(2)
+    expect(setResult).toBeCalledTimes(3)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(2)
@@ -267,14 +269,24 @@ describe('getConfirmationsForTx', () => {
     expect(setPendingConfirmations).toBeCalledTimes(1)
     expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
-    expect(setResult.mock.calls[0][0]()).toEqual(
+    const res1 = setResult.mock.calls[0][0]()
+    const res2 = setResult.mock.calls[1][0](res1)
+    const res3 = setResult.mock.calls[2][0](res2)
+    expect(res1).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+      ])
+    )
+    expect(res2).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED }
       ])
     )
-    expect(setResult.mock.calls[1][0]).toEqual(
+    expect(res3).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
@@ -341,7 +353,7 @@ describe('getConfirmationsForTx', () => {
     unsubscribe()
 
     expect(subscriptions.length).toEqual(0)
-    expect(setResult).toBeCalledTimes(2)
+    expect(setResult).toBeCalledTimes(4)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(2)
@@ -356,7 +368,27 @@ describe('getConfirmationsForTx', () => {
     expect(setPendingConfirmations).toBeCalledTimes(1)
     expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
-    expect(setResult.mock.calls[0][0]()).toEqual(
+    const res1 = setResult.mock.calls[0][0]()
+    const res2 = setResult.mock.calls[1][0](res1)
+    const res3 = setResult.mock.calls[2][0](res2)
+    const res4 = setResult.mock.calls[3][0](res3)
+    expect(res1).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+      ])
+    )
+    expect(res2).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+      ])
+    )
+    expect(res3).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
@@ -364,7 +396,7 @@ describe('getConfirmationsForTx', () => {
         { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED }
       ])
     )
-    expect(setResult.mock.calls[1][0]).toEqual(
+    expect(res4).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
@@ -433,7 +465,7 @@ describe('getConfirmationsForTx', () => {
 
     unsubscribe()
 
-    expect(setResult).toBeCalledTimes(2)
+    expect(setResult).toBeCalledTimes(4)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
@@ -447,14 +479,32 @@ describe('getConfirmationsForTx', () => {
     expect(setPendingConfirmations).toBeCalledTimes(1)
     expect(setPendingConfirmations.mock.calls[0][0]).toEqual(true)
 
-    expect(setResult.mock.calls[0][0]()).toEqual(
+    const res1 = setResult.mock.calls[0][0]()
+    const res2 = setResult.mock.calls[1][0](res1)
+    const res3 = setResult.mock.calls[2][0](res2)
+    const res4 = setResult.mock.calls[3][0](res3)
+    expect(res1).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+      ])
+    )
+    expect(res2).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+      ])
+    )
+    expect(res3).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
       ])
     )
-    expect(setResult.mock.calls[1][0]).toEqual(
+    expect(res4).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
@@ -520,7 +570,7 @@ describe('getConfirmationsForTx', () => {
     unsubscribe()
 
     expect(subscriptions.length).toEqual(0)
-    expect(setResult).toBeCalledTimes(2)
+    expect(setResult).toBeCalledTimes(3)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
@@ -534,14 +584,24 @@ describe('getConfirmationsForTx', () => {
     expect(setPendingConfirmations).toBeCalledTimes(1)
     expect(setPendingConfirmations.mock.calls[0][0]).toEqual(false)
 
-    expect(setResult.mock.calls[0][0]()).toEqual(
+    const res1 = setResult.mock.calls[0][0]()
+    const res2 = setResult.mock.calls[1][0](res1)
+    const res3 = setResult.mock.calls[2][0](res2)
+    expect(res1).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+      ])
+    )
+    expect(res2).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 }
       ])
     )
-    expect(setResult.mock.calls[1][0]).toEqual(
+    expect(res3).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
@@ -630,7 +690,7 @@ describe('getConfirmationsForTx', () => {
 
     unsubscribe()
 
-    expect(setResult).toBeCalledTimes(2)
+    expect(setResult).toBeCalledTimes(4)
     expect(getValidatorConfirmation).toBeCalledTimes(1)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(1)
     expect(setSignatureCollected).toBeCalledTimes(1)
@@ -644,14 +704,32 @@ describe('getConfirmationsForTx', () => {
     expect(setPendingConfirmations).toBeCalledTimes(1)
     expect(setPendingConfirmations.mock.calls[0][0]).toEqual(true)
 
-    expect(setResult.mock.calls[0][0]()).toEqual(
+    const res1 = setResult.mock.calls[0][0]()
+    const res2 = setResult.mock.calls[1][0](res1)
+    const res3 = setResult.mock.calls[2][0](res2)
+    const res4 = setResult.mock.calls[3][0](res3)
+    expect(res1).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+      ])
+    )
+    expect(res2).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+      ])
+    )
+    expect(res3).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
       ])
     )
-    expect(setResult.mock.calls[1][0]).toEqual(
+    expect(res4).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
@@ -680,7 +758,7 @@ describe('getConfirmationsForTx', () => {
 
     unsubscribe()
 
-    expect(setResult).toBeCalledTimes(4)
+    expect(setResult).toBeCalledTimes(7)
     expect(getValidatorConfirmation).toBeCalledTimes(2)
     expect(getSuccessExecutionTransaction).toBeCalledTimes(2)
     expect(setSignatureCollected).toBeCalledTimes(3)
@@ -698,14 +776,24 @@ describe('getConfirmationsForTx', () => {
     expect(setPendingConfirmations.mock.calls[0][0]).toEqual(true)
     expect(setPendingConfirmations.mock.calls[1][0]).toEqual(false)
 
-    expect(setResult.mock.calls[2][0]()).toEqual(
+    const res5 = setResult.mock.calls[4][0](res4)
+    const res6 = setResult.mock.calls[5][0](res5)
+    const res7 = setResult.mock.calls[6][0](res6)
+    expect(res5).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS }
       ])
     )
-    expect(setResult.mock.calls[3][0]).toEqual(
+    expect(res6).toEqual(
+      expect.arrayContaining([
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS }
+      ])
+    )
+    expect(res7).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
