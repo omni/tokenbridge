@@ -82,3 +82,5 @@ MONITOR_CACHE_EVENTS | If set to true, monitor will cache obtained events for ot
 MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST | File with a list of addresses, separated by newlines. If set, determines the privileged set of accounts whose requests should be automatically processed by the CollectedSignatures watcher. | string
 MONITOR_HOME_TO_FOREIGN_BLOCK_LIST | File with a list of addresses, separated by newlines. If set, determines the set of accounts whose requests should be marked as unclaimed. Has a lower priority than the `MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST`. | string
 MONITOR_HOME_TO_FOREIGN_CHECK_SENDER | If set to `true`, instructs the oracle to do an extra check for transaction origin in the block/allowance list. `false` by default. | `true` / `false`
+MONITOR_HOME_VALIDATORS_BALANCE_ENABLE | If set, defines the list of home validator addresses for which balance should be checked. | `string`
+MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE | If set, defines the list of foreign validator addresses for which balance should be checked. | `string`
