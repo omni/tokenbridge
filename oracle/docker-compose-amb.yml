@@ -6,13 +6,13 @@ services:
       file: docker-compose.yml
       service: rabbit
     networks:
-      - net_rabbit_bridge_transfer
+      - net_rabbit_bridge_information
   redis:
     extends:
       file: docker-compose.yml
       service: redis
     networks:
-      - net_db_bridge_transfer
+      - net_db_bridge_information
   bridge_request:
     extends:
       file: docker-compose.yml
