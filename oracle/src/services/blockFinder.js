@@ -24,14 +24,14 @@ async function makeBlockFinder(name, web3) {
       return web3.eth.getBlock(number)
     }
 
-    let blockDiff = Infinity
+    let prevBlockDiff = Infinity
     while (true) {
       const timeDiff = currentBlock.timestamp - timestamp
-      const newBlockDiff = Math.ceil(timeDiff / averageBlockTime)
-      if (Math.abs(newBlockDiff) < 2 || Math.abs(newBlockDiff) >= Math.abs(blockDiff)) {
+      const blockDiff = Math.ceil(timeDiff / averageBlockTime)
+      if (Math.abs(blockDiff) < 3 || Math.abs(blockDiff) >= Math.abs(prevBlockDiff)) {
         break
       }
-      blockDiff = newBlockDiff
+      prevBlockDiff = blockDiff
       const blockNumber = currentBlock.number - blockDiff
       logger.debug(`Moving ${-blockDiff} blocks from #${currentBlock.number} to #${blockNumber}`)
       currentBlock = await getBlock(blockNumber)
