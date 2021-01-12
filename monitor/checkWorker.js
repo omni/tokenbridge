@@ -12,10 +12,6 @@ const { web3Home } = require('./utils/web3')
 
 const { COMMON_HOME_BRIDGE_ADDRESS, MONITOR_BRIDGE_NAME } = process.env
 
-const MONITOR_VALIDATOR_HOME_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_HOME_TX_LIMIT) || 0
-const MONITOR_VALIDATOR_FOREIGN_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) || 0
-const MONITOR_TX_NUMBER_THRESHOLD = Number(process.env.MONITOR_TX_NUMBER_THRESHOLD) || 100
-
 const { HOME_ERC_TO_ERC_ABI } = require('../commons')
 
 async function checkWorker() {
@@ -44,27 +40,6 @@ async function checkWorker() {
     logger.debug('calling validators()')
     const vBalances = await validators(bridgeMode)
     if (!vBalances) throw new Error('vBalances is empty: ' + JSON.stringify(vBalances))
-
-    vBalances.homeOk = true
-    vBalances.foreignOk = true
-
-    if (MONITOR_VALIDATOR_HOME_TX_LIMIT) {
-      for (const hv in vBalances.home.validators) {
-        if (vBalances.home.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
-          vBalances.homeOk = false
-          break
-        }
-      }
-    }
-
-    if (MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) {
-      for (const hv in vBalances.foreign.validators) {
-        if (vBalances.foreign.validators[hv].leftTx < MONITOR_TX_NUMBER_THRESHOLD) {
-          vBalances.foreignOk = false
-          break
-        }
-      }
-    }
 
     vBalances.ok = vBalances.homeOk && vBalances.foreignOk
     vBalances.health = true

@@ -16,10 +16,13 @@ const {
   COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL,
   COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE,
   COMMON_FOREIGN_GAS_PRICE_FALLBACK,
-  COMMON_FOREIGN_GAS_PRICE_FACTOR
+  COMMON_FOREIGN_GAS_PRICE_FACTOR,
+  MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE,
+  MONITOR_HOME_VALIDATORS_BALANCE_ENABLE
 } = process.env
 const MONITOR_VALIDATOR_HOME_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_HOME_TX_LIMIT) || 0
 const MONITOR_VALIDATOR_FOREIGN_TX_LIMIT = Number(process.env.MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) || 0
+const MONITOR_TX_NUMBER_THRESHOLD = Number(process.env.MONITOR_TX_NUMBER_THRESHOLD) || 100
 
 const homeGasPriceSupplierOpts = {
   speedType: COMMON_HOME_GAS_PRICE_SPEED_TYPE,
@@ -31,12 +34,6 @@ const foreignGasPriceSupplierOpts = {
   speedType: COMMON_FOREIGN_GAS_PRICE_SPEED_TYPE,
   factor: COMMON_FOREIGN_GAS_PRICE_FACTOR,
   logger
-}
-
-const asyncForEach = async (array, callback) => {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array)
-  }
 }
 
 async function main(bridgeMode) {
@@ -109,53 +106,61 @@ async function main(bridgeMode) {
   }
 
   let validatorsMatch = true
-  logger.debug('calling asyncForEach foreignValidators foreignVBalances')
-  await asyncForEach(foreignValidators, async v => {
-    const balance = await web3Foreign.eth.getBalance(v)
-    if (MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) {
-      const leftTx = Web3Utils.toBN(balance)
-        .div(foreignTxCost)
-        .toString(10)
-      foreignVBalances[v] = {
-        balance: Web3Utils.fromWei(balance),
-        leftTx: Number(leftTx),
-        gasPrice: Number(foreignGasPriceGwei)
+  const foreignValidatorsWithBalanceCheck =
+    typeof MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE === 'string'
+      ? MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE.split(' ')
+      : foreignValidators
+  logger.debug('getting foreignValidators balances')
+  await Promise.all(
+    foreignValidators.map(async v => {
+      foreignVBalances[v] = {}
+      if (foreignValidatorsWithBalanceCheck.includes(v)) {
+        const balance = await web3Foreign.eth.getBalance(v)
+        foreignVBalances[v].balance = Web3Utils.fromWei(balance)
+        if (MONITOR_VALIDATOR_FOREIGN_TX_LIMIT) {
+          foreignVBalances[v].leftTx = Number(
+            Web3Utils.toBN(balance)
+              .div(foreignTxCost)
+              .toString(10)
+          )
+          foreignVBalances[v].gasPrice = parseFloat(foreignGasPriceGwei)
+        }
       }
-    } else {
-      foreignVBalances[v] = {
-        balance: Web3Utils.fromWei(balance)
-      }
-    }
 
-    if (!homeValidators.includes(v)) {
-      validatorsMatch = false
-      foreignVBalances[v].onlyOnForeign = true
-    }
-  })
-
-  logger.debug('calling asyncForEach homeValidators homeVBalances')
-  await asyncForEach(homeValidators, async v => {
-    const balance = await web3Home.eth.getBalance(v)
-    if (MONITOR_VALIDATOR_HOME_TX_LIMIT) {
-      const leftTx = Web3Utils.toBN(balance)
-        .div(homeTxCost)
-        .toString(10)
-      homeVBalances[v] = {
-        balance: Web3Utils.fromWei(balance),
-        leftTx: Number(leftTx),
-        gasPrice: Number(homeGasPriceGwei)
+      if (!homeValidators.includes(v)) {
+        validatorsMatch = false
+        foreignVBalances[v].onlyOnForeign = true
       }
-    } else {
-      homeVBalances[v] = {
-        balance: Web3Utils.fromWei(balance)
-      }
-    }
+    })
+  )
 
-    if (!foreignValidators.includes(v)) {
-      validatorsMatch = false
-      homeVBalances[v].onlyOnHome = true
-    }
-  })
+  const homeValidatorsWithBalanceCheck =
+    typeof MONITOR_HOME_VALIDATORS_BALANCE_ENABLE === 'string'
+      ? MONITOR_HOME_VALIDATORS_BALANCE_ENABLE.split(' ')
+      : homeValidators
+  logger.debug('calling homeValidators balances')
+  await Promise.all(
+    homeValidators.map(async v => {
+      homeVBalances[v] = {}
+      if (homeValidatorsWithBalanceCheck.includes(v)) {
+        const balance = await web3Home.eth.getBalance(v)
+        homeVBalances[v].balance = Web3Utils.fromWei(balance)
+        if (MONITOR_VALIDATOR_HOME_TX_LIMIT) {
+          homeVBalances[v].leftTx = Number(
+            Web3Utils.toBN(balance)
+              .div(homeTxCost)
+              .toString(10)
+          )
+          homeVBalances[v].gasPrice = parseFloat(homeGasPriceGwei)
+        }
+      }
+
+      if (!foreignValidators.includes(v)) {
+        validatorsMatch = false
+        homeVBalances[v].onlyOnHome = true
+      }
+    })
+  )
 
   logger.debug('calling homeBridgeValidators.methods.requiredSignatures().call()')
   const reqSigHome = await homeBridgeValidators.methods.requiredSignatures().call()
@@ -164,20 +169,22 @@ async function main(bridgeMode) {
   logger.debug('Done')
   return {
     home: {
-      validators: {
-        ...homeVBalances
-      },
+      validators: homeVBalances,
       requiredSignatures: Number(reqSigHome)
     },
     foreign: {
-      validators: {
-        ...foreignVBalances
-      },
+      validators: foreignVBalances,
       requiredSignatures: Number(reqSigForeign)
     },
     requiredSignaturesMatch: reqSigHome === reqSigForeign,
     validatorsMatch,
-    lastChecked: Math.floor(Date.now() / 1000)
+    lastChecked: Math.floor(Date.now() / 1000),
+    homeOk: Object.values(homeVBalances)
+      .filter(vb => typeof vb.leftTx === 'number')
+      .every(vb => vb.leftTx >= MONITOR_TX_NUMBER_THRESHOLD),
+    foreignOk: Object.values(foreignVBalances)
+      .filter(vb => typeof vb.leftTx === 'number')
+      .every(vb => vb.leftTx >= MONITOR_TX_NUMBER_THRESHOLD)
   }
 }
 

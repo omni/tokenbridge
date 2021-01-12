@@ -42,7 +42,6 @@ export interface BasicConfirmationParam {
 export interface ConfirmationParam extends BasicConfirmationParam {
   txHash: string
   timestamp: number
-  signature?: string
 }
 
 export interface ExecutionData {
