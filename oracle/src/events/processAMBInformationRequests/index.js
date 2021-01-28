@@ -1,14 +1,32 @@
 require('dotenv').config()
 const promiseLimit = require('promise-limit')
+const { soliditySha3 } = require('web3').utils
 const { HttpListProviderError } = require('../../services/HttpListProvider')
 const rootLogger = require('../../services/logger')
 const makeBlockFinder = require('../../services/blockFinder')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
-const { getValidatorContract } = require('../../tx/web3')
+const { getValidatorContract, getBlock } = require('../../tx/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
+
+const asyncCalls = {
+  ...require('./calls/ethCall'),
+  ...require('./calls/ethBlockNumber'),
+  ...require('./calls/ethGetBlockByNumber'),
+  ...require('./calls/ethGetBlockByHash'),
+  ...require('./calls/ethGetTransactionByHash'),
+  ...require('./calls/ethGetTransactionReceipt'),
+  ...require('./calls/ethGetBalance'),
+  ...require('./calls/ethGetTransactionCount'),
+  ...require('./calls/ethGetStorageAt')
+}
+
+const asyncCallsSelectorsMapping = {}
+Object.keys(asyncCalls).forEach(method => {
+  asyncCallsSelectorsMapping[soliditySha3(method)] = method
+})
 
 function processInformationRequestsBuilder(config) {
   const { home, foreign } = config
@@ -16,7 +34,7 @@ function processInformationRequestsBuilder(config) {
   let validatorContract = null
   let blockFinder = null
 
-  return async function processInformationRequests(informationRequests, lastForeignBlock) {
+  return async function processInformationRequests(informationRequests, opts) {
     const txToSend = []
 
     if (validatorContract === null) {
@@ -28,33 +46,42 @@ function processInformationRequestsBuilder(config) {
       blockFinder = await makeBlockFinder('foreign', foreign.web3)
     }
 
-    let closestForeignBlock
-
-    if (informationRequests.length > 0) {
-      closestForeignBlock = await blockFinder(informationRequests[0].returnValues.timestamp, lastForeignBlock)
+    const homeBlock = await getBlock(home.web3, opts.homeBlockNumber)
+    const lastForeignBlock = await getBlock(foreign.web3, opts.foreignBlockNumber)
+    if (homeBlock.timestamp > lastForeignBlock.timestamp) {
+      rootLogger.debug(
+        { homeTimestamp: homeBlock.timestamp, foreignTimestamp: lastForeignBlock.timestamp },
+        `Waiting for the closest foreign block to be confirmed`
+      )
+      throw new Error('Waiting for the closest foreign block to be confirmed')
     }
+    const foreignClosestBlock = await blockFinder(homeBlock.timestamp, lastForeignBlock)
 
     rootLogger.debug(`Processing ${informationRequests.length} UserRequestForInformation events`)
     const callbacks = informationRequests
       .map(informationRequest => async () => {
-        const { messageId, executor, data, from, gas } = informationRequest.returnValues
+        const { messageId, requestSelector, data } = informationRequest.returnValues
 
         const logger = rootLogger.child({
           eventTransactionHash: informationRequest.transactionHash,
           eventMessageId: messageId
         })
 
-        const [status, result] = await foreign.web3.eth
-          .call(
-            {
-              from,
-              to: executor,
-              data,
-              gas
-            },
-            closestForeignBlock.number
-          )
-          .then(result => [true, result], err => [false, err.data])
+        const asyncCallMethod = asyncCallsSelectorsMapping[requestSelector]
+
+        if (!asyncCallMethod) {
+          logger.warn({ requestSelector }, 'Unknown async request selector received')
+          return
+        }
+        logger.warn({ requestSelector, method: asyncCallMethod, data }, 'Processing async request')
+
+        const call = asyncCalls[asyncCallMethod]
+        const [status, result] = await call(config, informationRequest, foreignClosestBlock).catch(e => {
+          if (e instanceof HttpListProviderError) {
+            throw e
+          }
+          return [false, '0x']
+        })
 
         let gasEstimate
         try {

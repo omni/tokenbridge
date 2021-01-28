@@ -4,7 +4,7 @@ const { connectWatcherToQueue, connection } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const logger = require('./services/logger')
 const { getShutdownFlag } = require('./services/shutdownState')
-const { getBlock, getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
+const { getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
 const { EXIT_CODES } = require('./utils/constants')
 
@@ -29,7 +29,6 @@ const { getTokensState } = require('./utils/tokenState')
 const { web3, bridgeContract, eventContract, startBlock, pollingInterval, chain } = config.main
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
 let lastProcessedBlock = Math.max(startBlock - 1, 0)
-let nextPollingInterval = pollingInterval
 
 async function initialize() {
   try {
@@ -66,8 +65,7 @@ async function runMain({ sendToQueue }) {
 
   setTimeout(() => {
     runMain({ sendToQueue })
-  }, nextPollingInterval)
-  nextPollingInterval = pollingInterval
+  }, pollingInterval)
 }
 
 async function getLastProcessedBlock() {
@@ -159,16 +157,10 @@ async function main({ sendToQueue }) {
     if (events.length) {
       let job
 
-      // for async information requests, requests are processed in batches only if they are located in the same block.
-      // this brings two benefits:
-      // 1) corresponding foreign block for the specific timestamp is searched only once per events batch
-      // 2) watcher can carefully wait until corresponding foreign block has enough confirmations, without doing extra RPC requests
+      // for async information requests, requests are processed in batches only if they are located in the same block
       if (config.id === 'amb-information-request') {
-        const { foreign } = config
-
         // obtain block number and timestamp for events in the earliest block
         const batchBlockNumber = events[0].blockNumber
-        const batchTimestamp = events[0].returnValues.timestamp
 
         // obtain block number of the next upcoming batch, if any
         const nextBatchBlockNumber = events.find(event => event.blockNumber > batchBlockNumber)
@@ -179,20 +171,12 @@ async function main({ sendToQueue }) {
           lastBlockToProcess = nextBatchBlockNumber - 1
         }
 
-        // obtain last confirmed block on the foreign side
-        const lastForeignBlockNumber = await getLastBlockToProcess(foreign.web3, foreign.bridgeContract)
-        const lastForeignBlock = await getBlock(foreign.web3, lastForeignBlockNumber)
-
-        const remainingDelay = batchTimestamp - lastForeignBlock.timestamp
-        // if the requested timestamp from UserRequestForInformation events is higher
-        // than the timestamp of the last confirmed foreign block, the watcher process is suspended for X seconds
-        if (remainingDelay > 0) {
-          logger.debug(`Not enough foreign block confirmations, waiting ${remainingDelay} seconds`)
-          nextPollingInterval = Math.max(pollingInterval, remainingDelay * 1000)
-          return
+        const opts = {
+          homeBlockNumber: batchBlockNumber,
+          foreignBlockNumber: await getLastBlockToProcess(config.foreign.web3, config.foreign.bridgeContract)
         }
 
-        job = await processAMBInformationRequests(batchEvents, lastForeignBlock)
+        job = await processAMBInformationRequests(batchEvents, opts)
       } else {
         job = await processEvents(events)
       }
