@@ -163,12 +163,12 @@ async function main({ sendToQueue }) {
         const batchBlockNumber = events[0].blockNumber
 
         // obtain block number of the next upcoming batch, if any
-        const nextBatchBlockNumber = events.find(event => event.blockNumber > batchBlockNumber)
+        const nextBatchEvent = events.find(event => event.blockNumber > batchBlockNumber)
         const batchEvents = events.filter(event => event.blockNumber === batchBlockNumber)
         // if there are some other events in the later blocks,
         // adjust lastProcessedBlock so that these events will be processed again on the next iteration
-        if (nextBatchBlockNumber) {
-          lastBlockToProcess = nextBatchBlockNumber - 1
+        if (nextBatchEvent) {
+          lastBlockToProcess = nextBatchEvent.blockNumber - 1
         }
 
         const opts = {
