@@ -3,7 +3,7 @@ const path = require('path')
 const { isAttached, connectWatcherToQueue, connection } = require('./services/amqpClient')
 const logger = require('./services/logger')
 const GasPrice = require('./services/gasPrice')
-const { getNonce, getChainId, getEventsFromTx, getBlock } = require('./tx/web3')
+const { getNonce, getChainId, getEventsFromTx } = require('./tx/web3')
 const { sendTx } = require('./tx/sendTx')
 const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
@@ -92,6 +92,8 @@ function processEvents(events) {
       return processAMBCollectedSignatures(events)
     case 'amb-affirmation-request':
       return processAMBAffirmationRequests(events)
+    case 'amb-information-request':
+      return processAMBInformationRequests(events)
     default:
       return []
   }
@@ -109,25 +111,7 @@ async function main({ sendJob, txHash }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      let job
-
-      if (config.id === 'amb-information-request') {
-        const { foreign } = config
-
-        const batchTimestamp = events[0].returnValues.timestamp
-
-        // obtain last block on the foreign side
-        const lastForeignBlock = await getBlock(foreign.web3, 'latest')
-
-        if (batchTimestamp > lastForeignBlock.timestamp) {
-          logger.debug(`Not enough foreign block confirmations`)
-          return
-        }
-
-        job = await processAMBInformationRequests(events, lastForeignBlock)
-      } else {
-        job = await processEvents(events)
-      }
+      const job = await processEvents(events)
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {

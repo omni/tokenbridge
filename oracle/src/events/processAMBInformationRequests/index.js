@@ -6,7 +6,7 @@ const rootLogger = require('../../services/logger')
 const makeBlockFinder = require('../../services/blockFinder')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
-const { getValidatorContract, getBlock } = require('../../tx/web3')
+const { getValidatorContract, getBlock, getBlockNumber, getRequiredBlockConfirmations } = require('../../tx/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
@@ -34,7 +34,7 @@ function processInformationRequestsBuilder(config) {
   let validatorContract = null
   let blockFinder = null
 
-  return async function processInformationRequests(informationRequests, opts) {
+  return async function processInformationRequests(informationRequests) {
     const txToSend = []
 
     if (validatorContract === null) {
@@ -46,8 +46,11 @@ function processInformationRequestsBuilder(config) {
       blockFinder = await makeBlockFinder('foreign', foreign.web3)
     }
 
-    const homeBlock = await getBlock(home.web3, opts.homeBlockNumber)
-    const lastForeignBlock = await getBlock(foreign.web3, opts.foreignBlockNumber)
+    const foreignBlockNumber =
+      (await getBlockNumber(foreign.web3)) - (await getRequiredBlockConfirmations(foreign.bridgeContract))
+    const homeBlock = await getBlock(home.web3, informationRequests[0].blockNumber)
+    const lastForeignBlock = await getBlock(foreign.web3, foreignBlockNumber)
+
     if (homeBlock.timestamp > lastForeignBlock.timestamp) {
       rootLogger.debug(
         { homeTimestamp: homeBlock.timestamp, foreignTimestamp: lastForeignBlock.timestamp },

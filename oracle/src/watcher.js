@@ -159,24 +159,18 @@ async function main({ sendToQueue }) {
 
       // for async information requests, requests are processed in batches only if they are located in the same block
       if (config.id === 'amb-information-request') {
-        // obtain block number and timestamp for events in the earliest block
+        // obtain block number and events from the earliest block
         const batchBlockNumber = events[0].blockNumber
-
-        // obtain block number of the next upcoming batch, if any
-        const nextBatchEvent = events.find(event => event.blockNumber > batchBlockNumber)
         const batchEvents = events.filter(event => event.blockNumber === batchBlockNumber)
+
         // if there are some other events in the later blocks,
         // adjust lastProcessedBlock so that these events will be processed again on the next iteration
-        if (nextBatchEvent) {
-          lastBlockToProcess = nextBatchEvent.blockNumber - 1
+        if (batchEvents.length < events.length) {
+          // pick event outside from the batch
+          lastBlockToProcess = events[batchEvents.length].blockNumber - 1
         }
 
-        const opts = {
-          homeBlockNumber: batchBlockNumber,
-          foreignBlockNumber: await getLastBlockToProcess(config.foreign.web3, config.foreign.bridgeContract)
-        }
-
-        job = await processAMBInformationRequests(batchEvents, opts)
+        job = await processAMBInformationRequests(batchEvents)
       } else {
         job = await processEvents(events)
       }
