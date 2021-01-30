@@ -66,3 +66,12 @@ export const VALIDATOR_CONFIRMATION_STATUS = {
 export const SEARCHING_TX = 'Searching Transaction...'
 
 export const INCORRECT_CHAIN_ERROR = `Incorrect chain chosen. Switch to ${FOREIGN_NETWORK_NAME} in the wallet.`
+
+export const DOUBLE_EXECUTION_ATTEMPT_ERROR = `Your execution transaction has been reverted.
+However, the execution completed successfully in the transaction sent by a different party.`
+
+export const EXECUTION_FAILED_ERROR = `Your execution transaction has been reverted.
+Please, contact the support by messaging on %linkhttps://forum.poa.network/c/support`
+
+export const EXECUTION_OUT_OF_GAS_ERROR = `Your execution transaction has been reverted due to Out-of-Gas error.
+Please, resend the transaction and provide more gas for the transaction.`
