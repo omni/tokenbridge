@@ -1,19 +1,35 @@
 const { readFile } = require('./utils/file')
 
-const { MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST, MONITOR_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
+const {
+  MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST,
+  MONITOR_HOME_TO_FOREIGN_BLOCK_LIST,
+  MONITOR_HOME_VALIDATORS_BALANCE_ENABLE,
+  MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE
+} = process.env
+
+const homeConf = {
+  type: 'home',
+  validatorsBalanceEnable: MONITOR_HOME_VALIDATORS_BALANCE_ENABLE
+}
+const foreignConf = {
+  type: 'foreign',
+  validatorsBalanceEnable: MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE
+}
+
+const bridgeTypes = [homeConf, foreignConf]
 
 function hasError(obj) {
   return 'error' in obj
 }
 
-async function getPrometheusMetrics(bridgeName) {
+function getPrometheusMetrics(bridgeName) {
   const metrics = {}
 
   // Balance metrics
-  const balances = await readFile(`./responses/${bridgeName}/getBalances.json`)
+  const balancesFile = readFile(`./responses/${bridgeName}/getBalances.json`)
 
-  if (!hasError(balances)) {
-    const { home: homeBalances, foreign: foreignBalances, ...commonBalances } = balances
+  if (!hasError(balancesFile)) {
+    const { home: homeBalances, foreign: foreignBalances, ...commonBalances } = balancesFile
     metrics.balances_home_value = homeBalances.totalSupply
     metrics.balances_home_txs_deposit = homeBalances.deposits
     metrics.balances_home_txs_withdrawal = homeBalances.withdrawals
@@ -32,32 +48,38 @@ async function getPrometheusMetrics(bridgeName) {
   }
 
   // Validator metrics
-  const validators = await readFile(`./responses/${bridgeName}/validators.json`)
+  const validatorsFile = readFile(`./responses/${bridgeName}/validators.json`)
 
-  if (!hasError(validators)) {
-    Object.entries(validators.home.validators).forEach(([, val], ind) => {
-      metrics[`validators_balances_home_validator${ind}`] = val.balance
-    })
-    Object.entries(validators.foreign.validators).forEach(([, val], ind) => {
-      metrics[`validators_balances_foreign_validator${ind}`] = val.balance
-    })
+  if (!hasError(validatorsFile)) {
+    for (const bridge of bridgeTypes) {
+      const allValidators = validatorsFile[bridge.type].validators
+      const validatorAddressesWithBalanceCheck =
+        typeof bridge.validatorsBalanceEnable === 'string'
+          ? bridge.validatorsBalanceEnable.split(' ')
+          : Object.keys(allValidators)
+
+      validatorAddressesWithBalanceCheck.forEach(addr => {
+        metrics[`validators_balances_${bridge.type}_${addr}`] = allValidators[addr].balance
+      })
+    }
   }
 
   // Alert metrics
-  const alerts = await readFile(`./responses/${bridgeName}/alerts.json`)
+  const alertsFile = readFile(`./responses/${bridgeName}/alerts.json`)
 
-  if (!hasError(alerts)) {
-    Object.entries(alerts.executeSignatures.misbehavior).forEach(([period, val]) => {
-      metrics[`misbehavior_foreign_${period}`] = val
-    })
-    Object.entries(alerts.executeAffirmations.misbehavior).forEach(([period, val]) => {
-      metrics[`misbehavior_home_${period}`] = val
-    })
+  if (!hasError(alertsFile)) {
+    for (const bridge of bridgeTypes) {
+      const targetFunc = bridge.type === homeConf.type ? 'executeAffirmations' : 'executeSignatures'
+      Object.entries(alertsFile[targetFunc].misbehavior).forEach(([period, val]) => {
+        metrics[`misbehavior_${bridge.type}_${period}`] = val
+      })
+    }
   }
 
   // Pack metrcis into a plain text
   return Object.entries(metrics).reduceRight(
     // Prometheus supports `Nan` and possibly signed `Infinity`
+    // in case cast to `Number` fails
     (acc, [key, val]) => `${key} ${val ? Number(val) : 0}\n${acc}`,
     ''
   )
