@@ -58,8 +58,8 @@ function getPrometheusMetrics(bridgeName) {
           ? bridge.validatorsBalanceEnable.split(' ')
           : Object.keys(allValidators)
 
-      validatorAddressesWithBalanceCheck.forEach(addr => {
-        metrics[`validators_balances_${bridge.type}_${addr}`] = allValidators[addr].balance
+      validatorAddressesWithBalanceCheck.forEach((addr, ind) => {
+        metrics[`validators_balances_${bridge.type}${ind}{address="${addr}"}`] = allValidators[addr].balance
       })
     }
   }
