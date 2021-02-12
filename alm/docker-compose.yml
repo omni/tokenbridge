@@ -2,6 +2,7 @@
 version: '2.4'
 services:
   alm:
+    image: fusenet/alm:latest
     build:
       context: ..
       dockerfile: alm/Dockerfile
