@@ -11,6 +11,37 @@ import {
 import { getBlock, MessageObject } from './web3'
 import validatorsCache from '../services/ValidatorsCache'
 
+export const getSuccessExecutionData = async (contract: Contract, eventName: string, web3: Web3, messageId: string) => {
+  // Since it filters by the message id, only one event will be fetched
+  // so there is no need to limit the range of the block to reduce the network traffic
+  const events: EventData[] = await contract.getPastEvents(eventName, {
+    fromBlock: 0,
+    toBlock: 'latest',
+    filter: {
+      messageId
+    }
+  })
+  if (events.length > 0) {
+    const event = events[0]
+    const [txReceipt, block] = await Promise.all([
+      web3.eth.getTransactionReceipt(event.transactionHash),
+      getBlock(web3, event.blockNumber)
+    ])
+
+    const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
+    const validatorAddress = web3.utils.toChecksumAddress(txReceipt.from)
+
+    return {
+      status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
+      validator: validatorAddress,
+      txHash: event.transactionHash,
+      timestamp: blockTimestamp,
+      executionResult: event.returnValues.status
+    }
+  }
+  return null
+}
+
 export const getFinalizationEvent = async (
   contract: Maybe<Contract>,
   eventName: string,
@@ -29,32 +60,9 @@ export const getFinalizationEvent = async (
   setExecutionEventsFetched: Function
 ) => {
   if (!contract || !web3 || !waitingBlocksResolved) return
-  // Since it filters by the message id, only one event will be fetched
-  // so there is no need to limit the range of the block to reduce the network traffic
-  const events: EventData[] = await contract.getPastEvents(eventName, {
-    fromBlock: 0,
-    toBlock: 'latest',
-    filter: {
-      messageId: message.id
-    }
-  })
-  if (events.length > 0) {
-    const event = events[0]
-    const [txReceipt, block] = await Promise.all([
-      web3.eth.getTransactionReceipt(event.transactionHash),
-      getBlock(web3, event.blockNumber)
-    ])
-
-    const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
-    const validatorAddress = web3.utils.toChecksumAddress(txReceipt.from)
-
-    setResult({
-      status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
-      validator: validatorAddress,
-      txHash: event.transactionHash,
-      timestamp: blockTimestamp,
-      executionResult: event.returnValues.status
-    })
+  const successExecutionData = await getSuccessExecutionData(contract, eventName, web3, message.id)
+  if (successExecutionData) {
+    setResult(successExecutionData)
   } else {
     setExecutionEventsFetched(true)
     // If event is defined, it means it is a message from Home to Foreign
