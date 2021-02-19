@@ -11,60 +11,13 @@ app.use(cors())
 app.get('/favicon.ico', (req, res) => res.sendStatus(204))
 app.use('/:bridgeName', bridgeRouter)
 
-bridgeRouter.get('/', async (req, res, next) => {
+bridgeRouter.get('/:file(validators|eventsStats|alerts|mediators|stuckTransfers|failures)?', async (req, res, next) => {
   try {
-    const results = await readFile(`./responses/${req.params.bridgeName}/getBalances.json`)
+    const { bridgeName, file } = req.params
+    const results = await readFile(`./responses/${bridgeName}/${file || 'getBalances'}.json`)
     res.json(results)
   } catch (e) {
     // this will eventually be handled by your error handling middleware
-    next(e)
-  }
-})
-
-bridgeRouter.get('/validators', async (req, res, next) => {
-  try {
-    const results = await readFile(`./responses/${req.params.bridgeName}/validators.json`)
-    res.json(results)
-  } catch (e) {
-    // this will eventually be handled by your error handling middleware
-    next(e)
-  }
-})
-
-bridgeRouter.get('/eventsStats', async (req, res, next) => {
-  try {
-    const results = await readFile(`./responses/${req.params.bridgeName}/eventsStats.json`)
-    res.json(results)
-  } catch (e) {
-    // this will eventually be handled by your error handling middleware
-    next(e)
-  }
-})
-
-bridgeRouter.get('/alerts', async (req, res, next) => {
-  try {
-    const results = await readFile(`./responses/${req.params.bridgeName}/alerts.json`)
-    res.json(results)
-  } catch (e) {
-    next(e)
-  }
-})
-
-bridgeRouter.get('/mediators', async (req, res, next) => {
-  try {
-    const results = await readFile(`./responses/${req.params.bridgeName}/mediators.json`)
-    res.json(results)
-  } catch (e) {
-    // this will eventually be handled by your error handling middleware
-    next(e)
-  }
-})
-
-bridgeRouter.get('/stuckTransfers', async (req, res, next) => {
-  try {
-    const results = await readFile(`./responses/${req.params.bridgeName}/stuckTransfers.json`)
-    res.json(results)
-  } catch (e) {
     next(e)
   }
 })

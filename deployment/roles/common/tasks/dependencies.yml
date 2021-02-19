@@ -33,7 +33,7 @@
     mode: "0755"
 
 - name: Upgrade pip version
-  shell: pip3 install --upgrade pip
+  shell: pip3 install --upgrade pip==19.3.1
 
 - name: Install python docker library
   shell: pip3 install docker docker-compose setuptools
