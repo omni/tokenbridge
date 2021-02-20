@@ -2,9 +2,17 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { useWeb3React } from '@web3-react/core'
-import { INCORRECT_CHAIN_ERROR, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import {
+  DOUBLE_EXECUTION_ATTEMPT_ERROR,
+  EXECUTION_FAILED_ERROR,
+  EXECUTION_OUT_OF_GAS_ERROR,
+  INCORRECT_CHAIN_ERROR,
+  VALIDATOR_CONFIRMATION_STATUS
+} from '../config/constants'
 import { useStateProvider } from '../state/StateProvider'
 import { signatureToVRS, packSignatures } from '../utils/signatures'
+import { getSuccessExecutionData } from '../utils/getFinalizationEvent'
+import { TransactionReceipt } from 'web3-eth'
 
 const StyledButton = styled.button`
   color: var(--button-color);
@@ -61,7 +69,9 @@ export const ManualExecutionButton = ({
       if (!library || !foreign.bridgeContract || !signatureCollected || !signatureCollected.length) return
 
       const signatures = packSignatures(signatureCollected.map(signatureToVRS))
-      const data = foreign.bridgeContract.methods.executeSignatures(messageData, signatures).encodeABI()
+      const messageId = messageData.slice(0, 66)
+      const bridge = foreign.bridgeContract
+      const data = bridge.methods.executeSignatures(messageData, signatures).encodeABI()
       setManualExecution(false)
 
       library.eth
@@ -80,7 +90,27 @@ export const ManualExecutionButton = ({
           })
           setPendingExecution(true)
         })
-        .on('error', (e: Error) => setError(e.message))
+        .on('error', async (e: Error, receipt: TransactionReceipt) => {
+          if (e.message.includes('Transaction has been reverted by the EVM')) {
+            const successExecutionData = await getSuccessExecutionData(bridge, 'RelayedMessage', library, messageId)
+            if (successExecutionData) {
+              setExecutionData(successExecutionData)
+              setError(DOUBLE_EXECUTION_ATTEMPT_ERROR)
+            } else {
+              const { gas } = await library.eth.getTransaction(receipt.transactionHash)
+              setExecutionData({
+                status: VALIDATOR_CONFIRMATION_STATUS.FAILED,
+                validator: account,
+                txHash: receipt.transactionHash,
+                timestamp: Math.floor(new Date().getTime() / 1000.0),
+                executionResult: false
+              })
+              setError(gas === receipt.gasUsed ? EXECUTION_OUT_OF_GAS_ERROR : EXECUTION_FAILED_ERROR)
+            }
+          } else {
+            setError(e.message)
+          }
+        })
     },
     [
       manualExecution,

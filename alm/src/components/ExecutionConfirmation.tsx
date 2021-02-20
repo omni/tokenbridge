@@ -36,10 +36,12 @@ export const ExecutionConfirmation = ({
   const availableManualExecution =
     !isHome &&
     (executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ||
+      executionData.status === VALIDATOR_CONFIRMATION_STATUS.FAILED ||
       (executionData.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED &&
         executionEventsFetched &&
         !!executionData.validator))
   const requiredManualExecution = availableManualExecution && ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION
+  const showAgeColumn = !requiredManualExecution || executionData.status === VALIDATOR_CONFIRMATION_STATUS.FAILED
   const windowWidth = useWindowWidth()
 
   const txExplorerLink = getExplorerTxUrl(executionData.txHash, isHome)
@@ -71,7 +73,7 @@ export const ExecutionConfirmation = ({
           <tr>
             <th>{requiredManualExecution ? 'Execution info' : 'Executed by'}</th>
             <th className="text-center">Status</th>
-            {!requiredManualExecution && <th className="text-center">Age</th>}
+            {showAgeColumn && <th className="text-center">Age</th>}
             {availableManualExecution && <th className="text-center">Actions</th>}
           </tr>
         </Thead>
@@ -87,7 +89,7 @@ export const ExecutionConfirmation = ({
               )}
             </td>
             <StatusTd className="text-center">{getExecutionStatusElement(executionData.status)}</StatusTd>
-            {!requiredManualExecution && (
+            {showAgeColumn && (
               <AgeTd className="text-center">
                 {executionData.timestamp > 0 ? (
                   <ExplorerTxLink href={txExplorerLink} target="_blank">
