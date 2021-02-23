@@ -173,12 +173,14 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           `Tx Failed for event Tx ${job.transactionReference}.`,
           e.message
         )
-        if (!e.message.toLowerCase().includes('transaction with the same hash was already imported')) {
-          if (isResend) {
-            resendJobs.push(job)
-          } else {
-            failedTx.push(job)
-          }
+
+        if (isResend) {
+          // if transaction resend has failed, schedule it to resend once again
+          resendJobs.push(job)
+        } else if (!e.message.toLowerCase().includes('transaction with the same hash was already imported')) {
+          // if initial transaction sending has failed not due to the same hash error
+          // send it to the failed tx queue
+          failedTx.push(job)
         }
 
         if (e.message.toLowerCase().includes('insufficient funds')) {
