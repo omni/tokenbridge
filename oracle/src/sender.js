@@ -174,16 +174,17 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           e.message
         )
 
-        if (isResend) {
-          // if transaction resend has failed, schedule it to resend once again
+        const message = e.message.toLowerCase()
+        if (isResend || message.includes('transaction with the same hash was already imported')) {
           resendJobs.push(job)
-        } else if (!e.message.toLowerCase().includes('transaction with the same hash was already imported')) {
+        } else {
           // if initial transaction sending has failed not due to the same hash error
           // send it to the failed tx queue
+          // this will result in the sooner resend attempt than if using resendJobs
           failedTx.push(job)
         }
 
-        if (e.message.toLowerCase().includes('insufficient funds')) {
+        if (message.includes('insufficient funds')) {
           insufficientFunds = true
           const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
           minimumBalance = gasLimit.multipliedBy(gasPrice)
