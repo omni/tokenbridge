@@ -7,26 +7,29 @@ const {
   MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE
 } = process.env
 
-const homeConf = {
-  type: 'home',
-  validatorsBalanceEnable: MONITOR_HOME_VALIDATORS_BALANCE_ENABLE
-}
-const foreignConf = {
-  type: 'foreign',
-  validatorsBalanceEnable: MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE
+function BridgeConf(type, validatorsBalanceEnable, alertTargetFunc, failureDirection) {
+  this.type = type
+  this.validatorsBalanceEnable = validatorsBalanceEnable
+  this.alertTargetFunc = alertTargetFunc
+  this.failureDirection = failureDirection
 }
 
-const bridgeTypes = [homeConf, foreignConf]
+const BRIDGE_CONFS = [
+  new BridgeConf('home', MONITOR_HOME_VALIDATORS_BALANCE_ENABLE, 'executeAffirmations', 'homeToForeign'),
+  new BridgeConf('foreign', MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE, 'executeSignatures', 'foreignToHome')
+]
 
 function hasError(obj) {
   return 'error' in obj
 }
 
 function getPrometheusMetrics(bridgeName) {
+  const responsePath = jsonName => `./responses/${bridgeName}/${jsonName}.json`
+
   const metrics = {}
 
   // Balance metrics
-  const balancesFile = readFile(`./responses/${bridgeName}/getBalances.json`)
+  const balancesFile = readFile(responsePath('getBalances'))
 
   if (!hasError(balancesFile)) {
     const { home: homeBalances, foreign: foreignBalances, ...commonBalances } = balancesFile
@@ -48,10 +51,10 @@ function getPrometheusMetrics(bridgeName) {
   }
 
   // Validator metrics
-  const validatorsFile = readFile(`./responses/${bridgeName}/validators.json`)
+  const validatorsFile = readFile(responsePath('validators'))
 
   if (!hasError(validatorsFile)) {
-    for (const bridge of bridgeTypes) {
+    for (const bridge of BRIDGE_CONFS) {
       const allValidators = validatorsFile[bridge.type].validators
       const validatorAddressesWithBalanceCheck =
         typeof bridge.validatorsBalanceEnable === 'string'
@@ -65,13 +68,26 @@ function getPrometheusMetrics(bridgeName) {
   }
 
   // Alert metrics
-  const alertsFile = readFile(`./responses/${bridgeName}/alerts.json`)
+  const alertsFile = readFile(responsePath('alerts'))
 
   if (!hasError(alertsFile)) {
-    for (const bridge of bridgeTypes) {
-      const targetFunc = bridge.type === homeConf.type ? 'executeAffirmations' : 'executeSignatures'
-      Object.entries(alertsFile[targetFunc].misbehavior).forEach(([period, val]) => {
+    for (const bridge of BRIDGE_CONFS) {
+      Object.entries(alertsFile[bridge.alertTargetFunc].misbehavior).forEach(([period, val]) => {
         metrics[`misbehavior_${bridge.type}_${period}`] = val
+      })
+    }
+  }
+
+  // Failure metrics
+  const failureFile = readFile(responsePath('failures'))
+
+  if (!hasError(failureFile)) {
+    for (const bridge of BRIDGE_CONFS) {
+      const dir = bridge.failureDirection
+      const failures = failureFile[dir]
+      metrics[`failures_${dir}_total`] = failures.total
+      Object.entries(failures.stats).forEach(([period, count]) => {
+        metrics[`failures_${dir}_${period}`] = count
       })
     }
   }
