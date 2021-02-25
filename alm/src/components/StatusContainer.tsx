@@ -10,6 +10,7 @@ import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { ConfirmationsContainer } from './ConfirmationsContainer'
 import { TransactionReceipt } from 'web3-eth'
 import { BackButton } from './commons/BackButton'
+import { useClosestBlock } from '../hooks/useClosestBlock'
 
 export interface StatusContainerParam {
   onBackToMain: () => void
@@ -23,12 +24,15 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
   const { chainId, txHash, messageIdParam } = useParams()
   const validChainId = chainId === home.chainId.toString() || chainId === foreign.chainId.toString()
   const validParameters = validChainId && validTxHash(txHash)
+  const isHome = chainId === home.chainId.toString()
 
   const { messages, receipt, status, description, timestamp, loading } = useTransactionStatus({
     txHash: validParameters ? txHash : '',
     chainId: validParameters ? parseInt(chainId) : 0,
     receiptParam
   })
+  const homeStartBlock = useClosestBlock(true, isHome, receipt, timestamp)
+  const foreignStartBlock = useClosestBlock(false, isHome, receipt, timestamp)
 
   const selectedMessageId = messageIdParam === undefined || messages[messageIdParam] === undefined ? -1 : messageIdParam
 
@@ -64,7 +68,6 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
   const displayReference = multiMessageSelected ? messages[selectedMessageId].id : txHash
   const formattedMessageId = formatTxHash(displayReference)
 
-  const isHome = chainId === home.chainId.toString()
   const txExplorerLink = getExplorerTxUrl(txHash, isHome)
   const displayExplorerLink = status !== TRANSACTION_STATUS.NOT_FOUND
 
@@ -101,7 +104,13 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
       )}
       {displayMessageSelector && <MessageSelector messages={messages} onMessageSelected={onMessageSelected} />}
       {displayConfirmations && (
-        <ConfirmationsContainer message={messageToConfirm} receipt={receipt} fromHome={isHome} timestamp={timestamp} />
+        <ConfirmationsContainer
+          message={messageToConfirm}
+          receipt={receipt}
+          fromHome={isHome}
+          homeStartBlock={homeStartBlock}
+          foreignStartBlock={foreignStartBlock}
+        />
       )}
       <BackButton onBackToMain={onBackToMain} />
     </div>

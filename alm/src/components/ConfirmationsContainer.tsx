@@ -39,10 +39,17 @@ export interface ConfirmationsContainerParams {
   message: MessageObject
   receipt: Maybe<TransactionReceipt>
   fromHome: boolean
-  timestamp: number
+  homeStartBlock: Maybe<number>
+  foreignStartBlock: Maybe<number>
 }
 
-export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }: ConfirmationsContainerParams) => {
+export const ConfirmationsContainer = ({
+  message,
+  receipt,
+  fromHome,
+  homeStartBlock,
+  foreignStartBlock
+}: ConfirmationsContainerParams) => {
   const {
     home: { name: homeName },
     foreign: { name: foreignName }
@@ -62,7 +69,8 @@ export const ConfirmationsContainer = ({ message, receipt, fromHome, timestamp }
     message,
     receipt,
     fromHome,
-    timestamp,
+    homeStartBlock,
+    foreignStartBlock,
     requiredSignatures,
     validatorList,
     blockConfirmations

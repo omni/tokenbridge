@@ -2,18 +2,9 @@ import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { BasicConfirmationParam, ConfirmationParam } from '../hooks/useMessageConfirmations'
 import validatorsCache from '../services/ValidatorsCache'
-import {
-  CACHE_KEY_FAILED,
-  CACHE_KEY_SUCCESS,
-  ONE_DAY_TIMESTAMP,
-  VALIDATOR_CONFIRMATION_STATUS
-} from '../config/constants'
-import {
-  APIPendingTransaction,
-  APITransaction,
-  GetFailedTransactionParams,
-  GetPendingTransactionParams
-} from './explorer'
+import { CACHE_KEY_FAILED, CACHE_KEY_SUCCESS, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { APIPendingTransaction, APITransaction, GetTransactionParams, GetPendingTransactionParams } from './explorer'
+import { homeBlockNumberProvider } from '../services/BlockNumberProvider'
 
 export const getValidatorConfirmation = (
   web3: Web3,
@@ -50,8 +41,8 @@ export const getSuccessExecutionTransaction = (
   bridgeContract: Contract,
   fromHome: boolean,
   messageData: string,
-  timestamp: number,
-  getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
+  startBlock: number,
+  getSuccessTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>
 ) => async (validatorData: BasicConfirmationParam): Promise<ConfirmationParam> => {
   const { validator } = validatorData
   const validatorCacheKey = `${CACHE_KEY_SUCCESS}${validatorData.validator}-${messageData}`
@@ -65,8 +56,8 @@ export const getSuccessExecutionTransaction = (
     account: validatorData.validator,
     to: bridgeContract.options.address,
     messageData,
-    startTimestamp: timestamp,
-    endTimestamp: timestamp + ONE_DAY_TIMESTAMP
+    startBlock,
+    endBlock: homeBlockNumberProvider.get() || 0
   })
 
   let txHashTimestamp = 0
@@ -98,8 +89,8 @@ export const getSuccessExecutionTransaction = (
 export const getValidatorFailedTransaction = (
   bridgeContract: Contract,
   messageData: string,
-  timestamp: number,
-  getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
+  startBlock: number,
+  getFailedTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>
 ) => async (validatorData: BasicConfirmationParam): Promise<ConfirmationParam> => {
   const validatorCacheKey = `${CACHE_KEY_FAILED}${validatorData.validator}-${messageData}`
   const failedFromCache = validatorsCache.getData(validatorCacheKey)
@@ -112,8 +103,8 @@ export const getValidatorFailedTransaction = (
     account: validatorData.validator,
     to: bridgeContract.options.address,
     messageData,
-    startTimestamp: timestamp,
-    endTimestamp: timestamp + ONE_DAY_TIMESTAMP
+    startBlock,
+    endBlock: homeBlockNumberProvider.get() || 0
   })
   const newStatus =
     failedTransactions.length > 0 ? VALIDATOR_CONFIRMATION_STATUS.FAILED : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED

@@ -28,7 +28,8 @@ export interface useMessageConfirmationsParams {
   message: MessageObject
   receipt: Maybe<TransactionReceipt>
   fromHome: boolean
-  timestamp: number
+  homeStartBlock: Maybe<number>
+  foreignStartBlock: Maybe<number>
   requiredSignatures: number
   validatorList: string[]
   blockConfirmations: number
@@ -56,7 +57,8 @@ export const useMessageConfirmations = ({
   message,
   receipt,
   fromHome,
-  timestamp,
+  homeStartBlock,
+  foreignStartBlock,
   requiredSignatures,
   validatorList,
   blockConfirmations
@@ -90,6 +92,17 @@ export const useMessageConfirmations = ({
     return filteredList.length > 0
   }
 
+  // start watching blocks at the start
+  useEffect(
+    () => {
+      if (!home.web3 || !foreign.web3) return
+
+      homeBlockNumberProvider.start(home.web3)
+      foreignBlockNumberProvider.start(foreign.web3)
+    },
+    [foreign.web3, home.web3]
+  )
+
   // Check if the validators are waiting for block confirmations to verify the message
   useEffect(
     () => {
@@ -105,9 +118,6 @@ export const useMessageConfirmations = ({
 
       const blockProvider = fromHome ? homeBlockNumberProvider : foreignBlockNumberProvider
       const interval = fromHome ? HOME_RPC_POLLING_INTERVAL : FOREIGN_RPC_POLLING_INTERVAL
-      const web3 = fromHome ? home.web3 : foreign.web3
-      blockProvider.start(web3)
-
       const targetBlock = receipt.blockNumber + blockConfirmations
 
       checkSignaturesWaitingForBLocks(
@@ -123,7 +133,6 @@ export const useMessageConfirmations = ({
 
       return () => {
         unsubscribe()
-        blockProvider.stop()
       }
     },
     [
@@ -153,8 +162,6 @@ export const useMessageConfirmations = ({
         })
       }
 
-      homeBlockNumberProvider.start(home.web3)
-
       const fromBlock = receipt.blockNumber
       const toBlock = fromBlock + BLOCK_RANGE
       const messageHash = home.web3.utils.soliditySha3Raw(message.data)
@@ -171,7 +178,6 @@ export const useMessageConfirmations = ({
 
       return () => {
         unsubscribe()
-        homeBlockNumberProvider.stop()
       }
     },
     [fromHome, home.bridgeContract, home.web3, message.data, receipt, signatureCollected]
@@ -192,7 +198,6 @@ export const useMessageConfirmations = ({
         })
       }
 
-      homeBlockNumberProvider.start(home.web3)
       const targetBlock = collectedSignaturesEvent.blockNumber + blockConfirmations
 
       checkWaitingBlocksForExecution(
@@ -208,7 +213,6 @@ export const useMessageConfirmations = ({
 
       return () => {
         unsubscribe()
-        homeBlockNumberProvider.stop()
       }
     },
     [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, receipt, waitingBlocksForExecutionResolved]
@@ -218,7 +222,7 @@ export const useMessageConfirmations = ({
   // To avoid making extra requests, this is only executed when validators finished waiting for blocks confirmations
   useEffect(
     () => {
-      if (!waitingBlocksResolved || !timestamp || !requiredSignatures) return
+      if (!waitingBlocksResolved || !homeStartBlock || !requiredSignatures) return
 
       const subscriptions: Array<number> = []
 
@@ -239,7 +243,7 @@ export const useMessageConfirmations = ({
         setSignatureCollected,
         waitingBlocksResolved,
         subscriptions,
-        timestamp,
+        homeStartBlock,
         getValidatorFailedTransactionsForMessage,
         setFailedConfirmations,
         getValidatorPendingTransactionsForMessage,
@@ -259,7 +263,7 @@ export const useMessageConfirmations = ({
       home.bridgeContract,
       requiredSignatures,
       waitingBlocksResolved,
-      timestamp,
+      homeStartBlock,
       setConfirmations
     ]
   )
@@ -270,6 +274,8 @@ export const useMessageConfirmations = ({
   useEffect(
     () => {
       if ((fromHome && !waitingBlocksForExecutionResolved) || (!fromHome && !waitingBlocksResolved)) return
+      const startBlock = fromHome ? foreignStartBlock : homeStartBlock
+      if (!startBlock) return
 
       const subscriptions: Array<number> = []
 
@@ -285,6 +291,7 @@ export const useMessageConfirmations = ({
       const interval = fromHome ? FOREIGN_RPC_POLLING_INTERVAL : HOME_RPC_POLLING_INTERVAL
 
       getFinalizationEvent(
+        fromHome,
         bridgeContract,
         contractEvent,
         providedWeb3,
@@ -293,7 +300,7 @@ export const useMessageConfirmations = ({
         message,
         interval,
         subscriptions,
-        timestamp,
+        startBlock,
         collectedSignaturesEvent,
         getExecutionFailedTransactionForMessage,
         setFailedExecution,
@@ -315,8 +322,9 @@ export const useMessageConfirmations = ({
       home.web3,
       waitingBlocksResolved,
       waitingBlocksForExecutionResolved,
-      timestamp,
-      collectedSignaturesEvent
+      collectedSignaturesEvent,
+      foreignStartBlock,
+      homeStartBlock
     ]
   )
 
@@ -328,6 +336,9 @@ export const useMessageConfirmations = ({
           ? CONFIRMATIONS_STATUS.SUCCESS
           : CONFIRMATIONS_STATUS.SUCCESS_MESSAGE_FAILED
         setStatus(newStatus)
+
+        foreignBlockNumberProvider.stop()
+        homeBlockNumberProvider.stop()
       } else if (signatureCollected) {
         if (fromHome) {
           if (waitingBlocksForExecution) {
