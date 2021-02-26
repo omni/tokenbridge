@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const { readFile } = require('./utils/file')
+const { getPrometheusMetrics } = require('./prometheusMetrics')
 
 const app = express()
 const bridgeRouter = express.Router({ mergeParams: true })
@@ -11,13 +12,22 @@ app.use(cors())
 app.get('/favicon.ico', (req, res) => res.sendStatus(204))
 app.use('/:bridgeName', bridgeRouter)
 
-bridgeRouter.get('/:file(validators|eventsStats|alerts|mediators|stuckTransfers|failures)?', async (req, res, next) => {
+bridgeRouter.get('/:file(validators|eventsStats|alerts|mediators|stuckTransfers|failures)?', (req, res, next) => {
   try {
     const { bridgeName, file } = req.params
-    const results = await readFile(`./responses/${bridgeName}/${file || 'getBalances'}.json`)
+    const results = readFile(`./responses/${bridgeName}/${file || 'getBalances'}.json`)
     res.json(results)
   } catch (e) {
     // this will eventually be handled by your error handling middleware
+    next(e)
+  }
+})
+
+bridgeRouter.get('/metrics', (req, res, next) => {
+  try {
+    const metrics = getPrometheusMetrics(req.params.bridgeName)
+    res.type('text').send(metrics)
+  } catch (e) {
     next(e)
   }
 })

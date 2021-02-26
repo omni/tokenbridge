@@ -1,9 +1,9 @@
 const fs = require('fs')
 const path = require('path')
 
-async function readFile(filePath) {
+function readFile(filePath) {
   try {
-    const content = await fs.readFileSync(filePath)
+    const content = fs.readFileSync(filePath)
     const json = JSON.parse(content)
     const timeDiff = Math.floor(Date.now() / 1000) - json.lastChecked
     return Object.assign({}, json, { timeDiff })
