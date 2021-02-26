@@ -64,6 +64,7 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
       eventName,
       web3,
@@ -115,6 +116,7 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
       eventName,
       web3,
@@ -166,6 +168,7 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
       eventName,
       web3,
@@ -217,6 +220,7 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
       eventName,
       web3,
@@ -275,6 +279,7 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
       eventName,
       web3,

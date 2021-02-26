@@ -1,15 +1,11 @@
 import { Contract, EventData } from 'web3-eth-contract'
 import Web3 from 'web3'
-import { CACHE_KEY_EXECUTION_FAILED, THREE_DAYS_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { CACHE_KEY_EXECUTION_FAILED, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
-import {
-  APIPendingTransaction,
-  APITransaction,
-  GetFailedTransactionParams,
-  GetPendingTransactionParams
-} from './explorer'
+import { APIPendingTransaction, APITransaction, GetTransactionParams, GetPendingTransactionParams } from './explorer'
 import { getBlock, MessageObject } from './web3'
 import validatorsCache from '../services/ValidatorsCache'
+import { foreignBlockNumberProvider, homeBlockNumberProvider } from '../services/BlockNumberProvider'
 
 export const getSuccessExecutionData = async (contract: Contract, eventName: string, web3: Web3, messageId: string) => {
   // Since it filters by the message id, only one event will be fetched
@@ -43,6 +39,7 @@ export const getSuccessExecutionData = async (contract: Contract, eventName: str
 }
 
 export const getFinalizationEvent = async (
+  fromHome: boolean,
   contract: Maybe<Contract>,
   eventName: string,
   web3: Maybe<Web3>,
@@ -51,9 +48,9 @@ export const getFinalizationEvent = async (
   message: MessageObject,
   interval: number,
   subscriptions: number[],
-  timestamp: number,
+  startBlock: number,
   collectedSignaturesEvent: Maybe<EventData>,
-  getFailedExecution: (args: GetFailedTransactionParams) => Promise<APITransaction[]>,
+  getFailedExecution: (args: GetTransactionParams) => Promise<APITransaction[]>,
   setFailedExecution: Function,
   getPendingExecution: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>,
   setPendingExecution: Function,
@@ -92,14 +89,15 @@ export const getFinalizationEvent = async (
       } else {
         const validatorExecutionCacheKey = `${CACHE_KEY_EXECUTION_FAILED}${validator}-${message.id}`
         const failedFromCache = validatorsCache.get(validatorExecutionCacheKey)
+        const blockProvider = fromHome ? foreignBlockNumberProvider : homeBlockNumberProvider
 
         if (!failedFromCache) {
           const failedTransactions = await getFailedExecution({
             account: validator,
             to: contract.options.address,
             messageData: message.data,
-            startTimestamp: timestamp,
-            endTimestamp: timestamp + THREE_DAYS_TIMESTAMP
+            startBlock,
+            endBlock: blockProvider.get() || 0
           })
 
           if (failedTransactions.length > 0) {
@@ -125,6 +123,7 @@ export const getFinalizationEvent = async (
     const timeoutId = setTimeout(
       () =>
         getFinalizationEvent(
+          fromHome,
           contract,
           eventName,
           web3,
@@ -133,7 +132,7 @@ export const getFinalizationEvent = async (
           message,
           interval,
           subscriptions,
-          timestamp,
+          startBlock,
           collectedSignaturesEvent,
           getFailedExecution,
           setFailedExecution,

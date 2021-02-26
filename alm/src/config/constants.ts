@@ -18,9 +18,8 @@ export const ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION: boolean =
 
 export const HOME_RPC_POLLING_INTERVAL: number = 5000
 export const FOREIGN_RPC_POLLING_INTERVAL: number = 5000
-export const BLOCK_RANGE: number = 50
-export const ONE_DAY_TIMESTAMP: number = 86400
-export const THREE_DAYS_TIMESTAMP: number = 259200
+export const BLOCK_RANGE: number = 500
+export const MAX_TX_SEARCH_BLOCK_RANGE: number = 10000
 
 export const EXECUTE_AFFIRMATION_HASH = 'e7a2c01f'
 export const SUBMIT_SIGNATURE_HASH = '630cea8e'
