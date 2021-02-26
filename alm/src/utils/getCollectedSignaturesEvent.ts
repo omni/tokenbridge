@@ -31,7 +31,6 @@ export const getCollectedSignaturesEvent = async (
   if (filteredEvents.length) {
     const event = filteredEvents[0]
     setCollectedSignaturesEvent(event)
-    homeBlockNumberProvider.stop()
   } else {
     const newFromBlock = currentBlock ? securedToBlock : fromBlock
     const newToBlock = currentBlock ? toBlock + BLOCK_RANGE : toBlock

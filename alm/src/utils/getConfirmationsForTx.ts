@@ -1,12 +1,7 @@
 import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { HOME_RPC_POLLING_INTERVAL, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
-import {
-  GetFailedTransactionParams,
-  APITransaction,
-  APIPendingTransaction,
-  GetPendingTransactionParams
-} from './explorer'
+import { GetTransactionParams, APITransaction, APIPendingTransaction, GetPendingTransactionParams } from './explorer'
 import { getAffirmationsSigned, getMessagesSigned } from './contract'
 import {
   getValidatorConfirmation,
@@ -43,12 +38,12 @@ export const getConfirmationsForTx = async (
   setSignatureCollected: Function,
   waitingBlocksResolved: boolean,
   subscriptions: number[],
-  timestamp: number,
-  getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>,
+  startBlock: number,
+  getFailedTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>,
   setFailedConfirmations: Function,
   getPendingTransactions: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>,
   setPendingConfirmations: Function,
-  getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
+  getSuccessTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>
 ) => {
   if (!web3 || !validatorList || !validatorList.length || !bridgeContract || !waitingBlocksResolved) return
 
@@ -102,7 +97,7 @@ export const getConfirmationsForTx = async (
   // Check if confirmation failed
   const validatorFailedConfirmationsChecks = await Promise.all(
     undefinedConfirmations.map(
-      getValidatorFailedTransaction(bridgeContract, messageData, timestamp, getFailedTransactions)
+      getValidatorFailedTransaction(bridgeContract, messageData, startBlock, getFailedTransactions)
     )
   )
   const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
@@ -136,7 +131,7 @@ export const getConfirmationsForTx = async (
   // get transactions from success signatures
   const successConfirmationWithData = await Promise.all(
     successConfirmations.map(
-      getSuccessExecutionTransaction(web3, bridgeContract, fromHome, messageData, timestamp, getSuccessTransactions)
+      getSuccessExecutionTransaction(web3, bridgeContract, fromHome, messageData, startBlock, getSuccessTransactions)
     )
   )
 
@@ -162,7 +157,7 @@ export const getConfirmationsForTx = async (
           setSignatureCollected,
           waitingBlocksResolved,
           subscriptions,
-          timestamp,
+          startBlock,
           getFailedTransactions,
           setFailedConfirmations,
           getPendingTransactions,

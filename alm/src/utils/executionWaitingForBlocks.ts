@@ -30,7 +30,6 @@ export const checkWaitingBlocksForExecution = async (
     )
     setWaitingBlocksForExecutionResolved(true)
     setWaitingBlocksForExecution(false)
-    blockProvider.stop()
   } else {
     let nextInterval = interval
     if (!currentBlock) {

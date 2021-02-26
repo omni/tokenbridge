@@ -1,41 +1,20 @@
 import { Contract, EventData } from 'web3-eth-contract'
 import Web3 from 'web3'
-import { CACHE_KEY_EXECUTION_FAILED, THREE_DAYS_TIMESTAMP, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { CACHE_KEY_EXECUTION_FAILED, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
-import {
-  APIPendingTransaction,
-  APITransaction,
-  GetFailedTransactionParams,
-  GetPendingTransactionParams
-} from './explorer'
+import { APIPendingTransaction, APITransaction, GetTransactionParams, GetPendingTransactionParams } from './explorer'
 import { getBlock, MessageObject } from './web3'
 import validatorsCache from '../services/ValidatorsCache'
+import { foreignBlockNumberProvider, homeBlockNumberProvider } from '../services/BlockNumberProvider'
 
-export const getFinalizationEvent = async (
-  contract: Maybe<Contract>,
-  eventName: string,
-  web3: Maybe<Web3>,
-  setResult: React.Dispatch<React.SetStateAction<ExecutionData>>,
-  waitingBlocksResolved: boolean,
-  message: MessageObject,
-  interval: number,
-  subscriptions: number[],
-  timestamp: number,
-  collectedSignaturesEvent: Maybe<EventData>,
-  getFailedExecution: (args: GetFailedTransactionParams) => Promise<APITransaction[]>,
-  setFailedExecution: Function,
-  getPendingExecution: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>,
-  setPendingExecution: Function,
-  setExecutionEventsFetched: Function
-) => {
-  if (!contract || !web3 || !waitingBlocksResolved) return
+export const getSuccessExecutionData = async (contract: Contract, eventName: string, web3: Web3, messageId: string) => {
   // Since it filters by the message id, only one event will be fetched
   // so there is no need to limit the range of the block to reduce the network traffic
   const events: EventData[] = await contract.getPastEvents(eventName, {
     fromBlock: 0,
     toBlock: 'latest',
     filter: {
-      messageId: message.id
+      messageId
     }
   })
   if (events.length > 0) {
@@ -48,13 +27,39 @@ export const getFinalizationEvent = async (
     const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
     const validatorAddress = web3.utils.toChecksumAddress(txReceipt.from)
 
-    setResult({
+    return {
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       validator: validatorAddress,
       txHash: event.transactionHash,
       timestamp: blockTimestamp,
       executionResult: event.returnValues.status
-    })
+    }
+  }
+  return null
+}
+
+export const getFinalizationEvent = async (
+  fromHome: boolean,
+  contract: Maybe<Contract>,
+  eventName: string,
+  web3: Maybe<Web3>,
+  setResult: React.Dispatch<React.SetStateAction<ExecutionData>>,
+  waitingBlocksResolved: boolean,
+  message: MessageObject,
+  interval: number,
+  subscriptions: number[],
+  startBlock: number,
+  collectedSignaturesEvent: Maybe<EventData>,
+  getFailedExecution: (args: GetTransactionParams) => Promise<APITransaction[]>,
+  setFailedExecution: Function,
+  getPendingExecution: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>,
+  setPendingExecution: Function,
+  setExecutionEventsFetched: Function
+) => {
+  if (!contract || !web3 || !waitingBlocksResolved) return
+  const successExecutionData = await getSuccessExecutionData(contract, eventName, web3, message.id)
+  if (successExecutionData) {
+    setResult(successExecutionData)
   } else {
     setExecutionEventsFetched(true)
     // If event is defined, it means it is a message from Home to Foreign
@@ -84,14 +89,15 @@ export const getFinalizationEvent = async (
       } else {
         const validatorExecutionCacheKey = `${CACHE_KEY_EXECUTION_FAILED}${validator}-${message.id}`
         const failedFromCache = validatorsCache.get(validatorExecutionCacheKey)
+        const blockProvider = fromHome ? foreignBlockNumberProvider : homeBlockNumberProvider
 
         if (!failedFromCache) {
           const failedTransactions = await getFailedExecution({
             account: validator,
             to: contract.options.address,
             messageData: message.data,
-            startTimestamp: timestamp,
-            endTimestamp: timestamp + THREE_DAYS_TIMESTAMP
+            startBlock,
+            endBlock: blockProvider.get() || 0
           })
 
           if (failedTransactions.length > 0) {
@@ -117,6 +123,7 @@ export const getFinalizationEvent = async (
     const timeoutId = setTimeout(
       () =>
         getFinalizationEvent(
+          fromHome,
           contract,
           eventName,
           web3,
@@ -125,7 +132,7 @@ export const getFinalizationEvent = async (
           message,
           interval,
           subscriptions,
-          timestamp,
+          startBlock,
           collectedSignaturesEvent,
           getFailedExecution,
           setFailedExecution,

@@ -17,19 +17,33 @@ const otherAddress = '0xD4075FB57fCf038bFc702c915Ef9592534bED5c1'
 
 describe('getFailedTransactions', () => {
   test('should only return failed transactions', async () => {
-    const transactions = [{ isError: '0' }, { isError: '1' }, { isError: '0' }, { isError: '1' }, { isError: '1' }]
+    const to = otherAddress
+    const transactions = [
+      { isError: '0', to },
+      { isError: '1', to },
+      { isError: '0', to },
+      { isError: '1', to },
+      { isError: '1', to }
+    ]
 
     const fetchAccountTransactions = jest.fn().mockImplementation(() => transactions)
-    const result = await getFailedTransactions('', '', 0, 1, '', fetchAccountTransactions)
+    const result = await getFailedTransactions('', to, 0, 1, '', fetchAccountTransactions)
     expect(result.length).toEqual(3)
   })
 })
 describe('getSuccessTransactions', () => {
   test('should only return success transactions', async () => {
-    const transactions = [{ isError: '0' }, { isError: '1' }, { isError: '0' }, { isError: '1' }, { isError: '1' }]
+    const to = otherAddress
+    const transactions = [
+      { isError: '0', to },
+      { isError: '1', to },
+      { isError: '0', to },
+      { isError: '1', to },
+      { isError: '1', to }
+    ]
 
     const fetchAccountTransactions = jest.fn().mockImplementation(() => transactions)
-    const result = await getSuccessTransactions('', '', 0, 1, '', fetchAccountTransactions)
+    const result = await getSuccessTransactions('', to, 0, 1, '', fetchAccountTransactions)
     expect(result.length).toEqual(2)
   })
 })
@@ -74,8 +88,8 @@ describe('getExecutionFailedTransactionForMessage', () => {
         account: '',
         to: '',
         messageData,
-        startTimestamp: 0,
-        endTimestamp: 1
+        startBlock: 0,
+        endBlock: 1
       },
       fetchAccountTransactions
     )
