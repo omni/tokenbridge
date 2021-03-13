@@ -4,6 +4,8 @@ import { useStateProvider } from '../state/StateProvider'
 import { Contract } from 'web3-eth-contract'
 import { getRequiredBlockConfirmations } from '../utils/contract'
 import { foreignSnapshotProvider, homeSnapshotProvider, SnapshotProvider } from '../services/SnapshotProvider'
+import Web3 from 'web3'
+import { FOREIGN_EXPLORER_API, HOME_EXPLORER_API } from '../config/constants'
 
 export interface UseBlockConfirmationsParams {
   fromHome: boolean
@@ -19,9 +21,11 @@ export const useBlockConfirmations = ({ receipt, fromHome }: UseBlockConfirmatio
     contract: Contract,
     receipt: TransactionReceipt,
     setResult: Function,
-    snapshotProvider: SnapshotProvider
+    snapshotProvider: SnapshotProvider,
+    web3: Web3,
+    api: string
   ) => {
-    const result = await getRequiredBlockConfirmations(contract, receipt.blockNumber, snapshotProvider)
+    const result = await getRequiredBlockConfirmations(contract, receipt.blockNumber, snapshotProvider, web3, api)
     setResult(result)
   }
 
@@ -29,10 +33,12 @@ export const useBlockConfirmations = ({ receipt, fromHome }: UseBlockConfirmatio
     () => {
       const bridgeContract = fromHome ? home.bridgeContract : foreign.bridgeContract
       const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
-      if (!bridgeContract || !receipt) return
-      callRequireBlockConfirmations(bridgeContract, receipt, setBlockConfirmations, snapshotProvider)
+      const web3 = fromHome ? home.web3 : foreign.web3
+      const api = fromHome ? HOME_EXPLORER_API : FOREIGN_EXPLORER_API
+      if (!bridgeContract || !receipt || !web3) return
+      callRequireBlockConfirmations(bridgeContract, receipt, setBlockConfirmations, snapshotProvider, web3, api)
     },
-    [home.bridgeContract, foreign.bridgeContract, receipt, fromHome]
+    [home.bridgeContract, foreign.bridgeContract, receipt, fromHome, home.web3, foreign.web3]
   )
 
   return {

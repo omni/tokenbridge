@@ -7,6 +7,9 @@ import {
   MAX_TX_SEARCH_BLOCK_RANGE,
   SUBMIT_SIGNATURE_HASH
 } from '../config/constants'
+import { AbiItem } from 'web3-utils'
+import Web3 from 'web3'
+import { Contract } from 'web3-eth-contract'
 
 export interface APITransaction {
   timeStamp: string
@@ -142,6 +145,38 @@ export const getAccountTransactions = async ({
 
   console.warn(`Reached max transaction searching range, returning previously cached transactions for ${account}`)
   return transactionsCache[key].transactions
+}
+
+export const getLogs = async (
+  api: string,
+  web3: Web3,
+  contract: Contract,
+  event: string,
+  options: { fromBlock: number; toBlock: number | 'latest'; topics: (string | null)[] }
+) => {
+  const abi = contract.options.jsonInterface.find((abi: AbiItem) => abi.type === 'event' && abi.name === event)!
+
+  let params = `module=logs&action=getLogs&address=${contract.options.address}&fromBlock=${
+    options.fromBlock
+  }&toBlock=${options.toBlock || 'latest'}`
+  const topics = [web3.eth.abi.encodeEventSignature(abi), ...(options.topics || [])]
+  for (let i = 0; i < topics.length; i++) {
+    if (topics[i] !== null) {
+      params += `&topic${i}=${topics[i]}`
+      for (let j = 0; j < i; j++) {
+        params += `&topic${j}_${i}_opr=and`
+      }
+    }
+  }
+  const url = api.includes('blockscout') ? `${api}?${params}` : `${api}&${params}`
+
+  const logs = await fetch(url).then(res => res.json())
+
+  return logs.result.map((log: any) => ({
+    transactionHash: log.transactionHash,
+    blockNumber: parseInt(log.blockNumber.slice(2), 16),
+    returnValues: web3.eth.abi.decodeLog(abi.inputs!, log.data, log.topics.slice(1))
+  }))
 }
 
 const filterReceiver = (to: string) => (tx: APITransaction) => tx.to.toLowerCase() === to.toLowerCase()

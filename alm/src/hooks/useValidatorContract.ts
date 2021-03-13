@@ -6,6 +6,7 @@ import { BRIDGE_VALIDATORS_ABI } from '../abis'
 import { useStateProvider } from '../state/StateProvider'
 import { TransactionReceipt } from 'web3-eth'
 import { foreignSnapshotProvider, homeSnapshotProvider, SnapshotProvider } from '../services/SnapshotProvider'
+import { FOREIGN_EXPLORER_API, HOME_EXPLORER_API } from '../config/constants'
 
 export interface useValidatorContractParams {
   fromHome: boolean
@@ -30,10 +31,12 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
     contract: Maybe<Contract>,
     receipt: TransactionReceipt,
     setResult: Function,
-    snapshotProvider: SnapshotProvider
+    snapshotProvider: SnapshotProvider,
+    web3: Web3,
+    api: string
   ) => {
     if (!contract) return
-    const result = await getRequiredSignatures(contract, receipt.blockNumber, snapshotProvider)
+    const result = await getRequiredSignatures(contract, receipt.blockNumber, snapshotProvider, web3, api)
     setResult(result)
   }
 
@@ -41,32 +44,35 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
     contract: Maybe<Contract>,
     receipt: TransactionReceipt,
     setResult: Function,
-    snapshotProvider: SnapshotProvider
+    snapshotProvider: SnapshotProvider,
+    web3: Web3,
+    api: string
   ) => {
     if (!contract) return
-    const result = await getValidatorList(contract, receipt.blockNumber, snapshotProvider)
+    const result = await getValidatorList(contract, receipt.blockNumber, snapshotProvider, web3, api)
     setResult(result)
   }
 
+  const web3 = fromHome ? home.web3 : foreign.web3
+  const api = fromHome ? HOME_EXPLORER_API : FOREIGN_EXPLORER_API
+  const bridgeContract = fromHome ? home.bridgeContract : foreign.bridgeContract
+  const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
+
   useEffect(
     () => {
-      const web3 = fromHome ? home.web3 : foreign.web3
-      const bridgeContract = fromHome ? home.bridgeContract : foreign.bridgeContract
-
       if (!web3 || !bridgeContract) return
       callValidatorContract(bridgeContract, web3, setValidatorContract)
     },
-    [home.web3, foreign.web3, home.bridgeContract, foreign.bridgeContract, fromHome]
+    [web3, bridgeContract]
   )
 
   useEffect(
     () => {
-      if (!receipt) return
-      const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
-      callRequiredSignatures(validatorContract, receipt, setRequiredSignatures, snapshotProvider)
-      callValidatorList(validatorContract, receipt, setValidatorList, snapshotProvider)
+      if (!web3 || !receipt) return
+      callRequiredSignatures(validatorContract, receipt, setRequiredSignatures, snapshotProvider, web3, api)
+      callValidatorList(validatorContract, receipt, setValidatorList, snapshotProvider, web3, api)
     },
-    [validatorContract, receipt, fromHome]
+    [validatorContract, receipt, web3, snapshotProvider, api]
   )
 
   return {

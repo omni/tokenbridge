@@ -6,6 +6,7 @@ import {
   DOUBLE_EXECUTION_ATTEMPT_ERROR,
   EXECUTION_FAILED_ERROR,
   EXECUTION_OUT_OF_GAS_ERROR,
+  FOREIGN_EXPLORER_API,
   INCORRECT_CHAIN_ERROR,
   VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
@@ -92,7 +93,13 @@ export const ManualExecutionButton = ({
         })
         .on('error', async (e: Error, receipt: TransactionReceipt) => {
           if (e.message.includes('Transaction has been reverted by the EVM')) {
-            const successExecutionData = await getSuccessExecutionData(bridge, 'RelayedMessage', library, messageId)
+            const successExecutionData = await getSuccessExecutionData(
+              bridge,
+              'RelayedMessage',
+              library,
+              messageId,
+              FOREIGN_EXPLORER_API
+            )
             if (successExecutionData) {
               setExecutionData(successExecutionData)
               setError(DOUBLE_EXECUTION_ATTEMPT_ERROR)
