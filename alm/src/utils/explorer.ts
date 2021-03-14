@@ -50,10 +50,15 @@ export interface GetTransactionParams extends GetPendingTransactionParams {
 }
 
 export const fetchAccountTransactions = async ({ account, startBlock, endBlock, api }: AccountTransactionsParams) => {
-  const params = `module=account&action=txlist&address=${account}&filterby=from&startblock=${startBlock}&endblock=${endBlock}`
-  const url = api.includes('blockscout') ? `${api}?${params}` : `${api}&${params}`
+  const url = new URL(api)
+  url.searchParams.append('module', 'account')
+  url.searchParams.append('action', 'txlist')
+  url.searchParams.append('address', account)
+  url.searchParams.append('filterby', 'from')
+  url.searchParams.append('startblock', startBlock.toString())
+  url.searchParams.append('endblock', endBlock.toString())
 
-  const result = await fetch(url).then(res => res.json())
+  const result = await fetch(url.toString()).then(res => res.json())
 
   if (result.message === 'No transactions found') {
     return []
@@ -69,10 +74,13 @@ export const fetchPendingTransactions = async ({
   if (!api.includes('blockscout')) {
     return []
   }
-  const url = `${api}?module=account&action=pendingtxlist&address=${account}`
+  const url = new URL(api)
+  url.searchParams.append('module', 'account')
+  url.searchParams.append('action', 'pendingtxlist')
+  url.searchParams.append('address', account)
 
   try {
-    const result = await fetch(url).then(res => res.json())
+    const result = await fetch(url.toString()).then(res => res.json())
     if (result.status === '0') {
       return []
     }
@@ -88,9 +96,13 @@ export const getClosestBlockByTimestamp = async (api: string, timestamp: number)
     throw new Error('Blockscout does not support getblocknobytime')
   }
 
-  const url = `${api}&module=block&action=getblocknobytime&timestamp=${timestamp}&closest=before`
+  const url = new URL(api)
+  url.searchParams.append('module', 'block')
+  url.searchParams.append('action', 'getblocknobytime')
+  url.searchParams.append('timestamp', timestamp.toString())
+  url.searchParams.append('closest', 'before')
 
-  const blockNumber = await fetch(url).then(res => res.json())
+  const blockNumber = await fetch(url.toString()).then(res => res.json())
 
   return parseInt(blockNumber.result)
 }
@@ -156,21 +168,24 @@ export const getLogs = async (
 ) => {
   const abi = contract.options.jsonInterface.find((abi: AbiItem) => abi.type === 'event' && abi.name === event)!
 
-  let params = `module=logs&action=getLogs&address=${contract.options.address}&fromBlock=${
-    options.fromBlock
-  }&toBlock=${options.toBlock || 'latest'}`
+  const url = new URL(api)
+  url.searchParams.append('module', 'logs')
+  url.searchParams.append('action', 'getLogs')
+  url.searchParams.append('address', contract.options.address)
+  url.searchParams.append('fromBlock', options.fromBlock.toString())
+  url.searchParams.append('toBlock', options.toBlock.toString() || 'latest')
+
   const topics = [web3.eth.abi.encodeEventSignature(abi), ...(options.topics || [])]
   for (let i = 0; i < topics.length; i++) {
     if (topics[i] !== null) {
-      params += `&topic${i}=${topics[i]}`
+      url.searchParams.append(`topic${i}`, topics[i] as string)
       for (let j = 0; j < i; j++) {
-        params += `&topic${j}_${i}_opr=and`
+        url.searchParams.append(`topic${j}_${i}_opr`, 'and')
       }
     }
   }
-  const url = api.includes('blockscout') ? `${api}?${params}` : `${api}&${params}`
 
-  const logs = await fetch(url).then(res => res.json())
+  const logs = await fetch(url.toString()).then(res => res.json())
 
   return logs.result.map((log: any) => ({
     transactionHash: log.transactionHash,

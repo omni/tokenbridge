@@ -4,6 +4,7 @@ const path = require('path')
 require('dotenv').config()
 const Web3 = require('web3')
 const fetch = require('node-fetch')
+const { URL } = require('url')
 
 const fs = require('fs')
 
@@ -29,10 +30,13 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
       if (e.message.includes('exceed maximum block range')) {
         const abi = contract.options.jsonInterface.find(abi => abi.type === 'event' && abi.name === eventName)
 
-        const params = `module=logs&action=getLogs&address=${contract.options.address}&fromBlock=${
-          options.fromBlock
-        }&toBlock=${options.toBlock || 'latest'}&topic0=${web3.eth.abi.encodeEventSignature(abi)}`
-        const url = api.includes('blockscout') ? `${api}?${params}` : `${api}&${params}`
+        const url = new URL(api)
+        url.searchParams.append('module', 'logs')
+        url.searchParams.append('action', 'getLogs')
+        url.searchParams.append('address', contract.options.address)
+        url.searchParams.append('fromBlock', options.fromBlock)
+        url.searchParams.append('toBlock', options.toBlock || 'latest')
+        url.searchParams.append('topic0', web3.eth.abi.encodeEventSignature(abi))
 
         const logs = await fetch(url).then(res => res.json())
 
