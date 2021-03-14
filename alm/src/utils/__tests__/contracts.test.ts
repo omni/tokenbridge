@@ -16,7 +16,7 @@ describe('getRequiredBlockConfirmations', () => {
 
   test('Should call requiredBlockConfirmations method if no events present', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       },
       methods: methodsBuilder('1')
@@ -37,7 +37,7 @@ describe('getRequiredBlockConfirmations', () => {
   })
   test('Should not call to get events if block number was included in the snapshot', async () => {
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => []),
+      getPastEvents: jest.fn().mockImplementation(async () => []),
       methods: methodsBuilder('3')
     } as unknown) as Contract
 
@@ -64,7 +64,7 @@ describe('getRequiredBlockConfirmations', () => {
   })
   test('Should call to get events if block number was not included in the snapshot', async () => {
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => [
+      getPastEvents: jest.fn().mockImplementation(async () => [
         {
           blockNumber: 9,
           returnValues: {
@@ -102,7 +102,7 @@ describe('getRequiredBlockConfirmations', () => {
   })
   test('Should use the most updated event', async () => {
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => [
+      getPastEvents: jest.fn().mockImplementation(async () => [
         {
           blockNumber: 9,
           returnValues: {
@@ -141,7 +141,7 @@ describe('getRequiredBlockConfirmations', () => {
 describe('getRequiredSignatures', () => {
   test('Should not call to get events if block number was included in the snapshot', async () => {
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => [])
+      getPastEvents: jest.fn().mockImplementation(async () => [])
     } as unknown) as Contract
 
     const snapshotProvider = ({
@@ -173,7 +173,7 @@ describe('getRequiredSignatures', () => {
   })
   test('Should call to get events if block number is higher than the snapshot block number', async () => {
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => [
+      getPastEvents: jest.fn().mockImplementation(async () => [
         {
           blockNumber: 15,
           returnValues: {
@@ -216,7 +216,7 @@ describe('getRequiredSignatures', () => {
   })
   test('Should use the most updated event before the block number', async () => {
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => [
+      getPastEvents: jest.fn().mockImplementation(async () => [
         {
           blockNumber: 15,
           returnValues: {
@@ -270,7 +270,7 @@ describe('getValidatorList', () => {
   test('Should return the current validator list if no events found', async () => {
     const currentValidators = [validator1, validator2, validator3]
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => []),
+      getPastEvents: jest.fn().mockImplementation(async () => []),
       methods: methodsBuilder(currentValidators)
     } as unknown) as Contract
 
@@ -301,7 +301,7 @@ describe('getValidatorList', () => {
   test('If validator was added later from snapshot it should not include it', async () => {
     const currentValidators = [validator1, validator2, validator3]
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => []),
+      getPastEvents: jest.fn().mockImplementation(async () => []),
       methods: methodsBuilder(currentValidators)
     } as unknown) as Contract
 
@@ -340,7 +340,7 @@ describe('getValidatorList', () => {
   test('If validator was added later from chain it should not include it', async () => {
     const currentValidators = [validator1, validator2, validator3]
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(event => {
+      getPastEvents: jest.fn().mockImplementation(async event => {
         if (event === 'ValidatorAdded') {
           return [
             {
@@ -385,7 +385,7 @@ describe('getValidatorList', () => {
   test('If validator was removed later from snapshot it should include it', async () => {
     const currentValidators = [validator1, validator2]
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(() => []),
+      getPastEvents: jest.fn().mockImplementation(async () => []),
       methods: methodsBuilder(currentValidators)
     } as unknown) as Contract
 
@@ -424,7 +424,7 @@ describe('getValidatorList', () => {
   test('If validator was removed later from chain it should include it', async () => {
     const currentValidators = [validator1, validator2]
     const contract = ({
-      getPastEvents: jest.fn().mockImplementation(event => {
+      getPastEvents: jest.fn().mockImplementation(async event => {
         if (event === 'ValidatorRemoved') {
           return [
             {

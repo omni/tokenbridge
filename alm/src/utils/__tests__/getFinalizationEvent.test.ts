@@ -50,7 +50,7 @@ beforeEach(() => {
 describe('getFinalizationEvent', () => {
   test('should get finalization event and not try to get failed or pending transactions', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return [event]
       }
     } as unknown) as Contract
@@ -102,7 +102,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event and not try to get failed or pending transactions if foreign to home transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       }
     } as unknown) as Contract
@@ -147,7 +147,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event and try to get failed and pending transactions if home to foreign transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       },
       options: {
@@ -199,7 +199,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event and not to try to get failed transaction if pending transactions found if home to foreign transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       },
       options: {
@@ -258,7 +258,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event even if failed transaction found if home to foreign transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       },
       options: {

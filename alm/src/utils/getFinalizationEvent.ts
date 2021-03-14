@@ -1,16 +1,45 @@
 import { Contract, EventData } from 'web3-eth-contract'
 import Web3 from 'web3'
-import { CACHE_KEY_EXECUTION_FAILED, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import {
+  CACHE_KEY_EXECUTION_FAILED,
+  FOREIGN_EXPLORER_API,
+  HOME_EXPLORER_API,
+  VALIDATOR_CONFIRMATION_STATUS
+} from '../config/constants'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
-import { APIPendingTransaction, APITransaction, GetTransactionParams, GetPendingTransactionParams } from './explorer'
+import {
+  APIPendingTransaction,
+  APITransaction,
+  GetTransactionParams,
+  GetPendingTransactionParams,
+  getLogs
+} from './explorer'
 import { getBlock, MessageObject } from './web3'
 import validatorsCache from '../services/ValidatorsCache'
 import { foreignBlockNumberProvider, homeBlockNumberProvider } from '../services/BlockNumberProvider'
 
-export const getSuccessExecutionData = async (contract: Contract, eventName: string, web3: Web3, messageId: string) => {
+const getPastEventsWithFallback = (api: string, web3: Web3, contract: Contract, eventName: string, options: any) =>
+  contract.getPastEvents(eventName, options).catch(
+    () =>
+      api
+        ? getLogs(api, web3, contract, eventName, {
+            fromBlock: options.fromBlock,
+            toBlock: options.toBlock,
+            topics: [null, null, options.filter.messageId]
+          })
+        : []
+  )
+
+export const getSuccessExecutionData = async (
+  contract: Contract,
+  eventName: string,
+  web3: Web3,
+  messageId: string,
+  api: string = ''
+) => {
   // Since it filters by the message id, only one event will be fetched
   // so there is no need to limit the range of the block to reduce the network traffic
-  const events: EventData[] = await contract.getPastEvents(eventName, {
+  const events: EventData[] = await getPastEventsWithFallback(api, web3, contract, eventName, {
     fromBlock: 0,
     toBlock: 'latest',
     filter: {
@@ -57,7 +86,8 @@ export const getFinalizationEvent = async (
   setExecutionEventsFetched: Function
 ) => {
   if (!contract || !web3 || !waitingBlocksResolved) return
-  const successExecutionData = await getSuccessExecutionData(contract, eventName, web3, message.id)
+  const api = fromHome ? FOREIGN_EXPLORER_API : HOME_EXPLORER_API
+  const successExecutionData = await getSuccessExecutionData(contract, eventName, web3, message.id, api)
   if (successExecutionData) {
     setResult(successExecutionData)
   } else {
