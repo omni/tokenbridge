@@ -236,6 +236,8 @@ async function main(mode) {
     foreignToHomeRequests,
     isExternalErc20,
     bridgeMode,
+    homeBlockNumber,
+    foreignBlockNumber,
     homeDelayedBlockNumber,
     foreignDelayedBlockNumber
   }

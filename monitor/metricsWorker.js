@@ -5,11 +5,11 @@ const getPrometheusMetrics = require('./prometheusMetrics')
 
 const { MONITOR_BRIDGE_NAME } = process.env
 
-function metricsWorker() {
+async function metricsWorker() {
   try {
     createDir(`/responses/${MONITOR_BRIDGE_NAME}`)
     logger.debug('calling getPrometheusMetrics()')
-    const metrics = getPrometheusMetrics(MONITOR_BRIDGE_NAME)
+    const metrics = await getPrometheusMetrics(MONITOR_BRIDGE_NAME)
     if (!metrics) throw new Error('metrics is empty: ' + JSON.stringify(metrics))
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/metrics.txt`, metrics, { stringify: false })
     logger.debug('Done')
@@ -17,5 +17,4 @@ function metricsWorker() {
     logger.error(e)
   }
 }
-
 metricsWorker()
