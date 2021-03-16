@@ -2,12 +2,7 @@ require('dotenv').config()
 const logger = require('./logger')('getBalances')
 const { readFile } = require('./utils/file')
 
-const {
-  MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST,
-  MONITOR_HOME_TO_FOREIGN_BLOCK_LIST,
-  MONITOR_HOME_VALIDATORS_BALANCE_ENABLE,
-  MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE
-} = process.env
+const { MONITOR_HOME_VALIDATORS_BALANCE_ENABLE, MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE } = process.env
 
 function BridgeConf(type, validatorsBalanceEnable, alertTargetFunc, failureDirection) {
   this.type = type
@@ -25,6 +20,8 @@ function hasError(obj) {
   return 'error' in obj
 }
 
+// Try to collect all metrics from JSON responses and then
+// discard all unsuccessfully retrieved ones
 function getPrometheusMetrics(bridgeName) {
   const responsePath = jsonName => `./responses/${bridgeName}/${jsonName}.json`
 
@@ -34,22 +31,37 @@ function getPrometheusMetrics(bridgeName) {
   const balancesFile = readFile(responsePath('getBalances'))
 
   if (!hasError(balancesFile)) {
-    const { home: homeBalances, foreign: foreignBalances, ...commonBalances } = balancesFile
-    metrics.balances_home_value = homeBalances.totalSupply
-    metrics.balances_home_txs_deposit = homeBalances.deposits
-    metrics.balances_home_txs_withdrawal = homeBalances.withdrawals
+    const { home, foreign, ...commonBalances } = balancesFile
 
-    metrics.balances_foreign_value = foreignBalances.erc20Balance
-    metrics.balances_foreign_txs_deposit = foreignBalances.deposits
-    metrics.balances_foreign_txs_withdrawal = foreignBalances.withdrawals
+    const balanceMetrics = {
+      // ERC_TO_ERC or ERC_TO_NATIVE mode
+      balances_home_value: home.totalSupply,
+      balances_home_txs_deposit: home.deposits,
+      balances_home_txs_withdrawal: home.withdrawals,
+      balances_foreign_value: foreign.erc20Balance,
+      balances_foreign_txs_deposit: foreign.deposits,
+      balances_foreign_txs_withdrawal: foreign.withdrawals,
 
-    metrics.balances_diff_value = commonBalances.balanceDiff
-    metrics.balances_diff_deposit = commonBalances.depositsDiff
-    metrics.balances_diff_withdrawal = commonBalances.withdrawalDiff
-    if (MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST || MONITOR_HOME_TO_FOREIGN_BLOCK_LIST) {
-      metrics.balances_unclaimed_txs = commonBalances.unclaimedDiff
-      metrics.balances_unclaimed_value = commonBalances.unclaimedBalance
+      // Not ARBITRARY_MESSAGE mode
+      balances_diff_value: commonBalances.balanceDiff,
+      balances_diff_deposit: commonBalances.depositsDiff,
+      balances_diff_withdrawal: commonBalances.withdrawalDiff,
+
+      // MONITOR_HOME_TO_FOREIGN_ALLOWANCE_LIST or MONITOR_HOME_TO_FOREIGN_BLOCK_LIST is set
+      balances_unclaimed_txs: commonBalances.unclaimedDiff,
+      balances_unclaimed_value: commonBalances.unclaimedBalance,
+
+      // ARBITRARY_MESSAGE mode
+      txs_home_out: home.toForeign,
+      txs_home_in: home.fromForeign,
+      txs_foreign_out: foreign.toHome,
+      txs_foreign_in: foreign.fromHome,
+      txs_diff_home_out_oracles: commonBalances.fromHomeToForeignDiff,
+      txs_diff_home_out_users: commonBalances.fromHomeToForeignPBUDiff,
+      txs_diff_foreign_out: commonBalances.fromForeignToHomeDiff
     }
+
+    Object.assign(metrics, balanceMetrics)
   }
 
   // Validator metrics
