@@ -14,6 +14,7 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     ("oracle_bridge_affirmation_1"),
     ("oracle_bridge_senderhome_1"),
     ("oracle_bridge_senderforeign_1"),
+    ("oracle_bridge_shutdown_1"),
 ])
 def test_docker_containers(host, name):
     container = host.docker(name)

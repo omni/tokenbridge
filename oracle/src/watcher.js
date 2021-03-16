@@ -155,8 +155,20 @@ async function isWorkerNeeded() {
   }
 }
 
+async function isShutdowned() {
+  logger.debug('Checking current shutdown state in the DB')
+  const isShutdown = (await redis.get(config.shutdownKey)) === 'true'
+  logger.debug({ isShutdown }, 'Read shutdown state from the DB')
+  return isShutdown
+}
+
 async function main({ sendToQueue, sendToWorker }) {
   try {
+    if (await isShutdowned()) {
+      logger.info('Oracle watcher was suspended via the remote shutdown process')
+      return
+    }
+
     await checkConditions()
 
     const lastBlockToProcess = await getLastBlockToProcess()

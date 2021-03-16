@@ -86,6 +86,13 @@ async function readNonce(forceUpdate) {
   }
 }
 
+async function isShutdowned() {
+  logger.debug('Checking current shutdown state in the DB')
+  const isShutdown = (await redis.get(config.shutdownKey)) === 'true'
+  logger.debug({ isShutdown }, 'Read shutdown state from the DB')
+  return isShutdown
+}
+
 function updateNonce(nonce) {
   if (typeof nonce !== 'number') {
     logger.warn('Given nonce value is not a valid number. Nothing will be updated in the DB.')
@@ -98,6 +105,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
   try {
     if (redis.status !== 'ready') {
       nackMsg(msg)
+      return
+    }
+
+    if (await isShutdowned()) {
+      logger.info('Oracle sender was suspended via the remote shutdown process')
       return
     }
 
