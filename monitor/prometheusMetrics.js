@@ -1,3 +1,5 @@
+require('dotenv').config()
+const logger = require('./logger')('getBalances')
 const { readFile } = require('./utils/file')
 
 const {
@@ -62,7 +64,11 @@ function getPrometheusMetrics(bridgeName) {
           : Object.keys(allValidators)
 
       validatorAddressesWithBalanceCheck.forEach((addr, ind) => {
-        metrics[`validators_balances_${bridge.type}${ind}{address="${addr}"}`] = allValidators[addr].balance
+        if (addr in allValidators) {
+          metrics[`validators_balances_${bridge.type}${ind}{address="${addr}"}`] = allValidators[addr].balance
+        } else {
+          logger.debug(`Nonexistent validator address ${addr}`)
+        }
       })
     }
   }
@@ -96,9 +102,12 @@ function getPrometheusMetrics(bridgeName) {
   return Object.entries(metrics).reduceRight(
     // Prometheus supports `Nan` and possibly signed `Infinity`
     // in case cast to `Number` fails
-    (acc, [key, val]) => `${key} ${val ? Number(val) : 0}\n${acc}`,
+    (acc, [key, val]) => {
+      if (typeof val === 'undefined') return acc
+      else return `${key} ${Number(val)}\n${acc}`
+    },
     ''
   )
 }
 
-module.exports = { getPrometheusMetrics }
+module.exports = getPrometheusMetrics

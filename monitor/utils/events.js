@@ -242,7 +242,7 @@ async function main(mode) {
 
   if (MONITOR_CACHE_EVENTS === 'true') {
     logger.debug('saving obtained events into cache file')
-    writeFile(cacheFilePath, result, false)
+    writeFile(cacheFilePath, result, { useCwd: false })
   }
   return result
 }
