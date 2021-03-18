@@ -11,9 +11,6 @@ import {
   VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
 import { homeBlockNumberProvider, foreignBlockNumberProvider } from '../services/BlockNumberProvider'
-import { checkSignaturesWaitingForBLocks } from '../utils/signatureWaitingForBlocks'
-import { getCollectedSignaturesEvent } from '../utils/getCollectedSignaturesEvent'
-import { checkWaitingBlocksForExecution } from '../utils/executionWaitingForBlocks'
 import { getConfirmationsForTx } from '../utils/getConfirmationsForTx'
 import { getFinalizationEvent } from '../utils/getFinalizationEvent'
 import {
@@ -64,11 +61,11 @@ export const useMessageConfirmations = ({
   blockConfirmations
 }: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
-  const [confirmations, setConfirmations] = useState([])
+  const [confirmations, setConfirmations] = useState<ConfirmationParam[]>([])
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
   const [waitingBlocks, setWaitingBlocks] = useState(false)
   const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
-  const [signatureCollected, setSignatureCollected] = useState(false)
+  const [signatureCollected, setSignatureCollected] = useState<boolean | string[]>(false)
   const [executionEventsFetched, setExecutionEventsFetched] = useState(false)
   const [collectedSignaturesEvent, setCollectedSignaturesEvent] = useState<Maybe<EventData>>(null)
   const [executionData, setExecutionData] = useState<ExecutionData>({
@@ -85,12 +82,10 @@ export const useMessageConfirmations = ({
   const [pendingConfirmations, setPendingConfirmations] = useState(false)
   const [pendingExecution, setPendingExecution] = useState(false)
 
-  const existsConfirmation = (confirmationArray: ConfirmationParam[]) => {
-    const filteredList = confirmationArray.filter(
+  const existsConfirmation = (confirmationArray: ConfirmationParam[]) =>
+    confirmationArray.some(
       c => c.status !== VALIDATOR_CONFIRMATION_STATUS.UNDEFINED && c.status !== VALIDATOR_CONFIRMATION_STATUS.WAITING
     )
-    return filteredList.length > 0
-  }
 
   // start watching blocks at the start
   useEffect(
@@ -108,129 +103,154 @@ export const useMessageConfirmations = ({
     () => {
       if (!receipt || !blockConfirmations || waitingBlocksResolved) return
 
-      const subscriptions: Array<number> = []
-
-      const unsubscribe = () => {
-        subscriptions.forEach(s => {
-          clearTimeout(s)
-        })
-      }
+      let timeoutId: number
 
       const blockProvider = fromHome ? homeBlockNumberProvider : foreignBlockNumberProvider
       const interval = fromHome ? HOME_RPC_POLLING_INTERVAL : FOREIGN_RPC_POLLING_INTERVAL
       const targetBlock = receipt.blockNumber + blockConfirmations
+      const validatorsWaiting = validatorList.map(validator => ({
+        validator,
+        status: VALIDATOR_CONFIRMATION_STATUS.WAITING,
+        txHash: '',
+        timestamp: 0
+      }))
 
-      checkSignaturesWaitingForBLocks(
-        targetBlock,
-        setWaitingBlocks,
-        setWaitingBlocksResolved,
-        validatorList,
-        setConfirmations,
-        blockProvider,
-        interval,
-        subscriptions
-      )
+      const checkSignaturesWaitingForBLocks = () => {
+        const currentBlock = blockProvider.get()
 
-      return () => {
-        unsubscribe()
+        if (currentBlock && currentBlock >= targetBlock) {
+          setWaitingBlocksResolved(true)
+          setWaitingBlocks(false)
+        } else if (currentBlock) {
+          setWaitingBlocks(true)
+          setConfirmations(validatorsWaiting)
+          timeoutId = setTimeout(checkSignaturesWaitingForBLocks, interval)
+        } else {
+          timeoutId = setTimeout(checkSignaturesWaitingForBLocks, 500)
+        }
       }
+
+      checkSignaturesWaitingForBLocks()
+
+      return () => clearTimeout(timeoutId)
     },
-    [
-      blockConfirmations,
-      foreign.web3,
-      fromHome,
-      validatorList,
-      home.web3,
-      receipt,
-      setConfirmations,
-      waitingBlocksResolved
-    ]
+    [blockConfirmations, fromHome, receipt, validatorList, waitingBlocksResolved]
   )
 
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
   // the execution tx on the foreign network is waiting for block confirmations
   // This is executed if the message is in Home to Foreign direction only
+  const hasCollectedSignatures = !!signatureCollected // true or string[]
   useEffect(
     () => {
-      if (!fromHome || !receipt || !home.web3 || !signatureCollected) return
+      if (!fromHome || !receipt || !home.web3 || !home.bridgeContract || !hasCollectedSignatures) return
 
-      const subscriptions: Array<number> = []
+      let timeoutId: number
+      let isCancelled = false
 
-      const unsubscribe = () => {
-        subscriptions.forEach(s => {
-          clearTimeout(s)
-        })
+      const messageHash = home.web3.utils.soliditySha3Raw(message.data)
+      const contract = home.bridgeContract
+
+      const getCollectedSignaturesEvent = async (fromBlock: number, toBlock: number) => {
+        const currentBlock = homeBlockNumberProvider.get()
+
+        if (currentBlock) {
+          // prevent errors if the toBlock parameter is bigger than the latest
+          const securedToBlock = toBlock >= currentBlock ? currentBlock : toBlock
+          const events = await contract.getPastEvents('CollectedSignatures', {
+            fromBlock,
+            toBlock: securedToBlock
+          })
+          const event = events.find(e => e.returnValues.messageHash === messageHash)
+          if (event) {
+            setCollectedSignaturesEvent(event)
+          } else if (!isCancelled) {
+            timeoutId = setTimeout(() => getCollectedSignaturesEvent(securedToBlock, securedToBlock + BLOCK_RANGE), 500)
+          }
+        } else if (!isCancelled) {
+          timeoutId = setTimeout(() => getCollectedSignaturesEvent(fromBlock, toBlock), 500)
+        }
       }
 
-      const fromBlock = receipt.blockNumber
-      const toBlock = fromBlock + BLOCK_RANGE
-      const messageHash = home.web3.utils.soliditySha3Raw(message.data)
-
-      getCollectedSignaturesEvent(
-        home.web3,
-        home.bridgeContract,
-        fromBlock,
-        toBlock,
-        messageHash,
-        setCollectedSignaturesEvent,
-        subscriptions
-      )
+      getCollectedSignaturesEvent(receipt.blockNumber, receipt.blockNumber + BLOCK_RANGE)
 
       return () => {
-        unsubscribe()
+        clearTimeout(timeoutId)
+        isCancelled = true
       }
     },
-    [fromHome, home.bridgeContract, home.web3, message.data, receipt, signatureCollected]
+    [fromHome, home.bridgeContract, home.web3, message.data, receipt, hasCollectedSignatures]
   )
 
   // Check if the responsible validator is waiting for block confirmations to execute the message on foreign network
   // This is executed if the message is in Home to Foreign direction only
   useEffect(
     () => {
-      if (!fromHome || !home.web3 || !receipt || !collectedSignaturesEvent || !blockConfirmations) return
+      if (!fromHome || !home.web3 || !collectedSignaturesEvent || !blockConfirmations) return
       if (waitingBlocksForExecutionResolved) return
 
-      const subscriptions: Array<number> = []
-
-      const unsubscribe = () => {
-        subscriptions.forEach(s => {
-          clearTimeout(s)
-        })
-      }
+      let timeoutId: number
 
       const targetBlock = collectedSignaturesEvent.blockNumber + blockConfirmations
 
-      checkWaitingBlocksForExecution(
-        homeBlockNumberProvider,
-        HOME_RPC_POLLING_INTERVAL,
-        targetBlock,
-        collectedSignaturesEvent,
-        setWaitingBlocksForExecution,
-        setWaitingBlocksForExecutionResolved,
-        setExecutionData,
-        subscriptions
-      )
+      const checkWaitingBlocksForExecution = () => {
+        const currentBlock = homeBlockNumberProvider.get()
 
-      return () => {
-        unsubscribe()
+        if (currentBlock && currentBlock >= targetBlock) {
+          const undefinedExecutionState = {
+            status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+            validator: collectedSignaturesEvent.returnValues.authorityResponsibleForRelay,
+            txHash: '',
+            timestamp: 0,
+            executionResult: false
+          }
+          setExecutionData(
+            (data: any) =>
+              data.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED ||
+              data.status === VALIDATOR_CONFIRMATION_STATUS.WAITING
+                ? undefinedExecutionState
+                : data
+          )
+          setWaitingBlocksForExecutionResolved(true)
+          setWaitingBlocksForExecution(false)
+        } else if (currentBlock) {
+          setWaitingBlocksForExecution(true)
+          const waitingExecutionState = {
+            status: VALIDATOR_CONFIRMATION_STATUS.WAITING,
+            validator: collectedSignaturesEvent.returnValues.authorityResponsibleForRelay,
+            txHash: '',
+            timestamp: 0,
+            executionResult: false
+          }
+          setExecutionData(
+            (data: any) =>
+              data.status === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED ||
+              data.status === VALIDATOR_CONFIRMATION_STATUS.WAITING
+                ? waitingExecutionState
+                : data
+          )
+          timeoutId = setTimeout(() => checkWaitingBlocksForExecution(), HOME_RPC_POLLING_INTERVAL)
+        } else {
+          timeoutId = setTimeout(() => checkWaitingBlocksForExecution(), 500)
+        }
       }
+
+      checkWaitingBlocksForExecution()
+
+      return () => clearTimeout(timeoutId)
     },
-    [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, receipt, waitingBlocksForExecutionResolved]
+    [collectedSignaturesEvent, fromHome, blockConfirmations, home.web3, waitingBlocksForExecutionResolved]
   )
 
   // Checks if validators verified the message
   // To avoid making extra requests, this is only executed when validators finished waiting for blocks confirmations
   useEffect(
     () => {
-      if (!waitingBlocksResolved || !homeStartBlock || !requiredSignatures) return
+      if (!waitingBlocksResolved || !homeStartBlock || !requiredSignatures || !home.web3 || !home.bridgeContract) return
+      if (!validatorList || !validatorList.length) return
 
-      const subscriptions: Array<number> = []
-
-      const unsubscribe = () => {
-        subscriptions.forEach(s => {
-          clearTimeout(s)
-        })
-      }
+      let timeoutId: number
+      let isCancelled = false
 
       getConfirmationsForTx(
         message.data,
@@ -241,8 +261,8 @@ export const useMessageConfirmations = ({
         setConfirmations,
         requiredSignatures,
         setSignatureCollected,
-        waitingBlocksResolved,
-        subscriptions,
+        id => (timeoutId = id),
+        () => isCancelled,
         homeStartBlock,
         getValidatorFailedTransactionsForMessage,
         setFailedConfirmations,
@@ -252,7 +272,8 @@ export const useMessageConfirmations = ({
       )
 
       return () => {
-        unsubscribe()
+        clearTimeout(timeoutId)
+        isCancelled = true
       }
     },
     [
@@ -263,8 +284,7 @@ export const useMessageConfirmations = ({
       home.bridgeContract,
       requiredSignatures,
       waitingBlocksResolved,
-      homeStartBlock,
-      setConfirmations
+      homeStartBlock
     ]
   )
 
@@ -274,32 +294,23 @@ export const useMessageConfirmations = ({
   useEffect(
     () => {
       if ((fromHome && !waitingBlocksForExecutionResolved) || (!fromHome && !waitingBlocksResolved)) return
-      const startBlock = fromHome ? foreignStartBlock : homeStartBlock
-      if (!startBlock) return
 
-      const subscriptions: Array<number> = []
-
-      const unsubscribe = () => {
-        subscriptions.forEach(s => {
-          clearTimeout(s)
-        })
-      }
-
-      const contractEvent = fromHome ? 'RelayedMessage' : 'AffirmationCompleted'
       const bridgeContract = fromHome ? foreign.bridgeContract : home.bridgeContract
-      const providedWeb3 = fromHome ? foreign.web3 : home.web3
-      const interval = fromHome ? FOREIGN_RPC_POLLING_INTERVAL : HOME_RPC_POLLING_INTERVAL
+      const web3 = fromHome ? foreign.web3 : home.web3
+      const startBlock = fromHome ? foreignStartBlock : homeStartBlock
+      if (!startBlock || !bridgeContract || !web3) return
+
+      let timeoutId: number
+      let isCancelled = false
 
       getFinalizationEvent(
         fromHome,
         bridgeContract,
-        contractEvent,
-        providedWeb3,
+        web3,
         setExecutionData,
-        waitingBlocksResolved,
         message,
-        interval,
-        subscriptions,
+        id => (timeoutId = id),
+        () => isCancelled,
         startBlock,
         collectedSignaturesEvent,
         getExecutionFailedTransactionForMessage,
@@ -310,7 +321,8 @@ export const useMessageConfirmations = ({
       )
 
       return () => {
-        unsubscribe()
+        clearTimeout(timeoutId)
+        isCancelled = true
       }
     },
     [
