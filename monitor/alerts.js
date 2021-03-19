@@ -58,8 +58,6 @@ async function main(eventsInfo) {
       mostRecentTxHash: xAffirmationsMostRecentTxHash,
       transactions: xAffirmationsTxs
     },
-    homeBlockNumber,
-    foreignBlockNumber,
     lastChecked: Math.floor(Date.now() / 1000)
   }
 }

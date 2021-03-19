@@ -9,7 +9,7 @@ function readFile(filePath, parseJson = true) {
     const timeDiff = Math.floor(Date.now() / 1000) - json.lastChecked
     return Object.assign({}, json, { timeDiff })
   } catch (e) {
-    console.error(e)
+    console.error('readFlle', e)
     return {
       error: 'the bridge statistics are not available'
     }

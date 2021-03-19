@@ -1,7 +1,6 @@
 require('dotenv').config()
 const logger = require('./logger')('getBalances')
 const { readFile } = require('./utils/file')
-const { getHomeBlockNumber, getForeignBlockNumber } = require('./utils/web3')
 
 const {
   MONITOR_HOME_START_BLOCK,
@@ -67,7 +66,14 @@ async function getPrometheusMetrics(bridgeName) {
       txs_diff_foreign_out: commonBalances.fromForeignToHomeDiff
     }
 
-    Object.assign(metrics, balanceMetrics)
+    const blockRanges = {
+      state_startblock_home: commonBalances.startBlockHome || MONITOR_HOME_START_BLOCK,
+      state_startblock_foreign: commonBalances.startBlockForeign || MONITOR_FOREIGN_START_BLOCK,
+      state_endblock_home: commonBalances.endBlockHome,
+      state_endblock_foreign: commonBalances.endBlockForeign
+    }
+
+    Object.assign(metrics, blockRanges, balanceMetrics)
   }
 
   // Validator metrics
@@ -95,14 +101,6 @@ async function getPrometheusMetrics(bridgeName) {
   const alertsFile = readFile(responsePath('alerts'))
 
   if (!hasError(alertsFile)) {
-    const blockRanges = {
-      state_startblock_home: MONITOR_HOME_START_BLOCK,
-      state_startblock_foreign: MONITOR_FOREIGN_START_BLOCK,
-      state_endblock_home: alertsFile.homeBlockNumber || (await getHomeBlockNumber()),
-      state_endblock_foreign: alertsFile.foreignBlockNumber || (await getForeignBlockNumber())
-    }
-    Object.assign(metrics, blockRanges)
-
     for (const bridge of BRIDGE_CONFS) {
       Object.entries(alertsFile[bridge.alertTargetFunc].misbehavior).forEach(([period, val]) => {
         metrics[`misbehavior_${bridge.type}_${period}`] = val
