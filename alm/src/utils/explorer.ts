@@ -173,7 +173,7 @@ export const getLogs = async (
   url.searchParams.append('action', 'getLogs')
   url.searchParams.append('address', contract.options.address)
   url.searchParams.append('fromBlock', options.fromBlock.toString())
-  url.searchParams.append('toBlock', options.toBlock.toString() || 'latest')
+  url.searchParams.append('toBlock', (options.toBlock || 'latest').toString())
 
   const topics = [web3.eth.abi.encodeEventSignature(abi), ...(options.topics || [])]
   for (let i = 0; i < topics.length; i++) {
