@@ -1,5 +1,4 @@
 require('dotenv').config()
-const eventsInfo = require('./utils/events')
 const {
   processedMsgNotDelivered,
   deliveredMsgNotProcessed,
@@ -15,14 +14,14 @@ const {
   MONITOR_HOME_TO_FOREIGN_CHECK_SENDER
 } = process.env
 
-async function main() {
+async function main(eventsInfo) {
   const {
     homeToForeignRequests,
     homeToForeignConfirmations,
     foreignToHomeConfirmations,
     foreignToHomeRequests,
     bridgeMode
-  } = await eventsInfo()
+  } = eventsInfo
 
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {

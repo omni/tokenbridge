@@ -1,6 +1,7 @@
 require('dotenv').config()
 const logger = require('./logger')('checkWorker2')
 const eventsStats = require('./eventsStats')
+const getEventsInfo = require('./utils/events')
 const alerts = require('./alerts')
 const { writeFile, createDir } = require('./utils/file')
 const { saveCache } = require('./utils/web3Cache')
@@ -10,8 +11,10 @@ const { MONITOR_BRIDGE_NAME } = process.env
 async function checkWorker2() {
   try {
     createDir(`/responses/${MONITOR_BRIDGE_NAME}`)
+    logger.debug('calling getEventsInfo()')
+    const eventsInfo = await getEventsInfo()
     logger.debug('calling eventsStats()')
-    const evStats = await eventsStats()
+    const evStats = await eventsStats(eventsInfo)
     if (!evStats) throw new Error('evStats is empty: ' + JSON.stringify(evStats))
     evStats.ok =
       (evStats.onlyInHomeDeposits || evStats.home.deliveredMsgNotProcessedInForeign).length === 0 &&
@@ -22,7 +25,7 @@ async function checkWorker2() {
     writeFile(`/responses/${MONITOR_BRIDGE_NAME}/eventsStats.json`, evStats)
 
     logger.debug('calling alerts()')
-    const _alerts = await alerts()
+    const _alerts = await alerts(eventsInfo)
     if (!_alerts) throw new Error('alerts is empty: ' + JSON.stringify(_alerts))
     _alerts.ok = !_alerts.executeAffirmations.mostRecentTxHash && !_alerts.executeSignatures.mostRecentTxHash
     _alerts.health = true
