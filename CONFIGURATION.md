@@ -42,6 +42,11 @@ ORACLE_HOME_TO_FOREIGN_BLOCK_LIST | Filename with a list of addresses, separated
 ORACLE_HOME_TO_FOREIGN_CHECK_SENDER | If set to `true`, instructs the oracle to do an extra check for transaction origin in the block/allowance list. `false` by default. | `true` / `false`
 ORACLE_ALWAYS_RELAY_SIGNATURES | If set to `true`, the oracle will always relay signatures even if it was not the last who finilized the signatures collecting process. The default is `false`. | `true` / `false`
 ORACLE_RPC_REQUEST_TIMEOUT | Timeout in milliseconds for a single RPC request. Default value is `ORACLE_*_RPC_POLLING_INTERVAL * 2`. | integer
+ORACLE_SHUTDOWN_SERVICE_URL | Optional external URL to some other service/monitor/configuration manager that controls the remote shutdown process. GET request should return `application/json` message with the following schema: `{ shutdown: true/false }`. | URL
+ORACLE_SHUTDOWN_SERVICE_POLLING_INTERVAL | Optional interval in milliseconds used to request the side RPC node or external shutdown service. Default is 120000. | integer
+ORACLE_SIDE_RPC_URL | Optional HTTPS URL(s) for communication with the external shutdown service or side RPC nodes, used for shutdown manager activities. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection. | URL(s)
+ORACLE_SHUTDOWN_CONTRACT_ADDRESS | Optional contract address in the side chain accessible through `ORACLE_SIDE_RPC_URL`, where the method passed in `ORACLE_SHUTDOWN_CONTRACT_METHOD` is implemented. | `address`
+ORACLE_SHUTDOWN_CONTRACT_METHOD | Method signature to be used in the side chain to identify the current shutdown status. Method should return boolean. Default value is `isShutdown()`. | `function signature`
 
 
 ## UI configuration

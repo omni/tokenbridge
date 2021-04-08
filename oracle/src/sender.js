@@ -4,6 +4,7 @@ const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
 const logger = require('./services/logger')
+const { getShutdownFlag } = require('./services/shutdownState')
 const { sendTx } = require('./tx/sendTx')
 const { getNonce, getChainId } = require('./tx/web3')
 const {
@@ -86,13 +87,6 @@ async function readNonce(forceUpdate) {
   }
 }
 
-async function isShutdowned() {
-  logger.debug('Checking current shutdown state in the DB')
-  const isShutdown = (await redis.get(config.shutdownKey)) === 'true'
-  logger.debug({ isShutdown }, 'Read shutdown state from the DB')
-  return isShutdown
-}
-
 function updateNonce(nonce) {
   if (typeof nonce !== 'number') {
     logger.warn('Given nonce value is not a valid number. Nothing will be updated in the DB.')
@@ -108,8 +102,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       return
     }
 
-    if (await isShutdowned()) {
-      logger.info('Oracle sender was suspended via the remote shutdown process')
+    const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
+    if (await getShutdownFlag(logger, config.shutdownKey, true)) {
+      if (!wasShutdown) {
+        logger.info('Oracle sender was suspended via the remote shutdown process')
+      }
       return
     }
 
