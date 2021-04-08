@@ -5,7 +5,7 @@ async function getShutdownFlag(logger, shutdownKey, force = false) {
   if (force) {
     logger.debug('Reading current shutdown state from the DB')
     isShutdown = (await redis.get(shutdownKey)) === 'true'
-    logger.info({ isShutdown }, 'Read shutdown state from the DB')
+    logger.debug({ isShutdown }, 'Read shutdown state from the DB')
   }
   return isShutdown
 }
