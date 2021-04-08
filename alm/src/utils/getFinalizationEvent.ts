@@ -3,7 +3,9 @@ import Web3 from 'web3'
 import {
   CACHE_KEY_EXECUTION_FAILED,
   FOREIGN_EXPLORER_API,
+  FOREIGN_RPC_POLLING_INTERVAL,
   HOME_EXPLORER_API,
+  HOME_RPC_POLLING_INTERVAL,
   VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
 import { ExecutionData } from '../hooks/useMessageConfirmations'
@@ -69,14 +71,12 @@ export const getSuccessExecutionData = async (
 
 export const getFinalizationEvent = async (
   fromHome: boolean,
-  contract: Maybe<Contract>,
-  eventName: string,
-  web3: Maybe<Web3>,
+  contract: Contract,
+  web3: Web3,
   setResult: React.Dispatch<React.SetStateAction<ExecutionData>>,
-  waitingBlocksResolved: boolean,
   message: MessageObject,
-  interval: number,
-  subscriptions: number[],
+  setTimeoutId: (timeoutId: number) => void,
+  isCancelled: () => boolean,
   startBlock: number,
   collectedSignaturesEvent: Maybe<EventData>,
   getFailedExecution: (args: GetTransactionParams) => Promise<APITransaction[]>,
@@ -85,9 +85,11 @@ export const getFinalizationEvent = async (
   setPendingExecution: Function,
   setExecutionEventsFetched: Function
 ) => {
-  if (!contract || !web3 || !waitingBlocksResolved) return
+  const eventName = fromHome ? 'RelayedMessage' : 'AffirmationCompleted'
   const api = fromHome ? FOREIGN_EXPLORER_API : HOME_EXPLORER_API
+
   const successExecutionData = await getSuccessExecutionData(contract, eventName, web3, message.id, api)
+
   if (successExecutionData) {
     setResult(successExecutionData)
   } else {
@@ -150,28 +152,28 @@ export const getFinalizationEvent = async (
       }
     }
 
-    const timeoutId = setTimeout(
-      () =>
-        getFinalizationEvent(
-          fromHome,
-          contract,
-          eventName,
-          web3,
-          setResult,
-          waitingBlocksResolved,
-          message,
-          interval,
-          subscriptions,
-          startBlock,
-          collectedSignaturesEvent,
-          getFailedExecution,
-          setFailedExecution,
-          getPendingExecution,
-          setPendingExecution,
-          setExecutionEventsFetched
-        ),
-      interval
-    )
-    subscriptions.push(timeoutId)
+    if (!isCancelled()) {
+      const timeoutId = setTimeout(
+        () =>
+          getFinalizationEvent(
+            fromHome,
+            contract,
+            web3,
+            setResult,
+            message,
+            setTimeoutId,
+            isCancelled,
+            startBlock,
+            collectedSignaturesEvent,
+            getFailedExecution,
+            setFailedExecution,
+            getPendingExecution,
+            setPendingExecution,
+            setExecutionEventsFetched
+          ),
+        fromHome ? FOREIGN_RPC_POLLING_INTERVAL : HOME_RPC_POLLING_INTERVAL
+      )
+      setTimeoutId(timeoutId)
+    }
   }
 }

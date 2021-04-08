@@ -5,7 +5,6 @@ const connection = require('amqp-connection-manager').connect(process.env.ORACLE
 const logger = require('./logger')
 const { getRetrySequence } = require('../utils/utils')
 const {
-  TRANSACTION_RESEND_TIMEOUT,
   SENDER_QUEUE_MAX_PRIORITY,
   SENDER_QUEUE_SEND_PRIORITY,
   SENDER_QUEUE_CHECK_STATUS_PRIORITY
@@ -48,7 +47,7 @@ function connectWatcherToQueue({ queueName, workerQueue, cb }) {
   cb({ sendToQueue, sendToWorker, channel: channelWrapper })
 }
 
-function connectSenderToQueue({ queueName, oldQueueName, cb }) {
+function connectSenderToQueue({ queueName, oldQueueName, cb, resendInterval }) {
   const deadLetterExchange = `${queueName}-retry`
 
   async function resendMessagesToNewQueue(channel) {
@@ -97,7 +96,8 @@ function connectSenderToQueue({ queueName, oldQueueName, cb }) {
             channelWrapper,
             channel,
             queueName,
-            deadLetterExchange
+            deadLetterExchange,
+            delay: resendInterval
           })
         }
       })
@@ -164,13 +164,13 @@ async function generateRetry({ data, msgRetries, channelWrapper, channel, queueN
   })
 }
 
-async function generateTransactionResend({ data, channelWrapper, channel, queueName, deadLetterExchange }) {
-  const retryQueue = `${queueName}-check-tx-status`
+async function generateTransactionResend({ data, channelWrapper, channel, queueName, deadLetterExchange, delay }) {
+  const retryQueue = `${queueName}-check-tx-status-${delay}`
   await channel.assertQueue(retryQueue, {
     durable: true,
     deadLetterExchange,
-    messageTtl: TRANSACTION_RESEND_TIMEOUT,
-    expires: TRANSACTION_RESEND_TIMEOUT * 10,
+    messageTtl: delay,
+    expires: delay * 10,
     maxPriority: SENDER_QUEUE_MAX_PRIORITY
   })
   await channelWrapper.sendToQueue(retryQueue, data, {

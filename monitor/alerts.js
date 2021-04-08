@@ -1,18 +1,19 @@
 require('dotenv').config()
 const logger = require('./logger')('alerts')
-const eventsInfo = require('./utils/events')
 const { processedMsgNotDelivered, eventWithoutReference } = require('./utils/message')
 const { BRIDGE_MODES } = require('../commons')
-const { web3Home, web3Foreign, getHomeBlockNumber, getForeignBlockNumber } = require('./utils/web3')
+const { web3Home, web3Foreign } = require('./utils/web3')
 
-async function main() {
+async function main(eventsInfo) {
   const {
+    homeBlockNumber,
+    foreignBlockNumber,
     homeToForeignRequests,
     homeToForeignConfirmations,
     foreignToHomeConfirmations,
     foreignToHomeRequests,
     bridgeMode
-  } = await eventsInfo()
+  } = eventsInfo
 
   let xSignatures
   let xAffirmations
@@ -24,8 +25,6 @@ async function main() {
     xAffirmations = foreignToHomeConfirmations.filter(eventWithoutReference(foreignToHomeRequests))
   }
   logger.debug('building misbehavior blocks')
-  const homeBlockNumber = await getHomeBlockNumber()
-  const foreignBlockNumber = await getForeignBlockNumber()
 
   const baseRange = [false, false, false, false, false]
   const xSignaturesMisbehavior = buildRangesObject(

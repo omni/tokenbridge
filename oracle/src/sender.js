@@ -48,6 +48,7 @@ async function initialize() {
     connectSenderToQueue({
       queueName: config.queue,
       oldQueueName: config.oldQueue,
+      resendInterval: config.resendInterval,
       cb: options => {
         if (config.maxProcessingTime) {
           return watchdog(() => main(options), config.maxProcessingTime, () => {
@@ -216,7 +217,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
     }
     if (resendJobs.length) {
-      logger.info(`Sending ${resendJobs.length} Tx Delayed Resend Requests to Queue`)
+      logger.info({ delay: config.resendInterval }, `Sending ${resendJobs.length} Tx Delayed Resend Requests to Queue`)
       await scheduleTransactionResend(resendJobs)
     }
     ackMsg(msg)

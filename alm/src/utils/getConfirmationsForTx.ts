@@ -29,15 +29,15 @@ const mergeConfirmations = (oldConfirmations: BasicConfirmationParam[], newConfi
 
 export const getConfirmationsForTx = async (
   messageData: string,
-  web3: Maybe<Web3>,
+  web3: Web3,
   validatorList: string[],
-  bridgeContract: Maybe<Contract>,
+  bridgeContract: Contract,
   fromHome: boolean,
   setResult: Function,
   requiredSignatures: number,
   setSignatureCollected: Function,
-  waitingBlocksResolved: boolean,
-  subscriptions: number[],
+  setTimeoutId: (timeoutId: number) => void,
+  isCancelled: () => boolean,
   startBlock: number,
   getFailedTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>,
   setFailedConfirmations: Function,
@@ -45,8 +45,6 @@ export const getConfirmationsForTx = async (
   setPendingConfirmations: Function,
   getSuccessTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>
 ) => {
-  if (!web3 || !validatorList || !validatorList.length || !bridgeContract || !waitingBlocksResolved) return
-
   const confirmationContractMethod = fromHome ? getMessagesSigned : getAffirmationsSigned
 
   const hashMsg = web3.utils.soliditySha3Raw(messageData)
@@ -144,28 +142,30 @@ export const getConfirmationsForTx = async (
     (!hasEnoughSignatures && missingConfirmations.length > 0) ||
     successConfirmationWithTxFound.length < successConfirmationWithData.length
   ) {
-    const timeoutId = setTimeout(
-      () =>
-        getConfirmationsForTx(
-          messageData,
-          web3,
-          validatorList,
-          bridgeContract,
-          fromHome,
-          setResult,
-          requiredSignatures,
-          setSignatureCollected,
-          waitingBlocksResolved,
-          subscriptions,
-          startBlock,
-          getFailedTransactions,
-          setFailedConfirmations,
-          getPendingTransactions,
-          setPendingConfirmations,
-          getSuccessTransactions
-        ),
-      HOME_RPC_POLLING_INTERVAL
-    )
-    subscriptions.push(timeoutId)
+    if (!isCancelled()) {
+      const timeoutId = setTimeout(
+        () =>
+          getConfirmationsForTx(
+            messageData,
+            web3,
+            validatorList,
+            bridgeContract,
+            fromHome,
+            setResult,
+            requiredSignatures,
+            setSignatureCollected,
+            setTimeoutId,
+            isCancelled,
+            startBlock,
+            getFailedTransactions,
+            setFailedConfirmations,
+            getPendingTransactions,
+            setPendingConfirmations,
+            getSuccessTransactions
+          ),
+        HOME_RPC_POLLING_INTERVAL
+      )
+      setTimeoutId(timeoutId)
+    }
   }
 }

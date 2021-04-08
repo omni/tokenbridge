@@ -11,40 +11,23 @@ export const useTransactionFinder = ({ txHash, web3 }: { txHash: string; web3: M
     () => {
       if (!txHash || !web3) return
 
-      const subscriptions: number[] = []
+      let timeoutId: number
 
-      const unsubscribe = () => {
-        subscriptions.forEach(s => {
-          clearTimeout(s)
-        })
-      }
-
-      const getReceipt = async (
-        web3: Web3,
-        txHash: string,
-        setReceipt: Function,
-        setStatus: Function,
-        subscriptions: number[]
-      ) => {
+      const getReceipt = async () => {
         const txReceipt = await web3.eth.getTransactionReceipt(txHash)
         setReceipt(txReceipt)
 
         if (!txReceipt) {
           setStatus(TRANSACTION_STATUS.NOT_FOUND)
-          const timeoutId = setTimeout(
-            () => getReceipt(web3, txHash, setReceipt, setStatus, subscriptions),
-            HOME_RPC_POLLING_INTERVAL
-          )
-          subscriptions.push(timeoutId)
+          timeoutId = setTimeout(getReceipt, HOME_RPC_POLLING_INTERVAL)
         } else {
           setStatus(TRANSACTION_STATUS.FOUND)
         }
       }
 
-      getReceipt(web3, txHash, setReceipt, setStatus, subscriptions)
-      return () => {
-        unsubscribe()
-      }
+      getReceipt()
+
+      return () => clearTimeout(timeoutId)
     },
     [txHash, web3]
   )

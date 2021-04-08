@@ -31,19 +31,14 @@ export const useTransactionStatus = ({
 
   useEffect(
     () => {
-      const subscriptions: Array<number> = []
+      if (!chainId || !txHash || !home.chainId || !foreign.chainId || !home.web3 || !foreign.web3) return
+      const isHome = chainId === home.chainId
+      const web3 = isHome ? home.web3 : foreign.web3
 
-      const unsubscribe = () => {
-        subscriptions.forEach(s => {
-          clearTimeout(s)
-        })
-      }
+      let timeoutId: number
 
       const getReceipt = async () => {
-        if (!chainId || !txHash || !home.chainId || !foreign.chainId || !home.web3 || !foreign.web3) return
         setLoading(true)
-        const isHome = chainId === home.chainId
-        const web3 = isHome ? home.web3 : foreign.web3
 
         let txReceipt
 
@@ -59,8 +54,7 @@ export const useTransactionStatus = ({
           setStatus(TRANSACTION_STATUS.NOT_FOUND)
           setDescription(getTransactionStatusDescription(TRANSACTION_STATUS.NOT_FOUND))
           setMessages([{ id: txHash, data: '' }])
-          const timeoutId = setTimeout(() => getReceipt(), HOME_RPC_POLLING_INTERVAL)
-          subscriptions.push(timeoutId)
+          timeoutId = setTimeout(() => getReceipt(), HOME_RPC_POLLING_INTERVAL)
         } else {
           const blockNumber = txReceipt.blockNumber
           const block = await getBlock(web3, blockNumber)
@@ -70,9 +64,9 @@ export const useTransactionStatus = ({
           if (txReceipt.status) {
             let bridgeMessages: Array<MessageObject>
             if (isHome) {
-              bridgeMessages = getHomeMessagesFromReceipt(txReceipt, home.web3, home.bridgeAddress)
+              bridgeMessages = getHomeMessagesFromReceipt(txReceipt, web3, home.bridgeAddress)
             } else {
-              bridgeMessages = getForeignMessagesFromReceipt(txReceipt, foreign.web3, foreign.bridgeAddress)
+              bridgeMessages = getForeignMessagesFromReceipt(txReceipt, web3, foreign.bridgeAddress)
             }
 
             if (bridgeMessages.length === 0) {
@@ -98,14 +92,9 @@ export const useTransactionStatus = ({
         setLoading(false)
       }
 
-      // unsubscribe from previous txHash
-      unsubscribe()
-
       getReceipt()
-      return () => {
-        // unsubscribe when unmount component
-        unsubscribe()
-      }
+
+      return () => clearTimeout(timeoutId)
     },
     [
       txHash,
