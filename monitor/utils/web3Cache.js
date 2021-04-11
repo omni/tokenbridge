@@ -1,9 +1,15 @@
+const fetch = require('node-fetch')
 const logger = require('../logger')('web3Cache')
 const { readCacheFile, writeCacheFile } = require('./file')
 const { web3Home, web3Foreign } = require('./web3')
 const { getPastEvents: commonGetPastEvents } = require('../../commons')
 
-const { MONITOR_BRIDGE_NAME, MONITOR_CACHE_EVENTS } = process.env
+const {
+  MONITOR_BRIDGE_NAME,
+  MONITOR_CACHE_EVENTS,
+  MONITOR_FOREIGN_EXPLORER_API,
+  MONITOR_HOME_EXPLORER_API
+} = process.env
 
 let isDirty = false
 
@@ -52,6 +58,36 @@ async function isForeignContract(address) {
   return cachedForeignIsContract[address]
 }
 
+function getPastEventsWithAPIFallback(contract, options) {
+  return commonGetPastEvents(contract, options).catch(async e => {
+    const [api, web3] =
+      options.chain === 'home' ? [MONITOR_HOME_EXPLORER_API, web3Home] : [MONITOR_FOREIGN_EXPLORER_API, web3Foreign]
+    if (api && e.message.includes('exceed maximum block range')) {
+      logger.debug('BLOCK RANGE EXCEED, using fallback to the explorer API')
+
+      const abi = contract.options.jsonInterface.find(abi => abi.type === 'event' && abi.name === options.event)
+
+      const url = new URL(api)
+      url.searchParams.append('module', 'logs')
+      url.searchParams.append('action', 'getLogs')
+      url.searchParams.append('address', contract.options.address)
+      url.searchParams.append('fromBlock', options.fromBlock)
+      url.searchParams.append('toBlock', options.toBlock || 'latest')
+      url.searchParams.append('topic0', web3.eth.abi.encodeEventSignature(abi))
+
+      const logs = await fetch(url).then(res => res.json())
+
+      return logs.result.map(log => ({
+        transactionHash: log.transactionHash,
+        blockNumber: parseInt(log.blockNumber.slice(2), 16),
+        returnValues: web3.eth.abi.decodeLog(abi.inputs, log.data, log.topics.slice(1))
+      }))
+    } else {
+      throw new Error(e)
+    }
+  })
+}
+
 async function getPastEvents(contract, options) {
   if (MONITOR_CACHE_EVENTS !== 'true') {
     return commonGetPastEvents(contract, options)
@@ -94,14 +130,14 @@ async function getPastEvents(contract, options) {
     // requested:      A...B
     // cached:    C...D
     logger.debug(`Fetching events for blocks ${fromBlock}...${toBlock}`)
-    result = await commonGetPastEvents(contract, options)
+    result = await getPastEventsWithAPIFallback(contract, options)
   } else if (fromBlock < cachedFromBlock && toBlock <= cachedToBlock) {
     // requested: A...B
     // cached:      C...D
     logger.debug(`Cache hit for blocks ${cachedFromBlock}...${toBlock}`)
     logger.debug(`Fetching events for blocks ${fromBlock}...${cachedFromBlock - 1}`)
     result = [
-      ...(await commonGetPastEvents(contract, { ...options, toBlock: cachedFromBlock - 1 })),
+      ...(await getPastEventsWithAPIFallback(contract, { ...options, toBlock: cachedFromBlock - 1 })),
       ...cachedEvents.filter(e => e.blockNumber <= toBlock)
     ]
   } else if (fromBlock < cachedFromBlock && cachedToBlock < toBlock) {
@@ -111,9 +147,9 @@ async function getPastEvents(contract, options) {
     logger.debug(`Fetching events for blocks ${fromBlock}...${cachedFromBlock - 1}`)
     logger.debug(`Fetching events for blocks ${cachedToBlock + 1}...${toBlock}`)
     result = [
-      ...(await commonGetPastEvents(contract, { ...options, toBlock: cachedFromBlock - 1 })),
+      ...(await getPastEventsWithAPIFallback(contract, { ...options, toBlock: cachedFromBlock - 1 })),
       ...cachedEvents,
-      ...(await commonGetPastEvents(contract, { ...options, fromBlock: cachedToBlock + 1 }))
+      ...(await getPastEventsWithAPIFallback(contract, { ...options, fromBlock: cachedToBlock + 1 }))
     ]
   } else if (cachedFromBlock <= fromBlock && toBlock <= cachedToBlock) {
     // requested:   A.B
@@ -127,7 +163,7 @@ async function getPastEvents(contract, options) {
     logger.debug(`Fetching events for blocks ${cachedToBlock + 1}...${toBlock}`)
     result = [
       ...cachedEvents.filter(e => e.blockNumber >= fromBlock),
-      ...(await commonGetPastEvents(contract, { ...options, fromBlock: cachedToBlock + 1 }))
+      ...(await getPastEventsWithAPIFallback(contract, { ...options, fromBlock: cachedToBlock + 1 }))
     ]
   } else {
     throw new Error(

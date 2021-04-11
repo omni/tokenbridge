@@ -86,3 +86,5 @@ MONITOR_HOME_TO_FOREIGN_BLOCK_LIST | File with a list of addresses, separated by
 MONITOR_HOME_TO_FOREIGN_CHECK_SENDER | If set to `true`, instructs the oracle to do an extra check for transaction origin in the block/allowance list. `false` by default. | `true` / `false`
 MONITOR_HOME_VALIDATORS_BALANCE_ENABLE | If set, defines the list of home validator addresses for which balance should be checked. | `string`
 MONITOR_FOREIGN_VALIDATORS_BALANCE_ENABLE | If set, defines the list of foreign validator addresses for which balance should be checked. | `string`
+MONITOR_HOME_EXPLORER_API | The HTTPS URL of the Home network explorer API. If set, may be used as a fallback in case of the RPC node failure. | URL
+MONITOR_FOREIGN_EXPLORER_API | The HTTPS URL of the Foreign network explorer API. If set, may be used as a fallback in case of the RPC node failure. | URL
