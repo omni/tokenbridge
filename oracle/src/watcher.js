@@ -161,7 +161,7 @@ async function main({ sendToQueue, sendToWorker }) {
     const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
     if (await getShutdownFlag(logger, config.shutdownKey, true)) {
       if (!wasShutdown) {
-        logger.info('Oracle sender was suspended via the remote shutdown process')
+        logger.info('Oracle watcher was suspended via the remote shutdown process')
       }
       return
     }
