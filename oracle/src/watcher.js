@@ -5,6 +5,7 @@ const { connectWatcherToQueue, connection } = require('./services/amqpClient')
 const { getBlockNumber } = require('./tx/web3')
 const { redis } = require('./services/redisClient')
 const logger = require('./services/logger')
+const { getShutdownFlag } = require('./services/shutdownState')
 const { getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
 const { EXIT_CODES } = require('./utils/constants')
@@ -157,6 +158,14 @@ async function isWorkerNeeded() {
 
 async function main({ sendToQueue, sendToWorker }) {
   try {
+    const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
+    if (await getShutdownFlag(logger, config.shutdownKey, true)) {
+      if (!wasShutdown) {
+        logger.info('Oracle watcher was suspended via the remote shutdown process')
+      }
+      return
+    }
+
     await checkConditions()
 
     const lastBlockToProcess = await getLastBlockToProcess()

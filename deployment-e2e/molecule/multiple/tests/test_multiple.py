@@ -24,6 +24,7 @@ def test_services(host, service):
     ("oracle_bridge_affirmation_1"),
     ("oracle_bridge_senderhome_1"),
     ("oracle_bridge_senderforeign_1"),
+    ("oracle_bridge_shutdown_1"),
     ("ui_ui_1"),
     ("monitor_monitor_1")
 ])
