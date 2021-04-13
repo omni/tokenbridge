@@ -1,5 +1,5 @@
 require('dotenv').config()
-const logger = require('./logger')('alerts')
+const logger = require('./logger')('detectFailures.js')
 const eventsInfo = require('./utils/events')
 const { normalizeAMBMessageEvent } = require('../commons')
 const { getHomeBlockNumber, getForeignBlockNumber } = require('./utils/web3')
