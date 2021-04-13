@@ -42,6 +42,7 @@ startValidator () {
     fi
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn sender:home
     docker-compose $1 run $2 $3 -d oracle-erc20-native yarn sender:foreign
+    docker-compose $1 run $2 $3 -d oracle yarn manager:shutdown
 }
 
 startAMBValidator () {
@@ -52,6 +53,7 @@ startAMBValidator () {
     docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:affirmation-request
     docker-compose $1 run $2 $3 -d oracle-amb yarn sender:home
     docker-compose $1 run $2 $3 -d oracle-amb yarn sender:foreign
+    docker-compose $1 run $2 $3 -d oracle-amb yarn manager:shutdown
 }
 
 while [ "$1" != "" ]; do
@@ -120,13 +122,7 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "alm-e2e" ]; then
-    docker-compose up -d redis rabbit
-
-    docker-compose run -d oracle-amb yarn watcher:signature-request
-    docker-compose run -d oracle-amb yarn watcher:collected-signatures
-    docker-compose run -d oracle-amb yarn watcher:affirmation-request
-    docker-compose run -d oracle-amb yarn sender:home
-    docker-compose run -d oracle-amb yarn sender:foreign
+    startAMBValidator "" "" "" "redis" "rabbit"
 
     oracle2name="-p validator2"
     oracle2Values="-e ORACLE_VALIDATOR_ADDRESS=0xdCC784657C78054aa61FbcFFd2605F32374816A4 -e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=5a5c3645d0f04e9eb4f27f94ed4c244a225587405b8838e7456f7781ce3a9513"

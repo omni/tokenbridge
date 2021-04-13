@@ -5,7 +5,12 @@ const logger = require('./logger')('getBalances')
 const { BRIDGE_MODES } = require('../commons')
 const { web3Home, web3Foreign, getHomeBlockNumber } = require('./utils/web3')
 
-const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
+const {
+  MONITOR_HOME_START_BLOCK,
+  MONITOR_FOREIGN_START_BLOCK,
+  COMMON_HOME_BRIDGE_ADDRESS,
+  COMMON_FOREIGN_BRIDGE_ADDRESS
+} = process.env
 
 const {
   ERC20_ABI,
@@ -20,6 +25,8 @@ const {
 
 async function main(bridgeMode, eventsInfo) {
   const {
+    homeBlockNumber,
+    foreignBlockNumber,
     homeToForeignConfirmations,
     foreignToHomeConfirmations,
     homeDelayedBlockNumber,
@@ -45,6 +52,13 @@ async function main(bridgeMode, eventsInfo) {
     0,
     ...foreignToHomeConfirmations.filter(e => e.blockNumber > homeDelayedBlockNumber).map(e => e.value)
   )
+
+  const blockRanges = {
+    startBlockHome: MONITOR_HOME_START_BLOCK,
+    endBlockHome: homeBlockNumber,
+    startBlockForeign: MONITOR_FOREIGN_START_BLOCK,
+    endBlockForeign: foreignBlockNumber
+  }
 
   if (bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {
     const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_ERC_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
@@ -72,6 +86,7 @@ async function main(bridgeMode, eventsInfo) {
         erc20Balance: Web3Utils.fromWei(foreignErc20Balance)
       },
       balanceDiff: Number(Web3Utils.fromWei(diff)),
+      ...blockRanges,
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1) {
@@ -94,6 +109,7 @@ async function main(bridgeMode, eventsInfo) {
         totalSupply: Web3Utils.fromWei(totalSupply)
       },
       balanceDiff: Number(Web3Utils.fromWei(diff)),
+      ...blockRanges,
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else if (bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
@@ -163,12 +179,14 @@ async function main(bridgeMode, eventsInfo) {
       },
       foreign,
       balanceDiff: Number(Web3Utils.fromWei(diff)),
+      ...blockRanges,
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
     return {
       home: {},
       foreign: {},
+      ...blockRanges,
       lastChecked: Math.floor(Date.now() / 1000)
     }
   } else {

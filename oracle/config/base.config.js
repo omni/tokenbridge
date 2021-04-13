@@ -69,7 +69,8 @@ const bridgeConfig = {
   foreignBridgeAbi: foreignAbi,
   eventFilter: {},
   validatorAddress: ORACLE_VALIDATOR_ADDRESS || privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY),
-  maxProcessingTime
+  maxProcessingTime,
+  shutdownKey: 'oracle-shutdown'
 }
 
 const homeConfig = {

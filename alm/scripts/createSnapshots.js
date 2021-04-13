@@ -3,6 +3,8 @@ const { BRIDGE_VALIDATORS_ABI, HOME_AMB_ABI } = require('commons')
 const path = require('path')
 require('dotenv').config()
 const Web3 = require('web3')
+const fetch = require('node-fetch')
+const { URL } = require('url')
 
 const fs = require('fs')
 
@@ -10,7 +12,9 @@ const {
   COMMON_HOME_RPC_URL,
   COMMON_HOME_BRIDGE_ADDRESS,
   COMMON_FOREIGN_RPC_URL,
-  COMMON_FOREIGN_BRIDGE_ADDRESS
+  COMMON_FOREIGN_BRIDGE_ADDRESS,
+  ALM_FOREIGN_EXPLORER_API,
+  ALM_HOME_EXPLORER_API
 } = process.env
 
 const generateSnapshot = async (side, url, bridgeAddress) => {
@@ -19,6 +23,31 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   const snapshot = {}
 
   const web3 = new Web3(new Web3.providers.HttpProvider(url))
+  const api = side === 'home' ? ALM_HOME_EXPLORER_API : ALM_FOREIGN_EXPLORER_API
+
+  const getPastEventsWithFallback = (contract, eventName, options) =>
+    contract.getPastEvents(eventName, options).catch(async e => {
+      if (e.message.includes('exceed maximum block range')) {
+        const abi = contract.options.jsonInterface.find(abi => abi.type === 'event' && abi.name === eventName)
+
+        const url = new URL(api)
+        url.searchParams.append('module', 'logs')
+        url.searchParams.append('action', 'getLogs')
+        url.searchParams.append('address', contract.options.address)
+        url.searchParams.append('fromBlock', options.fromBlock)
+        url.searchParams.append('toBlock', options.toBlock || 'latest')
+        url.searchParams.append('topic0', web3.eth.abi.encodeEventSignature(abi))
+
+        const logs = await fetch(url).then(res => res.json())
+
+        return logs.result.map(log => ({
+          transactionHash: log.transactionHash,
+          blockNumber: parseInt(log.blockNumber.slice(2), 16),
+          returnValues: web3.eth.abi.decodeLog(abi.inputs, log.data, log.topics.slice(1))
+        }))
+      }
+      throw e
+    })
 
   const currentBlockNumber = await web3.eth.getBlockNumber()
   snapshot.snapshotBlockNumber = currentBlockNumber
@@ -29,10 +58,14 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   const bridgeContract = new web3.eth.Contract(HOME_AMB_ABI, bridgeAddress)
 
   // Save RequiredBlockConfirmationChanged events
-  let requiredBlockConfirmationChangedEvents = await bridgeContract.getPastEvents('RequiredBlockConfirmationChanged', {
-    fromBlock: 0,
-    toBlock: currentBlockNumber
-  })
+  let requiredBlockConfirmationChangedEvents = await getPastEventsWithFallback(
+    bridgeContract,
+    'RequiredBlockConfirmationChanged',
+    {
+      fromBlock: 0,
+      toBlock: currentBlockNumber
+    }
+  )
 
   // In case RequiredBlockConfirmationChanged was not emitted during initialization in early versions of AMB
   // manually generate an event for this. Example Sokol - Kovan bridge
@@ -59,10 +92,14 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   const validatorContract = new web3.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorAddress)
 
   // Save RequiredSignaturesChanged events
-  const RequiredSignaturesChangedEvents = await validatorContract.getPastEvents('RequiredSignaturesChanged', {
-    fromBlock: 0,
-    toBlock: currentBlockNumber
-  })
+  const RequiredSignaturesChangedEvents = await getPastEventsWithFallback(
+    validatorContract,
+    'RequiredSignaturesChanged',
+    {
+      fromBlock: 0,
+      toBlock: currentBlockNumber
+    }
+  )
   snapshot.RequiredSignaturesChanged = RequiredSignaturesChangedEvents.map(e => ({
     blockNumber: e.blockNumber,
     returnValues: {
@@ -71,7 +108,7 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   }))
 
   // Save ValidatorAdded events
-  const validatorAddedEvents = await validatorContract.getPastEvents('ValidatorAdded', {
+  const validatorAddedEvents = await getPastEventsWithFallback(validatorContract, 'ValidatorAdded', {
     fromBlock: 0,
     toBlock: currentBlockNumber
   })
@@ -85,7 +122,7 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   }))
 
   // Save ValidatorRemoved events
-  const validatorRemovedEvents = await validatorContract.getPastEvents('ValidatorRemoved', {
+  const validatorRemovedEvents = await getPastEventsWithFallback(validatorContract, 'ValidatorRemoved', {
     fromBlock: 0,
     toBlock: currentBlockNumber
   })

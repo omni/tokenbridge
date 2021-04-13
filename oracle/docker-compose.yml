@@ -21,12 +21,13 @@ services:
     command: [redis-server, --appendonly, 'yes']
     hostname: redis
     image: redis:4
-    networks:    
+    networks:
       - net_db_bridge_request
       - net_db_bridge_collected
       - net_db_bridge_affirmation
       - net_db_bridge_senderhome
       - net_db_bridge_senderforeign
+      - net_db_bridge_shutdown
     restart: unless-stopped
     volumes: ['~/bridge_data/redis:/data']
   bridge_request:
@@ -34,8 +35,8 @@ services:
     mem_limit: 500m
     image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
-    environment: 
-      - NODE_ENV=production 
+    environment:
+      - NODE_ENV=production
       - ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
     entrypoint: yarn watcher:signature-request
@@ -47,8 +48,8 @@ services:
     mem_limit: 500m
     image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
-    environment: 
-      - NODE_ENV=production 
+    environment:
+      - NODE_ENV=production
       - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
     restart: unless-stopped
     entrypoint: yarn watcher:collected-signatures
@@ -60,8 +61,8 @@ services:
     mem_limit: 500m
     image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
-    environment: 
-      - NODE_ENV=production 
+    environment:
+      - NODE_ENV=production
       - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
     restart: unless-stopped
     entrypoint: yarn watcher:affirmation-request
@@ -73,8 +74,8 @@ services:
     mem_limit: 500m
     image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
-    environment: 
-      - NODE_ENV=production 
+    environment:
+      - NODE_ENV=production
       - ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
     entrypoint: yarn sender:home
@@ -86,14 +87,25 @@ services:
     mem_limit: 500m
     image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
-    environment: 
-      - NODE_ENV=production 
+    environment:
+      - NODE_ENV=production
       - ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}
     restart: unless-stopped
     entrypoint: yarn sender:foreign
     networks:
       - net_db_bridge_senderforeign
       - net_rabbit_bridge_senderforeign
+  bridge_shutdown:
+    cpus: 0.1
+    mem_limit: 500m
+    image: poanetwork/tokenbridge-oracle:latest
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    entrypoint: yarn manager:shutdown
+    networks:
+      - net_db_bridge_shutdown
 
 networks:
   net_db_bridge_request:
@@ -105,6 +117,8 @@ networks:
   net_db_bridge_senderhome:
     driver: bridge
   net_db_bridge_senderforeign:
+    driver: bridge
+  net_db_bridge_shutdown:
     driver: bridge
   net_rabbit_bridge_request:
     driver: bridge

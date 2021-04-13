@@ -4,6 +4,7 @@ const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
 const logger = require('./services/logger')
+const { getShutdownFlag } = require('./services/shutdownState')
 const { sendTx } = require('./tx/sendTx')
 const { getNonce, getChainId } = require('./tx/web3')
 const {
@@ -47,6 +48,7 @@ async function initialize() {
     connectSenderToQueue({
       queueName: config.queue,
       oldQueueName: config.oldQueue,
+      resendInterval: config.resendInterval,
       cb: options => {
         if (config.maxProcessingTime) {
           return watchdog(() => main(options), config.maxProcessingTime, () => {
@@ -98,6 +100,14 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
   try {
     if (redis.status !== 'ready') {
       nackMsg(msg)
+      return
+    }
+
+    const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
+    if (await getShutdownFlag(logger, config.shutdownKey, true)) {
+      if (!wasShutdown) {
+        logger.info('Oracle sender was suspended via the remote shutdown process')
+      }
       return
     }
 
@@ -207,7 +217,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
     }
     if (resendJobs.length) {
-      logger.info(`Sending ${resendJobs.length} Tx Delayed Resend Requests to Queue`)
+      logger.info({ delay: config.resendInterval }, `Sending ${resendJobs.length} Tx Delayed Resend Requests to Queue`)
       await scheduleTransactionResend(resendJobs)
     }
     ackMsg(msg)

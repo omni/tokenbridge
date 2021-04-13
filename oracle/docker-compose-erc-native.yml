@@ -77,6 +77,12 @@ services:
     networks:
       - net_db_bridge_request
       - net_rabbit_bridge_request
+  bridge_shutdown:
+    extends:
+      file: docker-compose.yml
+      service: bridge_shutdown
+    networks:
+      - net_db_bridge_shutdown
 
 networks:
   net_db_bridge_request:
@@ -90,6 +96,8 @@ networks:
   net_db_bridge_senderhome:
     driver: bridge
   net_db_bridge_senderforeign:
+    driver: bridge
+  net_db_bridge_shutdown:
     driver: bridge
   net_rabbit_bridge_request:
     driver: bridge

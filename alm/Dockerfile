@@ -19,7 +19,7 @@ COPY --from=contracts /mono/contracts/build ./contracts/build
 COPY commons/package.json ./commons/
 COPY alm/package.json ./alm/
 COPY yarn.lock .
-RUN NOYARNPOSTINSTALL=1 yarn install --frozen-lockfile --production
+RUN NOYARNPOSTINSTALL=1 yarn install --frozen-lockfile
 
 COPY ./commons ./commons
 COPY ./alm ./alm
