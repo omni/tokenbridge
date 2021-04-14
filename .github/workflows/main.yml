@@ -209,4 +209,4 @@ jobs:
       - name: Reset docker socket permissions
         run: sudo chown -R $USER:docker /var/run/docker.sock
       - name: Run oracle e2e tests
-        run: docker-compose -f ./e2e-commons/docker-compose.yml run e2e yarn workspace oracle-e2e run ${{ matrix.task }}
+        run: docker-compose -f ./e2e-commons/docker-compose.yml run -e ULTIMATE=true e2e yarn workspace oracle-e2e run ${{ matrix.task }}

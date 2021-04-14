@@ -25,6 +25,11 @@ const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BR
 
 describe('erc to erc', () => {
   before(async () => {
+    if (process.env.ULTIMATE === 'true') {
+      return
+    }
+    console.log('Calling setRequiredSignatures(2)')
+
     // Set 2 required signatures for home bridge
     await setRequiredSignatures({
       bridgeContract: homeBridge,
