@@ -43,7 +43,7 @@ async function fetchShutdownFlag() {
   }
 
   if (config.shutdownContractAddress) {
-    const shutdownSelector = web3Side.eth.abi.encodeEventSignature(config.shutdownMethod)
+    const shutdownSelector = web3Side.eth.abi.encodeFunctionSignature(config.shutdownMethod)
     logger.debug(
       { contract: config.shutdownContractAddress, method: config.shutdownMethod, data: shutdownSelector },
       'Fetching shutdown status from contract'

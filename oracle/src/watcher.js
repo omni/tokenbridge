@@ -164,6 +164,8 @@ async function main({ sendToQueue, sendToWorker }) {
         logger.info('Oracle watcher was suspended via the remote shutdown process')
       }
       return
+    } else if (wasShutdown) {
+      logger.info(`Oracle watcher was unsuspended.`)
     }
 
     await checkConditions()
