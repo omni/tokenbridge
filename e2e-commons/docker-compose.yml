@@ -68,49 +68,6 @@ services:
       - '../e2e-commons/access-lists/allowance_list.txt:/mono/oracle/access-lists/allowance_list.txt'
     networks:
       - ultimate
-  ui:
-    image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-ui:${UI_TAG:-local}
-    build:
-      context: ..
-      dockerfile: ui/Dockerfile
-      args:
-        DOT_ENV_PATH: e2e-commons/components-envs/ui.env
-    command: "true"
-    networks:
-      - ultimate
-  ui-erc20:
-    build:
-      context: ..
-      dockerfile: e2e-commons/Dockerfile.ui
-      args:
-        DOCKER_IMAGE_BASE: ${DOCKER_IMAGE_BASE:-tokenbridge}
-        UI_TAG: ${UI_TAG:-local}
-        DOT_ENV_PATH: e2e-commons/components-envs/ui-erc20.env
-    command: "true"
-    networks:
-      - ultimate
-  ui-erc20-native:
-    build:
-      context: ..
-      dockerfile: e2e-commons/Dockerfile.ui
-      args:
-        DOCKER_IMAGE_BASE: ${DOCKER_IMAGE_BASE:-tokenbridge}
-        UI_TAG: ${UI_TAG:-local}
-        DOT_ENV_PATH: e2e-commons/components-envs/ui-erc20-native.env
-    command: "true"
-    networks:
-      - ultimate
-  ui-amb-stake-erc20-erc20:
-    build:
-      context: ..
-      dockerfile: e2e-commons/Dockerfile.ui
-      args:
-        DOCKER_IMAGE_BASE: ${DOCKER_IMAGE_BASE:-tokenbridge}
-        UI_TAG: ${UI_TAG:-local}
-        DOT_ENV_PATH: e2e-commons/components-envs/ui-amb-stake-erc20-erc20.env
-    command: "true"
-    networks:
-      - ultimate
   alm:
     image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-alm:${ALM_TAG:-local}
     build:

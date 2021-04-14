@@ -39,7 +39,6 @@
     "home": "0x32198D570fffC7033641F8A9094FFDCaAEF42624",
     "foreign": "0x2B6871b9B02F73fa24F4864322CdC78604207769",
     "foreignToken": "0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B",
-    "ui": "http://localhost:3000",
     "monitor": "http://monitor:3010/bridge"
   },
   "ercToErcBridge": {
@@ -47,7 +46,6 @@
     "foreign": "0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127",
     "homeToken": "0x792455a6bCb62Ed4C4362D323E0590654CA4765c",
     "foreignToken": "0x3C665A31199694Bf723fD08844AD290207B5797f",
-    "ui": "http://localhost:3001",
     "monitor": "http://monitor-erc20:3011/bridge"
   },
   "ercToNativeBridge": {
@@ -55,7 +53,6 @@
     "foreign": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
     "foreignToken": "0x7cc4b1851c35959d34e635a470f6b5c43ba3c9c9",
     "chaiToken": "0x06af07097c9eeb7fd685c692751d5c66db49c215",
-    "ui": "http://localhost:3002",
     "monitor": "http://monitor-erc20-native:3012/bridge"
   },
   "amb": {
@@ -65,14 +62,6 @@
     "foreignBox": "0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1",
     "blockedHomeBox": "0x612E8bd50A7b1F009F43f2b8679E9B8eD91eb5CE",
     "monitor": "http://monitor-amb:3013/bridge"
-  },
-  "ambStakeErcToErc": {
-    "home": "0xc26Aa60Ff574f157616D3aEE70e08aAC129E1dFC",
-    "foreign": "0xc26Aa60Ff574f157616D3aEE70e08aAC129E1dFC",
-    "homeToken": "0x6f359aC418a5f7538F7755A33C9c7dDf38785524",
-    "foreignToken": "0x6f359aC418a5f7538F7755A33C9c7dDf38785524",
-    "blockReward": "0xF9698Eb93702dfdd0e2d802088d4c21822a8A977",
-    "ui": "http://localhost:3003"
   },
   "homeRPC": {
     "URL": "http://parity1:8545",

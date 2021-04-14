@@ -8,8 +8,6 @@ while [ "$1" != "" ]; do
     docker-compose build oracle
   elif [ "$1" == "monitor" ]; then
     docker-compose build monitor
-  elif [ "$1" == "ui" ]; then
-    docker-compose build ui
   elif [ "$1" == "alm" ]; then
     docker-compose build alm
   fi
