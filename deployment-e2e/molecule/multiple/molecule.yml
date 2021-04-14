@@ -16,7 +16,6 @@ platforms:
     children:
       - oracle
       - monitor
-      - ui
     image: ubuntu:16.04
     privileged: true
     network_mode: host
