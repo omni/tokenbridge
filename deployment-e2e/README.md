@@ -16,7 +16,7 @@ Alternatively, if there are no changes except the playbooks, you can use the `ma
 ./molecule.sh <scenario_name>
 ```
 
-In this case `master` branch will be used as a codebase for Monitor, UI, Oracle and Contracts deployed by your local playbook.
+In this case `master` branch will be used as a codebase for Monitor, Oracle and Contracts deployed by your local playbook.
 
 ## Run the tests
 
@@ -29,7 +29,6 @@ Available scenarios:
 Scenario | Description
 --- | ---
 oracle | Deploys and checks standalone Oracle on Ubuntu host
-ui | Deploys and checks standalone UI on Ubuntu host
 
 ## Ultimate E2E tests
 

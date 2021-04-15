@@ -150,10 +150,6 @@ In case you need to reset your bridge or setup a new one (with different configu
   - `yarn sender:home`
   - `yarn sender:foreign`
 
-### Bridge UI
-
-See the [UI instructions](../ui/README.md) to configure and use the optional Bridge UI.
-
 ### Build the image without running the oracle
 
 To build the image change the directory:

@@ -20,12 +20,10 @@ Sub-repositories maintained within this monorepo are listed below.
 | Sub-repository | Description |
 | --- | --- |
 | [Oracle](oracle/README.md) | Oracle responsible for listening to bridge related events and authorizing asset transfers. |
-| [UI](ui/README.md) | DApp interface to transfer tokens and coins between chains. |
 | [Monitor](monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
 | [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
 | [Monitor-E2E](monitor-e2e/README.md) | End to end tests for the Monitor |
-| [UI-E2E](ui-e2e/README.md) | End to end tests for the UI |
 | [Deployment-E2E](deployment-e2e/README.md) | End to end tests for the Deployment |
 | [Commons](commons/README.md) | Interfaces, constants and utilities shared between the sub-repositories |
 | [E2E-Commons](e2e-commons/README.md) | Common utilities and configuration used in end to end tests |
@@ -68,7 +66,7 @@ Clone the repository:
 git clone https://github.com/poanetwork/tokenbridge
 ```
 
-If there is no need to build docker images for the TokenBridge components (oracle, monitor, UI), initialize submodules, install dependencies, compile the Smart Contracts:
+If there is no need to build docker images for the TokenBridge components (oracle, monitor), initialize submodules, install dependencies, compile the Smart Contracts:
 ```
 yarn initialize
 ```
@@ -91,7 +89,7 @@ Running tests for all projects:
 yarn test
 ```
 
-Additionally there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [UI](ui-e2e/README.md).
+Additionally there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [Monitor](monitor-e2e/README.md).
 
 For details on building, running and developing please refer to respective READMEs in sub-repositories.
 
