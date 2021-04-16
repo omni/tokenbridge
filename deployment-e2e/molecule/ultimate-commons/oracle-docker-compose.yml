@@ -18,5 +18,6 @@
       - oracle_net_rabbit_bridge_transfer
       - oracle_net_rabbit_bridge_senderhome
       - oracle_net_rabbit_bridge_senderforeign
+      - oracle_net_rabbit_bridge_convert_to_chai_worker
     delegate_to: 127.0.0.1
     become: false

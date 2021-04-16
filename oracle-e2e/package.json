@@ -6,7 +6,10 @@
   "scripts": {
     "start": "mocha",
     "lint": "eslint . --ignore-path ../.eslintignore",
-    "amb": "ULTIMATE=true mocha test/amb.js",
+    "amb": "mocha test/amb.js",
+    "native-to-erc": "mocha test/nativeToErc.js",
+    "erc-to-erc": "mocha test/ercToErc.js",
+    "erc-to-native": "mocha test/ercToNative.js",
     "alm": "mocha test/amb.js"
   },
   "author": "",

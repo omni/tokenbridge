@@ -51,29 +51,6 @@ ORACLE_SHUTDOWN_CONTRACT_ADDRESS | Optional contract address in the side chain a
 ORACLE_SHUTDOWN_CONTRACT_METHOD | Method signature to be used in the side chain to identify the current shutdown status. Method should return boolean. Default value is `isShutdown()`. | `function signature`
 
 
-## UI configuration
-
-name | description | value
---- | --- | ---
-UI_TITLE | The title for the bridge UI page. `%c` will be replaced by the name of the network. | string
-UI_OG_TITLE | The meta title for the deployed bridge page. | string
-UI_DESCRIPTION | The meta description for the deployed bridge page. | string
-UI_NATIVE_TOKEN_DISPLAY_NAME | name of the home native coin | string
-UI_HOME_NETWORK_DISPLAY_NAME | name to be displayed for home network | string
-UI_FOREIGN_NETWORK_DISPLAY_NAME | name to be displayed for foreign network | string
-UI_HOME_WITHOUT_EVENTS | `true` if home network doesn't support events | true/false
-UI_FOREIGN_WITHOUT_EVENTS | `true` if foreign network doesn't support events | true/false
-UI_HOME_EXPLORER_TX_TEMPLATE | template link to transaction on home explorer. `%s` will be replaced by transaction hash | URL template
-UI_FOREIGN_EXPLORER_TX_TEMPLATE | template link to transaction on foreign explorer. `%s` will be replaced by transaction hash | URL template
-UI_HOME_EXPLORER_ADDRESS_TEMPLATE | template link to address on home explorer. `%s` will be replaced by address | URL template
-UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE | template link to address on foreign explorer. `%s` will be replaced by address | URL template
-UI_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract. | integer
-UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | integer
-UI_PORT | The port for the UI app. | integer
-UI_STYLES | The set of styles to render the bridge UI page. | core/classic/stake
-UI_PUBLIC_URL | The public url for the deployed bridge page | string
-
-
 ## Monitor configuration
 
 name | description | value
