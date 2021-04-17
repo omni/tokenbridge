@@ -25,6 +25,7 @@ const StyledButton = styled.button`
 `
 
 interface ManualExecutionButtonParams {
+  safe?: boolean
   messageData: string
   setExecutionData: Function
   signatureCollected: string[]
@@ -32,6 +33,7 @@ interface ManualExecutionButtonParams {
 }
 
 export const ManualExecutionButton = ({
+  safe,
   messageData,
   setExecutionData,
   signatureCollected,
@@ -72,7 +74,10 @@ export const ManualExecutionButton = ({
       const signatures = packSignatures(signatureCollected.map(signatureToVRS))
       const messageId = messageData.slice(0, 66)
       const bridge = foreign.bridgeContract
-      const data = bridge.methods.executeSignatures(messageData, signatures).encodeABI()
+      const executeMethod = safe
+        ? bridge.methods.safeExecuteSignaturesWithAutoGasLimit
+        : bridge.methods.executeSignatures
+      const data = executeMethod(messageData, signatures).encodeABI()
       setManualExecution(false)
 
       library.eth
@@ -132,14 +137,15 @@ export const ManualExecutionButton = ({
       messageData,
       signatureCollected,
       setExecutionData,
-      setPendingExecution
+      setPendingExecution,
+      safe
     ]
   )
 
   return (
     <div className="is-center">
       <StyledButton className="button outline" onClick={() => setManualExecution(true)}>
-        Execute
+        {safe ? 'Safe Execute' : 'Execute'}
       </StyledButton>
     </div>
   )
