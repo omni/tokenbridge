@@ -195,7 +195,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         )
 
         const message = e.message.toLowerCase()
-        if (isResend || message.includes('transaction with the same hash was already imported')) {
+        if (message.includes('replacement transaction underpriced')) {
+          logger.info('Replacement transaction underpriced, forcing gas price update')
+          GasPrice.start(config.id)
+          failedTx.push(job)
+        } else if (isResend || message.includes('transaction with the same hash was already imported')) {
           resendJobs.push(job)
         } else {
           // if initial transaction sending has failed not due to the same hash error

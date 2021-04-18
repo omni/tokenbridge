@@ -64,9 +64,9 @@ function addExtraGas(gas, extraPercentage, maxGasLimit = Infinity) {
   return BigNumber.min(maxGasLimit, gasWithExtra)
 }
 
-function setIntervalAndRun(f, interval) {
+async function setIntervalAndRun(f, interval) {
   const handler = setInterval(f, interval)
-  f()
+  await f()
   return handler
 }
 
