@@ -123,16 +123,8 @@ export const ExecutionConfirmation = ({
             )}
             {availableManualExecution && (
               <td>
-                {safeExecutionAvailable && (
-                  <ManualExecutionButton
-                    safe
-                    messageData={messageData}
-                    setExecutionData={setExecutionData}
-                    signatureCollected={signatureCollected as string[]}
-                    setPendingExecution={setPendingExecution}
-                  />
-                )}
                 <ManualExecutionButton
+                  safeExecutionAvailable={safeExecutionAvailable}
                   messageData={messageData}
                   setExecutionData={setExecutionData}
                   signatureCollected={signatureCollected as string[]}

@@ -8,24 +8,27 @@ import {
   EXECUTION_OUT_OF_GAS_ERROR,
   FOREIGN_EXPLORER_API,
   INCORRECT_CHAIN_ERROR,
-  VALIDATOR_CONFIRMATION_STATUS
+  VALIDATOR_CONFIRMATION_STATUS,
+  EXECUTION_MODE
 } from '../config/constants'
 import { useStateProvider } from '../state/StateProvider'
 import { signatureToVRS, packSignatures } from '../utils/signatures'
 import { getSuccessExecutionData } from '../utils/getFinalizationEvent'
 import { TransactionReceipt } from 'web3-eth'
 
-const StyledButton = styled.button`
+const ActionButton = styled.button`
   color: var(--button-color);
   border-color: var(--font-color);
   margin-top: 10px;
+  min-width: 120px;
+  padding: 1rem;
   &:focus {
     outline: var(--button-color);
   }
 `
 
 interface ManualExecutionButtonParams {
-  safe?: boolean
+  safeExecutionAvailable: boolean
   messageData: string
   setExecutionData: Function
   signatureCollected: string[]
@@ -33,7 +36,7 @@ interface ManualExecutionButtonParams {
 }
 
 export const ManualExecutionButton = ({
-  safe,
+  safeExecutionAvailable,
   messageData,
   setExecutionData,
   signatureCollected,
@@ -41,7 +44,7 @@ export const ManualExecutionButton = ({
 }: ManualExecutionButtonParams) => {
   const { foreign, setError } = useStateProvider()
   const { library, activate, account, active } = useWeb3React()
-  const [manualExecution, setManualExecution] = useState(false)
+  const [manualExecution, setManualExecution] = useState(EXECUTION_MODE.NO_EXECUTION)
 
   useEffect(
     () => {
@@ -64,7 +67,7 @@ export const ManualExecutionButton = ({
           } else {
             setError(e.message)
           }
-          setManualExecution(false)
+          setManualExecution(EXECUTION_MODE.NO_EXECUTION)
         })
         return
       }
@@ -74,11 +77,12 @@ export const ManualExecutionButton = ({
       const signatures = packSignatures(signatureCollected.map(signatureToVRS))
       const messageId = messageData.slice(0, 66)
       const bridge = foreign.bridgeContract
-      const executeMethod = safe
-        ? bridge.methods.safeExecuteSignaturesWithAutoGasLimit
-        : bridge.methods.executeSignatures
+      const executeMethod =
+        manualExecution === EXECUTION_MODE.SAFE_EXECUTE_SIGNATURES
+          ? bridge.methods.safeExecuteSignaturesWithAutoGasLimit
+          : bridge.methods.executeSignatures
       const data = executeMethod(messageData, signatures).encodeABI()
-      setManualExecution(false)
+      setManualExecution(EXECUTION_MODE.NO_EXECUTION)
 
       library.eth
         .sendTransaction({
@@ -138,15 +142,32 @@ export const ManualExecutionButton = ({
       signatureCollected,
       setExecutionData,
       setPendingExecution,
-      safe
+      safeExecutionAvailable
     ]
   )
 
   return (
-    <div className="is-center">
-      <StyledButton className="button outline" onClick={() => setManualExecution(true)}>
-        {safe ? 'Safe Execute' : 'Execute'}
-      </StyledButton>
+    <div>
+      {safeExecutionAvailable && (
+        <div className="is-center">
+          <ActionButton
+            className="button outline"
+            title="Executes a message using auto gas limit, reverts on message failure"
+            onClick={() => setManualExecution(EXECUTION_MODE.SAFE_EXECUTE_SIGNATURES)}
+          >
+            Safe Execute
+          </ActionButton>
+        </div>
+      )}
+      <div className="is-center">
+        <ActionButton
+          className="button outline"
+          title="Executes a message using fixed gas limit"
+          onClick={() => setManualExecution(EXECUTION_MODE.EXECUTE_SIGNATURES)}
+        >
+          Execute
+        </ActionButton>
+      </div>
     </div>
   )
 }

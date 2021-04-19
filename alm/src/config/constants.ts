@@ -74,3 +74,9 @@ Please, contact the support by messaging on %linkhttps://forum.poa.network/c/sup
 
 export const EXECUTION_OUT_OF_GAS_ERROR = `Your execution transaction has been reverted due to Out-of-Gas error.
 Please, resend the transaction and provide more gas to it.`
+
+export const EXECUTION_MODE = {
+  NO_EXECUTION: 0,
+  EXECUTE_SIGNATURES: 1,
+  SAFE_EXECUTE_SIGNATURES: 2
+}
