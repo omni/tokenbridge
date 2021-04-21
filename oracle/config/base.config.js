@@ -91,6 +91,7 @@ const foreignConfig = {
   bridgeAbi: foreignAbi,
   pollingInterval: process.env.ORACLE_FOREIGN_RPC_POLLING_INTERVAL,
   startBlock: toBN(process.env.ORACLE_FOREIGN_START_BLOCK || 0),
+  blockPollingLimit: toBN(process.env.ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT || 0),
   web3: web3Foreign
 }
 

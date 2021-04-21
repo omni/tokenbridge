@@ -168,7 +168,7 @@ async function main({ sendToQueue, sendToWorker }) {
     }
 
     const fromBlock = lastProcessedBlock.add(ONE)
-    const toBlock = BN.min(lastBlockToProcess, fromBlock.add(THOUSAND))
+    const toBlock = config.blockPollingLimit ? BN.min(lastBlockToProcess, fromBlock.add(config.blockPollingLimit)) : lastBlockToProcess
 
     const events = await getEvents({
       contract: eventContract,
