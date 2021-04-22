@@ -29,6 +29,7 @@ const { getTokensState } = require('./utils/tokenState')
 
 const ZERO = toBN(0)
 const ONE = toBN(1)
+const THOUSAND = toBN(1000)
 
 const web3Instance = config.web3
 const bridgeContract = new web3Instance.eth.Contract(config.bridgeAbi, config.bridgeContractAddress)
@@ -167,7 +168,7 @@ async function main({ sendToQueue, sendToWorker }) {
     }
 
     const fromBlock = lastProcessedBlock.add(ONE)
-    const toBlock = lastBlockToProcess
+    const toBlock = config.blockPollingLimit ? BN.min(lastBlockToProcess, fromBlock.add(config.blockPollingLimit)) : lastBlockToProcess
 
     const events = await getEvents({
       contract: eventContract,
