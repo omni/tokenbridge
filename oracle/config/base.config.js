@@ -73,6 +73,8 @@ const bridgeConfig = {
   shutdownKey: 'oracle-shutdown'
 }
 
+const toBNOrNull = x => (x ? toBN(x) : null)
+
 const homeConfig = {
   chain: 'home',
   eventContractAddress: process.env.COMMON_HOME_BRIDGE_ADDRESS,
@@ -81,6 +83,7 @@ const homeConfig = {
   bridgeAbi: homeAbi,
   pollingInterval: process.env.ORACLE_HOME_RPC_POLLING_INTERVAL,
   startBlock: toBN(process.env.ORACLE_HOME_START_BLOCK || 0),
+  blockPollingLimit: toBNOrNull(process.env.ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT),
   web3: web3Home
 }
 
@@ -92,6 +95,7 @@ const foreignConfig = {
   bridgeAbi: foreignAbi,
   pollingInterval: process.env.ORACLE_FOREIGN_RPC_POLLING_INTERVAL,
   startBlock: toBN(process.env.ORACLE_FOREIGN_START_BLOCK || 0),
+  blockPollingLimit: toBNOrNull(process.env.ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT),
   web3: web3Foreign
 }
 
