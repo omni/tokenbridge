@@ -29,11 +29,28 @@ const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, amb.foreign,
 describe('arbitrary message bridging', () => {
   let requiredSignatures = 1
   before(async () => {
+    const allowedMethods = [
+      'eth_call(address,bytes)',
+      'eth_call(address,address,uint256,bytes)',
+      'eth_blockNumber()',
+      'eth_getBlockByNumber()',
+      'eth_getBlockByNumber(uint256)',
+      'eth_getBlockByHash(bytes32)',
+      'eth_getBalance(address)',
+      'eth_getTransactionCount(address)',
+      'eth_getTransactionByHash(bytes32)',
+      'eth_getTransactionReceipt(bytes32)',
+      'eth_getStorageAt(address,bytes32)'
+    ]
+    for (const method of allowedMethods) {
+      const selector = homeWeb3.utils.soliditySha3(method)
+      await homeBridge.methods.enableAsyncRequestSelector(selector, true).send({ from: validator.address })
+    }
+
     // Only 1 validator is used in ultimate tests
     if (process.env.ULTIMATE === 'true') {
       return
     }
-<<<<<<< HEAD
     console.log('Calling setRequiredSignatures(2)')
 
     requiredSignatures = 2
@@ -58,26 +75,6 @@ describe('arbitrary message bridging', () => {
         gas: '4000000'
       }
     })
-=======
-
-    const allowedMethods = [
-      'eth_call(address,bytes)',
-      'eth_call(address,address,uint256,bytes)',
-      'eth_blockNumber()',
-      'eth_getBlockByNumber()',
-      'eth_getBlockByNumber(uint256)',
-      'eth_getBlockByHash(bytes32)',
-      'eth_getBalance(address)',
-      'eth_getTransactionCount(address)',
-      'eth_getTransactionByHash(bytes32)',
-      'eth_getTransactionReceipt(bytes32)',
-      'eth_getStorageAt(address,bytes32)'
-    ]
-    for (const method of allowedMethods) {
-      const selector = homeWeb3.utils.soliditySha3(method)
-      await homeBridge.methods.enableAsyncRequestSelector(selector, true).send({ from: validator.address })
-    }
->>>>>>> Use selectors approach for async AMB requests
   })
   describe('Home to Foreign', () => {
     describe('Subsidized Mode', () => {
