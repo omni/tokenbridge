@@ -49,6 +49,8 @@ ORACLE_SHUTDOWN_SERVICE_POLLING_INTERVAL | Optional interval in milliseconds use
 ORACLE_SIDE_RPC_URL | Optional HTTPS URL(s) for communication with the external shutdown service or side RPC nodes, used for shutdown manager activities. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection. | URL(s)
 ORACLE_SHUTDOWN_CONTRACT_ADDRESS | Optional contract address in the side chain accessible through `ORACLE_SIDE_RPC_URL`, where the method passed in `ORACLE_SHUTDOWN_CONTRACT_METHOD` is implemented. | `address`
 ORACLE_SHUTDOWN_CONTRACT_METHOD | Method signature to be used in the side chain to identify the current shutdown status. Method should return boolean. Default value is `isShutdown()`. | `function signature`
+ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Foreign chain. Infinite, if not provided. | `integer`
+ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Home chain. Infinite, if not provided. | `integer`
 
 
 ## Monitor configuration
