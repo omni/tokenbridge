@@ -7,7 +7,6 @@ services:
       service: rabbit
     networks:
       - net_rabbit_bridge_transfer
-      - net_rabbit_bridge_convert_to_chai_worker
   redis:
     extends:
       file: docker-compose.yml
@@ -51,18 +50,6 @@ services:
     networks:
       - net_db_bridge_transfer
       - net_rabbit_bridge_transfer
-  bridge_convert_to_chai_worker:
-    cpus: 0.1
-    mem_limit: 500m
-    image: poanetwork/tokenbridge-oracle:latest
-    env_file: ./.env
-    environment:
-      - NODE_ENV=production
-      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
-    restart: unless-stopped
-    entrypoint: yarn worker:convert-to-chai
-    networks:
-      - net_rabbit_bridge_convert_to_chai_worker
   bridge_senderhome:
     extends:
       file: docker-compose.yml
@@ -110,6 +97,4 @@ networks:
   net_rabbit_bridge_senderhome:
     driver: bridge
   net_rabbit_bridge_senderforeign:
-    driver: bridge
-  net_rabbit_bridge_convert_to_chai_worker:
     driver: bridge

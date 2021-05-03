@@ -29,11 +29,6 @@ if (!transferWatcherRequired) {
   process.exit(EXIT_CODES.WATCHER_NOT_REQUIRED)
 }
 
-const workerQueueConfig = {}
-if (baseConfig.id === 'erc-native') {
-  workerQueueConfig.workerQueue = 'convert-to-chai'
-}
-
 module.exports = {
   ...baseConfig.bridgeConfig,
   ...baseConfig.foreignConfig,
@@ -42,7 +37,6 @@ module.exports = {
   eventAbi: ERC20_ABI,
   eventFilter: { to: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS },
   queue: 'home-prioritized',
-  ...workerQueueConfig,
   name: `watcher-${id}`,
   id
 }
