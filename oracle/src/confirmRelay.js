@@ -47,7 +47,6 @@ async function initialize() {
 
     connectWatcherToQueue({
       queueName: config.queue,
-      workerQueue: config.workerQueue,
       cb: runMain
     })
   } catch (e) {

@@ -9,7 +9,6 @@ const { getShutdownFlag } = require('./services/shutdownState')
 const { getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
 const { EXIT_CODES } = require('./utils/constants')
-const { isChaiTokenEnabled } = require('./utils/chaiUtils')
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -47,7 +46,6 @@ async function initialize() {
     await getLastProcessedBlock()
     connectWatcherToQueue({
       queueName: config.queue,
-      workerQueue: config.workerQueue,
       cb: runMain
     })
   } catch (e) {
@@ -56,16 +54,16 @@ async function initialize() {
   }
 }
 
-async function runMain({ sendToQueue, sendToWorker }) {
+async function runMain({ sendToQueue }) {
   try {
     if (connection.isConnected() && redis.status === 'ready') {
       if (config.maxProcessingTime) {
-        await watchdog(() => main({ sendToQueue, sendToWorker }), config.maxProcessingTime, () => {
+        await watchdog(() => main({ sendToQueue }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
           process.exit(EXIT_CODES.MAX_TIME_REACHED)
         })
       } else {
-        await main({ sendToQueue, sendToWorker })
+        await main({ sendToQueue })
       }
     }
   } catch (e) {
@@ -73,7 +71,7 @@ async function runMain({ sendToQueue, sendToWorker }) {
   }
 
   setTimeout(() => {
-    runMain({ sendToQueue, sendToWorker })
+    runMain({ sendToQueue })
   }, config.pollingInterval)
 }
 
@@ -147,16 +145,7 @@ async function getLastBlockToProcess() {
   return lastBlockNumber.sub(requiredBlockConfirmations)
 }
 
-async function isWorkerNeeded() {
-  switch (config.id) {
-    case 'erc-native-transfer':
-      return isChaiTokenEnabled(bridgeContract, logger)
-    default:
-      return true
-  }
-}
-
-async function main({ sendToQueue, sendToWorker }) {
+async function main({ sendToQueue }) {
   try {
     const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
     if (await getShutdownFlag(logger, config.shutdownKey, true)) {
@@ -191,10 +180,6 @@ async function main({ sendToQueue, sendToWorker }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      if (sendToWorker && (await isWorkerNeeded())) {
-        await sendToWorker({ blockNumber: toBlock.toString() })
-      }
-
       const job = await processEvents(events)
       logger.info('Transactions to send:', job.length)
 
