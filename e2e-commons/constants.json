@@ -52,7 +52,6 @@
     "home": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
     "foreign": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
     "foreignToken": "0x7cc4b1851c35959d34e635a470f6b5c43ba3c9c9",
-    "chaiToken": "0x06af07097c9eeb7fd685c692751d5c66db49c215",
     "monitor": "http://monitor-erc20-native:3012/bridge"
   },
   "amb": {
