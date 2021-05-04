@@ -13,6 +13,7 @@ const {
   privateKeyToAddress,
   syncForEach,
   waitForFunds,
+  waitForUnsuspend,
   watchdog,
   nonceError
 } = require('./utils/utils')
@@ -45,30 +46,40 @@ async function initialize() {
     GasPrice.start(config.id)
 
     chainId = await getChainId(web3Instance)
-    connectSenderToQueue({
-      queueName: config.queue,
-      oldQueueName: config.oldQueue,
-      resendInterval: config.resendInterval,
-      cb: options => {
-        if (config.maxProcessingTime) {
-          return watchdog(() => main(options), config.maxProcessingTime, () => {
-            logger.fatal('Max processing time reached')
-            process.exit(EXIT_CODES.MAX_TIME_REACHED)
-          })
-        }
 
-        return main(options)
-      }
-    })
+    connectQueue()
   } catch (e) {
     logger.error(e.message)
     process.exit(EXIT_CODES.GENERAL_ERROR)
   }
 }
 
+function connectQueue() {
+  connectSenderToQueue({
+    queueName: config.queue,
+    oldQueueName: config.oldQueue,
+    resendInterval: config.resendInterval,
+    cb: options => {
+      if (config.maxProcessingTime) {
+        return watchdog(() => main(options), config.maxProcessingTime, () => {
+          logger.fatal('Max processing time reached')
+          process.exit(EXIT_CODES.MAX_TIME_REACHED)
+        })
+      }
+
+      return main(options)
+    }
+  })
+}
+
 function resume(newBalance) {
   logger.info(`Validator balance changed. New balance is ${newBalance}. Resume messages processing.`)
-  initialize()
+  connectQueue()
+}
+
+function unsuspend() {
+  logger.info(`Oracle sender was unsuspended.`)
+  connectQueue()
 }
 
 async function readNonce(forceUpdate) {
@@ -103,11 +114,10 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       return
     }
 
-    const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
     if (await getShutdownFlag(logger, config.shutdownKey, true)) {
-      if (!wasShutdown) {
-        logger.info('Oracle sender was suspended via the remote shutdown process')
-      }
+      logger.info('Oracle sender was suspended via the remote shutdown process')
+      channel.close()
+      waitForUnsuspend(() => getShutdownFlag(logger, config.shutdownKey, true), unsuspend)
       return
     }
 
@@ -185,7 +195,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         )
 
         const message = e.message.toLowerCase()
-        if (isResend || message.includes('transaction with the same hash was already imported')) {
+        if (message.includes('replacement transaction underpriced')) {
+          logger.info('Replacement transaction underpriced, forcing gas price update')
+          GasPrice.start(config.id)
+          failedTx.push(job)
+        } else if (isResend || message.includes('transaction with the same hash was already imported')) {
           resendJobs.push(job)
         } else {
           // if initial transaction sending has failed not due to the same hash error

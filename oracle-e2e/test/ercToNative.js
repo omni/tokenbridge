@@ -34,6 +34,11 @@ const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME
 
 describe('erc to native', () => {
   before(async () => {
+    if (process.env.ULTIMATE === 'true') {
+      return
+    }
+    console.log('Calling setRequiredSignatures(2)')
+
     // Set 2 required signatures for home bridge
     await setRequiredSignatures({
       bridgeContract: homeBridge,
@@ -144,47 +149,53 @@ describe('erc to native', () => {
       }
     })
   })
-  it('should not process transaction from blocked users', async () => {
-    const originalBalance1 = await erc20Token.methods.balanceOf(user.address).call()
-    const originalBalance2 = await erc20Token.methods.balanceOf(blockedUser.address).call()
+  // allowance/block lists files are not mounted to the host during the ultimate test
+  if (process.env.ULTIMATE !== 'true') {
+    it('should not process transaction from blocked users', async () => {
+      const originalBalance1 = await erc20Token.methods.balanceOf(user.address).call()
+      const originalBalance2 = await erc20Token.methods.balanceOf(blockedUser.address).call()
 
-    // check that account has tokens in home chain
-    const balance1 = await homeWeb3.eth.getBalance(user.address)
-    const balance2 = await homeWeb3.eth.getBalance(blockedUser.address)
-    assert(!toBN(balance1).isZero(), 'Account should have tokens')
-    assert(!toBN(balance2).isZero(), 'Account should have tokens')
+      // check that account has tokens in home chain
+      const balance1 = await homeWeb3.eth.getBalance(user.address)
+      const balance2 = await homeWeb3.eth.getBalance(blockedUser.address)
+      assert(!toBN(balance1).isZero(), 'Account should have tokens')
+      assert(!toBN(balance2).isZero(), 'Account should have tokens')
 
-    // send transaction to home bridge
-    await homeWeb3.eth.sendTransaction({
-      from: user.address,
-      to: COMMON_HOME_BRIDGE_ADDRESS,
-      gasPrice: '1',
-      gas: '1000000',
-      value: homeWeb3.utils.toWei('0.01')
+      // send transaction to home bridge
+      await homeWeb3.eth.sendTransaction({
+        from: user.address,
+        to: COMMON_HOME_BRIDGE_ADDRESS,
+        gasPrice: '1',
+        gas: '1000000',
+        value: homeWeb3.utils.toWei('0.01')
+      })
+
+      // send transaction to home bridge
+      await homeWeb3.eth.sendTransaction({
+        from: blockedUser.address,
+        to: COMMON_HOME_BRIDGE_ADDRESS,
+        gasPrice: '1',
+        gas: '1000000',
+        value: homeWeb3.utils.toWei('0.01')
+      })
+
+      // check that balance increases
+      await uniformRetry(async retry => {
+        const balance = await erc20Token.methods.balanceOf(user.address).call()
+        if (toBN(balance).lte(toBN(originalBalance1))) {
+          retry()
+        }
+      })
+
+      await sleep(3000)
+
+      const balance = await erc20Token.methods.balanceOf(blockedUser.address).call()
+      assert(
+        toBN(balance).eq(toBN(originalBalance2)),
+        'Bridge should not process collected signatures from blocked user'
+      )
     })
-
-    // send transaction to home bridge
-    await homeWeb3.eth.sendTransaction({
-      from: blockedUser.address,
-      to: COMMON_HOME_BRIDGE_ADDRESS,
-      gasPrice: '1',
-      gas: '1000000',
-      value: homeWeb3.utils.toWei('0.01')
-    })
-
-    // check that balance increases
-    await uniformRetry(async retry => {
-      const balance = await erc20Token.methods.balanceOf(user.address).call()
-      if (toBN(balance).lte(toBN(originalBalance1))) {
-        retry()
-      }
-    })
-
-    await sleep(3000)
-
-    const balance = await erc20Token.methods.balanceOf(blockedUser.address).call()
-    assert(toBN(balance).eq(toBN(originalBalance2)), 'Bridge should not process collected signatures from blocked user')
-  })
+  }
   it('should not invest dai when chai token is disabled', async () => {
     const bridgeDaiTokenBalance = await erc20Token.methods.balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS).call()
 
@@ -273,121 +284,123 @@ describe('erc to native', () => {
     })
   })
 
-  describe('handling of chai swaps', async () => {
-    before(async () => {
-      // Next tests check validator nonces, this will force every validator to submit signature/affirmation
-      // Set 3 required signatures for home bridge
-      await setRequiredSignatures({
-        bridgeContract: homeBridge,
-        web3: homeWeb3,
-        requiredSignatures: 3,
-        options: {
-          from: validator.address,
-          gas: '4000000'
-        }
+  if (process.env.ULTIMATE !== 'true') {
+    describe('handling of chai swaps', async () => {
+      before(async () => {
+        // Next tests check validator nonces, this will force every validator to submit signature/affirmation
+        // Set 3 required signatures for home bridge
+        await setRequiredSignatures({
+          bridgeContract: homeBridge,
+          web3: homeWeb3,
+          requiredSignatures: 3,
+          options: {
+            from: validator.address,
+            gas: '4000000'
+          }
+        })
+
+        // Set 3 required signatures for foreign bridge
+        await setRequiredSignatures({
+          bridgeContract: foreignBridge,
+          web3: foreignWeb3,
+          requiredSignatures: 3,
+          options: {
+            from: validator.address,
+            gas: '4000000'
+          }
+        })
       })
 
-      // Set 3 required signatures for foreign bridge
-      await setRequiredSignatures({
-        bridgeContract: foreignBridge,
-        web3: foreignWeb3,
-        requiredSignatures: 3,
-        options: {
+      it('should not handle transfer event in paying interest', async () => {
+        await foreignBridge.methods.setInterestReceiver(user.address).send({
           from: validator.address,
-          gas: '4000000'
-        }
+          gas: '1000000'
+        })
+        const initialNonce = await homeWeb3.eth.getTransactionCount(validator.address)
+        await foreignBridge.methods.payInterest().send({
+          from: user.address,
+          gas: '1000000'
+        })
+
+        await promiseRetry(async (retry, number) => {
+          if (number < 6) {
+            retry()
+          } else {
+            const nonce = await homeWeb3.eth.getTransactionCount(validator.address)
+            assert(
+              nonce === initialNonce,
+              'Validator should not process transfer event originated during converting Chai => Dai'
+            )
+          }
+        })
+      })
+
+      it('should not handle chai withdrawal transfer event in executeSignatures as a regular transfer', async () => {
+        await foreignBridge.methods.setMinDaiTokenBalance('0').send({
+          from: validator.address,
+          gas: '1000000'
+        }) // set investing limit to 0
+        await foreignBridge.methods.convertDaiToChai().send({
+          from: validator.address,
+          gas: '1000000'
+        }) // convert all existing dai tokens on bridge account to chai, in order to start from zero balance
+
+        const initialNonce = await homeWeb3.eth.getTransactionCount(validator.address)
+
+        const originalBalance = await erc20Token.methods.balanceOf(user.address).call()
+        // send transaction to home bridge
+        await homeWeb3.eth.sendTransaction({
+          from: user.address,
+          to: COMMON_HOME_BRIDGE_ADDRESS,
+          gasPrice: '1',
+          gas: '1000000',
+          value: homeWeb3.utils.toWei('0.01')
+        })
+
+        // check that balance increases
+        await uniformRetry(async retry => {
+          const balance = await erc20Token.methods.balanceOf(user.address).call()
+          if (toBN(balance).lte(toBN(originalBalance))) {
+            retry()
+          }
+        })
+
+        await promiseRetry(async (retry, number) => {
+          if (number < 6) {
+            retry()
+          } else {
+            const nonce = await homeWeb3.eth.getTransactionCount(validator.address)
+            assert(
+              nonce === initialNonce + 1,
+              'Validator should not process transfer event originated during converting Chai => Dai'
+            )
+          }
+        })
+      })
+
+      after(async () => {
+        // Set 2 required signatures for home bridge
+        await setRequiredSignatures({
+          bridgeContract: homeBridge,
+          web3: homeWeb3,
+          requiredSignatures: 2,
+          options: {
+            from: validator.address,
+            gas: '4000000'
+          }
+        })
+
+        // Set 2 required signatures for foreign bridge
+        await setRequiredSignatures({
+          bridgeContract: foreignBridge,
+          web3: foreignWeb3,
+          requiredSignatures: 2,
+          options: {
+            from: validator.address,
+            gas: '4000000'
+          }
+        })
       })
     })
-
-    it('should not handle transfer event in paying interest', async () => {
-      await foreignBridge.methods.setInterestReceiver(user.address).send({
-        from: validator.address,
-        gas: '1000000'
-      })
-      const initialNonce = await homeWeb3.eth.getTransactionCount(validator.address)
-      await foreignBridge.methods.payInterest().send({
-        from: user.address,
-        gas: '1000000'
-      })
-
-      await promiseRetry(async (retry, number) => {
-        if (number < 6) {
-          retry()
-        } else {
-          const nonce = await homeWeb3.eth.getTransactionCount(validator.address)
-          assert(
-            nonce === initialNonce,
-            'Validator should not process transfer event originated during converting Chai => Dai'
-          )
-        }
-      })
-    })
-
-    it('should not handle chai withdrawal transfer event in executeSignatures as a regular transfer', async () => {
-      await foreignBridge.methods.setMinDaiTokenBalance('0').send({
-        from: validator.address,
-        gas: '1000000'
-      }) // set investing limit to 0
-      await foreignBridge.methods.convertDaiToChai().send({
-        from: validator.address,
-        gas: '1000000'
-      }) // convert all existing dai tokens on bridge account to chai, in order to start from zero balance
-
-      const initialNonce = await homeWeb3.eth.getTransactionCount(validator.address)
-
-      const originalBalance = await erc20Token.methods.balanceOf(user.address).call()
-      // send transaction to home bridge
-      await homeWeb3.eth.sendTransaction({
-        from: user.address,
-        to: COMMON_HOME_BRIDGE_ADDRESS,
-        gasPrice: '1',
-        gas: '1000000',
-        value: homeWeb3.utils.toWei('0.01')
-      })
-
-      // check that balance increases
-      await uniformRetry(async retry => {
-        const balance = await erc20Token.methods.balanceOf(user.address).call()
-        if (toBN(balance).lte(toBN(originalBalance))) {
-          retry()
-        }
-      })
-
-      await promiseRetry(async (retry, number) => {
-        if (number < 6) {
-          retry()
-        } else {
-          const nonce = await homeWeb3.eth.getTransactionCount(validator.address)
-          assert(
-            nonce === initialNonce + 1,
-            'Validator should not process transfer event originated during converting Chai => Dai'
-          )
-        }
-      })
-    })
-
-    after(async () => {
-      // Set 2 required signatures for home bridge
-      await setRequiredSignatures({
-        bridgeContract: homeBridge,
-        web3: homeWeb3,
-        requiredSignatures: 2,
-        options: {
-          from: validator.address,
-          gas: '4000000'
-        }
-      })
-
-      // Set 2 required signatures for foreign bridge
-      await setRequiredSignatures({
-        bridgeContract: foreignBridge,
-        web3: foreignWeb3,
-        requiredSignatures: 2,
-        options: {
-          from: validator.address,
-          gas: '4000000'
-        }
-      })
-    })
-  })
+  }
 })

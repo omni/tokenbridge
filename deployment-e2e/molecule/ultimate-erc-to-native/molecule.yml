@@ -13,17 +13,6 @@ platforms:
     network_mode: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  - name: ui-erc-to-native-host
-    groups:
-      - ultimate
-      - erc-to-native
-    children:
-      - ui
-    image: ubuntu:16.04
-    privileged: true
-    network_mode: host
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
 provisioner:
   name: ansible
   playbooks:
@@ -36,9 +25,6 @@ provisioner:
         ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
         ORACLE_HOME_START_BLOCK: 1
         ORACLE_FOREIGN_START_BLOCK: 1
-      ui-erc-to-native-host:
-        COMMON_HOME_RPC_URL: "http://localhost:8541"
-        COMMON_FOREIGN_RPC_URL: "http://localhost:8542"
 verifier:
   name: testinfra
   lint:

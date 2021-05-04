@@ -49,29 +49,8 @@ ORACLE_SHUTDOWN_SERVICE_POLLING_INTERVAL | Optional interval in milliseconds use
 ORACLE_SIDE_RPC_URL | Optional HTTPS URL(s) for communication with the external shutdown service or side RPC nodes, used for shutdown manager activities. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection. | URL(s)
 ORACLE_SHUTDOWN_CONTRACT_ADDRESS | Optional contract address in the side chain accessible through `ORACLE_SIDE_RPC_URL`, where the method passed in `ORACLE_SHUTDOWN_CONTRACT_METHOD` is implemented. | `address`
 ORACLE_SHUTDOWN_CONTRACT_METHOD | Method signature to be used in the side chain to identify the current shutdown status. Method should return boolean. Default value is `isShutdown()`. | `function signature`
-
-
-## UI configuration
-
-name | description | value
---- | --- | ---
-UI_TITLE | The title for the bridge UI page. `%c` will be replaced by the name of the network. | string
-UI_OG_TITLE | The meta title for the deployed bridge page. | string
-UI_DESCRIPTION | The meta description for the deployed bridge page. | string
-UI_NATIVE_TOKEN_DISPLAY_NAME | name of the home native coin | string
-UI_HOME_NETWORK_DISPLAY_NAME | name to be displayed for home network | string
-UI_FOREIGN_NETWORK_DISPLAY_NAME | name to be displayed for foreign network | string
-UI_HOME_WITHOUT_EVENTS | `true` if home network doesn't support events | true/false
-UI_FOREIGN_WITHOUT_EVENTS | `true` if foreign network doesn't support events | true/false
-UI_HOME_EXPLORER_TX_TEMPLATE | template link to transaction on home explorer. `%s` will be replaced by transaction hash | URL template
-UI_FOREIGN_EXPLORER_TX_TEMPLATE | template link to transaction on foreign explorer. `%s` will be replaced by transaction hash | URL template
-UI_HOME_EXPLORER_ADDRESS_TEMPLATE | template link to address on home explorer. `%s` will be replaced by address | URL template
-UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE | template link to address on foreign explorer. `%s` will be replaced by address | URL template
-UI_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract. | integer
-UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | integer
-UI_PORT | The port for the UI app. | integer
-UI_STYLES | The set of styles to render the bridge UI page. | core/classic/stake
-UI_PUBLIC_URL | The public url for the deployed bridge page | string
+ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Foreign chain. Infinite, if not provided. | `integer`
+ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Home chain. Infinite, if not provided. | `integer`
 
 
 ## Monitor configuration

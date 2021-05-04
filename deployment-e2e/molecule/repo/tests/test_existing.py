@@ -15,7 +15,6 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
     ("/home/poadocker/bridge/contracts"),
     ("/home/poadocker/bridge/oracle"),
     ("/home/poadocker/bridge/monitor"),
-    ("/home/poadocker/bridge/ui"),
     ("/home/poadocker/bridge/parity")
 ])
 def test_existing_folders(host, path):
@@ -28,8 +27,7 @@ def test_existing_folders(host, path):
     ("/home/poadocker/bridge/commons/package.json"),
     ("/home/poadocker/bridge/contracts/package.json"),
     ("/home/poadocker/bridge/oracle/package.json"),
-    ("/home/poadocker/bridge/monitor/package.json"),
-    ("/home/poadocker/bridge/ui/package.json")
+    ("/home/poadocker/bridge/monitor/package.json")
 ])
 def test_existing_package_json(host, path):
     assert host.file(path).exists
@@ -41,8 +39,7 @@ def test_existing_package_json(host, path):
     ("/home/poadocker/bridge/contracts/Dockerfile"),
     ("/home/poadocker/bridge/parity/Dockerfile"),
     ("/home/poadocker/bridge/oracle/Dockerfile"),
-    ("/home/poadocker/bridge/monitor/Dockerfile"),
-    ("/home/poadocker/bridge/ui/Dockerfile")
+    ("/home/poadocker/bridge/monitor/Dockerfile")
 ])
 def test_existing_docker_files(host, path):
     assert host.file(path).exists

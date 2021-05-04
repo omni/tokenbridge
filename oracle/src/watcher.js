@@ -164,6 +164,8 @@ async function main({ sendToQueue, sendToWorker }) {
         logger.info('Oracle watcher was suspended via the remote shutdown process')
       }
       return
+    } else if (wasShutdown) {
+      logger.info(`Oracle watcher was unsuspended.`)
     }
 
     await checkConditions()
@@ -176,7 +178,8 @@ async function main({ sendToQueue, sendToWorker }) {
     }
 
     const fromBlock = lastProcessedBlock.add(ONE)
-    const toBlock = lastBlockToProcess
+    const rangeEndBlock = config.blockPollingLimit ? fromBlock.add(config.blockPollingLimit) : lastBlockToProcess
+    const toBlock = BN.min(lastBlockToProcess, rangeEndBlock)
 
     const events = await getEvents({
       contract: eventContract,
@@ -200,8 +203,8 @@ async function main({ sendToQueue, sendToWorker }) {
       }
     }
 
-    logger.debug({ lastProcessedBlock: lastBlockToProcess.toString() }, 'Updating last processed block')
-    await updateLastProcessedBlock(lastBlockToProcess)
+    logger.debug({ lastProcessedBlock: toBlock.toString() }, 'Updating last processed block')
+    await updateLastProcessedBlock(toBlock)
   } catch (e) {
     logger.error(e)
   }

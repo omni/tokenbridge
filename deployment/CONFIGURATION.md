@@ -34,14 +34,6 @@ cp hosts.yml.example hosts.yml
           #syslog_server_port: "<protocol>://<ip>:<port>" # When this parameter is set all bridge logs will be redirected to <ip>:<port> address.
         <host_ip_B>:
           # (...)
-    ui:
-      hosts:
-        <host_ip_B>:
-          ansible_user: <user>
-          #syslog_server_port: "<protocol>://<ip>:<port>"
-        <host_ip_C>:
-          ansible_user: <user>
-          #syslog_server_port: "<protocol>://<ip>:<port>"
     monitor:
       hosts:
         <host_ip_B>:
@@ -50,18 +42,7 @@ cp hosts.yml.example hosts.yml
           #monitor_cron_schedule: "*/4 * * * *" # When this parameter is set, it will overwrite default schedule for performing checks
 ```
 
-The config above would install the Oracle on `<host_ip_A>`, UI on `<host_ip_C>`, and both Oracle, UI and Monitor on `<host_ip_B>`.
-
-Example config for installing only UI:
-```yaml
-<bridge_name>:
-  children:
-    oracle:
-      hosts:
-    ui:
-      hosts:
-        <host_ip>:
-          ansible_user: <user>
+The config above would install the Oracle on `<host_ip_A>`, and both Oracle and Monitor on `<host_ip_B>`.
 ```
 
 | Value | Description |

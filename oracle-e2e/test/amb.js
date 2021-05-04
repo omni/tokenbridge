@@ -28,30 +28,33 @@ describe('arbitrary message bridging', () => {
   let requiredSignatures = 1
   before(async () => {
     // Only 1 validator is used in ultimate tests
-    if (process.env.ULTIMATE !== 'true') {
-      requiredSignatures = 2
-      // Set 2 required signatures for home bridge
-      await setRequiredSignatures({
-        bridgeContract: homeBridge,
-        web3: homeWeb3,
-        requiredSignatures: 2,
-        options: {
-          from: validator.address,
-          gas: '4000000'
-        }
-      })
-
-      // Set 2 required signatures for foreign bridge
-      await setRequiredSignatures({
-        bridgeContract: foreignBridge,
-        web3: foreignWeb3,
-        requiredSignatures: 2,
-        options: {
-          from: validator.address,
-          gas: '4000000'
-        }
-      })
+    if (process.env.ULTIMATE === 'true') {
+      return
     }
+    console.log('Calling setRequiredSignatures(2)')
+
+    requiredSignatures = 2
+    // Set 2 required signatures for home bridge
+    await setRequiredSignatures({
+      bridgeContract: homeBridge,
+      web3: homeWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
+
+    // Set 2 required signatures for foreign bridge
+    await setRequiredSignatures({
+      bridgeContract: foreignBridge,
+      web3: foreignWeb3,
+      requiredSignatures: 2,
+      options: {
+        from: validator.address,
+        gas: '4000000'
+      }
+    })
   })
   describe('Home to Foreign', () => {
     describe('Subsidized Mode', () => {

@@ -1,5 +1,5 @@
 require('dotenv').config()
-const logger = require('./logger')('getBalances')
+const logger = require('./logger')('metrics')
 const { readFile } = require('./utils/file')
 
 const {

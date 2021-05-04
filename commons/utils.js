@@ -1,4 +1,4 @@
-const { toWei, toBN } = require('web3-utils')
+const { toWei, toBN, BN } = require('web3-utils')
 const { GasPriceOracle } = require('gas-price-oracle')
 const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
@@ -150,11 +150,8 @@ const tryCall = async (method, fallbackValue) => {
 
 const getDeployedAtBlock = async contract => tryCall(contract.methods.deployedAtBlock(), 0)
 
-const getPastEvents = async (
-  contract,
-  { event = 'allEvents', fromBlock = toBN(0), toBlock = 'latest', options = {} }
-) => {
-  let events
+const getPastEventsOrSplit = async (contract, { event, fromBlock, toBlock, options }) => {
+  let events = []
   try {
     events = await contract.getPastEvents(event, {
       ...options,
@@ -162,19 +159,19 @@ const getPastEvents = async (
       toBlock
     })
   } catch (e) {
-    if (e.message.includes('query returned more than') && toBlock !== 'latest') {
+    if (e.message.includes('query returned more than') || e.message.toLowerCase().includes('timeout')) {
       const middle = toBN(fromBlock)
         .add(toBN(toBlock))
         .divRound(toBN(2))
       const middlePlusOne = middle.add(toBN(1))
 
-      const firstHalfEvents = await getPastEvents(contract, {
+      const firstHalfEvents = await getPastEventsOrSplit(contract, {
         options,
         event,
         fromBlock,
         toBlock: middle
       })
-      const secondHalfEvents = await getPastEvents(contract, {
+      const secondHalfEvents = await getPastEventsOrSplit(contract, {
         options,
         event,
         fromBlock: middlePlusOne,
@@ -186,6 +183,31 @@ const getPastEvents = async (
     }
   }
   return events
+}
+
+const getPastEvents = async (
+  contract,
+  { event = 'allEvents', fromBlock = toBN(0), toBlock = 'latest', options = {} }
+) => {
+  if (toBlock === 'latest') {
+    return contract.getPastEvents(event, {
+      ...options,
+      fromBlock,
+      toBlock
+    })
+  }
+
+  const batchSize = 1000000
+  const to = toBN(toBlock)
+  const events = []
+
+  for (let from = toBN(fromBlock); from.lte(to); from = from.addn(batchSize + 1)) {
+    const opts = { event, fromBlock: from, toBlock: BN.min(to, from.addn(batchSize)), options }
+    const batch = await getPastEventsOrSplit(contract, opts)
+    events.push(batch)
+  }
+
+  return [].concat(...events)
 }
 
 const getValidatorList = async (address, eth, options) => {

@@ -29,24 +29,30 @@ function checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger) {
   }
 }
 
+const promiseRetryForever = f => promiseRetry(f, { forever: true, factor: 1 })
+
 async function waitForFunds(web3, address, minimumBalance, cb, logger) {
-  promiseRetry(
-    async retry => {
-      logger.debug('Getting balance of validator account')
-      const newBalance = web3.utils.toBN(await web3.eth.getBalance(address))
-      if (newBalance.gte(web3.utils.toBN(minimumBalance.toString(10)))) {
-        logger.debug({ balance: newBalance, minimumBalance }, 'Validator has minimum necessary balance')
-        cb(newBalance)
-      } else {
-        logger.debug({ balance: newBalance, minimumBalance }, 'Balance of validator is still less than the minimum')
-        retry()
-      }
-    },
-    {
-      forever: true,
-      factor: 1
+  promiseRetryForever(async retry => {
+    logger.debug('Getting balance of validator account')
+    const newBalance = web3.utils.toBN(await web3.eth.getBalance(address))
+    if (newBalance.gte(web3.utils.toBN(minimumBalance.toString(10)))) {
+      logger.debug({ balance: newBalance, minimumBalance }, 'Validator has minimum necessary balance')
+      cb(newBalance)
+    } else {
+      logger.debug({ balance: newBalance, minimumBalance }, 'Balance of validator is still less than the minimum')
+      retry()
     }
-  )
+  })
+}
+
+async function waitForUnsuspend(getSuspendFlag, cb) {
+  promiseRetryForever(async retry => {
+    if (await getSuspendFlag()) {
+      retry()
+    } else {
+      cb()
+    }
+  })
 }
 
 function addExtraGas(gas, extraPercentage, maxGasLimit = Infinity) {
@@ -58,9 +64,9 @@ function addExtraGas(gas, extraPercentage, maxGasLimit = Infinity) {
   return BigNumber.min(maxGasLimit, gasWithExtra)
 }
 
-function setIntervalAndRun(f, interval) {
+async function setIntervalAndRun(f, interval) {
   const handler = setInterval(f, interval)
-  f()
+  await f()
   return handler
 }
 
@@ -135,6 +141,7 @@ module.exports = {
   syncForEach,
   checkHTTPS,
   waitForFunds,
+  waitForUnsuspend,
   addExtraGas,
   setIntervalAndRun,
   watchdog,

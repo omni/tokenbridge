@@ -8,7 +8,6 @@ testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
 
 @pytest.mark.parametrize("service", [
     ("poabridge"),
-    ("tokenbridge-ui"),
     ("tokenbridge-monitor")
 ])
 def test_services(host, service):
@@ -25,7 +24,6 @@ def test_services(host, service):
     ("oracle_bridge_senderhome_1"),
     ("oracle_bridge_senderforeign_1"),
     ("oracle_bridge_shutdown_1"),
-    ("ui_ui_1"),
     ("monitor_monitor_1")
 ])
 def test_docker_containers(host, name):

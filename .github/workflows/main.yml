@@ -61,31 +61,6 @@ jobs:
           key: ${{ needs.initialize.outputs.cache_key }}
       - name: yarn run ${{ matrix.task }}
         run: ${{ steps.cache-repo.outputs.cache-hit }} && yarn run ${{ matrix.task }}
-  ui-coverage:
-    runs-on: ubuntu-latest
-    needs:
-      - initialize
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags')
-    steps:
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 10
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
-      - uses: actions/cache@v2
-        id: cache-repo
-        with:
-          path: |
-            **/node_modules
-            contracts/build
-          key: ${{ needs.initialize.outputs.cache_key }}
-      - name: yarn workspace ui run coverage
-        run: ${{ steps.cache-repo.outputs.cache-hit }} && yarn workspace ui run coverage
-      - uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ github.token }}
-          path-to-lcov: ./ui/coverage/lcov.info
   build-e2e-images:
     runs-on: ubuntu-latest
     steps:
@@ -98,7 +73,6 @@ jobs:
           echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}" >> $GITHUB_ENV
           echo "ORACLE_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}" >> $GITHUB_ENV
           echo "MONITOR_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}" >> $GITHUB_ENV
-          echo "UI_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'ui') }}" >> $GITHUB_ENV
           echo "ALM_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}" >> $GITHUB_ENV
       - name: Rebuild and push updated images
         run: |
@@ -109,7 +83,6 @@ jobs:
           if ! check_if_image_exists e2e ${E2E_TAG};         then updated+=("e2e"); fi
           if ! check_if_image_exists oracle ${ORACLE_TAG};   then updated+=("oracle"); fi
           if ! check_if_image_exists monitor ${MONITOR_TAG}; then updated+=("monitor"); fi
-          if ! check_if_image_exists ui ${UI_TAG};           then updated+=("ui"); fi
           if ! check_if_image_exists alm ${ALM_TAG};         then updated+=("alm"); fi
           if [ ${#updated[@]} -gt 0 ]; then
             echo "Updated services: ${updated[@]}"
@@ -149,11 +122,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [oracle-e2e, monitor-e2e, alm-e2e, 'ui-e2e:ci']
+        task: [oracle-e2e, monitor-e2e, alm-e2e]
         include:
           - task: alm-e2e
-            use-cache: true
-          - task: 'ui-e2e:ci'
             use-cache: true
     steps:
       - uses: actions/checkout@v2
@@ -165,7 +136,6 @@ jobs:
           echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}" >> $GITHUB_ENV
           echo "ORACLE_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}" >> $GITHUB_ENV
           echo "MONITOR_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}" >> $GITHUB_ENV
-          echo "UI_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'ui') }}" >> $GITHUB_ENV
           echo "ALM_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}" >> $GITHUB_ENV
       - if: ${{ matrix.use-cache }}
         uses: actions/cache@v2
@@ -187,7 +157,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [oracle, ui, monitor, multiple, repo]
+        task: [oracle, monitor, multiple, repo]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -206,20 +176,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [amb, erc-to-erc, erc-to-native, native-to-erc, amb-stake-erc-to-erc]
-        include:
-          - task: erc-to-erc
-            ui-e2e-grep: 'ERC TO ERC'
-            ui-config: 'e2e-commons/components-envs/ui-erc20.env'
-          - task: erc-to-native
-            ui-e2e-grep: 'ERC TO NATIVE'
-            ui-config: 'e2e-commons/components-envs/ui-erc20-native.env'
-          - task: native-to-erc
-            ui-e2e-grep: 'NATIVE TO ERC'
-            ui-config: 'e2e-commons/components-envs/ui.env'
-          - task: amb-stake-erc-to-erc
-            ui-e2e-grep: 'AMB-STAKE-ERC-TO-ERC'
-            ui-config: 'e2e-commons/components-envs/ui-amb-stake-erc20-erc20.env'
+        task: [amb, erc-to-erc, erc-to-native, native-to-erc]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -230,7 +187,6 @@ jobs:
           echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}" >> $GITHUB_ENV
           echo "ORACLE_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}" >> $GITHUB_ENV
           echo "MONITOR_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}" >> $GITHUB_ENV
-          echo "UI_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'ui') }}" >> $GITHUB_ENV
           echo "ALM_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}" >> $GITHUB_ENV
           echo "MOLECULE_RUNNER_TAG=${{ hashFiles('./deployment-e2e/Dockerfile') }}" >> $GITHUB_ENV
       - uses: actions/cache@v2
@@ -248,24 +204,9 @@ jobs:
         run: |
          docker-compose -f ./e2e-commons/docker-compose.yml pull oracle
          docker tag ${DOCKER_IMAGE_BASE}/tokenbridge-e2e-oracle:${ORACLE_TAG} poanetwork/tokenbridge-oracle:latest
-      - if: ${{ matrix.ui-e2e-grep }}
-        name: Pull e2e ui image
-        run: |
-          docker-compose -f ./e2e-commons/docker-compose.yml pull ui
-          docker build \
-            --build-arg DOCKER_IMAGE_BASE=${DOCKER_IMAGE_BASE} \
-            --build-arg UI_TAG=${UI_TAG} \
-            --build-arg DOT_ENV_PATH=${{ matrix.ui-config }} \
-            -f ./e2e-commons/Dockerfile.ui \
-            -t ui_ui:latest \
-            .
-      - name: Deploy oracle and ui
+      - name: Deploy oracle
         run: deployment-e2e/molecule.sh ultimate-${{ matrix.task }}
       - name: Reset docker socket permissions
         run: sudo chown -R $USER:docker /var/run/docker.sock
-      - name: Run ui e2e tests
-        if: ${{ matrix.ui-e2e-grep }}
-        run: cd ui-e2e && xvfb-run yarn mocha -g "${{ matrix.ui-e2e-grep }}" -b ./test.js
       - name: Run oracle e2e tests
-        if: ${{ !matrix.ui-e2e-grep }}
-        run: docker-compose -f ./e2e-commons/docker-compose.yml run e2e yarn workspace oracle-e2e run ${{ matrix.task }}
+        run: docker-compose -f ./e2e-commons/docker-compose.yml run -e ULTIMATE=true e2e yarn workspace oracle-e2e run ${{ matrix.task }}

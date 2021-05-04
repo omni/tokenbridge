@@ -156,6 +156,7 @@ function saveCache() {
   if (isDirty) {
     logger.debug('Saving cache on disk')
     writeCacheFile(homeTxSendersCacheFile, cachedHomeTxSenders)
+    writeCacheFile(foreignTxSendersCacheFile, cachedForeignTxSenders)
     writeCacheFile(homeIsContractCacheFile, cachedHomeIsContract)
     writeCacheFile(foreignIsContractCacheFile, cachedForeignIsContract)
   }

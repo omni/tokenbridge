@@ -1,5 +1,5 @@
 require('dotenv').config()
-const logger = require('./logger')('stuckTransfers.js')
+const logger = require('./logger')('detectMediators.js')
 const { isHomeContract, isForeignContract } = require('./utils/web3Cache')
 const eventsInfo = require('./utils/events')
 const { getHomeTxSender, getForeignTxSender } = require('./utils/web3Cache')
@@ -13,9 +13,19 @@ function countInteractions(requests) {
       stats[msg.sender] = {}
     }
     if (!stats[msg.sender][msg.executor]) {
-      stats[msg.sender][msg.executor] = 0
+      stats[msg.sender][msg.executor] = {
+        success: 0,
+        failed: 0,
+        pending: 0
+      }
     }
-    stats[msg.sender][msg.executor] += 1
+    if (msg.status === true) {
+      stats[msg.sender][msg.executor].success += 1
+    } else if (msg.status === false) {
+      stats[msg.sender][msg.executor].failed += 1
+    } else {
+      stats[msg.sender][msg.executor].pending += 1
+    }
   })
   return stats
 }
@@ -80,14 +90,8 @@ async function main(mode) {
     homeToForeignConfirmations,
     foreignToHomeConfirmations
   } = await eventsInfo(mode)
-  const homeToForeign = homeToForeignRequests
-    .map(normalize)
-    .map(addExecutionStatus(homeToForeignConfirmations))
-    .filter(x => typeof x.status === 'boolean')
-  const foreignToHome = foreignToHomeRequests
-    .map(normalize)
-    .map(addExecutionStatus(foreignToHomeConfirmations))
-    .filter(x => typeof x.status === 'boolean')
+  const homeToForeign = homeToForeignRequests.map(normalize).map(addExecutionStatus(homeToForeignConfirmations))
+  const foreignToHome = foreignToHomeRequests.map(normalize).map(addExecutionStatus(foreignToHomeConfirmations))
 
   for (const event of homeToForeign) {
     // AMB contract emits a single UserRequestForSignature event for every home->foreign request.
@@ -98,7 +102,7 @@ async function main(mode) {
 
     // Executor is definitely a contract if a message execution failed, since message calls to EOA always succeed.
     // Alternatively, the executor is checked to be a contract by looking at its bytecode size.
-    event.isExecutorAContract = !event.status || (await isForeignContract(event.executor))
+    event.isExecutorAContract = event.status === false || (await isForeignContract(event.executor))
   }
   for (const event of foreignToHome) {
     // AMB contract emits a single UserRequestForAffirmation event for every foreign->home request.
@@ -109,7 +113,7 @@ async function main(mode) {
 
     // Executor is definitely a contract if a message execution failed, since message calls to EOA always succeed.
     // Alternatively, the executor is checked to be a contract by looking at its bytecode size.
-    event.isExecutorAContract = !event.status || (await isHomeContract(event.executor))
+    event.isExecutorAContract = event.status === false || (await isHomeContract(event.executor))
   }
   const C2C = event => event.isSenderAContract && event.isExecutorAContract
   const U2C = event => !event.isSenderAContract && event.isExecutorAContract
