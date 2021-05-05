@@ -143,7 +143,7 @@ async function main({ sendToQueue }) {
 
     const fromBlock = lastProcessedBlock + 1
     const rangeEndBlock = config.blockPollingLimit ? fromBlock + config.blockPollingLimit : lastBlockToProcess
-    const toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
+    let toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
 
     const events = (await getEvents({
       contract: eventContract,
@@ -167,7 +167,7 @@ async function main({ sendToQueue }) {
         // adjust lastProcessedBlock so that these events will be processed again on the next iteration
         if (batchEvents.length < events.length) {
           // pick event outside from the batch
-          lastBlockToProcess = events[batchEvents.length].blockNumber - 1
+          toBlock = events[batchEvents.length].blockNumber - 1
         }
 
         job = await processAMBInformationRequests(batchEvents)
