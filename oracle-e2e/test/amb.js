@@ -31,16 +31,20 @@ describe('arbitrary message bridging', () => {
   before(async () => {
     const allowedMethods = [
       'eth_call(address,bytes)',
+      'eth_call(address,bytes,uint256)',
       'eth_call(address,address,uint256,bytes)',
       'eth_blockNumber()',
       'eth_getBlockByNumber()',
       'eth_getBlockByNumber(uint256)',
       'eth_getBlockByHash(bytes32)',
       'eth_getBalance(address)',
+      'eth_getBalance(address,uint256)',
       'eth_getTransactionCount(address)',
+      'eth_getTransactionCount(address,uint256)',
       'eth_getTransactionByHash(bytes32)',
       'eth_getTransactionReceipt(bytes32)',
-      'eth_getStorageAt(address,bytes32)'
+      'eth_getStorageAt(address,bytes32)',
+      'eth_getStorageAt(address,bytes32,uint256)'
     ]
     for (const method of allowedMethods) {
       const selector = homeWeb3.utils.soliditySha3(method)
@@ -275,6 +279,46 @@ describe('arbitrary message bridging', () => {
       assert.strictEqual(await homeBox.methods.data().call(), null, 'returned data is incorrect')
     })
 
+    it('should make async eth_call for specific block', async () => {
+      const foreignValue = await foreignBox.methods.value().call()
+      const blockNumber = await foreignWeb3.eth.getBlockNumber()
+      const selector = homeWeb3.utils.soliditySha3('eth_call(address,bytes,uint256)')
+      const data1 = homeWeb3.eth.abi.encodeParameters(
+        ['address', 'bytes', 'uint256'],
+        [amb.foreignBox, foreignBox.methods.value().encodeABI(), 60]
+      )
+      const data2 = homeWeb3.eth.abi.encodeParameters(
+        ['address', 'bytes', 'uint256'],
+        [amb.foreignBox, foreignBox.methods.value().encodeABI(), blockNumber - 2]
+      )
+      const data3 = homeWeb3.eth.abi.encodeParameters(
+        ['address', 'bytes', 'uint256'],
+        [amb.foreignBox, foreignBox.methods.value().encodeABI(), blockNumber + 20]
+      )
+
+      await makeAsyncCall(selector, data1)
+
+      assert(await homeBox.methods.status().call(), 'status is false')
+      assert.strictEqual(
+        await homeBox.methods.data().call(),
+        homeWeb3.eth.abi.encodeParameters(['bytes'], [homeWeb3.eth.abi.encodeParameter('uint256', 0)]),
+        'returned data is incorrect'
+      )
+
+      await makeAsyncCall(selector, data2)
+
+      assert(await homeBox.methods.status().call(), 'status is false')
+      assert.strictEqual(
+        await homeBox.methods.data().call(),
+        homeWeb3.eth.abi.encodeParameters(['bytes'], [homeWeb3.eth.abi.encodeParameter('uint256', foreignValue)]),
+        'returned data is incorrect'
+      )
+
+      await makeAsyncCall(selector, data3)
+
+      assert(!(await homeBox.methods.status().call()), 'status is true')
+    })
+
     it('should make async eth_blockNumber', async () => {
       const selector = homeWeb3.utils.soliditySha3('eth_blockNumber()')
 
@@ -347,6 +391,35 @@ describe('arbitrary message bridging', () => {
       assert.strictEqual(homeWeb3.eth.abi.decodeParameter('uint256', data), balance, 'wrong user balance returned')
     })
 
+    it('should make async eth_getBalance for specific block', async () => {
+      const balance = await foreignWeb3.eth.getBalance(user.address)
+      const { blockNumber } = await foreignWeb3.eth.sendTransaction({
+        to: user.address,
+        value: 1,
+        from: user.address,
+        gas: 21000
+      })
+      const selector = homeWeb3.utils.soliditySha3('eth_getBalance(address,uint256)')
+
+      const data1 = homeWeb3.eth.abi.encodeParameters(['address', 'uint256'], [user.address, blockNumber - 1])
+      const data2 = homeWeb3.eth.abi.encodeParameters(['address', 'uint256'], [user.address, blockNumber])
+      await makeAsyncCall(selector, data1)
+
+      assert(await homeBox.methods.status().call(), 'status is false')
+      let data = await homeBox.methods.data().call()
+      assert.strictEqual(data.length, 2 + 64)
+
+      assert.strictEqual(homeWeb3.eth.abi.decodeParameter('uint256', data), balance, 'wrong user balance returned')
+
+      await makeAsyncCall(selector, data2)
+
+      assert(await homeBox.methods.status().call(), 'status is false')
+      data = await homeBox.methods.data().call()
+      assert.strictEqual(data.length, 2 + 64)
+
+      assert.notStrictEqual(homeWeb3.eth.abi.decodeParameter('uint256', data), balance, 'wrong user balance returned')
+    })
+
     it('should make async eth_getTransactionCount', async () => {
       const nonce = (await foreignWeb3.eth.getTransactionCount(user.address)).toString()
       const selector = homeWeb3.utils.soliditySha3('eth_getTransactionCount(address)')
@@ -357,6 +430,35 @@ describe('arbitrary message bridging', () => {
       const data = await homeBox.methods.data().call()
       assert.strictEqual(data.length, 2 + 64)
 
+      assert.strictEqual(homeWeb3.eth.abi.decodeParameter('uint256', data), nonce, 'wrong user nonce returned')
+    })
+
+    it('should make async eth_getTransactionCount for specific block', async () => {
+      let nonce = (await foreignWeb3.eth.getTransactionCount(user.address)).toString()
+      const { blockNumber } = await foreignWeb3.eth.sendTransaction({
+        to: user.address,
+        value: 1,
+        from: user.address,
+        gas: 21000
+      })
+      const selector = homeWeb3.utils.soliditySha3('eth_getTransactionCount(address,uint256)')
+
+      const data1 = homeWeb3.eth.abi.encodeParameters(['address', 'uint256'], [user.address, blockNumber - 1])
+      const data2 = homeWeb3.eth.abi.encodeParameters(['address', 'uint256'], [user.address, blockNumber])
+
+      await makeAsyncCall(selector, data1)
+      assert(await homeBox.methods.status().call(), 'status is false')
+      let data = await homeBox.methods.data().call()
+      assert.strictEqual(data.length, 2 + 64)
+
+      assert.strictEqual(homeWeb3.eth.abi.decodeParameter('uint256', data), nonce, 'wrong user nonce returned')
+
+      await makeAsyncCall(selector, data2)
+      assert(await homeBox.methods.status().call(), 'status is false')
+      data = await homeBox.methods.data().call()
+      assert.strictEqual(data.length, 2 + 64)
+
+      nonce = (parseInt(nonce, 10) + 1).toString()
       assert.strictEqual(homeWeb3.eth.abi.decodeParameter('uint256', data), nonce, 'wrong user nonce returned')
     })
 
@@ -428,6 +530,36 @@ describe('arbitrary message bridging', () => {
       const data = await homeBox.methods.data().call()
 
       assert.strictEqual(data, value, 'wrong storage value returned')
+    })
+
+    it('should make async eth_getStorageAt for specific block', async () => {
+      // slot for uintStorage[MAX_GAS_PER_TX]
+      const slot = '0x3d7fe2ee9790702383ef0118b516833ef2542132d3ca4ac6c77f62f1230fa610'
+      const value = await foreignWeb3.eth.getStorageAt(amb.foreign, slot)
+      const blockNumber = await foreignWeb3.eth.getBlockNumber()
+      const selector = homeWeb3.utils.soliditySha3('eth_getStorageAt(address,bytes32,uint256)')
+
+      const data1 = homeWeb3.eth.abi.encodeParameters(
+        ['address', 'bytes32', 'uint256'],
+        [amb.foreign, slot, blockNumber]
+      )
+      const data2 = homeWeb3.eth.abi.encodeParameters(['address', 'bytes32', 'uint256'], [amb.foreign, slot, 1])
+
+      await makeAsyncCall(selector, data1)
+      assert(await homeBox.methods.status().call(), 'status is false')
+      let data = await homeBox.methods.data().call()
+
+      assert.strictEqual(data, value, 'wrong storage value returned')
+
+      await makeAsyncCall(selector, data2)
+      assert(await homeBox.methods.status().call(), 'status is false')
+      data = await homeBox.methods.data().call()
+
+      assert.strictEqual(
+        data,
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+        'wrong storage value returned'
+      )
     })
   })
 })

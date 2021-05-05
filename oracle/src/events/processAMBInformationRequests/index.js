@@ -56,7 +56,7 @@ function processInformationRequestsBuilder(config) {
         { homeTimestamp: homeBlock.timestamp, foreignTimestamp: lastForeignBlock.timestamp },
         `Waiting for the closest foreign block to be confirmed`
       )
-      throw new Error('Waiting for the closest foreign block to be confirmed')
+      return null
     }
     const foreignClosestBlock = await blockFinder(homeBlock.timestamp, lastForeignBlock)
 
@@ -76,15 +76,16 @@ function processInformationRequestsBuilder(config) {
           logger.warn({ requestSelector }, 'Unknown async request selector received')
           return
         }
-        logger.warn({ requestSelector, method: asyncCallMethod, data }, 'Processing async request')
+        logger.info({ requestSelector, method: asyncCallMethod, data }, 'Processing async request')
 
         const call = asyncCalls[asyncCallMethod]
-        const [status, result] = await call(config, informationRequest, foreignClosestBlock).catch(e => {
+        const [status, result] = await call(foreign.web3, data, foreignClosestBlock).catch(e => {
           if (e instanceof HttpListProviderError) {
             throw e
           }
           return [false, '0x']
         })
+        logger.info({ requestSelector, method: asyncCallMethod, status, result }, 'Request result obtained')
 
         let gasEstimate
         try {

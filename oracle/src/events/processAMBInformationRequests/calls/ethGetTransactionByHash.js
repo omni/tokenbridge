@@ -1,19 +1,15 @@
 const { serializeTx } = require('./serializers')
 
-async function call(config, informationRequest, foreignBlock) {
-  const { foreign } = config
+async function call(web3, data, foreignBlock) {
+  const hash = web3.eth.abi.decodeParameter('bytes32', data)
 
-  const { data } = informationRequest.returnValues
-
-  const hash = foreign.web3.eth.abi.decodeParameter('bytes32', data)
-
-  const tx = await foreign.web3.eth.getTransaction(hash)
+  const tx = await web3.eth.getTransaction(hash)
 
   if (tx === null || tx.blockNumber > foreignBlock.number) {
     return [false, '0x']
   }
 
-  return [true, serializeTx(foreign.web3, tx)]
+  return [true, serializeTx(web3, tx)]
 }
 
 module.exports = {

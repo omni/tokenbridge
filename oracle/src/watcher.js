@@ -134,7 +134,7 @@ async function main({ sendToQueue }) {
 
     await checkConditions()
 
-    let lastBlockToProcess = await getLastBlockToProcess(web3, bridgeContract)
+    const lastBlockToProcess = await getLastBlockToProcess(web3, bridgeContract)
 
     if (lastBlockToProcess <= lastProcessedBlock) {
       logger.debug('All blocks already processed')
@@ -171,6 +171,9 @@ async function main({ sendToQueue }) {
         }
 
         job = await processAMBInformationRequests(batchEvents)
+        if (job === null) {
+          return
+        }
       } else {
         job = await processEvents(events)
       }
