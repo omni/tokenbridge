@@ -176,7 +176,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        task: [amb, erc-to-erc, erc-to-native, native-to-erc]
+        task: [amb, erc-to-native]
     steps:
       - uses: actions/checkout@v2
         with:
