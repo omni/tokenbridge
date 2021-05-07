@@ -3,7 +3,6 @@
   with_items:
     - docker-compose
     - docker-compose-transfer
-    - docker-compose-erc-native
   loop_control:
     loop_var: file
 

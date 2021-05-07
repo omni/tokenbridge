@@ -1,12 +1,5 @@
 const Web3 = require('web3')
-const {
-  ERC677_BRIDGE_TOKEN_ABI,
-  BRIDGE_VALIDATORS_ABI,
-  FOREIGN_NATIVE_TO_ERC_ABI,
-  FOREIGN_ERC_TO_NATIVE_ABI,
-  BOX_ABI
-} = require('../commons')
-const { validator } = require('../e2e-commons/constants')
+const { ERC20_ABI, BRIDGE_VALIDATORS_ABI, FOREIGN_ERC_TO_NATIVE_ABI, BOX_ABI } = require('../commons')
 
 const waitUntil = async (predicate, step = 100, timeout = 60000) => {
   const stopTime = Date.now() + timeout
@@ -36,7 +29,7 @@ const sendEther = async (rpcUrl, account, to) => {
 const sendTokens = async (rpcUrl, account, tokenAddress, recipientAddress) => {
   const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
   web3.eth.accounts.wallet.add(account.privateKey)
-  const erc20Token = new web3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, tokenAddress)
+  const erc20Token = new web3.eth.Contract(ERC20_ABI, tokenAddress)
 
   await erc20Token.methods.transfer(recipientAddress, web3.utils.toWei('0.01')).send({
     from: account.address,
@@ -62,7 +55,7 @@ const sendAMBMessage = async (rpcUrl, account, boxAddress, bridgeAddress, boxOth
 const addValidator = async (rpcUrl, account, bridgeAddress) => {
   const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
   web3.eth.accounts.wallet.add(account.privateKey)
-  const bridgeContract = new web3.eth.Contract(FOREIGN_NATIVE_TO_ERC_ABI, bridgeAddress)
+  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
   const foreignValidatorsAddress = await bridgeContract.methods.validatorContract().call()
   const foreignBridgeValidators = new web3.eth.Contract(BRIDGE_VALIDATORS_ABI, foreignValidatorsAddress)
   await foreignBridgeValidators.methods.addValidator('0xE71FBa5db00172bb0C93d649362B006300000935').send({
@@ -71,46 +64,10 @@ const addValidator = async (rpcUrl, account, bridgeAddress) => {
   })
 }
 
-const initializeChaiToken = async (rpcUrl, bridgeAddress) => {
-  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
-  web3.eth.accounts.wallet.add(validator.privateKey)
-  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
-
-  await bridgeContract.methods.initializeChaiToken().send({
-    from: validator.address,
-    gas: '1000000'
-  })
-}
-
-const setMinDaiTokenBalance = async (rpcUrl, bridgeAddress, limit) => {
-  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
-  web3.eth.accounts.wallet.add(validator.privateKey)
-  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
-
-  await bridgeContract.methods.setMinDaiTokenBalance(web3.utils.toWei(limit)).send({
-    from: validator.address,
-    gas: '1000000'
-  })
-}
-
-const convertDaiToChai = async (rpcUrl, bridgeAddress) => {
-  const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl))
-  web3.eth.accounts.wallet.add(validator.privateKey)
-  const bridgeContract = new web3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, bridgeAddress)
-
-  await bridgeContract.methods.convertDaiToChai().send({
-    from: validator.address,
-    gas: '1000000'
-  })
-}
-
 module.exports = {
   waitUntil,
   sendEther,
   sendTokens,
   addValidator,
-  sendAMBMessage,
-  initializeChaiToken,
-  setMinDaiTokenBalance,
-  convertDaiToChai
+  sendAMBMessage
 }

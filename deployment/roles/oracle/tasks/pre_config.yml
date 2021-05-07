@@ -20,4 +20,3 @@
   with_items:
     - docker-compose.yml
     - docker-compose-transfer.yml
-    - docker-compose-erc-native.yml
