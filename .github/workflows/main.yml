@@ -184,7 +184,7 @@ jobs:
       - name: Evaluate e2e docker images tags
         run: |
           git submodule status > submodule.status
-          echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}" >> $GITHUB_ENV
+          echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e', 'e2e-commons') }}" >> $GITHUB_ENV
           echo "ORACLE_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}" >> $GITHUB_ENV
           echo "MONITOR_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}" >> $GITHUB_ENV
           echo "ALM_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}" >> $GITHUB_ENV
@@ -202,7 +202,7 @@ jobs:
         run: ${{ steps.cache-repo.outputs.cache-hit }} && e2e-commons/up.sh deploy blocks
       - name: Pull e2e oracle image
         run: |
-         docker-compose -f ./e2e-commons/docker-compose.yml pull oracle
+         docker-compose -f ./e2e-commons/docker-compose.yml pull oracle-amb
          docker tag ${DOCKER_IMAGE_BASE}/tokenbridge-e2e-oracle:${ORACLE_TAG} poanetwork/tokenbridge-oracle:latest
       - name: Deploy oracle
         run: deployment-e2e/molecule.sh ultimate-${{ matrix.task }}

@@ -41,7 +41,7 @@ async function main(mode) {
   let erc20Address
   let normalizeEvent = normalizeEventInformation
   if (bridgeMode !== BRIDGE_MODES.ARBITRARY_MESSAGE) {
-    erc20Address = await foreignBridge.erc20token().call()
+    erc20Address = await foreignBridge.methods.erc20token().call()
     isExternalErc20 = true
     erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
   } else {
