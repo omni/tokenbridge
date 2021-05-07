@@ -3,10 +3,6 @@ require('../env')
 const { toBN } = require('web3').utils
 const {
   BRIDGE_MODES,
-  HOME_NATIVE_TO_ERC_ABI,
-  FOREIGN_NATIVE_TO_ERC_ABI,
-  HOME_ERC_TO_ERC_ABI,
-  FOREIGN_ERC_TO_ERC_ABI,
   HOME_ERC_TO_NATIVE_ABI,
   FOREIGN_ERC_TO_NATIVE_ABI,
   HOME_AMB_ABI,
@@ -22,16 +18,6 @@ let foreignAbi
 let id
 
 switch (process.env.ORACLE_BRIDGE_MODE) {
-  case BRIDGE_MODES.NATIVE_TO_ERC:
-    homeAbi = HOME_NATIVE_TO_ERC_ABI
-    foreignAbi = FOREIGN_NATIVE_TO_ERC_ABI
-    id = 'native-erc'
-    break
-  case BRIDGE_MODES.ERC_TO_ERC:
-    homeAbi = HOME_ERC_TO_ERC_ABI
-    foreignAbi = FOREIGN_ERC_TO_ERC_ABI
-    id = 'erc-erc'
-    break
   case BRIDGE_MODES.ERC_TO_NATIVE:
     homeAbi = HOME_ERC_TO_NATIVE_ABI
     foreignAbi = FOREIGN_ERC_TO_NATIVE_ABI

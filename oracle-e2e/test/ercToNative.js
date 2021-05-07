@@ -9,7 +9,7 @@ const {
   homeRPC,
   foreignRPC
 } = require('../../e2e-commons/constants.json')
-const { ERC677_BRIDGE_TOKEN_ABI, FOREIGN_ERC_TO_NATIVE_ABI, HOME_ERC_TO_NATIVE_ABI } = require('../../commons')
+const { ERC20_ABI, FOREIGN_ERC_TO_NATIVE_ABI, HOME_ERC_TO_NATIVE_ABI } = require('../../commons')
 const { uniformRetry, sleep } = require('../../e2e-commons/utils')
 const { setRequiredSignatures } = require('./utils')
 
@@ -27,7 +27,7 @@ homeWeb3.eth.accounts.wallet.add(validator.privateKey)
 foreignWeb3.eth.accounts.wallet.add(user.privateKey)
 foreignWeb3.eth.accounts.wallet.add(validator.privateKey)
 
-const erc20Token = new foreignWeb3.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, ercToNativeBridge.foreignToken)
+const erc20Token = new foreignWeb3.eth.Contract(ERC20_ABI, ercToNativeBridge.foreignToken)
 const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
 const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
 

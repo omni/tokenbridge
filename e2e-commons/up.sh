@@ -17,32 +17,20 @@ docker-compose up -d parity1 parity2 e2e
 startValidator () {
     docker-compose $1 run -d --name $4 redis
     docker-compose $1 run -d --name $5 rabbit
-    if [[ -z "$MODE" || "$MODE" == native-to-erc ]]; then
-      docker-compose $1 run $2 $3 -d oracle yarn watcher:signature-request
-      docker-compose $1 run $2 $3 -d oracle yarn watcher:collected-signatures
-      docker-compose $1 run $2 $3 -d oracle yarn watcher:affirmation-request
-    fi
-    if [[ -z "$MODE" || "$MODE" == erc-to-erc ]]; then
-      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:signature-request
-      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:collected-signatures
-      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:affirmation-request
-      docker-compose $1 run $2 $3 -d oracle-erc20 yarn watcher:transfer
-    fi
     if [[ -z "$MODE" || "$MODE" == erc-to-native ]]; then
       docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:signature-request
       docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:collected-signatures
       docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:affirmation-request
       docker-compose $1 run $2 $3 -d oracle-erc20-native yarn watcher:transfer
-      docker-compose $1 run $2 $3 -d oracle-erc20-native yarn worker:convert-to-chai
     fi
     if [[ -z "$MODE" || "$MODE" == amb ]]; then
       docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:signature-request
       docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:collected-signatures
       docker-compose $1 run $2 $3 -d oracle-amb yarn watcher:affirmation-request
     fi
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn sender:home
-    docker-compose $1 run $2 $3 -d oracle-erc20-native yarn sender:foreign
-    docker-compose $1 run $2 $3 -d oracle yarn manager:shutdown
+    docker-compose $1 run $2 $3 -d oracle-amb yarn sender:home
+    docker-compose $1 run $2 $3 -d oracle-amb yarn sender:foreign
+    docker-compose $1 run $2 $3 -d oracle-amb yarn manager:shutdown
 }
 
 startAMBValidator () {
@@ -94,17 +82,11 @@ while [ "$1" != "" ]; do
       amb)
         docker-compose up -d monitor-amb
         ;;
-      native-to-erc)
-        docker-compose up -d monitor
-        ;;
-      erc-to-erc)
-        docker-compose up -d monitor-erc20
-        ;;
       erc-to-native)
         docker-compose up -d monitor-erc20-native
         ;;
       *)
-        docker-compose up -d monitor monitor-erc20 monitor-erc20-native monitor-amb
+        docker-compose up -d monitor-erc20-native monitor-amb
         ;;
     esac
   fi

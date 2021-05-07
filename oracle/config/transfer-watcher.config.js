@@ -1,5 +1,5 @@
 const baseConfig = require('./base.config')
-const { ERC20_ABI, ERC_TYPES } = require('../../commons')
+const { ERC20_ABI } = require('../../commons')
 const { EXIT_CODES } = require('../src/utils/constants')
 
 const initialChecksJson = process.argv[3]
@@ -15,16 +15,9 @@ try {
   throw new Error('Error on decoding values from initial checks.')
 }
 
-if (baseConfig.id === 'erc-erc' && initialChecks.foreignERC === ERC_TYPES.ERC677) {
-  baseConfig.id = 'erc677-erc677'
-}
-
 const id = `${baseConfig.id}-transfer`
 
-const transferWatcherRequired =
-  (baseConfig.id === 'erc-erc' && initialChecks.foreignERC === ERC_TYPES.ERC20) || baseConfig.id === 'erc-native'
-
-if (!transferWatcherRequired) {
+if (baseConfig.id !== 'erc-native') {
   console.error(`Transfer watcher not required for bridge mode ${process.env.ORACLE_BRIDGE_MODE}`)
   process.exit(EXIT_CODES.WATCHER_NOT_REQUIRED)
 }

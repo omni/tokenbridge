@@ -35,31 +35,18 @@
     "address": "0xB4579fd5AfEaB60B03Db3F408AAdD315035943f7",
     "privateKey": "0xd6143d390d8b28c33601bb0fe29392fb1c35c24ccfe8722c09c2bdd6ada2699f"
   },
-  "nativeToErcBridge": {
-    "home": "0x32198D570fffC7033641F8A9094FFDCaAEF42624",
-    "foreign": "0x2B6871b9B02F73fa24F4864322CdC78604207769",
-    "foreignToken": "0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B",
-    "monitor": "http://monitor:3010/bridge"
-  },
-  "ercToErcBridge": {
-    "home": "0x1feB40aD9420b186F019A717c37f5546165d411E",
-    "foreign": "0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127",
-    "homeToken": "0x792455a6bCb62Ed4C4362D323E0590654CA4765c",
-    "foreignToken": "0x3C665A31199694Bf723fD08844AD290207B5797f",
-    "monitor": "http://monitor-erc20:3011/bridge"
-  },
   "ercToNativeBridge": {
-    "home": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
-    "foreign": "0x488Af810997eD1730cB3a3918cD83b3216E6eAda",
+    "home": "0x5118AC62AE912Dd5B51EEfF7338c4fcb0248Ba8c",
+    "foreign": "0x32198D570fffC7033641F8A9094FFDCaAEF42624",
     "foreignToken": "0x7cc4b1851c35959d34e635a470f6b5c43ba3c9c9",
     "monitor": "http://monitor-erc20-native:3012/bridge"
   },
   "amb": {
-    "home": "0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0",
-    "foreign": "0x0AEe1FCD12dDFab6265F7f8956e6E012A9Fe4Aa0",
-    "homeBox": "0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1",
-    "foreignBox": "0x6C4EaAb8756d53Bf599FFe2347FAFF1123D6C8A1",
-    "blockedHomeBox": "0x6f359aC418a5f7538F7755A33C9c7dDf38785524",
+    "home": "0x8397be90BCF57b0B71219f555Fe121b22e5a994C",
+    "foreign": "0x1feB40aD9420b186F019A717c37f5546165d411E",
+    "homeBox": "0xb008E9076fCbDB2C3AF84225Bc07Eb35B2bE5ECD",
+    "foreignBox": "0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127",
+    "blockedHomeBox": "0xF9698Eb93702dfdd0e2d802088d4c21822a8A977",
     "monitor": "http://monitor-amb:3013/bridge"
   },
   "homeRPC": {

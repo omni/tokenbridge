@@ -10,13 +10,9 @@ The Oracle is deployed on specified validator nodes (only nodes whose private ke
 
 ## Architecture
 
-### Native-to-ERC20 and Arbitrary-Message
+### ERC20-to-Native
 
-![Native-to-ERC](Native-to-ERC.png)
-
-### ERC20-to-ERC20 and ERC20-to-Native
-
-![ERC-to-ERC](ERC-to-ERC.png)
+![ERC-to-Native](ERC_TO_NATIVE.png)
 
 ### Watcher
 A watcher listens for a certain event and creates proper jobs in the queue. These jobs contain the transaction data (without the nonce) and the transaction hash for the related event. The watcher runs on a given frequency, keeping track of the last processed block.
@@ -27,8 +23,8 @@ There are three Watchers:
 - **Signature Request Watcher**: Listens to `UserRequestForSignature` events on the Home network.
 - **Collected Signatures Watcher**: Listens to `CollectedSignatures` events on the Home network.
 - **Affirmation Request Watcher**: Depends on the bridge mode. 
-   - `Native-to-ERC20` and `Arbitrary-Message`: Listens to `UserRequestForAffirmation` raised by the bridge contract.
-   - `ERC20-to-ERC20` and `ERC20-to-Native`: Listens to `Transfer` events raised by the token contract.
+   - `Arbitrary-Message`: Listens to `UserRequestForAffirmation` raised by the bridge contract.
+   - `ERC20-to-Native`: Listens to `Transfer` events raised by the token contract.
 
 ### Sender
 A sender subscribes to the queue and keeps track of the nonce. It takes jobs from the queue, extracts transaction data, adds the proper nonce, and sends it to the network.
@@ -59,32 +55,12 @@ For more information on the Redis/RabbitMQ requirements, see [#90](/../../issues
   
 #### Output examples
 
-   `Native-to-ERC20` mode example:
-   ```json
-   {
-       "homeBridge": {
-           "address": "0xc60daff55ec5b5ce5c3d2105a77e287ff638c35e",
-           "deployedBlockNumber": 123321
-       },
-       "foreignBridge": {
-           "address": "0x3f5ce5fbfe3e9af3971dd833d26ba9b5c936f0be",
-           "deployedBlockNumber": 456654,
-           "erc677": {
-               "address": "0x41a29780309dc2582f080f6af89953be3435679a"
-           }
-       }
-   }
-   ```
-
-   `ERC20-to-ERC20` mode example:
+   `ERC20-to-Native` mode example:
    ```json
    {
        "homeBridge": {
            "address": "0x765a0d90e5a5773deacbd94b2dc941cbb163bdab",
-           "deployedBlockNumber": 789987,
-           "erc677": {
-               "address": "0x269f57f5ae5421d084686f9e353f5b7ee6af54c2"
-           }
+           "deployedBlockNumber": 789987
        },
        "foreignBridge": {
            "address": "0x7ae703ea88b0545eef1f0bf8f91d5276e39be2f7",
@@ -220,20 +196,6 @@ yarn test
 See the [E2E README](../oracle-e2e/README.md) for instructions. 
 
 *Notice*: for docker-based installations do not forget to add `docker-compose exec bridge_affirmation` before the test commands listed below.
-
-### Native-to-ERC20 Mode Testing
-
-When running the processes, the following commands can be used to test functionality.
-
-- To send deposits to a home contract run `node scripts/native_to_erc20/sendHome.js <tx num>`, where `<tx num>` is how many tx will be sent out to deposit.
-
-- To send withdrawals to a foreign contract run `node scripts/native_to_erc20/sendForeign.js <tx num>`, where `<tx num>` is how many tx will be sent out to withdraw.
-
-### ERC20-to-ERC20 Mode Testing
-
-- To deposit from a Foreign to a Home contract run `node scripts/erc20_to_erc20/sendForeign.js <tx num>`.
-
-- To make withdrawal to Home from a Foreign contract run `node scripts/erc20_to_erc20/sendHome.js <tx num>`.
 
 ### ERC20-to-Native Mode Testing
 

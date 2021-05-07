@@ -26,9 +26,7 @@ Shut down and cleans up containers, networks, services, running scripts:
 | oracle-validator-3 | Launches Oracle containers for third validator |
 | blocks | Auto mines blocks |
 | monitor | Launches Monitor containers |
-| native-to-erc | Creates infrastructure for ultimate e2e testing, for native-to-erc type of bridge |
 | erc-to-native | Creates infrastructure for ultimate e2e testing, for erc-to-native type of bridge |
-| erc-to-erc | Creates infrastructure for ultimate e2e testing, for erc-to-erc type of bridge |
 | amb | Creates infrastructure for ultimate e2e testing, for arbitrary message type of bridge |
 
 #### Ultimate e2e testing
