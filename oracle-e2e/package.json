@@ -23,7 +23,7 @@
     "websocket": "^1.0.28"
   },
   "engines": {
-    "node": ">= 10.18"
+    "node": ">= 12.22"
   },
   "devDependencies": {}
 }
