@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v1
         with:
-          node-version: 10
+          node-version: 12
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -70,7 +70,7 @@ jobs:
       - name: Evaluate e2e docker images tags
         run: |
           git submodule status > submodule.status
-          echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}" >> $GITHUB_ENV
+          echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e', 'e2e-commons') }}" >> $GITHUB_ENV
           echo "ORACLE_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}" >> $GITHUB_ENV
           echo "MONITOR_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}" >> $GITHUB_ENV
           echo "ALM_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}" >> $GITHUB_ENV
@@ -81,8 +81,8 @@ jobs:
           }
           updated=()
           if ! check_if_image_exists e2e ${E2E_TAG};         then updated+=("e2e"); fi
-          if ! check_if_image_exists oracle ${ORACLE_TAG};   then updated+=("oracle"); fi
-          if ! check_if_image_exists monitor ${MONITOR_TAG}; then updated+=("monitor"); fi
+          if ! check_if_image_exists oracle ${ORACLE_TAG};   then updated+=("oracle-amb"); fi
+          if ! check_if_image_exists monitor ${MONITOR_TAG}; then updated+=("monitor-amb"); fi
           if ! check_if_image_exists alm ${ALM_TAG};         then updated+=("alm"); fi
           if [ ${#updated[@]} -gt 0 ]; then
             echo "Updated services: ${updated[@]}"
@@ -133,7 +133,7 @@ jobs:
       - name: Evaluate e2e docker images tags
         run: |
           git submodule status > submodule.status
-          echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e') }}" >> $GITHUB_ENV
+          echo "E2E_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'Dockerfile.e2e', 'commons', 'oracle-e2e', 'monitor-e2e', 'e2e-commons') }}" >> $GITHUB_ENV
           echo "ORACLE_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'oracle') }}" >> $GITHUB_ENV
           echo "MONITOR_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'monitor') }}" >> $GITHUB_ENV
           echo "ALM_TAG=${{ hashFiles('yarn.lock', 'package.json', 'submodule.status', 'commons', 'alm') }}" >> $GITHUB_ENV

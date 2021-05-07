@@ -40,6 +40,9 @@ services:
       - ultimate
   oracle-amb:
     image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-oracle:${ORACLE_TAG:-local}
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     env_file: ../e2e-commons/components-envs/oracle-amb.env
     environment:
     - NODE_ENV=production
@@ -69,6 +72,9 @@ services:
       - ultimate
   monitor-amb:
     image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-monitor:${MONITOR_TAG:-local}
+    build:
+      context: ..
+      dockerfile: monitor/Dockerfile
     env_file: ../e2e-commons/components-envs/monitor-amb.env
     entrypoint: yarn check-and-start
     ports:
