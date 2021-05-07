@@ -1,6 +1,6 @@
 const { toWei, toBN, BN } = require('web3-utils')
 const { GasPriceOracle } = require('gas-price-oracle')
-const { BRIDGE_MODES, ERC_TYPES } = require('./constants')
+const { BRIDGE_MODES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
 
 const gasPriceOracle = new GasPriceOracle()
