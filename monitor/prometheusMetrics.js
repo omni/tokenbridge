@@ -39,7 +39,7 @@ async function getPrometheusMetrics(bridgeName) {
     const { home, foreign, ...commonBalances } = balancesFile
 
     const balanceMetrics = {
-      // ERC_TO_ERC or ERC_TO_NATIVE mode
+      // ERC_TO_NATIVE mode
       balances_home_value: home.totalSupply,
       balances_home_txs_deposit: home.deposits,
       balances_home_txs_withdrawal: home.withdrawals,

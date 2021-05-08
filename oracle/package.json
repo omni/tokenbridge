@@ -9,7 +9,6 @@
     "watcher:collected-signatures": "./scripts/start-worker.sh watcher collected-signatures-watcher",
     "watcher:affirmation-request": "./scripts/start-worker.sh watcher affirmation-request-watcher",
     "watcher:transfer": "./scripts/start-worker.sh watcher transfer-watcher",
-    "worker:convert-to-chai": "./scripts/start-worker.sh worker convert-to-chai-worker",
     "sender:home": "./scripts/start-worker.sh sender home-sender",
     "sender:foreign": "./scripts/start-worker.sh sender foreign-sender",
     "confirm:transfer": "./scripts/start-worker.sh confirmRelay transfer-watcher",
@@ -47,6 +46,6 @@
     "sinon": "^6.1.0"
   },
   "engines": {
-    "node": ">= 10.18"
+    "node": ">= 12.22"
   }
 }

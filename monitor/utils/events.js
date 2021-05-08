@@ -2,13 +2,10 @@ require('dotenv').config()
 const logger = require('../logger')('eventsUtils')
 const {
   BRIDGE_MODES,
-  ERC_TYPES,
   getBridgeABIs,
   getBridgeMode,
-  HOME_ERC_TO_ERC_ABI,
+  HOME_ERC_TO_NATIVE_ABI,
   ERC20_ABI,
-  ERC677_BRIDGE_TOKEN_ABI,
-  getTokenType,
   ZERO_ADDRESS,
   OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI,
   OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI
@@ -34,24 +31,18 @@ async function main(mode) {
     }
   }
 
-  const homeErcBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
+  const homeErcBridge = new web3Home.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
   const bridgeMode = mode || (await getBridgeMode(homeErcBridge))
   const { HOME_ABI, FOREIGN_ABI } = getBridgeABIs(bridgeMode)
   const homeBridge = new web3Home.eth.Contract(HOME_ABI, COMMON_HOME_BRIDGE_ADDRESS)
   const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
-  const v1Bridge = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC_V1
-  let isExternalErc20
+  let isExternalErc20 = false
   let erc20Contract
   let erc20Address
   let normalizeEvent = normalizeEventInformation
   if (bridgeMode !== BRIDGE_MODES.ARBITRARY_MESSAGE) {
-    const erc20MethodName = bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC || v1Bridge ? 'erc677token' : 'erc20token'
-    erc20Address = await foreignBridge.methods[erc20MethodName]().call()
-    const tokenType = await getTokenType(
-      new web3Foreign.eth.Contract(ERC677_BRIDGE_TOKEN_ABI, erc20Address),
-      COMMON_FOREIGN_BRIDGE_ADDRESS
-    )
-    isExternalErc20 = tokenType === ERC_TYPES.ERC20
+    erc20Address = await foreignBridge.methods.erc20token().call()
+    isExternalErc20 = true
     erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
   } else {
     normalizeEvent = e => e
@@ -104,7 +95,7 @@ async function main(mode) {
 
   logger.debug("calling homeBridge.getPastEvents('UserRequestForSignature')")
   const homeToForeignRequestsNew = (await getPastEvents(homeBridge, {
-    event: v1Bridge ? 'Deposit' : 'UserRequestForSignature',
+    event: 'UserRequestForSignature',
     fromBlock: homeMigrationBlock,
     toBlock: homeDelayedBlockNumber,
     chain: 'home'
@@ -113,7 +104,7 @@ async function main(mode) {
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
   const homeToForeignConfirmations = (await getPastEvents(foreignBridge, {
-    event: v1Bridge ? 'Deposit' : 'RelayedMessage',
+    event: 'RelayedMessage',
     fromBlock: MONITOR_FOREIGN_START_BLOCK,
     toBlock: foreignBlockNumber,
     chain: 'foreign',
@@ -122,7 +113,7 @@ async function main(mode) {
 
   logger.debug("calling homeBridge.getPastEvents('AffirmationCompleted')")
   const foreignToHomeConfirmations = (await getPastEvents(homeBridge, {
-    event: v1Bridge ? 'Withdraw' : 'AffirmationCompleted',
+    event: 'AffirmationCompleted',
     fromBlock: MONITOR_HOME_START_BLOCK,
     toBlock: homeBlockNumber,
     chain: 'home',
@@ -131,7 +122,7 @@ async function main(mode) {
 
   logger.debug("calling foreignBridge.getPastEvents('UserRequestForAffirmation')")
   const foreignToHomeRequestsNew = (await getPastEvents(foreignBridge, {
-    event: v1Bridge ? 'Withdraw' : 'UserRequestForAffirmation',
+    event: 'UserRequestForAffirmation',
     fromBlock: foreignMigrationBlock,
     toBlock: foreignDelayedBlockNumber,
     chain: 'foreign'

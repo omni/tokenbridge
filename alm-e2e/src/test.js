@@ -6,8 +6,8 @@ jest.setTimeout(60000)
 const statusText = 'Success'
 const statusSelector = 'label[data-id="status"]'
 
-const homeToForeignTxURL = 'http://localhost:3004/77/0x58e7d63368335b9591d4dbb43889084f698fcee93ab7656fd7a39d8c66bc4b60'
-const foreignToHomeTxURL = 'http://localhost:3004/42/0x592bf28fc896419d2838f71cd0388775814b692688f1ecd5b1519081566b994a'
+const homeToForeignTxURL = 'http://localhost:3004/77/0xbc83d43bdc675a615a2b820e43e52d25857aa5fdd77acf2dd92cd247af2c693c'
+const foreignToHomeTxURL = 'http://localhost:3004/42/0x09dfb947dbd17e27bcc117773b6e133829f7cef9646199a93ef019c4f7c0fec6'
 
 describe('ALM', () => {
   let browser

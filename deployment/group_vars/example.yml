@@ -1,6 +1,6 @@
 ---
 ## General settings
-ORACLE_BRIDGE_MODE: "NATIVE_TO_ERC"
+ORACLE_BRIDGE_MODE: "ARBITRARY_MESSAGE"
 ORACLE_LOG_LEVEL: debug
 
 ## Home contract

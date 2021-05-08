@@ -5,12 +5,6 @@ case "$mode" in
   amb)
     script=./test/amb.js
     ;;
-  native-to-erc)
-    script=./test/nativeToErc.js
-    ;;
-  erc-to-erc)
-    script=./test/ercToErc.js
-    ;;
   erc-to-native)
     script=./test/ercToNative.js
     ;;

@@ -1,4 +1,4 @@
-FROM node:10 as contracts
+FROM node:12 as contracts
 
 WORKDIR /mono
 
@@ -11,7 +11,7 @@ COPY ./contracts/truffle-config.js ./
 COPY ./contracts/contracts ./contracts
 RUN npm run compile
 
-FROM node:10
+FROM node:12
 
 RUN apt-get update && \
     apt-get install -y build-essential libc6-dev libc6-dev-i386 wget && \
