@@ -29,7 +29,7 @@ Object.keys(asyncCalls).forEach(method => {
 })
 
 function processInformationRequestsBuilder(config) {
-  const { home, foreign } = config
+  const { home, foreign, web3ForeignArchive } = config
 
   let validatorContract = null
   let blockFinder = null
@@ -79,7 +79,7 @@ function processInformationRequestsBuilder(config) {
         logger.info({ requestSelector, method: asyncCallMethod, data }, 'Processing async request')
 
         const call = asyncCalls[asyncCallMethod]
-        const [status, result] = await call(foreign.web3, data, foreignClosestBlock).catch(e => {
+        const [status, result] = await call(web3ForeignArchive, data, foreignClosestBlock).catch(e => {
           if (e instanceof HttpListProviderError) {
             throw e
           }

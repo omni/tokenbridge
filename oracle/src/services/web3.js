@@ -7,6 +7,7 @@ const {
   COMMON_HOME_RPC_URL,
   COMMON_FOREIGN_RPC_URL,
   ORACLE_SIDE_RPC_URL,
+  ORACLE_FOREIGN_ARCHIVE_RPC_URL,
   ORACLE_RPC_REQUEST_TIMEOUT,
   ORACLE_HOME_RPC_POLLING_INTERVAL,
   ORACLE_FOREIGN_RPC_POLLING_INTERVAL
@@ -41,6 +42,18 @@ const web3Home = new Web3(homeProvider)
 
 const foreignProvider = new HttpListProvider(foreignUrls, foreignOptions)
 const web3Foreign = new Web3(foreignProvider)
+
+let web3ForeignArchive = null
+if (ORACLE_FOREIGN_ARCHIVE_RPC_URL) {
+  const archiveUrls = ORACLE_FOREIGN_ARCHIVE_RPC_URL.split(' ').filter(url => url.length > 0)
+  const options = {
+    requestTimeout: configuredTimeout || 2000,
+    retry: RETRY_CONFIG
+  }
+
+  const archiveProvider = new HttpListProvider(archiveUrls, options)
+  web3ForeignArchive = new Web3(archiveProvider)
+}
 
 let web3Side = null
 if (ORACLE_SIDE_RPC_URL) {
@@ -83,6 +96,7 @@ if (foreignUrls.length > 1) {
 module.exports = {
   web3Home,
   web3Foreign,
+  web3ForeignArchive,
   web3Side,
   web3HomeRedundant,
   web3ForeignRedundant,
