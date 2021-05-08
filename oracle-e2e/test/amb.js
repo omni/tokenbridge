@@ -463,7 +463,7 @@ describe('arbitrary message bridging', () => {
     })
 
     it('should make async eth_getTransactionByHash', async () => {
-      const txHash = '0x592bf28fc896419d2838f71cd0388775814b692688f1ecd5b1519081566b994a'
+      const txHash = '0x09dfb947dbd17e27bcc117773b6e133829f7cef9646199a93ef019c4f7c0fec6'
       const tx = await foreignWeb3.eth.getTransaction(txHash)
       const selector = homeWeb3.utils.soliditySha3('eth_getTransactionByHash(bytes32)')
 
@@ -496,7 +496,7 @@ describe('arbitrary message bridging', () => {
     })
 
     it('should make async eth_getTransactionReceipt', async () => {
-      const txHash = '0x592bf28fc896419d2838f71cd0388775814b692688f1ecd5b1519081566b994a'
+      const txHash = '0x09dfb947dbd17e27bcc117773b6e133829f7cef9646199a93ef019c4f7c0fec6'
       const receipt = await foreignWeb3.eth.getTransactionReceipt(txHash)
       const selector = homeWeb3.utils.soliditySha3('eth_getTransactionReceipt(bytes32)')
 
