@@ -6,7 +6,7 @@ const { web3Foreign, web3ForeignRedundant, web3ForeignFallback } = require('../s
 const { ORACLE_FOREIGN_TX_RESEND_INTERVAL } = process.env
 
 module.exports = {
-  ...baseConfig.bridgeConfig,
+  ...baseConfig,
   queue: 'foreign-prioritized',
   oldQueue: 'foreign',
   id: 'foreign',

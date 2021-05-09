@@ -2,8 +2,7 @@ require('dotenv').config()
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('../../services/HttpListProvider')
 const rootLogger = require('../../services/logger')
-const { web3Home } = require('../../services/web3')
-const bridgeValidatorsABI = require('../../../../contracts/build/contracts/BridgeValidators').abi
+const { getValidatorContract } = require('../../tx/web3')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
 const { parseAMBMessage } = require('../../../../commons')
@@ -11,20 +10,16 @@ const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = req
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
-let validatorContract = null
-
 function processAffirmationRequestsBuilder(config) {
-  const homeBridge = new web3Home.eth.Contract(config.homeBridgeAbi, config.homeBridgeAddress)
+  const { bridgeContract, web3 } = config.home
+
+  let validatorContract = null
 
   return async function processAffirmationRequests(affirmationRequests) {
     const txToSend = []
 
     if (validatorContract === null) {
-      rootLogger.debug('Getting validator contract address')
-      const validatorContractAddress = await homeBridge.methods.validatorContract().call()
-      rootLogger.debug({ validatorContractAddress }, 'Validator contract address obtained')
-
-      validatorContract = new web3Home.eth.Contract(bridgeValidatorsABI, validatorContractAddress)
+      validatorContract = await getValidatorContract(bridgeContract, web3)
     }
 
     rootLogger.debug(`Processing ${affirmationRequests.length} AffirmationRequest events`)
@@ -45,8 +40,8 @@ function processAffirmationRequestsBuilder(config) {
         try {
           logger.debug('Estimate gas')
           gasEstimate = await estimateGas({
-            web3: web3Home,
-            homeBridge,
+            web3,
+            homeBridge: bridgeContract,
             validatorContract,
             message,
             address: config.validatorAddress
@@ -70,14 +65,13 @@ function processAffirmationRequestsBuilder(config) {
           }
         }
 
-        const data = await homeBridge.methods.executeAffirmation(message).encodeABI()
-
+        const data = bridgeContract.methods.executeAffirmation(message).encodeABI()
         txToSend.push({
           data,
           gasEstimate,
           extraGas: EXTRA_GAS_ABSOLUTE,
           transactionReference: affirmationRequest.transactionHash,
-          to: config.homeBridgeAddress
+          to: config.home.bridgeAddress
         })
       })
       .map(promise => limit(promise))

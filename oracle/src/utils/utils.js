@@ -137,6 +137,14 @@ async function readAccessListFile(fileName, logger) {
   return readAccessLists[fileName]
 }
 
+function zipToObject(keys, values) {
+  const res = {}
+  keys.forEach((key, i) => {
+    res[key] = values[i]
+  })
+  return res
+}
+
 module.exports = {
   syncForEach,
   checkHTTPS,
@@ -149,5 +157,6 @@ module.exports = {
   nonceError,
   getRetrySequence,
   promiseAny,
-  readAccessListFile
+  readAccessListFile,
+  zipToObject
 }

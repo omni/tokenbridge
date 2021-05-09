@@ -8,7 +8,7 @@ const {
 } = process.env
 
 module.exports = {
-  ...baseConfig.bridgeConfig,
+  ...baseConfig,
   id: 'shutdown-manager',
   name: 'shutdown-manager',
   pollingInterval: ORACLE_SHUTDOWN_SERVICE_POLLING_INTERVAL || 120000,
@@ -16,5 +16,6 @@ module.exports = {
   checksBeforeStop: 1,
   shutdownServiceURL: ORACLE_SHUTDOWN_SERVICE_URL,
   shutdownContractAddress: ORACLE_SHUTDOWN_CONTRACT_ADDRESS,
-  shutdownMethod: (ORACLE_SHUTDOWN_CONTRACT_METHOD || 'isShutdown()').trim()
+  shutdownMethod: (ORACLE_SHUTDOWN_CONTRACT_METHOD || 'isShutdown()').trim(),
+  requestTimeout: 2000
 }

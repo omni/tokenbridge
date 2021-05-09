@@ -1,16 +1,10 @@
 require('../env')
 
 const { BRIDGE_VALIDATORS_ABI } = require('../../commons')
-const { web3Home, web3Foreign } = require('../src/services/web3')
-const { bridgeConfig } = require('../config/base.config')
+const { home, foreign } = require('../config/base.config')
 
-const homeABI = bridgeConfig.homeBridgeAbi
-const foreignABI = bridgeConfig.foreignBridgeAbi
-
-async function getStartBlock(web3, bridgeAddress, bridgeAbi) {
+async function getStartBlock(bridgeContract, web3) {
   try {
-    const bridgeContract = new web3.eth.Contract(bridgeAbi, bridgeAddress)
-
     const deployedAtBlock = await bridgeContract.methods.deployedAtBlock().call()
 
     const validatorContractAddress = await bridgeContract.methods.validatorContract().call()
@@ -30,10 +24,8 @@ async function getStartBlock(web3, bridgeAddress, bridgeAbi) {
 }
 
 async function main() {
-  const { COMMON_HOME_BRIDGE_ADDRESS, COMMON_FOREIGN_BRIDGE_ADDRESS } = process.env
-
-  const homeStartBlock = await getStartBlock(web3Home, COMMON_HOME_BRIDGE_ADDRESS, homeABI)
-  const foreignStartBlock = await getStartBlock(web3Foreign, COMMON_FOREIGN_BRIDGE_ADDRESS, foreignABI)
+  const homeStartBlock = await getStartBlock(home.bridgeContract, home.web3)
+  const foreignStartBlock = await getStartBlock(foreign.bridgeContract, foreign.web3)
   const result = {
     homeStartBlock,
     foreignStartBlock

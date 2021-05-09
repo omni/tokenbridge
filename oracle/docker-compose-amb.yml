@@ -1,0 +1,97 @@
+---
+version: '2.4'
+services:
+  rabbit:
+    extends:
+      file: docker-compose.yml
+      service: rabbit
+    networks:
+      - net_rabbit_bridge_information
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+    networks:
+      - net_db_bridge_information
+  bridge_request:
+    extends:
+      file: docker-compose.yml
+      service: bridge_request
+    networks:
+      - net_db_bridge_request
+      - net_rabbit_bridge_request
+  bridge_collected:
+    extends:
+      file: docker-compose.yml
+      service: bridge_collected
+    networks:
+      - net_db_bridge_request
+      - net_rabbit_bridge_request
+  bridge_affirmation:
+    extends:
+      file: docker-compose.yml
+      service: bridge_affirmation
+    networks:
+      - net_db_bridge_request
+      - net_rabbit_bridge_request
+  bridge_information:
+    cpus: 0.1
+    mem_limit: 500m
+    image: poanetwork/tokenbridge-oracle:latest
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
+    restart: unless-stopped
+    entrypoint: yarn watcher:information-request
+    networks:
+      - net_db_bridge_information
+      - net_rabbit_bridge_information
+  bridge_senderhome:
+    extends:
+      file: docker-compose.yml
+      service: bridge_senderhome
+    networks:
+      - net_db_bridge_request
+      - net_rabbit_bridge_request
+  bridge_senderforeign:
+    extends:
+      file: docker-compose.yml
+      service: bridge_senderforeign
+    networks:
+      - net_db_bridge_request
+      - net_rabbit_bridge_request
+  bridge_shutdown:
+    extends:
+      file: docker-compose.yml
+      service: bridge_shutdown
+    networks:
+      - net_db_bridge_shutdown
+
+networks:
+  net_db_bridge_request:
+    driver: bridge
+  net_db_bridge_collected:
+    driver: bridge
+  net_db_bridge_affirmation:
+    driver: bridge
+  net_db_bridge_information:
+    driver: bridge
+  net_db_bridge_senderhome:
+    driver: bridge
+  net_db_bridge_senderforeign:
+    driver: bridge
+  net_rabbit_bridge_request:
+    driver: bridge
+  net_db_bridge_shutdown:
+    driver: bridge
+  net_rabbit_bridge_collected:
+    driver: bridge
+  net_rabbit_bridge_affirmation:
+    driver: bridge
+  net_rabbit_bridge_information:
+    driver: bridge
+  net_rabbit_bridge_senderhome:
+    driver: bridge
+  net_rabbit_bridge_senderforeign:
+    driver: bridge

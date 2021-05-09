@@ -6,6 +6,7 @@
   ],
   "plugins": ["node"],
   "rules": {
-    "node/no-unpublished-require": "off"
+    "node/no-unpublished-require": "off",
+    "global-require": "off"
   }
 }

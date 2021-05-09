@@ -8,6 +8,7 @@
     "watcher:signature-request": "./scripts/start-worker.sh watcher signature-request-watcher",
     "watcher:collected-signatures": "./scripts/start-worker.sh watcher collected-signatures-watcher",
     "watcher:affirmation-request": "./scripts/start-worker.sh watcher affirmation-request-watcher",
+    "watcher:information-request": "./scripts/start-worker.sh watcher information-request-watcher",
     "watcher:transfer": "./scripts/start-worker.sh watcher transfer-watcher",
     "sender:home": "./scripts/start-worker.sh sender home-sender",
     "sender:foreign": "./scripts/start-worker.sh sender foreign-sender",

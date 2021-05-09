@@ -1,9 +1,8 @@
 require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('../../services/HttpListProvider')
-const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
-const { web3Home } = require('../../services/web3')
+const { getValidatorContract } = require('../../tx/web3')
 const { createMessage } = require('../../utils/message')
 const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
@@ -13,25 +12,21 @@ const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
-let expectedMessageLength = null
-let validatorContract = null
-
 function processSignatureRequestsBuilder(config) {
-  const homeBridge = new web3Home.eth.Contract(config.homeBridgeAbi, config.homeBridgeAddress)
+  const { bridgeContract, web3 } = config.home
+
+  let expectedMessageLength = null
+  let validatorContract = null
 
   return async function processSignatureRequests(signatureRequests) {
     const txToSend = []
 
     if (expectedMessageLength === null) {
-      expectedMessageLength = await homeBridge.methods.requiredMessageLength().call()
+      expectedMessageLength = await bridgeContract.methods.requiredMessageLength().call()
     }
 
     if (validatorContract === null) {
-      rootLogger.debug('Getting validator contract address')
-      const validatorContractAddress = await homeBridge.methods.validatorContract().call()
-      rootLogger.debug({ validatorContractAddress }, 'Validator contract address obtained')
-
-      validatorContract = new web3Home.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
+      validatorContract = await getValidatorContract(bridgeContract, web3)
     }
 
     rootLogger.debug(`Processing ${signatureRequests.length} SignatureRequest events`)
@@ -49,18 +44,18 @@ function processSignatureRequestsBuilder(config) {
           recipient,
           value,
           transactionHash: signatureRequest.transactionHash,
-          bridgeAddress: config.foreignBridgeAddress,
+          bridgeAddress: config.foreign.bridgeAddress,
           expectedMessageLength
         })
 
-        const signature = web3Home.eth.accounts.sign(message, `0x${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}`)
+        const signature = web3.eth.accounts.sign(message, `0x${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}`)
 
         let gasEstimate
         try {
           logger.debug('Estimate gas')
           gasEstimate = await estimateGas({
-            web3: web3Home,
-            homeBridge,
+            web3,
+            homeBridge: bridgeContract,
             validatorContract,
             signature: signature.signature,
             message,
@@ -87,15 +82,12 @@ function processSignatureRequestsBuilder(config) {
           }
         }
 
-        const data = await homeBridge.methods
-          .submitSignature(signature.signature, message)
-          .encodeABI({ from: config.validatorAddress })
-
+        const data = bridgeContract.methods.submitSignature(signature.signature, message).encodeABI()
         txToSend.push({
           data,
           gasEstimate,
           transactionReference: signatureRequest.transactionHash,
-          to: config.homeBridgeAddress
+          to: config.home.bridgeAddress
         })
       })
       .map(promise => limit(promise))

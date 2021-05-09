@@ -3,6 +3,7 @@ const path = require('path')
 const {
   web3Home,
   web3Foreign,
+  web3ForeignArchive,
   web3Side,
   web3HomeFallback,
   web3ForeignFallback,
@@ -30,6 +31,10 @@ web3HomeFallback.currentProvider.setLogger(logger)
 web3ForeignFallback.currentProvider.setLogger(logger)
 web3HomeRedundant.currentProvider.setLogger(logger)
 web3ForeignRedundant.currentProvider.setLogger(logger)
+
+if (web3ForeignArchive) {
+  web3ForeignArchive.currentProvider.setLogger(logger)
+}
 
 if (web3Side) {
   web3Side.currentProvider.setLogger(logger)

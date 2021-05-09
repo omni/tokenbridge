@@ -20,3 +20,4 @@
   with_items:
     - docker-compose.yml
     - docker-compose-transfer.yml
+    - docker-compose-amb.yml
