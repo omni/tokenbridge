@@ -28,7 +28,7 @@
     "bignumber.js": "^7.2.1",
     "dotenv": "^5.0.1",
     "ioredis": "^3.2.2",
-    "node-fetch": "^2.1.2",
+    "node-fetch": "^2.6.1",
     "pino": "^4.17.3",
     "pino-pretty": "^2.0.1",
     "promise-limit": "^2.7.0",
