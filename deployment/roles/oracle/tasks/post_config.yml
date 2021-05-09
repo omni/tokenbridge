@@ -38,13 +38,13 @@
   set_fact:
     FOREIGN_ERC_TYPE: "{{ (ERCTYPE.stdout).foreignERC | default('') }}"
 
-- name: Extend docker compose file
-  set_fact: composefileoverride="-f docker-compose-transfer.yml"
-  when: ORACLE_BRIDGE_MODE == "ERC_TO_ERC" and FOREIGN_ERC_TYPE != "ERC677"
-
 - name: Extend docker compose file for erc to native
-  set_fact: composefileoverride="-f docker-compose-erc-native.yml"
+  set_fact: composefileoverride="-f docker-compose-transfer.yml"
   when: ORACLE_BRIDGE_MODE == "ERC_TO_NATIVE"
+
+- name: Extend docker compose file for amb
+  set_fact: composefileoverride="-f docker-compose-amb.yml"
+  when: ORACLE_BRIDGE_MODE == "ARBITRARY_MESSAGE"
 
 - name: Install .key config
   template:

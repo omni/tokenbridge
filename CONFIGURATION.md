@@ -22,7 +22,7 @@ COMMON_FOREIGN_GAS_PRICE_FACTOR | A value that will multiply the gas price of th
 
 name | description | value
 --- | --- | ---
-ORACLE_BRIDGE_MODE | The bridge mode. The bridge starts listening to a different set of events based on this parameter. | NATIVE_TO_ERC / ERC_TO_ERC / ERC_TO_NATIVE / ARBITRARY_MESSAGE
+ORACLE_BRIDGE_MODE | The bridge mode. The bridge starts listening to a different set of events based on this parameter. | ERC_TO_NATIVE / ARBITRARY_MESSAGE
 ORACLE_ALLOW_HTTP_FOR_RPC | **Only use in test environments - must be omitted in production environments.**. If this parameter is specified and set to `yes`, RPC URLs can be specified in form of HTTP links. A warning that the connection is insecure will be written to the logs. | `yes` / `no`
 ORACLE_HOME_RPC_POLLING_INTERVAL | The interval in milliseconds used to request the RPC node in the Home network for new blocks. The interval should match the average production time for a new block. | integer
 ORACLE_FOREIGN_RPC_POLLING_INTERVAL | The interval in milliseconds used to request the RPC node in the Foreign network for new blocks. The interval should match the average production time for a new block. | integer
@@ -47,6 +47,7 @@ ORACLE_FOREIGN_TX_RESEND_INTERVAL | Interval in milliseconds for automatic resen
 ORACLE_SHUTDOWN_SERVICE_URL | Optional external URL to some other service/monitor/configuration manager that controls the remote shutdown process. GET request should return `application/json` message with the following schema: `{ shutdown: true/false }`. | URL
 ORACLE_SHUTDOWN_SERVICE_POLLING_INTERVAL | Optional interval in milliseconds used to request the side RPC node or external shutdown service. Default is 120000. | integer
 ORACLE_SIDE_RPC_URL | Optional HTTPS URL(s) for communication with the external shutdown service or side RPC nodes, used for shutdown manager activities. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection. | URL(s)
+ORACLE_FOREIGN_ARCHIVE_RPC_URL | Optional HTTPS URL(s) for communication with the archive nodes on the foreign network. Only used in AMB bridge mode for async information request processing. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection. | URL(s)
 ORACLE_SHUTDOWN_CONTRACT_ADDRESS | Optional contract address in the side chain accessible through `ORACLE_SIDE_RPC_URL`, where the method passed in `ORACLE_SHUTDOWN_CONTRACT_METHOD` is implemented. | `address`
 ORACLE_SHUTDOWN_CONTRACT_METHOD | Method signature to be used in the side chain to identify the current shutdown status. Method should return boolean. Default value is `isShutdown()`. | `function signature`
 ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Foreign chain. Infinite, if not provided. | `integer`

@@ -25,10 +25,9 @@ const processTransfers = require('./events/processTransfers')(config)
 const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
+const processAMBInformationRequests = require('./events/processAMBInformationRequests')(config)
 
-const web3Instance = config.web3
-const { eventContractAddress } = config
-const eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+const { web3, eventContract } = config.main
 
 let attached
 
@@ -36,7 +35,7 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
+    web3.currentProvider.urls.forEach(checkHttps(config.chain))
 
     attached = await isAttached()
     if (attached) {
@@ -47,7 +46,6 @@ async function initialize() {
 
     connectWatcherToQueue({
       queueName: config.queue,
-      workerQueue: config.workerQueue,
       cb: runMain
     })
   } catch (e) {
@@ -80,20 +78,12 @@ async function runMain({ sendToQueue }) {
 
 function processEvents(events) {
   switch (config.id) {
-    case 'native-erc-signature-request':
-    case 'erc-erc-signature-request':
     case 'erc-native-signature-request':
       return processSignatureRequests(events)
-    case 'native-erc-collected-signatures':
-    case 'erc-erc-collected-signatures':
     case 'erc-native-collected-signatures':
       return processCollectedSignatures(events)
-    case 'native-erc-affirmation-request':
-    case 'erc677-erc677-affirmation-request':
     case 'erc-native-affirmation-request':
-    case 'erc-erc-affirmation-request':
       return processAffirmationRequests(events)
-    case 'erc-erc-transfer':
     case 'erc-native-transfer':
       return processTransfers(events)
     case 'amb-signature-request':
@@ -102,6 +92,8 @@ function processEvents(events) {
       return processAMBCollectedSignatures(events)
     case 'amb-affirmation-request':
       return processAMBAffirmationRequests(events)
+    case 'amb-information-request':
+      return processAMBInformationRequests(events)
     default:
       return []
   }
@@ -110,7 +102,7 @@ function processEvents(events) {
 async function main({ sendJob, txHash }) {
   try {
     const events = await getEventsFromTx({
-      web3: web3Instance,
+      web3,
       contract: eventContract,
       event: config.event,
       txHash,
@@ -137,8 +129,8 @@ async function main({ sendJob, txHash }) {
 
 async function sendJobTx(jobs) {
   const gasPrice = await GasPrice.start(config.chain, true)
-  const chainId = await getChainId(web3Instance)
-  let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
+  const chainId = await getChainId(web3)
+  let nonce = await getNonce(web3, ORACLE_VALIDATOR_ADDRESS)
 
   await syncForEach(jobs, async job => {
     let gasLimit
@@ -159,7 +151,7 @@ async function sendJobTx(jobs) {
         privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
         to: job.to,
         chainId,
-        web3: web3Instance
+        web3
       })
 
       nonce++
@@ -175,7 +167,7 @@ async function sendJobTx(jobs) {
       )
 
       if (e.message.toLowerCase().includes('insufficient funds')) {
-        const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
+        const currentBalance = await web3.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
         const minimumBalance = gasLimit.multipliedBy(gasPrice)
         logger.error(
           `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`

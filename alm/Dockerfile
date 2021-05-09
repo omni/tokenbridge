@@ -1,4 +1,4 @@
-FROM node:10 as contracts
+FROM node:12 as contracts
 
 WORKDIR /mono
 

@@ -27,25 +27,6 @@ services:
     image: "rabbitmq:3-management"
     networks:
       - ultimate
-  oracle:
-    image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-oracle:${ORACLE_TAG:-local}
-    build:
-      context: ..
-      dockerfile: oracle/Dockerfile
-    env_file: ../e2e-commons/components-envs/oracle.env
-    environment:
-    - NODE_ENV=production
-    command: "true"
-    networks:
-      - ultimate
-  oracle-erc20:
-    image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-oracle:${ORACLE_TAG:-local}
-    env_file: ../e2e-commons/components-envs/oracle-erc20.env
-    environment:
-    - NODE_ENV=production
-    command: "true"
-    networks:
-      - ultimate
   oracle-erc20-native:
     image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-oracle:${ORACLE_TAG:-local}
     env_file: ../e2e-commons/components-envs/oracle-erc20-native.env
@@ -59,6 +40,9 @@ services:
       - ultimate
   oracle-amb:
     image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-oracle:${ORACLE_TAG:-local}
+    build:
+      context: ..
+      dockerfile: oracle/Dockerfile
     env_file: ../e2e-commons/components-envs/oracle-amb.env
     environment:
     - NODE_ENV=production
@@ -78,25 +62,6 @@ services:
     command: "true"
     networks:
       - ultimate
-  monitor:
-    image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-monitor:${MONITOR_TAG:-local}
-    build:
-      context: ..
-      dockerfile: monitor/Dockerfile
-    env_file: ../e2e-commons/components-envs/monitor.env
-    entrypoint: yarn check-and-start
-    ports:
-      - "3010:3010"
-    networks:
-      - ultimate
-  monitor-erc20:
-    image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-monitor:${MONITOR_TAG:-local}
-    env_file: ../e2e-commons/components-envs/monitor-erc20.env
-    entrypoint: yarn check-and-start
-    ports:
-      - "3011:3011"
-    networks:
-      - ultimate
   monitor-erc20-native:
     image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-monitor:${MONITOR_TAG:-local}
     env_file: ../e2e-commons/components-envs/monitor-erc20-native.env
@@ -107,6 +72,9 @@ services:
       - ultimate
   monitor-amb:
     image: ${DOCKER_IMAGE_BASE:-tokenbridge}/tokenbridge-e2e-monitor:${MONITOR_TAG:-local}
+    build:
+      context: ..
+      dockerfile: monitor/Dockerfile
     env_file: ../e2e-commons/components-envs/monitor-amb.env
     entrypoint: yarn check-and-start
     ports:

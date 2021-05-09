@@ -1,9 +1,8 @@
 require('../../../env')
 const promiseLimit = require('promise-limit')
 const { HttpListProviderError } = require('../../services/HttpListProvider')
-const { BRIDGE_VALIDATORS_ABI } = require('../../../../commons')
 const rootLogger = require('../../services/logger')
-const { web3Home, web3Foreign } = require('../../services/web3')
+const { getValidatorContract } = require('../../tx/web3')
 const { signatureToVRS, packSignatures, parseMessage } = require('../../utils/message')
 const { readAccessListFile } = require('../../utils/utils')
 const estimateGas = require('./estimateGas')
@@ -19,22 +18,16 @@ const {
 
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
-let validatorContract = null
-
 function processCollectedSignaturesBuilder(config) {
-  const homeBridge = new web3Home.eth.Contract(config.homeBridgeAbi, config.homeBridgeAddress)
+  const { home, foreign } = config
 
-  const foreignBridge = new web3Foreign.eth.Contract(config.foreignBridgeAbi, config.foreignBridgeAddress)
+  let validatorContract = null
 
   return async function processCollectedSignatures(signatures) {
     const txToSend = []
 
     if (validatorContract === null) {
-      rootLogger.debug('Getting validator contract address')
-      const validatorContractAddress = await foreignBridge.methods.validatorContract().call()
-      rootLogger.debug({ validatorContractAddress }, 'Validator contract address obtained')
-
-      validatorContract = new web3Foreign.eth.Contract(BRIDGE_VALIDATORS_ABI, validatorContractAddress)
+      validatorContract = await getValidatorContract(foreign.bridgeContract, foreign.web3)
     }
 
     rootLogger.debug(`Processing ${signatures.length} CollectedSignatures events`)
@@ -48,13 +41,13 @@ function processCollectedSignaturesBuilder(config) {
 
         if (ORACLE_ALWAYS_RELAY_SIGNATURES && ORACLE_ALWAYS_RELAY_SIGNATURES === 'true') {
           logger.debug('Validator handles all CollectedSignature requests')
-        } else if (authorityResponsibleForRelay !== web3Home.utils.toChecksumAddress(config.validatorAddress)) {
+        } else if (authorityResponsibleForRelay !== home.web3.utils.toChecksumAddress(config.validatorAddress)) {
           logger.info(`Validator not responsible for relaying CollectedSignatures ${colSignature.transactionHash}`)
           return
         }
 
         logger.info(`Processing CollectedSignatures ${colSignature.transactionHash}`)
-        const message = await homeBridge.methods.message(messageHash).call()
+        const message = await home.bridgeContract.methods.message(messageHash).call()
 
         if (ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST || ORACLE_HOME_TO_FOREIGN_BLOCK_LIST) {
           const parsedMessage = parseMessage(message)
@@ -66,7 +59,7 @@ function processCollectedSignaturesBuilder(config) {
             if (allowanceList.indexOf(recipient) === -1) {
               if (ORACLE_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
                 logger.debug({ txHash: originalTxHash }, 'Requested sender of an original withdrawal transaction')
-                const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+                const sender = (await home.web3.eth.getTransaction(originalTxHash)).from.toLowerCase()
                 if (allowanceList.indexOf(sender) === -1) {
                   logger.info(
                     { sender, recipient },
@@ -90,7 +83,7 @@ function processCollectedSignaturesBuilder(config) {
             }
             if (ORACLE_HOME_TO_FOREIGN_CHECK_SENDER === 'true') {
               logger.debug({ txHash: originalTxHash }, 'Requested sender of an original withdrawal transaction')
-              const sender = (await web3Home.eth.getTransaction(originalTxHash)).from.toLowerCase()
+              const sender = (await home.bridgeContract.eth.getTransaction(originalTxHash)).from.toLowerCase()
               if (blockList.indexOf(sender) > -1) {
                 logger.info({ sender }, 'Validator skips a transaction. Sender address is in the block list.')
                 return
@@ -110,7 +103,7 @@ function processCollectedSignaturesBuilder(config) {
         logger.debug('Getting message signatures')
         const signaturePromises = requiredSignatures.map(async (el, index) => {
           logger.debug({ index }, 'Getting message signature')
-          const signature = await homeBridge.methods.signature(messageHash, index).call()
+          const signature = await home.bridgeContract.methods.signature(messageHash, index).call()
           const vrs = signatureToVRS(signature)
           v.push(vrs.v)
           r.push(vrs.r)
@@ -125,7 +118,7 @@ function processCollectedSignaturesBuilder(config) {
         try {
           logger.debug('Estimate gas')
           gasEstimate = await estimateGas({
-            foreignBridge,
+            foreignBridge: foreign.bridgeContract,
             validatorContract,
             v,
             r,
@@ -149,12 +142,12 @@ function processCollectedSignaturesBuilder(config) {
             throw e
           }
         }
-        const data = await foreignBridge.methods.executeSignatures(message, signatures).encodeABI()
+        const data = foreign.bridgeContract.methods.executeSignatures(message, signatures).encodeABI()
         txToSend.push({
           data,
           gasEstimate,
           transactionReference: colSignature.transactionHash,
-          to: config.foreignBridgeAddress
+          to: config.foreign.bridgeAddress
         })
       })
       .map(promise => limit(promise))

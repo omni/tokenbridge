@@ -12,12 +12,12 @@ const { web3Home } = require('./utils/web3')
 
 const { COMMON_HOME_BRIDGE_ADDRESS, MONITOR_BRIDGE_NAME } = process.env
 
-const { HOME_ERC_TO_ERC_ABI } = require('../commons')
+const { HOME_ERC_TO_NATIVE_ABI } = require('../commons')
 
 async function checkWorker() {
   try {
     createDir(`/responses/${MONITOR_BRIDGE_NAME}`)
-    const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_ERC_ABI, COMMON_HOME_BRIDGE_ADDRESS)
+    const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
     const bridgeMode = await getBridgeMode(homeBridge)
     logger.debug('Bridge mode:', bridgeMode)
     logger.debug('calling getEventsInfo()')
