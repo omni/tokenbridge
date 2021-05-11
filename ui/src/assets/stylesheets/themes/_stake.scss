@@ -9,11 +9,11 @@ $secondary-color-dark: #64a231;
 $tertiary-color: #ffaa07;
 $danger-color: #f13662;
 $blue-color: #3ab9fe;
-$base-button-bg-color: #4DA9A6;
-$base-button-bg-color-darker: #408684;
+$base-button-bg-color: #7023ff;
+$base-button-bg-color-darker: #7023ff;
 
 $text-color: #333;
-$link-color: #4DA9A6;
+$link-color: #7023ff;
 
 $gradient-color-1: $primary-color;
 $gradient-color-2: #7b5ab2;
@@ -29,10 +29,10 @@ $header-logo-width: 128.54px;
 $header-logo-height: 30px;
 
 // header menu
-$header-menu-icon-color: #9EAAB6;
-$header-menu-text-color: #242A31;
-$header-menu-icon-color-selected: #4DA9A6;
-$header-menu-text-color-selected: #4DA9A6;
+$header-menu-icon-color: #7023ff;
+$header-menu-text-color: #677294;
+$header-menu-icon-color-selected: #7023ff;
+$header-menu-text-color-selected: #7023ff;
 $header-font-size: 14px;
 
 // daily quota
@@ -50,6 +50,8 @@ $footer-text-color: #fff;
 $separator-color: #e4e4e4;
 $separator-display: none;
 
+$container-background-image: $base-images-path + '/themes/' + $theme-name + '/background/background.png';
+
 // background
 $pattern-background-image: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
 
@@ -60,6 +62,10 @@ $social-icons-icon-color: $primary-color;
 // logo
 $logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo.svg';
 $footer-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/footer-logo.svg';
+
+//pumapay-logo
+$pumapay-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/pumapay-logo.svg';
+$footer-pumapay-logo-image: $pumapay-logo-image;
 
 // home logo
 $home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.png';
@@ -74,7 +80,7 @@ $foreign-logo-width: 54px;
 $foreign-logo-height: 11px;
 
 // buttons
-$button-background-color: #4DA9A6;
+$button-background-color: #7023ff;
 $button-text-color: #fff;
 
 $button-background-color-2: $tertiary-color;
@@ -108,7 +114,7 @@ $modal-background-color: #fff;
 $modal-overlay-background-color: rgba(#9EAAB6, 0.8);
 $modal-title-color: #242A31;
 $modal-text-color: #242A31;
-$modal-link-color: #4DA9A6;
+$modal-link-color: #7023ff;
 $daily-quota-modal-title: $text-color;
 $modal-close-button: "../images/themes/stake/bridge/close.svg";
 $modal-close-button-padding: 0;
@@ -141,17 +147,18 @@ $loading-container-justify-content: space-around;
 $bridge-gradient-start: #fff;
 $bridge-gradient-end: #fff;
 $bridge-logo-background-color: $primary-color;
-$bridge-link-color: #4DA9A6;
-$bridge-balance-color: #4DA9A6;
-$bridge-button-background-color: #4DA9A6;
+$bridge-link-color: #00CDFF;
+$bridge-balance-color: #00CDFF;
+$bridge-button-background-color: #7023ff;
 $bridge-button-text-color: #fff;
 $bridge-textfield-background: #F5F7F9;
 $bridge-input-label-color: #75818D;
-$bridge-label-color: #242A31;
-$bridge-textfield-color: #242A31;
-$bridge-textfield-placeholder-color: #75818D;
+$bridge-label-color: #FFFFFF;
+$bridge-textfield-color: #051441;
+$bridge-textfield-placeholder-color: #ADB5CC;
 $bridge-side-image-width: 272px;
 $bridge-side-image-height: 276px;
+$bridge-image-backgroung: $base-images-path + '/themes/' + $theme-name + '/bridge/bridge_bg.png';
 $bridge-image-center-pointing-left: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-left.svg';
 $bridge-image-center-pointing-right: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-right.svg';
 $bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name + '/bridge/center-image-pointing-down@2x.png';
@@ -200,8 +207,8 @@ $transfer-operation-arrow-ellipse-image: $base-images-path + '/themes/' + $theme
 $transfer-operation-arrow-image: $base-images-path + '/themes/' + $theme-name + '/bridge/arrow.svg';
 
 // copy icon
-$copy-icon-color: #4DA9A6;
-$copy-icon-hover-color: #408684;
+$copy-icon-color: #5e0ff0;
+$copy-icon-hover-color: #7023ff;
 
 // status section
 $status-text-color: #9EAAB6;
@@ -213,7 +220,8 @@ $status-title-font-weight: bold;
 $status-title-letter-spacing: 0.2em;
 $status-title-text-transform: uppercase;
 $status-title-padding: 0 0 17px 0;
-$status-container-flex-direction: row;
+$status-container-flex-direction: column;
+$status-container-align-items: center;
 $status-container-mobile-flex-direction: column;
 $status-container-justify-content: space-between;
 $status-container-padding: 37px 0 0 0;
@@ -259,7 +267,7 @@ $statistics-title-text-transform: $status-title-text-transform;
 $statistics-title-padding: $status-title-padding;
 $statistics-fee-container-order: 1;
 $statistics-fee-container-padding: 38px 0 0 0;
-$statistics-fee-data-justify-content: flex-start;
+$statistics-fee-data-justify-content: center;
 $statistics-fee-container-width: auto;
 $statistics-deposit-container-width: auto;
 $statistics-bridge-data-mobile-margin: 0 0 10px 0;

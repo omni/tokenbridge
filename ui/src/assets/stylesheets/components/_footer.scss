@@ -1,10 +1,10 @@
 .footer {
   @extend %full-width;
-  background-color: $footer-background-color;
   bottom: 0;
   color: $footer-text-color;
   padding: 18px 0;
   position: absolute;
+  border-top: 1px solid #EBEEFA;
 
   .container {
     align-items: center;
@@ -17,12 +17,32 @@
     }
   }
 
+  .copy-right {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 15px;
+    color: #ADB5CC;
+    @media screen and (max-width: $tablet-width) {
+      padding-bottom: 20px;
+    }
+  }
+
+  .t_and_c {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 15px;
+    color: #677294;
+  }
+
   .social-icons {
-    order: 2;
+    // order: 2;
 
     @media screen and (max-width: $tablet-width) {
-      margin-top: 15px;
-      order: 1;
+      margin-top: 20px;
     }
   }
 

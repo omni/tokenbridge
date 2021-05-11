@@ -1,6 +1,5 @@
 import React from 'react'
 import { MenuItems } from './MenuItems'
-import { Wallet } from './Wallet'
 import NetworkSelect from './NetworkSelect'
 
 export const HeaderMenu = ({ selected, withoutEvents, displayEventsTab, onMenuToggle }) => (
@@ -11,7 +10,6 @@ export const HeaderMenu = ({ selected, withoutEvents, displayEventsTab, onMenuTo
       displayEventsTab={displayEventsTab}
       onMenuToggle={onMenuToggle}
     />
-    <Wallet />
     <NetworkSelect />
   </div>
 )

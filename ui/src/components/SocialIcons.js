@@ -3,10 +3,18 @@ import {
   AlternativeIconGithub,
   AlternativeIconTelegram,
   AlternativeIconTwitter,
+  AlternativeIconBlog,
+  AlternativeIconMedium,
+  AlternativeIconFacebook,
+  AlternativeIconReddit,
   IconGithub,
   IconPOA,
   IconTelegram,
   IconTwitter,
+  IconFacebook,
+  IconBlog,
+  IconReddit,
+  IconMedium,
   IconXDai
 } from './social-icons'
 
@@ -17,20 +25,32 @@ export const SocialIcons = () => {
 
   const socialItems = [
     {
-      icon: useAlternativeIcons ? <IconXDai /> : <IconPOA />,
-      link: useAlternativeIcons ? 'https://xdaichain.com/' : 'https://poa.network'
+      icon: useAlternativeIcons ? <AlternativeIconTwitter /> : <IconTwitter />,
+      link: 'https://twitter.com/PumaPay'
     },
     {
-      icon: useAlternativeIcons ? <AlternativeIconTwitter /> : <IconTwitter />,
-      link: useAlternativeIcons ? 'https://twitter.com/xdaichain' : 'https://twitter.com/poanetwork'
+      icon: useAlternativeIcons ? <AlternativeIconFacebook /> : <IconFacebook />,
+      link: 'https://www.facebook.com/PumaPayOfficial'
     },
     {
       icon: useAlternativeIcons ? <AlternativeIconTelegram /> : <IconTelegram />,
-      link: useAlternativeIcons ? 'https://t.me/xdaistable' : 'https://t.me/poa_network'
+      link: 'https://t.me/PumaPay'
+    },
+    {
+      icon: useAlternativeIcons ? <AlternativeIconMedium /> : <IconMedium />,
+      link: 'https://medium.com/@pumapay'
+    },
+    {
+      icon: useAlternativeIcons ? <AlternativeIconBlog /> : <IconBlog />,
+      link: 'https://pumapay.io/blog'
+    },
+    {
+      icon: useAlternativeIcons ? <AlternativeIconReddit /> : <IconReddit />,
+      link: 'https://www.reddit.com/r/PumaPay/'
     },
     {
       icon: useAlternativeIcons ? <AlternativeIconGithub /> : <IconGithub />,
-      link: useAlternativeIcons ? 'https://github.com/xdaichain' : 'https://github.com/poanetwork/tokenbridge'
+      link: 'https://github.com/pumapayio'
     }
   ]
 

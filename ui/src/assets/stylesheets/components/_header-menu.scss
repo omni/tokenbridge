@@ -1,9 +1,9 @@
 .header-menu {
     align-items: center;
     display: flex;
-    justify-content: space-between;
     font-size: $header-font-size;
-    @media screen and (max-width: $mobile-width) {
+    width: calc(100% - 130px);
+    @media screen and (max-width: $tablet-width) {
         display: none;
     }
     @media screen and (max-width: $tablet-width) {

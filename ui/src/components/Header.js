@@ -54,7 +54,7 @@ export class Header extends React.Component {
           <Link
             to="/"
             onClick={showMobileMenu ? onMenuToggle : () => this.changeSelectedMenu('/')}
-            className="header-logo"
+            className="header-pumapay-logo"
           />
           <HeaderMenu
             selected={selected}

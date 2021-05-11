@@ -9,26 +9,35 @@
   &-stake {
     box-shadow: 0 3px 8px 0 rgba(116, 129, 141, 0.1);
     border-bottom: 1px solid #D4DADF;
+    @media screen and (max-width: $tablet-width) {
+      display: flex;
+      flex-direction: column-reverse;
+    }
   }
 
   .container {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-
-    @media screen and (max-width: $mobile-width) {
-      padding: 22px 0;
-      width: 93%;
-    }
+    height: 70px;
 
     @media screen and (max-width: $tablet-width) {
-      padding: 22px 0;
+      width: 93%;
+      justify-content: space-between;
     }
   }
 
   &-logo {
     background-image: url('#{ $logo-image }');
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: block;
+    height: $header-logo-height;
+    width: $header-logo-width;
+  }
+  
+  &-pumapay-logo {
+    background-image: url('#{ $pumapay-logo-image }');
     background-repeat: no-repeat;
     background-size: contain;
     display: block;

@@ -1,6 +1,6 @@
 import React from 'react'
 import { inject, observer } from 'mobx-react'
-import { WalletIcon } from './menu-icons/WalletIcon'
+import { AlternativeWalletIcon } from './menu-icons/AlternativeWalletIcon'
 
 @inject('RootStore')
 @observer
@@ -27,9 +27,7 @@ export class Wallet extends React.Component {
           {web3Store.defaultAccount.address.slice(0, 17).concat('...')}
         </a>
       ) : (
-        <span className="wallet-text">
-          Login with <span className="wallet-text-metamask">wallet</span>
-        </span>
+        <span className="wallet-text">Login with wallet</span>
       )
 
     return (
@@ -39,7 +37,7 @@ export class Wallet extends React.Component {
         onMouseLeave={() => alertStore.setShowDailyQuotaInfo(false)}
       >
         <div className="wallet-container">
-          <span className="wallet-icon">{<WalletIcon />}</span>
+          <span className="wallet-icon">{<AlternativeWalletIcon />}</span>
           {wallet}
         </div>
         <div className="daily-quota-container">

@@ -49,6 +49,8 @@ $footer-text-color: #fff;
 $separator-color: #333;
 $separator-display: initial;
 
+$container-background-image: $base-images-path + '/themes/' + $theme-name + '/background/background.png';
+
 // background
 $pattern-background-image: $base-images-path + '/themes/' + $theme-name + '/background/bg-pattern.svg';
 
@@ -59,6 +61,10 @@ $social-icons-icon-color: #b9b0e1;
 // logo
 $logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo.svg';
 $footer-logo-image: $logo-image;
+
+//pumapay-logo
+$pumapay-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/pumapay-logo.svg';
+$footer-pumapay-logo-image: $pumapay-logo-image;
 
 // home logo
 $home-logo-image: $base-images-path + '/themes/' + $theme-name + '/logos/logo-home.svg';
@@ -149,6 +155,7 @@ $bridge-textfield-color: $primary-color-dark;
 $bridge-textfield-placeholder-color: #666;
 $bridge-side-image-width: 272px;
 $bridge-side-image-height: 276px;
+$bridge-image-backgroung: $base-images-path + '/themes/' + $theme-name + '/bridge/bridge_bg.png';
 $bridge-image-center-pointing-left: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
 $bridge-image-center-pointing-right: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
 $bridge-image-center-pointing-down: $base-images-path + '/themes/' + $theme-name + '/transparent.png';
@@ -211,6 +218,7 @@ $status-title-font-weight: normal;
 $status-title-letter-spacing: normal;
 $status-title-text-transform: none;
 $status-container-flex-direction: column;
+$status-container-align-items: center;
 $status-container-mobile-flex-direction: $status-container-flex-direction;
 $status-container-justify-content: unset;
 $status-container-padding: 30px 0 25px 0;
@@ -257,7 +265,7 @@ $statistics-title-text-transform: none;
 $statistics-title-padding: 0 0 20px 0;
 $statistics-fee-container-order: 0;
 $statistics-fee-container-padding: 90px 0 0 0;
-$statistics-fee-data-justify-content: space-evenly;
+$statistics-fee-data-justify-content: center;
 $statistics-fee-container-width: 50%;
 $statistics-deposit-container-width: 40%;
 $statistics-bridge-data-mobile-margin: 0 0 0 0;

@@ -1,6 +1,7 @@
 import BN from 'bignumber.js'
 import React from 'react'
 import { toHex } from 'web3-utils'
+import numeral from 'numeral'
 import swal from 'sweetalert'
 import { BRIDGE_MODES, ERC_TYPES, isErcToErcMode } from '../../../commons'
 import { BridgeAddress } from './index'
@@ -21,7 +22,16 @@ export class Bridge extends React.Component {
     modalData: {},
     confirmationData: {},
     showModal: false,
-    showConfirmation: false
+    showConfirmation: false,
+    height: this.props.height
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateDimensions)
+  }
+
+  updateDimensions = () => {
+    this.setState({ height: window.innerHeight - 137 + 'px' })
   }
 
   handleInputChange = name => event => {
@@ -37,9 +47,12 @@ export class Bridge extends React.Component {
         this.forceUpdate()
       }
     })
+    this.updateDimensions()
+    window.addEventListener('resize', this.updateDimensions)
   }
 
   async _sendToHome(amount) {
+    console.log('sending to home')
     const { web3Store, homeStore, alertStore, txStore, bridgeMode } = this.props.RootStore
     const { isLessThan, isGreaterThan } = this
     if (web3Store.metamaskNet.id.toString() !== web3Store.homeNet.id.toString()) {
@@ -48,25 +61,26 @@ export class Bridge extends React.Component {
     }
     if (isLessThan(amount, homeStore.minPerTx)) {
       alertStore.pushError(
-        `The amount is less than current minimum per transaction amount.\nThe minimum per transaction amount is: ${
+        `The amount is less than current minimum per transaction amount.\nThe minimum per transaction amount is: ${numeral(
           homeStore.minPerTx
-        } ${homeStore.symbol}`
+        ).format('0,0.00', Math.floor)} ${homeStore.symbol}`
       )
       return
     }
     if (isGreaterThan(amount, homeStore.maxPerTx)) {
       alertStore.pushError(
-        `The amount is above current maximum per transaction limit.\nThe maximum per transaction limit is: ${
+        `The amount is above current maximum per transaction limit.\nThe maximum per transaction limit is: ${numeral(
           homeStore.maxPerTx
-        } ${homeStore.symbol}`
+        ).format('0,0.00', Math.floor)} ${homeStore.symbol}`
       )
       return
     }
     if (isGreaterThan(amount, homeStore.maxCurrentDeposit)) {
       alertStore.pushError(
-        `The amount is above current daily limit.\nThe max deposit today: ${homeStore.maxCurrentDeposit} ${
-          homeStore.symbol
-        }`
+        `The amount is above current daily limit.\nThe max deposit today: ${numeral(homeStore.maxCurrentDeposit).format(
+          '0,0.00',
+          Math.floor
+        )} ${homeStore.symbol}`
       )
       return
     }
@@ -100,6 +114,7 @@ export class Bridge extends React.Component {
   }
 
   async _sendToForeign(amount) {
+    console.log('sending to foreign')
     const { web3Store, foreignStore, alertStore, txStore } = this.props.RootStore
     const isExternalErc20 = foreignStore.tokenType === ERC_TYPES.ERC20
     const { isLessThan, isGreaterThan } = this
@@ -107,32 +122,36 @@ export class Bridge extends React.Component {
       swal('Error', `Please switch wallet to ${web3Store.foreignNet.name} network`, 'error')
       return
     }
-    if (!isExternalErc20 && isLessThan(amount, foreignStore.minPerTx)) {
+    if (isLessThan(amount, foreignStore.minPerTx)) {
       alertStore.pushError(
-        `The amount is less than minimum amount per transaction.\nThe min per transaction is: ${
+        `The amount is less than minimum amount per transaction.\nThe min per transaction is: ${numeral(
           foreignStore.minPerTx
-        } ${foreignStore.symbol}`
+        ).format('0,0.00', Math.floor)} ${foreignStore.symbol}`
       )
       return
     }
-    if (!isExternalErc20 && isGreaterThan(amount, foreignStore.maxPerTx)) {
+    if (isGreaterThan(amount, foreignStore.maxPerTx)) {
       alertStore.pushError(
-        `The amount is above maximum amount per transaction.\nThe max per transaction is: ${foreignStore.maxPerTx} ${
-          foreignStore.symbol
-        }`
+        `The amount is above maximum amount per transaction.\nThe max per transaction is: ${numeral(
+          foreignStore.maxPerTx
+        ).format('0,0.00', Math.floor)} ${foreignStore.symbol}`
       )
       return
     }
-    if (!isExternalErc20 && isGreaterThan(amount, foreignStore.maxCurrentDeposit)) {
+    if (isGreaterThan(amount, foreignStore.maxCurrentDeposit)) {
       alertStore.pushError(
-        `The amount is above current daily limit.\nThe max withdrawal today: ${foreignStore.maxCurrentDeposit} ${
-          foreignStore.symbol
-        }`
+        `The amount is above current daily limit.\nThe max withdrawal today: ${numeral(
+          foreignStore.maxCurrentDeposit
+        ).format('0,0.00', Math.floor)} ${foreignStore.symbol}`
       )
       return
     }
     if (isGreaterThan(amount, foreignStore.balance)) {
-      alertStore.pushError(`Insufficient token balance. Your balance is ${foreignStore.balance} ${foreignStore.symbol}`)
+      alertStore.pushError(
+        `Insufficient token balance. Your balance is ${numeral(foreignStore.balance).format('0,0.00', Math.floor)} ${
+          foreignStore.symbol
+        }`
+      )
     } else {
       try {
         alertStore.setLoading(true)
@@ -280,7 +299,7 @@ export class Bridge extends React.Component {
       totalSupply: foreignStore.totalSupply,
       balance: foreignStore.balance,
       displayTokenAddress: true,
-      displayBridgeLimits: !isExternalErc20,
+      displayBridgeLimits: true, //!isExternalErc20,
       getExplorerAddressUrl: address => foreignStore.getExplorerAddressUrl(address)
     }
 
@@ -338,66 +357,63 @@ export class Bridge extends React.Component {
     const foreignNetworkSubtitle = this.getNetworkSubTitle(foreignStore.networkName)
 
     return (
-      <div className="bridge-container">
-        <div className="bridge">
-          <BridgeAddress isHome={true} reverse={reverse} />
-          <div className="bridge-transfer">
-            <div className={`left-image-wrapper left-image-wrapper-${REACT_APP_UI_STYLES}`}>
-              <div className="left-image" />
-            </div>
-            <div className={`bridge-transfer-content bridge-transfer-content-${REACT_APP_UI_STYLES}`}>
-              <div
-                className={`bridge-transfer-content-background bridge-transfer-content-background-${REACT_APP_UI_STYLES}`}
-              >
-                <BridgeNetwork
-                  balance={reverse ? foreignStore.balance : homeStore.getDisplayedBalance()}
-                  currency={reverse ? foreignStore.symbol : homeStore.symbol}
-                  isHome={true}
-                  networkSubtitle={reverse ? foreignNetworkSubtitle : homeNetworkSubtitle}
-                  networkTitle={reverse ? foreignNetworkName : homeNetworkName}
-                  showModal={reverse ? this.loadForeignDetails : this.loadHomeDetails}
-                  side="left"
-                />
-                <BridgeForm
-                  currency={formCurrency}
-                  displayArrow={!web3Store.metamaskNotSetted}
-                  onInputChange={this.handleInputChange('amount')}
-                  onTransfer={this.onTransfer}
-                  reverse={reverse}
-                />
-                <BridgeNetwork
-                  balance={reverse ? homeStore.getDisplayedBalance() : foreignStore.balance}
-                  currency={reverse ? homeStore.symbol : foreignStore.symbol}
-                  isHome={false}
-                  networkSubtitle={reverse ? homeNetworkSubtitle : foreignNetworkSubtitle}
-                  networkTitle={reverse ? homeNetworkName : foreignNetworkName}
-                  showModal={reverse ? this.loadHomeDetails : this.loadForeignDetails}
-                  side="right"
-                />
+      <div className="bridge-container" style={{ height: this.state.height }}>
+        <div className="bridge-section">
+          <div className="bridge">
+            <BridgeAddress isHome={true} reverse={reverse} />
+            <div className="bridge-transfer">
+              <div className={`bridge-transfer-content bridge-transfer-content-${REACT_APP_UI_STYLES}`}>
+                <div
+                  className={`bridge-transfer-content-background bridge-transfer-content-background-${REACT_APP_UI_STYLES}`}
+                >
+                  <BridgeNetwork
+                    balance={reverse ? foreignStore.balance : homeStore.getDisplayedBalance()}
+                    currency={reverse ? foreignStore.symbol : homeStore.symbol}
+                    isHome={true}
+                    networkSubtitle={reverse ? foreignNetworkSubtitle : homeNetworkSubtitle}
+                    networkTitle={reverse ? foreignNetworkName : homeNetworkName}
+                    showModal={reverse ? this.loadForeignDetails : this.loadHomeDetails}
+                    side="left"
+                  />
+                  <BridgeForm
+                    currency={formCurrency}
+                    displayArrow={!web3Store.metamaskNotSetted}
+                    onInputChange={this.handleInputChange('amount')}
+                    onTransfer={this.onTransfer}
+                    reverse={reverse}
+                  />
+                  <BridgeNetwork
+                    balance={reverse ? homeStore.getDisplayedBalance() : foreignStore.balance}
+                    currency={reverse ? homeStore.symbol : foreignStore.symbol}
+                    isHome={false}
+                    networkSubtitle={reverse ? homeNetworkSubtitle : foreignNetworkSubtitle}
+                    networkTitle={reverse ? homeNetworkName : foreignNetworkName}
+                    showModal={reverse ? this.loadHomeDetails : this.loadForeignDetails}
+                    side="right"
+                  />
+                </div>
               </div>
             </div>
-            <div className={`right-image-wrapper right-image-wrapper-${REACT_APP_UI_STYLES}`}>
-              <div className="right-image" />
-            </div>
-          </div>
-          <BridgeAddress isHome={false} reverse={reverse} />
-          <ModalContainer
-            hideModal={() => {
-              this.setState({ showModal: false })
-            }}
-            showModal={showModal}
-          >
-            <NetworkDetails {...modalData} />
-          </ModalContainer>
-          <ModalContainer showModal={showConfirmation}>
-            <TransferAlert
-              onConfirmation={this.onTransferConfirmation}
-              onCancel={() => {
-                this.setState({ showConfirmation: false, confirmationData: {} })
+            <BridgeAddress isHome={false} reverse={reverse} />
+            <ModalContainer
+              hideModal={() => {
+                this.setState({ showModal: false })
               }}
-              {...confirmationData}
-            />
-          </ModalContainer>
+              showModal={showModal}
+            >
+              <NetworkDetails {...modalData} />
+            </ModalContainer>
+            <ModalContainer showModal={showConfirmation}>
+              <TransferAlert
+                onConfirmation={this.onTransferConfirmation}
+                onCancel={() => {
+                  this.setState({ showConfirmation: false, confirmationData: {} })
+                }}
+                {...confirmationData}
+              />
+            </ModalContainer>
+          </div>
+          <div className="bridge-background" />
         </div>
       </div>
     )

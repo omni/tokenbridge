@@ -6,6 +6,7 @@
     display: flex;
     flex-direction: $status-container-flex-direction;
     justify-content: $status-container-justify-content;
+    align-items: $status-container-align-items;;
     max-width: $container-width;
     width: $status-page-container-width;
     padding: $status-container-padding;
@@ -29,6 +30,9 @@
       letter-spacing: $status-title-letter-spacing;
       text-transform: $status-title-text-transform;
       padding: $status-title-padding;
+      @media screen and (max-width: $tablet-width) {
+        text-align: center;
+       }
     }
 
     .status-configuration-container {
@@ -65,6 +69,9 @@
 
       .status-authorities-title {
         padding-bottom: 30px;
+        @media screen and (max-width: $mobile-width) {
+          text-align: center;
+         }
       }
 
       .status-authorities-data {
@@ -122,6 +129,19 @@
             @media screen and (max-width: $tablet-width) {
               font-size: 12px;
               padding-left: 0;
+              display: none;
+            }
+          }
+          .authority-address-mobile {
+            display: none;
+            @media screen and (max-width: $tablet-width) {
+              color: $status-authority-address-color;
+              font-size: 16px;
+              font-weight: 700;
+              line-height: 59px;
+              padding-left: 20px;
+              text-align: left;
+              display: block;
             }
           }
         }

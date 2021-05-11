@@ -37,6 +37,7 @@ export class DailyQuotaModal extends React.Component {
     const to = isHome ? foreignStore.symbol : homeStore.symbol
     const networkNameFrom = isHome ? homeStore.networkName : foreignStore.networkName
     const networkNameTo = isHome ? foreignStore.networkName : homeStore.networkName
+    console.log('limit', limit)
     const description =
       limit && limit !== '0'
         ? `${numeral(value).format('0,0.0', Math.floor)} ${from} on ${networkNameFrom + ' '}

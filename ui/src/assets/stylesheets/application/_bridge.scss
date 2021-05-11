@@ -1,23 +1,33 @@
-
-.bridge-container {
-    align-items: center;
-    display: flex;
-    height: 80vh;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
+.bridge-container:after {
+    background-image: url($container-background-image);
+    content: '';
+    height: 100%;
+    float: left;
+    position: absolute;
+    top: 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     width: 100%;
+    z-index: 9;
+    background-position: center center;
+}
 
-    @media screen and (max-width: $tablet-width) {
-        height: 512px;
-    }
+.bridge-section {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
 }
 
 .bridge {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    width: 100%;
+    width: 968px;
+
+    @media screen and (min-width: 768px) and (max-width: 1023px) {
+        width: 100%;
+    }
+    @media screen and (max-width: 767px) {
+        width: 100%;
+    }
 
     .bridge-home {
         align-self: center;
@@ -30,7 +40,7 @@
           display: none
         }
 
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             display: none
         }
 
@@ -74,7 +84,7 @@
           display: none
         }
 
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             display: none
         }
 
@@ -119,18 +129,12 @@
         font-size: 16px;
         font-weight: 700;
 
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             font-size: 9px;
         }
     }
     .bridge-transfer {
-        height: $form-container-height;
-        display: flex;
-        justify-content: center;
-
-        @media screen and (max-width: $tablet-width) {
-            height: 389px;
-        }
+        padding: 0 20px;
         .left-image-wrapper {
             background-color: $bridge-gradient-start;
 
@@ -149,7 +153,7 @@
                 max-width: 100%;
                 width: $bridge-side-image-width;
 
-                @media screen and (max-width: $tablet-width) {
+                @media screen and (max-width: $mobile-max-width) {
                     display: none;
                 }
             }
@@ -173,96 +177,76 @@
               max-width: 100%;
               width: $bridge-side-image-width;
 
-              @media screen and (max-width: $tablet-width) {
+              @media screen and (max-width: $mobile-max-width) {
                   display: none;
               }
             }
         }
 
         .bridge-transfer-content {
-            background-image: linear-gradient(to right, $bridge-gradient-start, $bridge-gradient-end);
-            border-bottom-left-radius: 10px;
-            border-top-right-radius: 10px;
-            display: flex;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            width: $bridge-transfer-width;
-
+            @media screen and (max-width: $tablet-width) {
+                background-image: url($bridge-image-backgroung);
+                background-size: cover;
+                background-repeat: no-repeat;
+            }
+            
             &-stake {
-              border: 1px solid #E6ECF1;
-              box-sizing: border-box;
-              border-radius: 10px;
+                @media screen and (max-width: $tablet-width) {
+                    background-image: url($bridge-image-backgroung);
+                    background-size: 100% 100%;
+                    background-repeat: no-repeat;
+                    border-radius: 20px;
+                }
             }
 
-            @media screen and (max-width: $tablet-width) {
-                border-radius: 8px;
+            @media screen and (max-width: $mobile-max-width) {
+                border-radius: 20px;
                 flex-direction: column;
-                max-width: 92%;
+                justify-content: flex-start;
             }
 
             .bridge-transfer-content-background {
                 display: flex;
-                flex-shrink: 0;
-                flex-wrap: wrap;
-                width: $bridge-transfer-width;
+                background: linear-gradient(180deg , #7023FF 0%, #051441 100%);
+                border-radius: 20px;
+                padding: 89px 32px 58px 32px;
 
                 &-stake {
                   justify-content: space-between;
                 }
 
-                @media screen and (max-width: $tablet-width) {
+                @media screen and (max-width: $mobile-max-width) {
                     background-image: url('#{ $bridge-image-center-pointing-down }');
                     background-position: center;
                     background-repeat: no-repeat;
                     background-size: 164px 203px;
                     flex-direction: column;
                     width: auto;
+                    align-items: center;
                 }
             }
 
             .network-container-home {
-                align-items: flex-start;
-                display: flex;
-                flex-direction: column;
-                height: $network-container-height;
-                justify-content: $network-container-justify-content;
-                padding: $network-container-padding;
-                width: 22%;
-
-                &-stake {
-                  width: 260px;
+                p:nth-child(2) {
+                    margin: 17px 0 14px 0;
+                }
+                @media screen and (min-width: $mobile-max-width) and (max-width: $tablet-width) {
+                    max-width: 160px;
                 }
 
-                @media screen and (max-width: $tablet-width) {
-                    align-items: center;
-                    align-self: center;
-                    height: 136px;
-                    padding: 5px 0 5px 0;
-                    width: auto;
-                    justify-content: space-around;
-
-                  &-stake {
-                    width: auto;
-                  }
+                @media screen and (max-width: $mobile-max-width) {
+                    padding-bottom: 15px;
+                    p:nth-child(2) {
+                        text-align: center;
+                    }
                 }
             }
             .network-container-foreign {
-                align-items: flex-end;
-                display: flex;
-                flex-direction: column;
-                height: $network-container-height;
-                justify-content: $network-container-justify-content;
-                padding: $network-container-padding-foreign;
-                width: 22%;
-
-                &-stake {
-                  width: 260px;
+                p:nth-child(2) {
+                    margin: 17px 0 14px 0;
                 }
-
-                @media screen and (max-width: $tablet-width) {
+                @media screen and (max-width: $mobile-max-width) {
                     align-items: center;
-                    align-self: center;
-                    height: 136px;
                     padding: 5px 0 5px 0;
                     width: auto;
                     justify-content: space-around;
@@ -270,12 +254,18 @@
                     &-stake {
                       width: auto;
                     }
+                    p {
+                        text-align: center;
+                    }
                 }
             }
             .bridge-network-data {
                 align-items: center;
                 cursor: pointer;
                 display: flex;
+                @media screen and (max-width: $mobile-max-width) {
+                justify-content: center;
+                }
             }
             .network-basic-label {
                 font-size: $network-basic-label-font-size;
@@ -288,9 +278,9 @@
                 font-weight: 700;
                 &-stake {
                   font-style: normal;
-                  font-weight: bold;
-                  font-size: 20px;
-                  line-height: 23px;
+                  font-weight: normal;
+                  font-size: 24px;
+                  line-height: 28px;
                 }
             }
             .network-name {
@@ -302,14 +292,14 @@
             .text-left {
                 text-align: left;
 
-                @media screen and (max-width: $mobile-width) {
+                @media screen and (max-width: $mobile-max-width) {
                     text-align: center;
                 }
             }
             .text-right {
                 text-align: right;
 
-                @media screen and (max-width: $mobile-width) {
+                @media screen and (max-width: $mobile-max-width) {
                     text-align: center;
                 }
             }
@@ -336,6 +326,7 @@
                 color: $bridge-link-color;
                 font-size: 14px;
                 font-weight: $network-show-more-font-weight;
+                z-index: 10;
               &:hover {
                 text-decoration-line: underline;
               }
@@ -354,39 +345,31 @@
             .info-icon-right {
                 margin-left: 10px;
             }
-            .transfer-right {
-                background-image: url('#{ $bridge-image-center-pointing-right }');
-                background-position: center;
-                background-repeat: no-repeat;
-
-                @media screen and (max-width: $tablet-width) {
-                    background-image: none;
-                }
-            }
             .transfer-left {
                 background-image: url('#{ $bridge-image-center-pointing-left }');
                 background-position: center;
                 background-repeat: no-repeat;
 
-                @media screen and (max-width: $tablet-width) {
+                @media screen and (max-width: $mobile-max-width) {
                     background-image: none;
                 }
             }
+            .transfer-right {
+                max-width: 384px;
+                padding: 0 20px;
+            }
             .form-container {
-                height: $form-container-height;
-                max-width: $form-container-max-width;
-                width: 44%;
-                @media screen and (max-width: $tablet-width) {
-                    align-self: center;
-                    height: 97px;
-                    width: 100%;
+                .transfer-arrow {
+                    text-align: center;
+                    @media screen and (max-width: $mobile-max-width) {
+                        display: none;
+                    }
                 }
                 .bridge-form {
                     display: flex;
                     flex-direction: column;
-                    height: $form-container-height;
                     justify-content: space-evenly;
-                    @media screen and (max-width: $tablet-width) {
+                    @media screen and (max-width: $mobile-max-width) {
                         height: auto;
                         width: 100%;
                     }
@@ -395,8 +378,9 @@
                         background-color: $bridge-textfield-background;
                         border-radius: 5px;
                         padding: 8px 8px 8px 0;
+                        z-index: 9;
 
-                        @media screen and (max-width: $tablet-width) {
+                        @media screen and (max-width: $mobile-max-width) {
                             background-color: unset;
                             flex-direction: column;
                             padding: 8px 8px 8px 8px;
@@ -407,12 +391,14 @@
                           box-sizing: border-box;
                           border-radius: 4px;
                           height: 60px;
+                          margin-bottom: 40px;
+                          z-index: 99;
 
-                          @media screen and (max-width: $tablet-width) {
-                            background-color: unset;
+                          @media screen and (max-width: $mobile-max-width) {
+                            background-color: #FFFFFF;
                             flex-direction: column;
                             padding: 0 0 0 0;
-                            margin: 0 8px 0 8px;
+                            margin-bottom: 60px;
                             height: 40px;
                           }
                         }
@@ -420,9 +406,8 @@
                     .bridge-form-input-container {
                         display: flex;
                         justify-content: space-between;
-                        width: 292px;
 
-                        @media screen and (max-width: $tablet-width) {
+                        @media screen and (max-width: $mobile-max-width) {
                             background-color: rgba(251, 251, 252, 0.2);
                             border-radius: 3px 3px 0 0;
                             width: 100%;
@@ -432,17 +417,17 @@
                         background-color: transparent;
                         color: $bridge-textfield-color;
                         font-size: 24px;
-                        font-weight: 700;
+                        font-weight: normal;
                         height: $bridge-input-label-line-height;
                         padding-left: 16px;
-                        width: 165px;
+                        width: 100%;
 
                         &::placeholder {
                             color: $bridge-textfield-placeholder-color;
                             font-size: 24px;
                             font-weight: 700;
 
-                            @media screen and (max-width: $tablet-width) {
+                            @media screen and (max-width: $mobile-max-width) {
                                 font-size: 18px;
                             }
                         }
@@ -450,24 +435,23 @@
                         &::placeholder {
                             opacity: 0.3;
                         }
-                        @media screen and (max-width: $tablet-width) {
+                        @media screen and (max-width: $mobile-max-width) {
                             font-size: 18px;
                         }
                     }
                     &-label {
-                        color: $bridge-input-label-color;
-                        font-size: $bridge-input-label-font-size;
-                        font-weight: 700;
-                        line-height: $bridge-input-label-line-height;
-                        margin: $bridge-input-label-margin;
+                        color: #051441;
+                        font-size: 24px;
+                        font-weight: 400;
+                        line-height: 28px;
+                        margin: 8px 20px;
                         text-transform: uppercase;
 
-                        @media screen and (max-width: $tablet-width) {
+                        @media screen and (max-width: $mobile-max-width) {
                             font-size: 18px;
                         }
                     }
                     &-button {
-                        background-color: $bridge-button-background-color;
                         border-radius: $bridge-transfer-button-border-radius;
                         color: $bridge-button-text-color;
                         display: block;
@@ -476,14 +460,15 @@
                         height: $bridge-transfer-button-height;
                         text-decoration: none;
                         width: $bridge-transfer-button-width;
+                        background: linear-gradient(90deg, #22D7FD 0%, #7023FF 100%);
 
-                        @media screen and (max-width: $tablet-width) {
+                        @media screen and (max-width: $mobile-max-width) {
                             border-radius: $bridge-transfer-button-border-radius;
                             width: 100%;
                         }
 
                         &:hover {
-                            background-color: $button-bridge-form-hover-background-color;
+                            background: linear-gradient(90deg, #22D7FD 0%, #7023FF 100%);
                         }
                     }
                     .bridge-transfer-direction {
@@ -507,7 +492,7 @@
         flex-direction: column;
         min-width: 558px;
 
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             min-width: 100%;
         }
 
@@ -521,7 +506,7 @@
             justify-content: center;
             width: 85px;
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 display: none;
             }
 
@@ -537,7 +522,7 @@
             width: 20px;
             bottom: 0;
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 display: none;
             }
         }
@@ -547,7 +532,7 @@
             right: 453px;
             top: 70px;
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 display: none;
             }
         }
@@ -568,14 +553,14 @@
               height: 380px;
             }
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 align-self: center;
                 border-radius: 10px 10px 10px 10px;
                 height: 430px;
                 padding: 20px 15px 20px 15px;
                 width: 85%;
             }
-            @media screen and (max-width: $tablet-width) and (min-width: 415px) {
+            @media screen and (max-width: $mobile-max-width) and (min-width: 415px) {
                 height: 300px;
             }
             @media screen and (max-width: 600px) {
@@ -586,7 +571,7 @@
                 display: flex;
                 justify-content: space-between;
 
-                @media screen and (max-width: $tablet-width) {
+                @media screen and (max-width: $mobile-max-width) {
                     flex-direction: column;
                 }
 
@@ -639,7 +624,7 @@
             height: 10px;
             width: 20px;
             bottom: 0;
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 display: none;
             }
         }
@@ -648,7 +633,7 @@
             top: 80px;
             border-radius: 0 10px 0 0;
             box-shadow: 10px 0 0 0 #fff;
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 display: none;
             }
         }
@@ -663,7 +648,7 @@
         display: flex;
         height: $transfer-alert-height;
         width: $transfer-alert-width;
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             flex-direction: column;
             height: auto;
             width: 100%;
@@ -672,7 +657,7 @@
             margin-right: 20px;
             width: 166px;
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 width: 100%;
             }
             .arrows-icon {
@@ -693,7 +678,7 @@
             padding: $transfer-alert-container-padding;
             width: $transfer-alert-container-width;
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 padding: 10px 10px;
                 width: 94%;
                 height: 317px;
@@ -755,10 +740,17 @@
                     flex-direction: column;
                     justify-content: center;
                     text-align: center;
+                    padding: 2px;
+                    @media screen and (max-width: $mobile-max-width) {
+                        height: auto;
+                    }
 
                     .transfer-operation-box-value {
-                      font-size: 18px;
-                      line-height: 21px;
+                        font-size: 18px;
+                        line-height: 21px;
+                        @media screen and (max-width: $mobile-max-width) {
+                            font-size: 14px;
+                        }
                     }
 
                     .transfer-operation-box-network {
@@ -773,6 +765,11 @@
                     background-image: url('#{ $transfer-operation-arrow-line-image }');
                     background-position: center;
                     background-repeat: no-repeat;
+                    @media screen and (max-width: $mobile-max-width) {
+                        width: 90px;
+                        display: flex;
+                        align-items: center;
+                    }
 
                     .transfer-operation-ellipse {
                       width: 120px;
@@ -780,6 +777,9 @@
                       background-image: url('#{ $transfer-operation-arrow-ellipse-image }');
                       background-position: center;
                       background-repeat: no-repeat;
+                      @media screen and (max-width: $mobile-max-width) {
+                        width: 90px;
+                      }
 
                       .transfer-operation-arrow {
                         width: 113px;
@@ -787,6 +787,9 @@
                         background-image: url('#{ $transfer-operation-arrow-image }');
                         background-position: center;
                         background-repeat: no-repeat;
+                        @media screen and (max-width: $mobile-max-width) {
+                            width: 80px;
+                        }
                       }
                     }
                   }
@@ -855,7 +858,7 @@
     @media screen and (max-width: $small-mobile-width) {
         padding-top: 60px;
     }
-    @media screen and (max-width: $tablet-width) {
+    @media screen and (max-width: $mobile-max-width) {
         flex-direction: column;
         width: 92%;
         height: auto;
@@ -865,7 +868,7 @@
         background-image: linear-gradient(to right, $gradient-color-2, $gradient-color-1);
         border-radius: 8px 0 0 8px;
         width: 150px;
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             display: none;
         }
         .noWallet-icon {
@@ -880,7 +883,7 @@
         padding: 24px 30px;
         width: 389px;
 
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             align-self: center;
             padding: 10px 0;
             width: 88%;
@@ -890,7 +893,7 @@
             font-size: 24px;
             line-height: 1;
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 font-size: 30px;
                 padding-top: 2%;
                 padding-bottom: 2%;
@@ -903,7 +906,7 @@
             line-height: 1.71;
             padding-bottom: 10px;
             padding-top: 10px;
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 padding-left: 1%;
                 padding-right: 1%;
             }
@@ -916,7 +919,7 @@
         grid-template-columns: 1fr 1fr;
         row-gap: 10px;
 
-        @media screen and (max-width: $mobile-width) {
+        @media screen and (max-width: $mobile-max-width) {
             grid-template-columns: 1fr;
         }
 
@@ -978,7 +981,7 @@
     padding: 15px 0;
     width: 600px;
 
-    @media screen and (max-width: $tablet-width) {
+    @media screen and (max-width: $mobile-max-width) {
         flex-direction: column;
         margin: 0 auto;
         width: 92%;
@@ -987,7 +990,7 @@
     .image-container {
         width: 164px;
 
-        @media screen and (max-width: $tablet-width) {
+        @media screen and (max-width: $mobile-max-width) {
             display: none;
         }
 
@@ -1007,7 +1010,22 @@
         padding-top: 40px;
         width: 389px;
 
-        @media screen and (max-width: $tablet-width) {
+        &-t-and-c {
+            padding: 10px 0;
+            &-checkbox{
+                margin-right: 10px;
+            }
+            &-label{
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 10px;
+                color: #242A31;
+            }
+        }
+
+
+        @media screen and (max-width: $mobile-max-width) {
             align-self: center;
             padding: 10px 0;
             width: 88%;
@@ -1021,8 +1039,9 @@
             color: $modal-title-color;
             font-size: 24px;
             line-height: 1;
+            padding-bottom: 5px;
 
-            @media screen and (max-width: $tablet-width) {
+            @media screen and (max-width: $mobile-max-width) {
                 font-size: 30px;
                 padding-bottom: 2%;
                 padding-top: 2%;
@@ -1034,8 +1053,14 @@
             line-height: 1.71;
             padding-bottom: 10px;
             padding-top: 10px;
+            display: flex;
+            flex-direction: column;
 
-            @media screen and (max-width: $tablet-width) {
+            span {
+                padding: 5px 0;
+            }
+
+            @media screen and (max-width: $mobile-max-width) {
                 padding-left: 1%;
                 padding-right: 1%;
             }

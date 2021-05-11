@@ -1,5 +1,5 @@
 .mobile-menu {
-    @media screen and (max-width: $mobile-width) {
+    @media screen and (max-width: $tablet-width) {
         background-color: $mobile-menu-background-color;
         height: 272px;
     }
@@ -7,7 +7,7 @@
 
 .mobile-menu-links {
     display: none;
-    @media screen and (max-width: $mobile-width) {
+    @media screen and (max-width: $tablet-width) {
         display: flex;
         align-items: center;
         flex-direction: column;
@@ -17,7 +17,7 @@
 }
 
 .mobile-menu-open {
-    @media screen and (max-width: $mobile-width) {
+    @media screen and (max-width: $tablet-width) {
         background-color: $mobile-menu-overlay-color;
         height: 100%;
         position: fixed;

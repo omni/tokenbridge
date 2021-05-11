@@ -26,6 +26,9 @@ export const BridgeForm = ({ reverse, currency, onTransfer, onInputChange, displ
             </button>
           </div>
         </div>
+        <div className="transfer-arrow">
+          <img src={require('../assets/images/icons/arrow.png')} alt="transfer" />
+        </div>
       </form>
     </div>
   )

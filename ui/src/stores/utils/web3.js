@@ -67,8 +67,10 @@ const networks = {
   30: 'RSK Mainnet',
   31: 'RSK Testnet',
   42: 'Kovan Testnet',
+  56: 'Binance Smart Chain',
   61: 'Ethereum Classic',
   77: 'Sokol Testnet',
+  97: 'Binance Smart Chain Testnet',
   99: 'POA Network',
   100: 'xDai Chain'
 }

@@ -29,6 +29,9 @@
       text-transform: $statistics-title-text-transform;
       padding: $statistics-title-padding;
       text-align: left;
+      @media screen and (max-width: $tablet-width) {
+        text-align: center;
+       }
     }
 
     .statistics-bridge-container {
@@ -76,6 +79,8 @@
           display: $status-configuration-data-display;
           grid-template-columns: 1fr 1fr;
           row-gap: 20px;
+          flex-direction: column;
+          align-items: center;
         }
       }
     }
