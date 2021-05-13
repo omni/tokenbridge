@@ -445,7 +445,7 @@ class ForeignStore {
   }
 
   async getStatistics() {
-    // try {
+    try {
       // if (isMediatorMode(this.rootStore.bridgeMode)) {
       //   const events = await getPastEvents(this.foreignBridge, 0, 'latest', 'TokensBridged')
       //   processLargeArrayAsync(events, this.processMediatorEvent, () => {
@@ -463,10 +463,10 @@ class ForeignStore {
       // } else {
       //   this.statistics.finished = true
       // }
-    // } catch (e) {
-    //   console.error(e)
-    //   this.getStatistics()
-    // }
+    } catch (e) {
+      console.error(e)
+      this.getStatistics()
+    }
   }
 
   processMediatorEvent = event => {
@@ -481,7 +481,7 @@ class ForeignStore {
 
   async getFeeEvents() {
     if (!isMediatorMode(this.rootStore.bridgeMode)) {
-      // try {
+      try {
         
         // const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
         // const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
@@ -489,10 +489,10 @@ class ForeignStore {
         // processLargeArrayAsync(events, this.processEvent, () => {
         //   this.feeEventsFinished = true
         // })
-      // } catch (e) {
-      //   console.error(e)
-      //   this.getFeeEvents()
-      // }
+      } catch (e) {
+        console.error(e)
+        this.getFeeEvents()
+      }
     } else {
       this.feeEventsFinished = true
     }

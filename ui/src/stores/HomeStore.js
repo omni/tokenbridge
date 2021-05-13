@@ -485,7 +485,7 @@ class HomeStore {
   }
 
   async getStatistics() {
-    // try {
+    try {
       // if (!isMediatorMode(this.rootStore.bridgeMode)) {
       //   const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
       //   const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
@@ -509,10 +509,10 @@ class HomeStore {
       //     this.lastEventRelayedOnHome = block.timestamp
       //   }
       // }
-    // } catch (e) {
-    //   console.error(e)
-    //   this.getStatistics()
-    // }
+    } catch (e) {
+      console.error(e)
+      this.getStatistics()
+    }
   }
 
   processEvent = event => {
