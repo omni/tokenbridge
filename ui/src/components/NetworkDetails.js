@@ -22,6 +22,25 @@ export const NetworkDetails = ({
   tokenName,
   getExplorerAddressUrl
 }) => {
+  console.log({
+    isHome,
+    networkName,
+    url,
+    address,
+    currency,
+    maxCurrentLimit,
+    maxPerTx,
+    minPerTx,
+    tokenAddress,
+    totalSupply,
+    totalBalance,
+    balance,
+    displayTokenAddress,
+    displayBridgeLimits,
+    nativeSupplyTitle,
+    tokenName,
+    getExplorerAddressUrl
+  });
   const { REACT_APP_UI_STYLES } = process.env
   const networkTitle = isHome ? 'Bridge Home' : 'Bridge Foreign'
   const logoClass = isHome ? 'home-logo home-logo-modal' : 'foreign-logo foreign-logo-modal'
@@ -35,6 +54,7 @@ export const NetworkDetails = ({
   const formattedBalance = isNaN(numeral(balance).format('0.00', Math.floor))
     ? numeral(0).format('0,0.00', Math.floor)
     : numeral(balance).format('0,0.000', Math.floor)
+    console.log(formattedBalance, totalAmount);
 
   return (
     <div className="network-details" data-testid="network-details">

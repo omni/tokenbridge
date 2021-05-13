@@ -439,12 +439,29 @@
                             font-size: 18px;
                         }
                     }
+                    &-max-label {
+                        font-style: normal;
+                        font-weight: normal;
+                        font-size: 14px;
+                        line-height: 17px;
+                        text-align: center;
+                        padding: 14px;
+                        color: #1E69FF;
+                        text-transform: uppercase;
+                        background-color: #EBF1FF;
+                        border-radius: 8px;
+                        cursor: pointer;
+
+                        @media screen and (max-width: $mobile-max-width) {
+                            font-size: 18px;
+                        }
+                    }
                     &-label {
                         color: #051441;
                         font-size: 24px;
                         font-weight: 400;
                         line-height: 28px;
-                        margin: 8px 20px;
+                        margin: 8px 5px;
                         text-transform: uppercase;
 
                         @media screen and (max-width: $mobile-max-width) {
