@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Bridge, RelayEvents, Footer, SweetAlert, Loading, StatusPage, StatisticsPage } from './components'
+import { Header, Bridge, RelayEvents, Footer, SweetAlert, Loading, StatusPage, StatisticsPage, TopWarning } from './components'
 import { Route } from 'react-router-dom'
 import './assets/stylesheets/application.css'
 import { Disclaimer } from './components'
@@ -34,6 +34,7 @@ export class App extends React.Component {
     const { showDisclaimer, showMobileMenu } = this.state
     return (
       <div className={showMobileMenu ? 'mobile-menu-is-open' : ''}>
+        <Route render={() => <TopWarning />} />
         <Route component={Loading} />
         <Route component={SweetAlert} />
         <Route render={() => <Header onMenuToggle={this.toggleMobileMenu} showMobileMenu={showMobileMenu} />} />

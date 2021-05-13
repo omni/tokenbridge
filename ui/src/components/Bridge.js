@@ -31,7 +31,7 @@ export class Bridge extends React.Component {
   }
 
   updateDimensions = () => {
-    this.setState({ height: window.innerHeight - 137 + 'px' })
+    this.setState({ height: window.innerHeight - 180 + 'px' })
   }
 
   handleInputChange = name => event => {
