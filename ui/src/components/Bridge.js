@@ -52,7 +52,6 @@ export class Bridge extends React.Component {
   }
 
   async _sendToHome(amount) {
-    console.log('sending to home')
     const { web3Store, homeStore, alertStore, txStore, bridgeMode } = this.props.RootStore
     const { isLessThan, isGreaterThan } = this
     if (web3Store.metamaskNet.id.toString() !== web3Store.homeNet.id.toString()) {
@@ -114,7 +113,6 @@ export class Bridge extends React.Component {
   }
 
   async _sendToForeign(amount) {
-    console.log('sending to foreign')
     const { web3Store, foreignStore, alertStore, txStore } = this.props.RootStore
     const isExternalErc20 = foreignStore.tokenType === ERC_TYPES.ERC20
     const { isLessThan, isGreaterThan } = this

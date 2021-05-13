@@ -486,29 +486,29 @@ class HomeStore {
 
   async getStatistics() {
     try {
-      if (!isMediatorMode(this.rootStore.bridgeMode)) {
-        const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
-        const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
-        const abi = [...HOME_V1_ABI, ...HOME_ABI]
-        const contract = new this.homeWeb3.eth.Contract(abi, this.COMMON_HOME_BRIDGE_ADDRESS)
-        const events = await getPastEvents(contract, deployedAtBlock, 'latest')
-        processLargeArrayAsync(events, this.processEvent, () => {
-          this.statistics.finished = true
-          this.statistics.totalBridged = this.statistics.totalBridged.plus(this.statistics.depositsValue)
-        })
-      } else {
-        const events = await getPastEvents(this.homeBridge, 0, 'latest', 'TokensBridged')
-        processLargeArrayAsync(events, this.processMediatorEvent, () => {
-          this.statistics.finished = true
-          this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawalsValue)
-        })
-        const lastEventRelayedOnHome = events.length ? events[events.length - 1] : null
-        if (lastEventRelayedOnHome) {
-          const blockNumber = lastEventRelayedOnHome.blockNumber
-          const block = await this.homeWeb3.eth.getBlock(blockNumber)
-          this.lastEventRelayedOnHome = block.timestamp
-        }
-      }
+      // if (!isMediatorMode(this.rootStore.bridgeMode)) {
+      //   const deployedAtBlock = await getDeployedAtBlock(this.homeBridge)
+      //   const { HOME_ABI } = getBridgeABIs(this.rootStore.bridgeMode)
+      //   const abi = [...HOME_V1_ABI, ...HOME_ABI]
+      //   const contract = new this.homeWeb3.eth.Contract(abi, this.COMMON_HOME_BRIDGE_ADDRESS)
+      //   const events = await getPastEvents(contract, deployedAtBlock, 'latest')
+      //   processLargeArrayAsync(events, this.processEvent, () => {
+      //     this.statistics.finished = true
+      //     this.statistics.totalBridged = this.statistics.totalBridged.plus(this.statistics.depositsValue)
+      //   })
+      // } else {
+      //   const events = await getPastEvents(this.homeBridge, 0, 'latest', 'TokensBridged')
+      //   processLargeArrayAsync(events, this.processMediatorEvent, () => {
+      //     this.statistics.finished = true
+      //     this.statistics.totalBridged = this.statistics.depositsValue.plus(this.statistics.withdrawalsValue)
+      //   })
+      //   const lastEventRelayedOnHome = events.length ? events[events.length - 1] : null
+      //   if (lastEventRelayedOnHome) {
+      //     const blockNumber = lastEventRelayedOnHome.blockNumber
+      //     const block = await this.homeWeb3.eth.getBlock(blockNumber)
+      //     this.lastEventRelayedOnHome = block.timestamp
+      //   }
+      // }
     } catch (e) {
       console.error(e)
       this.getStatistics()

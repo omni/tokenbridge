@@ -446,23 +446,23 @@ class ForeignStore {
 
   async getStatistics() {
     try {
-      if (isMediatorMode(this.rootStore.bridgeMode)) {
-        const events = await getPastEvents(this.foreignBridge, 0, 'latest', 'TokensBridged')
-        processLargeArrayAsync(events, this.processMediatorEvent, () => {
-          this.statistics.finished = true
-          this.rootStore.homeStore.statistics.totalBridged = this.rootStore.homeStore.statistics.totalBridged.plus(
-            this.rootStore.homeStore.statistics.withdrawalsValue
-          )
-        })
-        const lastEventRelayedOnForeign = events.length ? events[events.length - 1] : null
-        if (lastEventRelayedOnForeign) {
-          const blockNumber = lastEventRelayedOnForeign.blockNumber
-          const block = await this.foreignWeb3.eth.getBlock(blockNumber)
-          this.lastEventRelayedOnForeign = block.timestamp
-        }
-      } else {
-        this.statistics.finished = true
-      }
+      // if (isMediatorMode(this.rootStore.bridgeMode)) {
+      //   const events = await getPastEvents(this.foreignBridge, 0, 'latest', 'TokensBridged')
+      //   processLargeArrayAsync(events, this.processMediatorEvent, () => {
+      //     this.statistics.finished = true
+      //     this.rootStore.homeStore.statistics.totalBridged = this.rootStore.homeStore.statistics.totalBridged.plus(
+      //       this.rootStore.homeStore.statistics.withdrawalsValue
+      //     )
+      //   })
+      //   const lastEventRelayedOnForeign = events.length ? events[events.length - 1] : null
+      //   if (lastEventRelayedOnForeign) {
+      //     const blockNumber = lastEventRelayedOnForeign.blockNumber
+      //     const block = await this.foreignWeb3.eth.getBlock(blockNumber)
+      //     this.lastEventRelayedOnForeign = block.timestamp
+      //   }
+      // } else {
+      //   this.statistics.finished = true
+      // }
     } catch (e) {
       console.error(e)
       this.getStatistics()
@@ -482,12 +482,13 @@ class ForeignStore {
   async getFeeEvents() {
     if (!isMediatorMode(this.rootStore.bridgeMode)) {
       try {
-        const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
-        const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
+        
+        // const deployedAtBlock = await getDeployedAtBlock(this.foreignBridge)
+        // const events = await getPastEvents(this.foreignBridge, deployedAtBlock, 'latest')
 
-        processLargeArrayAsync(events, this.processEvent, () => {
-          this.feeEventsFinished = true
-        })
+        // processLargeArrayAsync(events, this.processEvent, () => {
+        //   this.feeEventsFinished = true
+        // })
       } catch (e) {
         console.error(e)
         this.getFeeEvents()

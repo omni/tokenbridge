@@ -1,11 +1,11 @@
 import React from 'react'
 import {
   EventsIcon,
-  // StatusIcon,
-  DocumentIcon
-  // StatisticsIcon,
-  // AlternativeStatusIcon,
-  // AlternativeStatisticsIcon
+  StatusIcon,
+  DocumentIcon,
+  StatisticsIcon,
+  AlternativeStatusIcon,
+  AlternativeStatisticsIcon
 } from './menu-icons'
 import { Link } from 'react-router-dom'
 import { Wallet } from './Wallet'
@@ -21,23 +21,22 @@ export const MenuItems = ({ selected, onMenuToggle = null, withoutEvents, displa
       isTargetBlank: false,
       selected: selected === '/events'
     },
-    // use in future
-    // {
-    //   hide: false,
-    //   icon: displayEventsTab ? <StatusIcon /> : <AlternativeStatusIcon />,
-    //   link: '/status',
-    //   text: 'Status',
-    //   isTargetBlank: false,
-    //   selected: selected === '/status'
-    // },
-    // {
-    //   hide: withoutEvents,
-    //   icon: displayEventsTab ? <StatisticsIcon /> : <AlternativeStatisticsIcon />,
-    //   link: '/statistics',
-    //   text: 'Statistics',
-    //   isTargetBlank: false,
-    //   selected: selected === '/statistics'
-    // },
+    {
+      hide: true,
+      icon: displayEventsTab ? <StatusIcon /> : <AlternativeStatusIcon />,
+      link: '/status',
+      text: 'Status',
+      isTargetBlank: false,
+      selected: selected === '/status'
+    },
+    {
+      hide: true,
+      icon: displayEventsTab ? <StatisticsIcon /> : <AlternativeStatisticsIcon />,
+      link: '/statistics',
+      text: 'Statistics',
+      isTargetBlank: false,
+      selected: selected === '/statistics'
+    },
     {
       isWallet: true
     },

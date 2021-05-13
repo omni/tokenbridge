@@ -42,7 +42,6 @@ class TxStore {
             chainId: this.web3Store.metamaskNet.id
           })
           .on('transactionHash', hash => {
-            console.log('txHash', hash)
             this.txsValues[hash] = sentValue
             this.alertStore.setRequiredBlockConfirmations(requiredConfirmations)
             this.alertStore.setLoadingStepIndex(1)
@@ -110,7 +109,6 @@ class TxStore {
       if (res && res.blockNumber) {
         this.getTxStatus(hash)
       } else {
-        console.log('not mined yet', hash)
         setTimeout(() => {
           this.getTxReceipt(hash)
         }, 5000)
