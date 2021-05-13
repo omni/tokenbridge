@@ -108,7 +108,6 @@ class AlertStore {
   @action
   setLoadingStepIndex(index) {
     this.loadingStepIndex = index
-    console.log(this.loadingSteps[index])
     if (index === this.loadingSteps.length - 1) {
       setTimeout(() => {
         this.setLoading(false)
