@@ -453,7 +453,9 @@
                         cursor: pointer;
 
                         @media screen and (max-width: $mobile-max-width) {
-                            font-size: 18px;
+                            font-size: 10px;
+                            padding: 8px;
+                            margin: auto;
                         }
                     }
                     &-label {
