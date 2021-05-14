@@ -1,12 +1,17 @@
 .top-warning {
   background: linear-gradient(90deg, #FF6601 0.45%, #FF00B8 96.65%);
   text-align: center;
-  padding: 10px 0;
+  padding: 10px;
   display: flex;
   justify-content: center;
+  &-detail{
+    margin: auto;
+    display: flex;
+  }
   &-img {
     padding: 0 10px;
   }
+  &-close,
   &-text{
     color: #FFFFFF;
     font-style: normal;
@@ -14,5 +19,9 @@
     font-size: 14px;
     line-height: 18px;
     padding: 2px 0 0;
+  }
+  &-close {
+    margin-left: 10px;
+    cursor: pointer;
   }
 }
