@@ -140,6 +140,73 @@ describe('arbitrary message bridging', () => {
           const value = await foreignBox.methods.value().call()
           assert(!toBN(value).eq(toBN(newValue)), 'Message should not be relayed by oracle automatically')
         })
+
+        it('should reconfirm message in case of validators change', async () => {
+          const newValue = 15
+
+          const initialValue = await foreignBox.methods.value().call()
+          assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
+
+          const signatures = await homeBridge.getPastEvents('SignedForUserRequest', {
+            fromBlock: 0,
+            toBlock: 'latest'
+          })
+
+          const { events } = await homeBox.methods
+            .setValueOnOtherNetworkUsingManualLane(newValue, amb.home, amb.foreignBox)
+            .send()
+            .catch(e => {
+              console.error(e)
+            })
+          const message = homeWeb3.eth.abi.decodeParameter('bytes', events['0'].raw.data)
+
+          await delay(10000)
+
+          await setRequiredSignatures({
+            bridgeContract: homeBridge,
+            web3: homeWeb3,
+            requiredSignatures: 3,
+            options: {
+              from: validator.address,
+              gas: '4000000'
+            }
+          })
+
+          const signatures2 = await homeBridge.getPastEvents('SignedForUserRequest', {
+            fromBlock: 0,
+            toBlock: 'latest'
+          })
+
+          assert(
+            signatures2.length === signatures.length + requiredSignatures,
+            `Incorrect amount of signatures submitted, got ${signatures2.length}, expected ${signatures.length +
+              requiredSignatures}`
+          )
+
+          await homeBridge.methods.requestMessageReconfirm(message).send()
+
+          await delay(10000)
+
+          const signatures3 = await homeBridge.getPastEvents('SignedForUserRequest', {
+            fromBlock: 0,
+            toBlock: 'latest'
+          })
+
+          assert(
+            signatures3.length === signatures.length + 3,
+            `Incorrect amount of signatures submitted, got ${signatures3.length}, expected ${signatures.length + 3}`
+          )
+
+          await setRequiredSignatures({
+            bridgeContract: homeBridge,
+            web3: homeWeb3,
+            requiredSignatures: 2,
+            options: {
+              from: validator.address,
+              gas: '4000000'
+            }
+          })
+        })
       }
 
       it('should confirm but not relay message from manual lane', async () => {
