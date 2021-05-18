@@ -1,9 +1,9 @@
 import React, {useState} from 'react'
 
 export const TopWarning = () => {
-  const [isClose, setIsClose] = useState(localStorage.getItem("top-warning-close"));
+  const [isClose, setIsClose] = useState(sessionStorage.getItem("top-warning-close"));
   const handleClose = () => {
-    localStorage.setItem("top-warning-close", true);
+    sessionStorage.setItem("top-warning-close", true);
     setIsClose(true)
   }
   return (
