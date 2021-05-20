@@ -1,3 +1,5 @@
+const { soliditySha3 } = require('web3-utils')
+
 function strip0x(input) {
   return input.replace(/^0x/, '')
 }
@@ -39,8 +41,35 @@ const normalizeAMBMessageEvent = e => {
   return parseAMBMessage(msgData)
 }
 
+const ambInformationSignatures = [
+  'eth_call(address,bytes)',
+  'eth_call(address,bytes,uint256)',
+  'eth_call(address,address,uint256,bytes)',
+  'eth_blockNumber()',
+  'eth_getBlockByNumber()',
+  'eth_getBlockByNumber(uint256)',
+  'eth_getBlockByHash(bytes32)',
+  'eth_getBalance(address)',
+  'eth_getBalance(address,uint256)',
+  'eth_getTransactionCount(address)',
+  'eth_getTransactionCount(address,uint256)',
+  'eth_getTransactionByHash(bytes32)',
+  'eth_getTransactionReceipt(bytes32)',
+  'eth_getStorageAt(address,bytes32)',
+  'eth_getStorageAt(address,bytes32,uint256)'
+]
+const ambInformationSelectors = Object.fromEntries(ambInformationSignatures.map(sig => [soliditySha3(sig), sig]))
+const normalizeAMBInfoRequest = e => ({
+  messageId: e.returnValues.messageId,
+  sender: e.returnValues.sender,
+  requestSelector: ambInformationSelectors[e.returnValues.requestSelector] || 'unknown',
+  data: e.returnValues.data
+})
+
 module.exports = {
   strip0x,
   parseAMBMessage,
-  normalizeAMBMessageEvent
+  normalizeAMBMessageEvent,
+  ambInformationSignatures,
+  normalizeAMBInfoRequest
 }

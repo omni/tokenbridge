@@ -129,6 +129,27 @@ async function main(mode) {
   })).map(normalizeEvent)
   foreignToHomeRequests = [...foreignToHomeRequests, ...foreignToHomeRequestsNew]
 
+  let informationRequests
+  let informationResponses
+  if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    logger.debug("calling homeBridge.getPastEvents('UserRequestForInformation')")
+    informationRequests = (await getPastEvents(homeBridge, {
+      event: 'UserRequestForInformation',
+      fromBlock: MONITOR_HOME_START_BLOCK,
+      toBlock: homeDelayedBlockNumber,
+      chain: 'home'
+    })).map(normalizeEvent)
+
+    logger.debug("calling foreignBridge.getPastEvents('InformationRetrieved')")
+    informationResponses = (await getPastEvents(homeBridge, {
+      event: 'InformationRetrieved',
+      fromBlock: MONITOR_HOME_START_BLOCK,
+      toBlock: homeBlockNumber,
+      safeToBlock: homeDelayedBlockNumber,
+      chain: 'home'
+    })).map(normalizeEvent)
+  }
+
   if (isExternalErc20) {
     logger.debug("calling erc20Contract.getPastEvents('Transfer')")
     let transferEvents = (await getPastEvents(erc20Contract, {
@@ -225,6 +246,8 @@ async function main(mode) {
     homeToForeignConfirmations,
     foreignToHomeConfirmations,
     foreignToHomeRequests,
+    informationRequests,
+    informationResponses,
     isExternalErc20,
     bridgeMode,
     homeBlockNumber,
