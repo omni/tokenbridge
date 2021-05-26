@@ -28,6 +28,21 @@ function addExecutionStatus(processedList) {
   }
 }
 
+function addRetrievalStatus(retrievedInfoList) {
+  const statuses = {}
+  retrievedInfoList.forEach(e => {
+    statuses[e.returnValues.messageId] = {
+      callStatus: e.returnValues.status,
+      callbackStatus: e.returnValues.callbackStatus
+    }
+  })
+  return deliveredMsg => {
+    deliveredMsg.callStatus = statuses[deliveredMsg.messageId].callStatus
+    deliveredMsg.callbackStatus = statuses[deliveredMsg.messageId].callbackStatus
+    return deliveredMsg
+  }
+}
+
 /**
  * Normalizes the different event objects to facilitate data processing
  * @param {Object} event
@@ -89,6 +104,7 @@ module.exports = {
   deliveredMsgNotProcessed,
   processedMsgNotDelivered,
   addExecutionStatus,
+  addRetrievalStatus,
   normalizeEventInformation,
   eventWithoutReference,
   unclaimedHomeToForeignRequests,

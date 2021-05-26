@@ -21,7 +21,9 @@ async function main(bridgeMode, eventsInfo) {
     homeToForeignConfirmations,
     homeToForeignRequests,
     foreignToHomeConfirmations,
-    foreignToHomeRequests
+    foreignToHomeRequests,
+    informationRequests,
+    informationResponses
   } = eventsInfo
 
   if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
@@ -34,7 +36,9 @@ async function main(bridgeMode, eventsInfo) {
       fromForeignToHomeDiff: foreignToHomeConfirmations.length - foreignToHomeRequests.length,
       home: {
         toForeign: homeToForeignRequests.length,
-        fromForeign: foreignToHomeConfirmations.length
+        fromForeign: foreignToHomeConfirmations.length,
+        informationRequests: informationRequests.length,
+        informationResponses: informationResponses.length
       },
       foreign: {
         fromHome: homeToForeignConfirmations.length,
