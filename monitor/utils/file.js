@@ -8,8 +8,8 @@ function readFile(filePath, parseJson = true) {
     const json = JSON.parse(content)
     const timeDiff = Math.floor(Date.now() / 1000) - json.lastChecked
     return Object.assign({}, json, { timeDiff })
-  } catch (e) {
-    console.error('readFlle', e)
+  } catch (_) {
+    console.error(`File ${filePath} does not exist`)
     return {
       error: 'the bridge statistics are not available'
     }
