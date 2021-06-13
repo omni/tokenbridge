@@ -1,6 +1,9 @@
 export const HOME_BRIDGE_ADDRESS: string = process.env.REACT_APP_COMMON_HOME_BRIDGE_ADDRESS || ''
 export const FOREIGN_BRIDGE_ADDRESS: string = process.env.REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS || ''
 
+export const HOME_SUBGRAPH_URL: string = process.env.REACT_APP_HOME_SUBGRAPH_URL || ''
+export const FOREIGN_SUBGRAPH_URL: string = process.env.REACT_APP_FOREIGN_SUBGRAPH_URL || ''
+
 export const HOME_RPC_URL: string = process.env.REACT_APP_COMMON_HOME_RPC_URL || ''
 export const FOREIGN_RPC_URL: string = process.env.REACT_APP_COMMON_FOREIGN_RPC_URL || ''
 
