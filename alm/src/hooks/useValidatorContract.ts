@@ -29,22 +29,24 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
   const callRequiredSignatures = async (
     contract: Maybe<Contract>,
     receipt: TransactionReceipt,
+    fromHome: boolean,
     setResult: Function,
     snapshotProvider: SnapshotProvider
   ) => {
     if (!contract) return
-    const result = await getRequiredSignatures(contract, receipt.blockNumber, snapshotProvider)
+    const result = await getRequiredSignatures(contract, receipt.blockNumber, fromHome, snapshotProvider)
     setResult(result)
   }
 
   const callValidatorList = async (
     contract: Maybe<Contract>,
     receipt: TransactionReceipt,
+    fromHome: boolean,
     setResult: Function,
     snapshotProvider: SnapshotProvider
   ) => {
     if (!contract) return
-    const result = await getValidatorList(contract, receipt.blockNumber, snapshotProvider)
+    const result = await getValidatorList(contract, receipt.blockNumber, fromHome, snapshotProvider)
     setResult(result)
   }
 
@@ -63,8 +65,8 @@ export const useValidatorContract = ({ receipt, fromHome }: useValidatorContract
     () => {
       if (!receipt) return
       const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
-      callRequiredSignatures(validatorContract, receipt, setRequiredSignatures, snapshotProvider)
-      callValidatorList(validatorContract, receipt, setValidatorList, snapshotProvider)
+      callRequiredSignatures(validatorContract, receipt, fromHome, setRequiredSignatures, snapshotProvider)
+      callValidatorList(validatorContract, receipt, fromHome, setValidatorList, snapshotProvider)
     },
     [validatorContract, receipt, fromHome]
   )

@@ -10,11 +10,14 @@ import {
 } from './explorer'
 import { getBlock, MessageObject } from './web3'
 import validatorsCache from '../services/ValidatorsCache'
+import { getEvents } from './events'
+import { usingSubgraph } from './subgraph'
 
 export const getFinalizationEvent = async (
   contract: Maybe<Contract>,
   eventName: string,
   web3: Maybe<Web3>,
+  fromHome: boolean,
   setResult: React.Dispatch<React.SetStateAction<ExecutionData>>,
   waitingBlocksResolved: boolean,
   message: MessageObject,
@@ -31,19 +34,13 @@ export const getFinalizationEvent = async (
   if (!contract || !web3 || !waitingBlocksResolved) return
   // Since it filters by the message id, only one event will be fetched
   // so there is no need to limit the range of the block to reduce the network traffic
-  const events: EventData[] = await contract.getPastEvents(eventName, {
-    fromBlock: 0,
-    toBlock: 'latest',
-    filter: {
-      messageId: message.id
-    }
-  })
+  const events: any = await getEvents(contract, eventName, 0, fromHome, undefined, { messageId: message.id })
   if (events.length > 0) {
     const event = events[0]
-    const [txReceipt, block] = await Promise.all([
-      web3.eth.getTransactionReceipt(event.transactionHash),
-      getBlock(web3, event.blockNumber)
-    ])
+    const txReceipt = await web3.eth.getTransactionReceipt(
+      usingSubgraph(fromHome) ? event.returnValues.id : event.transactionHash
+    )
+    const block = await getBlock(web3, txReceipt.blockNumber)
 
     const blockTimestamp = typeof block.timestamp === 'string' ? parseInt(block.timestamp) : block.timestamp
     const validatorAddress = web3.utils.toChecksumAddress(txReceipt.from)
@@ -51,7 +48,7 @@ export const getFinalizationEvent = async (
     setResult({
       status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
       validator: validatorAddress,
-      txHash: event.transactionHash,
+      txHash: usingSubgraph(fromHome) ? event.returnValues.id : event.transactionHash,
       timestamp: blockTimestamp,
       executionResult: event.returnValues.status
     })
@@ -120,6 +117,7 @@ export const getFinalizationEvent = async (
           contract,
           eventName,
           web3,
+          fromHome,
           setResult,
           waitingBlocksResolved,
           message,
