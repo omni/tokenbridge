@@ -10,7 +10,9 @@ const {
   COMMON_HOME_RPC_URL,
   COMMON_HOME_BRIDGE_ADDRESS,
   COMMON_FOREIGN_RPC_URL,
-  COMMON_FOREIGN_BRIDGE_ADDRESS
+  COMMON_FOREIGN_BRIDGE_ADDRESS,
+  HOME_SUBGRAPH_URL,
+  FOREIGN_SUBGRAPH_URL
 } = process.env
 
 const generateSnapshot = async (side, url, bridgeAddress) => {
@@ -102,11 +104,20 @@ const generateSnapshot = async (side, url, bridgeAddress) => {
   fs.writeFileSync(snapshotFullPath, JSON.stringify(snapshot, null, 2))
 }
 
+const isNonEmptyString = (str) => {
+  if(typeof str !== 'string' || str === '') 
+    return true;
+  return false;
+}
+
 const main = async () => {
-  await Promise.all([
-    generateSnapshot('home', COMMON_HOME_RPC_URL, COMMON_HOME_BRIDGE_ADDRESS),
-    generateSnapshot('foreign', COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS)
-  ])
+  let promises = [];
+  // If we're using subgraphs, there is no need for snapshots. This solution was introduced because of the binance rpc limits for eth_getLogs method
+  if(!isNonEmptyString(HOME_SUBGRAPH_URL))
+    promises.push(generateSnapshot('home', COMMON_HOME_RPC_URL, COMMON_HOME_BRIDGE_ADDRESS))
+  if(!isNonEmptyString(FOREIGN_SUBGRAPH_URL))
+    promises.push(generateSnapshot('foreign', COMMON_FOREIGN_RPC_URL, COMMON_FOREIGN_BRIDGE_ADDRESS))
+  await Promise.all(promises)
 }
 
 main()
