@@ -69,3 +69,28 @@ export const VALIDATOR_CONFIRMATION_STATUS = {
 export const SEARCHING_TX = 'Searching Transaction...'
 
 export const INCORRECT_CHAIN_ERROR = `Incorrect chain chosen. Switch to ${FOREIGN_NETWORK_NAME} in the wallet.`
+
+// Fields of the events in the subgraph
+export const SUBGRAPH_EVENT_FIELDS: { [key: string]: string[] } = {
+  userRequestForAffirmations: ['id', 'messageId', 'encodedData'],
+  userRequestForSignatures: ['id', 'messageId', 'encodedData'],
+  relayedMessages: ['id', 'sender', 'executor', 'messageId', 'status'],
+  affirmationCompleteds: ['id', 'sender', 'executor', 'messageId', 'status'],
+  collectedSignatures: ['id', 'authorityResponsibleForRelay', 'messageHash', 'numberOfCollectedSignatures'],
+  validatorAddeds: ['id', 'validator'],
+  validatorRemoveds: ['id', 'validator'],
+  requiredSignaturesChangeds: ['id', 'requiredSignatures'],
+  requiredBlockConfirmationChangeds: ['id', 'requiredBlockConfirmations']
+}
+
+export const EVENT_QUERIES: { [key: string]: string } = {
+  UserRequestForAffirmation: 'userRequestForAffirmations',
+  UserRequestForSignature: 'userRequestForSignature',
+  RelayedMessage: 'relayedMessages',
+  AffirmationCompleted: 'affirmationCompleteds',
+  CollectedSignatures: 'collectedSignatures',
+  ValidatorAdded: 'validatorAddeds',
+  ValidatorRemoved: 'validatorRemoveds',
+  RequiredSignaturesChanged: 'requiredSignaturesChangeds',
+  RequiredBlockConfirmationChanged: 'requiredBlockConfirmationChangeds'
+}
