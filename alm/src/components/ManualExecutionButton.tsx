@@ -8,8 +8,7 @@ import {
   EXECUTION_OUT_OF_GAS_ERROR,
   FOREIGN_EXPLORER_API,
   INCORRECT_CHAIN_ERROR,
-  VALIDATOR_CONFIRMATION_STATUS,
-  EXECUTION_MODE
+  VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
 import { useStateProvider } from '../state/StateProvider'
 import { signatureToVRS, packSignatures } from '../utils/signatures'
@@ -44,7 +43,8 @@ export const ManualExecutionButton = ({
 }: ManualExecutionButtonParams) => {
   const { foreign, setError } = useStateProvider()
   const { library, activate, account, active } = useWeb3React()
-  const [manualExecution, setManualExecution] = useState(EXECUTION_MODE.NO_EXECUTION)
+  const [manualExecution, setManualExecution] = useState(false)
+  const [allowFailures, setAllowFailures] = useState(false)
 
   useEffect(
     () => {
@@ -67,7 +67,7 @@ export const ManualExecutionButton = ({
           } else {
             setError(e.message)
           }
-          setManualExecution(EXECUTION_MODE.NO_EXECUTION)
+          setManualExecution(false)
         })
         return
       }
@@ -78,11 +78,11 @@ export const ManualExecutionButton = ({
       const messageId = messageData.slice(0, 66)
       const bridge = foreign.bridgeContract
       const executeMethod =
-        manualExecution === EXECUTION_MODE.SAFE_EXECUTE_SIGNATURES
+        safeExecutionAvailable && !allowFailures
           ? bridge.methods.safeExecuteSignaturesWithAutoGasLimit
           : bridge.methods.executeSignatures
       const data = executeMethod(messageData, signatures).encodeABI()
-      setManualExecution(EXECUTION_MODE.NO_EXECUTION)
+      setManualExecution(false)
 
       library.eth
         .sendTransaction({
@@ -142,32 +142,34 @@ export const ManualExecutionButton = ({
       signatureCollected,
       setExecutionData,
       setPendingExecution,
-      safeExecutionAvailable
+      safeExecutionAvailable,
+      allowFailures
     ]
   )
 
   return (
     <div>
-      {safeExecutionAvailable && (
-        <div className="is-center">
-          <ActionButton
-            className="button outline"
-            title="Executes a message using auto gas limit, reverts on message failure"
-            onClick={() => setManualExecution(EXECUTION_MODE.SAFE_EXECUTE_SIGNATURES)}
-          >
-            Safe Execute
-          </ActionButton>
-        </div>
-      )}
       <div className="is-center">
-        <ActionButton
-          className="button outline"
-          title="Executes a message using fixed gas limit"
-          onClick={() => setManualExecution(EXECUTION_MODE.EXECUTE_SIGNATURES)}
-        >
+        <ActionButton className="button outline" onClick={() => setManualExecution(true)}>
           Execute
         </ActionButton>
       </div>
+      {safeExecutionAvailable && (
+        <div
+          title="Allow executed message to fail and record its failure on-chain without reverting the whole transaction.
+          Use fixed gas limit for execution."
+          className="is-center"
+          style={{ paddingTop: 10 }}
+        >
+          <input
+            type="checkbox"
+            id="allow-failures"
+            checked={allowFailures}
+            onChange={e => setAllowFailures(e.target.checked)}
+          />
+          <label htmlFor="allow-failures">Allow Failures</label>
+        </div>
+      )}
     </div>
   )
 }
