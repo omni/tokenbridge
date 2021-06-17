@@ -74,37 +74,7 @@ export const getValidatorList = async (
   fromHome: boolean,
   snapshotProvider: SnapshotProvider
 ) => {
-  const addedEventsFromSnapshot = snapshotProvider.validatorAddedEvents(blockNumber)
-  const removedEventsFromSnapshot = snapshotProvider.validatorRemovedEvents(blockNumber)
-  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
-
-  const fromBlock = snapshotBlockNumber > blockNumber ? snapshotBlockNumber + 1 : blockNumber
-  const [currentList, added, removed] = await Promise.all([
-    contract.methods.validatorList().call(),
-    getEvents(contract, 'ValidatorAdded', fromBlock, fromHome),
-    getEvents(contract, 'ValidatorRemoved', fromBlock, fromHome)
-  ])
-
-  // TODO: sort events
-  // // Ordered desc
-  // const orderedEvents = [...addedEventsFromSnapshot, added, ...removedEventsFromSnapshot, removed].sort(
-  //   ({ blockNumber: prev }, { blockNumber: next }) => next - prev
-  // )
-
-  // // Stored as a Set to avoid duplicates
-  // const validatorList = new Set(currentList)
-
-  // orderedEvents.forEach(e => {
-  //   const { validator } = e.returnValues
-  //   if (e.event === 'ValidatorRemoved') {
-  //     validatorList.add(validator)
-  //   } else if (e.event === 'ValidatorAdded') {
-  //     validatorList.delete(validator)
-  //   }
-  // })
-
-  // return Array.from(validatorList)
-  return ['0x6F7648D9B6203fF9e6289BBAae3B5738Ad27a0b4']
+  return await contract.methods.validatorList().call()
 }
 
 export const getMessagesSigned = (contract: Contract, hash: string) => contract.methods.messagesSigned(hash).call()
