@@ -110,7 +110,7 @@ const isNonEmptyString = str => {
 }
 
 const main = async () => {
-  let promises = []
+  const promises = []
   // If we're using subgraphs, there is no need for snapshots. This solution was introduced because of the bsc rpc limits for eth_getLogs method
   if (!isNonEmptyString(HOME_SUBGRAPH_URL))
     promises.push(generateSnapshot('home', COMMON_HOME_RPC_URL, COMMON_HOME_BRIDGE_ADDRESS))
