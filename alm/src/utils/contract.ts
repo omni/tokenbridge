@@ -6,7 +6,7 @@ import { getEvents } from './events'
 export const getRequiredBlockConfirmations = async (
   contract: Contract,
   blockNumber: number,
-  fromHome: boolean,
+  isHome: boolean,
   snapshotProvider: SnapshotProvider
 ) => {
   const eventsFromSnapshot = snapshotProvider.requiredBlockConfirmationEvents(blockNumber)
@@ -18,7 +18,7 @@ export const getRequiredBlockConfirmations = async (
       contract,
       'RequiredBlockConfirmationChanged',
       snapshotBlockNumber + 1,
-      fromHome,
+      isHome,
       blockNumber
     )
   }
@@ -43,7 +43,7 @@ export const getValidatorAddress = (contract: Contract) => contract.methods.vali
 export const getRequiredSignatures = async (
   contract: Contract,
   blockNumber: number,
-  fromHome: boolean,
+  isHome: boolean,
   snapshotProvider: SnapshotProvider
 ) => {
   const eventsFromSnapshot = snapshotProvider.requiredSignaturesEvents(blockNumber)
@@ -55,7 +55,7 @@ export const getRequiredSignatures = async (
       contract,
       'RequiredSignaturesChanged',
       snapshotBlockNumber + 1,
-      fromHome,
+      isHome,
       blockNumber
     )
   }
@@ -71,7 +71,7 @@ export const getRequiredSignatures = async (
 export const getValidatorList = async (
   contract: Contract,
   blockNumber: number,
-  fromHome: boolean,
+  isHome: boolean,
   snapshotProvider: SnapshotProvider
 ) => {
   return await contract.methods.validatorList().call()
