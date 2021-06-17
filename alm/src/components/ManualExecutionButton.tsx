@@ -167,7 +167,7 @@ export const ManualExecutionButton = ({
             checked={allowFailures}
             onChange={e => setAllowFailures(e.target.checked)}
           />
-          <label htmlFor="allow-failures">Allow Failures</label>
+          <label htmlFor="allow-failures">Unsafe mode</label>
         </div>
       )}
     </div>
