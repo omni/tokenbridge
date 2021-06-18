@@ -124,6 +124,24 @@ const abi: AbiItem[] = [
     type: 'function'
   },
   {
+    constant: false,
+    inputs: [
+      {
+        name: '_data',
+        type: 'bytes'
+      },
+      {
+        name: '_signatures',
+        type: 'bytes'
+      }
+    ],
+    name: 'safeExecuteSignaturesWithAutoGasLimit',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
     constant: true,
     inputs: [
       {
