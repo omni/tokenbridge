@@ -1,21 +1,26 @@
 import { Contract } from 'web3-eth-contract'
 import { EventData } from 'web3-eth-contract'
 import { SnapshotProvider } from '../services/SnapshotProvider'
+import { getEvents } from './events'
 
 export const getRequiredBlockConfirmations = async (
   contract: Contract,
   blockNumber: number,
+  isHome: boolean,
   snapshotProvider: SnapshotProvider
 ) => {
   const eventsFromSnapshot = snapshotProvider.requiredBlockConfirmationEvents(blockNumber)
   const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
 
-  let contractEvents: EventData[] = []
+  let contractEvents: any = []
   if (blockNumber > snapshotBlockNumber) {
-    contractEvents = await contract.getPastEvents('RequiredBlockConfirmationChanged', {
-      fromBlock: snapshotBlockNumber + 1,
-      toBlock: blockNumber
-    })
+    contractEvents = await getEvents(
+      contract,
+      'RequiredBlockConfirmationChanged',
+      snapshotBlockNumber + 1,
+      isHome,
+      blockNumber
+    )
   }
 
   const events = [...eventsFromSnapshot, ...contractEvents]
@@ -38,17 +43,21 @@ export const getValidatorAddress = (contract: Contract) => contract.methods.vali
 export const getRequiredSignatures = async (
   contract: Contract,
   blockNumber: number,
+  isHome: boolean,
   snapshotProvider: SnapshotProvider
 ) => {
   const eventsFromSnapshot = snapshotProvider.requiredSignaturesEvents(blockNumber)
   const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
 
-  let contractEvents: EventData[] = []
+  let contractEvents: any = []
   if (blockNumber > snapshotBlockNumber) {
-    contractEvents = await contract.getPastEvents('RequiredSignaturesChanged', {
-      fromBlock: snapshotBlockNumber + 1,
-      toBlock: blockNumber
-    })
+    contractEvents = await getEvents(
+      contract,
+      'RequiredSignaturesChanged',
+      snapshotBlockNumber + 1,
+      isHome,
+      blockNumber
+    )
   }
 
   const events = [...eventsFromSnapshot, ...contractEvents]
@@ -59,40 +68,13 @@ export const getRequiredSignatures = async (
   return parseInt(requiredSignatures)
 }
 
-export const getValidatorList = async (contract: Contract, blockNumber: number, snapshotProvider: SnapshotProvider) => {
-  const addedEventsFromSnapshot = snapshotProvider.validatorAddedEvents(blockNumber)
-  const removedEventsFromSnapshot = snapshotProvider.validatorRemovedEvents(blockNumber)
-  const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
-
-  const fromBlock = snapshotBlockNumber > blockNumber ? snapshotBlockNumber + 1 : blockNumber
-  const [currentList, added, removed] = await Promise.all([
-    contract.methods.validatorList().call(),
-    contract.getPastEvents('ValidatorAdded', {
-      fromBlock
-    }),
-    contract.getPastEvents('ValidatorRemoved', {
-      fromBlock
-    })
-  ])
-
-  // Ordered desc
-  const orderedEvents = [...addedEventsFromSnapshot, ...added, ...removedEventsFromSnapshot, ...removed].sort(
-    ({ blockNumber: prev }, { blockNumber: next }) => next - prev
-  )
-
-  // Stored as a Set to avoid duplicates
-  const validatorList = new Set(currentList)
-
-  orderedEvents.forEach(e => {
-    const { validator } = e.returnValues
-    if (e.event === 'ValidatorRemoved') {
-      validatorList.add(validator)
-    } else if (e.event === 'ValidatorAdded') {
-      validatorList.delete(validator)
-    }
-  })
-
-  return Array.from(validatorList)
+export const getValidatorList = async (
+  contract: Contract,
+  blockNumber: number,
+  isHome: boolean,
+  snapshotProvider: SnapshotProvider
+) => {
+  return await contract.methods.validatorList().call()
 }
 
 export const getMessagesSigned = (contract: Contract, hash: string) => contract.methods.messagesSigned(hash).call()

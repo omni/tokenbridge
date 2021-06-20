@@ -1,6 +1,9 @@
 export const HOME_BRIDGE_ADDRESS: string = process.env.REACT_APP_COMMON_HOME_BRIDGE_ADDRESS || ''
 export const FOREIGN_BRIDGE_ADDRESS: string = process.env.REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS || ''
 
+export const HOME_SUBGRAPH_URL: string = process.env.REACT_APP_HOME_SUBGRAPH_URL || ''
+export const FOREIGN_SUBGRAPH_URL: string = process.env.REACT_APP_FOREIGN_SUBGRAPH_URL || ''
+
 export const HOME_RPC_URL: string = process.env.REACT_APP_COMMON_HOME_RPC_URL || ''
 export const FOREIGN_RPC_URL: string = process.env.REACT_APP_COMMON_FOREIGN_RPC_URL || ''
 
@@ -66,3 +69,28 @@ export const VALIDATOR_CONFIRMATION_STATUS = {
 export const SEARCHING_TX = 'Searching Transaction...'
 
 export const INCORRECT_CHAIN_ERROR = `Incorrect chain chosen. Switch to ${FOREIGN_NETWORK_NAME} in the wallet.`
+
+// Fields of the events in the subgraph
+export const SUBGRAPH_EVENT_FIELDS: { [key: string]: string[] } = {
+  userRequestForAffirmations: ['id', 'messageId', 'encodedData'],
+  userRequestForSignatures: ['id', 'messageId', 'encodedData'],
+  relayedMessages: ['id', 'sender', 'executor', 'messageId', 'status'],
+  affirmationCompleteds: ['id', 'sender', 'executor', 'messageId', 'status'],
+  collectedSignatures: ['id', 'authorityResponsibleForRelay', 'messageHash', 'numberOfCollectedSignatures'],
+  validatorAddeds: ['id', 'validator'],
+  validatorRemoveds: ['id', 'validator'],
+  requiredSignaturesChangeds: ['id', 'requiredSignatures'],
+  requiredBlockConfirmationChangeds: ['id', 'requiredBlockConfirmations']
+}
+
+export const EVENT_QUERIES: { [key: string]: string } = {
+  UserRequestForAffirmation: 'userRequestForAffirmations',
+  UserRequestForSignature: 'userRequestForSignature',
+  RelayedMessage: 'relayedMessages',
+  AffirmationCompleted: 'affirmationCompleteds',
+  CollectedSignatures: 'collectedSignatures',
+  ValidatorAdded: 'validatorAddeds',
+  ValidatorRemoved: 'validatorRemoveds',
+  RequiredSignaturesChanged: 'requiredSignaturesChangeds',
+  RequiredBlockConfirmationChanged: 'requiredBlockConfirmationChangeds'
+}

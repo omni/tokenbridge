@@ -10,6 +10,7 @@ import {
   HOME_RPC_POLLING_INTERVAL,
   VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
+import { usingSubgraph } from '../utils/subgraph'
 import { homeBlockNumberProvider, foreignBlockNumberProvider } from '../services/BlockNumberProvider'
 import { checkSignaturesWaitingForBLocks } from '../utils/signatureWaitingForBlocks'
 import { getCollectedSignaturesEvent } from '../utils/getCollectedSignaturesEvent'
@@ -82,6 +83,7 @@ export const useMessageConfirmations = ({
   const [failedExecution, setFailedExecution] = useState(false)
   const [pendingConfirmations, setPendingConfirmations] = useState(false)
   const [pendingExecution, setPendingExecution] = useState(false)
+  const [targetBlock, setTargetBlock] = useState(0)
 
   const existsConfirmation = (confirmationArray: ConfirmationParam[]) => {
     const filteredList = confirmationArray.filter(
@@ -192,8 +194,10 @@ export const useMessageConfirmations = ({
         })
       }
 
-      homeBlockNumberProvider.start(home.web3)
-      const targetBlock = collectedSignaturesEvent.blockNumber + blockConfirmations
+      homeBlockNumberProvider.start(home.web3);
+      (async () => {
+        return await home.web3?.eth.getTransactionReceipt(usingSubgraph(fromHome)? collectedSignaturesEvent.returnValues.id:collectedSignaturesEvent.transactionHash)
+      })().then(tx => {setTargetBlock(tx?.blockNumber || 0 + blockConfirmations);})
 
       checkWaitingBlocksForExecution(
         homeBlockNumberProvider,
@@ -288,6 +292,7 @@ export const useMessageConfirmations = ({
         bridgeContract,
         contractEvent,
         providedWeb3,
+        !fromHome,
         setExecutionData,
         waitingBlocksResolved,
         message,
