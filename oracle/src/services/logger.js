@@ -1,6 +1,8 @@
 const pino = require('pino')
 const path = require('path')
 
+const { setLogger } = require('./injectedLogger')
+
 const config = process.env.NODE_ENV !== 'test' ? require(path.join('../../config/', process.argv[2])) : {}
 
 const logger = pino({
@@ -14,5 +16,7 @@ const logger = pino({
         }
       : {}
 })
+
+setLogger(logger)
 
 module.exports = logger

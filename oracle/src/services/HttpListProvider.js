@@ -1,7 +1,8 @@
 const fetch = require('node-fetch')
 const promiseRetry = require('promise-retry')
 const { FALLBACK_RPC_URL_SWITCH_TIMEOUT } = require('../utils/constants')
-const logger = require('./logger')
+
+const { onInjected } = require('./injectedLogger')
 
 // From EIP-1474 and Infura documentation
 const JSONRPC_ERROR_CODES = [-32603, -32002, -32005]
@@ -34,7 +35,10 @@ function HttpListProvider(urls, options = {}) {
   this.options = { ...defaultOptions, ...options }
   this.currentIndex = 0
   this.lastTimeUsedPrimary = 0
-  this.logger = logger.child({ module: `HttpListProvider:${this.options.name}` })
+
+  onInjected(logger => {
+    this.logger = logger.child({ module: `HttpListProvider:${this.options.name}` })
+  })
 }
 
 HttpListProvider.prototype.send = async function send(payload, callback) {

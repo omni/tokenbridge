@@ -1,10 +1,12 @@
 const { hexToNumber, isHexStrict } = require('web3').utils
 
-const logger = require('./logger')
+const { onInjected } = require('./injectedLogger')
 
 function SafeEthLogsProvider(provider) {
-  this.provider = provider
-  this.logger = logger.child({ module: 'SafeEthLogsProvider' })
+  this.subProvider = provider
+  onInjected(logger => {
+    this.logger = logger.child({ module: 'SafeEthLogsProvider' })
+  })
 }
 
 SafeEthLogsProvider.prototype.send = function send(payload, callback) {
@@ -12,7 +14,7 @@ SafeEthLogsProvider.prototype.send = function send(payload, callback) {
     this.logger.debug('Modifying eth_getLogs request to include batch eth_blockNumber request')
 
     const newPayload = [payload, { jsonrpc: '2.0', id: payload.id + 1, method: 'eth_blockNumber', params: [] }]
-    this.provider.send(newPayload, (err, res) => {
+    this.subProvider.send(newPayload, (err, res) => {
       if (err) {
         callback(err, null)
       } else {
@@ -30,7 +32,7 @@ SafeEthLogsProvider.prototype.send = function send(payload, callback) {
       }
     })
   } else {
-    this.provider.send(payload, callback)
+    this.subProvider.send(payload, callback)
   }
 }
 
