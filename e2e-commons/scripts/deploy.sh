@@ -35,3 +35,9 @@ echo -e "\n\n############ Deploying one more test contract for amb ############\
 cd "$DEPLOY_PATH"
 node src/utils/deployTestBox.js
 cd - > /dev/null
+
+echo -e "\n\n############ Deploying one more amb without oracle for confirm relay tests ############\n"
+cp "$ENVS_PATH/amb.env" "$DEPLOY_PATH/.env"
+cd "$DEPLOY_PATH"
+node deploy.js
+cd - > /dev/null

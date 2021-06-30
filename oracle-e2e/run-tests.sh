@@ -10,7 +10,7 @@ case "$mode" in
     ;;
 esac
 
-MODE="$mode" ../e2e-commons/up.sh deploy blocks oracle oracle-validator-2 oracle-validator-3
+MODE="$mode" ../e2e-commons/up.sh deploy generate-amb-tx manual-amb-relay blocks oracle oracle-validator-2 oracle-validator-3
 
 docker-compose -f ../e2e-commons/docker-compose.yml run e2e yarn workspace oracle-e2e run start $script
 rc=$?

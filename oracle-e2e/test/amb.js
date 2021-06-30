@@ -63,6 +63,17 @@ describe('arbitrary message bridging', () => {
       }
     })
   })
+  describe('Confirm Relay', () => {
+    it('should process lost affirmation-request via confirm relay', async () => {
+      const value = await homeBox.methods.value().call()
+      assert(value === '789', 'incorrect value')
+    })
+
+    it('should process lost signature-request & collected-signatures via confirm relay', async () => {
+      const value = await foreignBox.methods.value().call()
+      assert(value === '123', 'incorrect value')
+    })
+  })
   describe('Home to Foreign', () => {
     describe('Subsidized Mode', () => {
       it('should bridge message', async () => {
@@ -71,12 +82,13 @@ describe('arbitrary message bridging', () => {
         const initialValue = await foreignBox.methods.value().call()
         assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
-        await homeBox.methods
+        const res = await homeBox.methods
           .setValueOnOtherNetwork(newValue, amb.home, amb.foreignBox)
           .send()
           .catch(e => {
             console.error(e)
           })
+        console.log(res.transactionHash)
 
         // check that value changed and balance decreased
         await uniformRetry(async retry => {
@@ -169,12 +181,13 @@ describe('arbitrary message bridging', () => {
         const initialValue = await homeBox.methods.value().call()
         assert(!toBN(initialValue).eq(toBN(newValue)), 'initial value should be different from new value')
 
-        await foreignBox.methods
+        const res = await foreignBox.methods
           .setValueOnOtherNetwork(newValue, amb.foreign, amb.homeBox)
           .send()
           .catch(e => {
             console.error(e)
           })
+        console.log(res.transactionHash)
 
         // check that value changed and balance decreased
         await uniformRetry(async retry => {
@@ -268,7 +281,7 @@ describe('arbitrary message bridging', () => {
       const selector = homeWeb3.utils.soliditySha3('eth_call(address,bytes,uint256)')
       const data1 = homeWeb3.eth.abi.encodeParameters(
         ['address', 'bytes', 'uint256'],
-        [amb.foreignBox, foreignBox.methods.value().encodeABI(), 60]
+        [amb.foreignBox, foreignBox.methods.value().encodeABI(), 25]
       )
       const data2 = homeWeb3.eth.abi.encodeParameters(
         ['address', 'bytes', 'uint256'],
@@ -446,7 +459,7 @@ describe('arbitrary message bridging', () => {
     })
 
     it('should make async eth_getTransactionByHash', async () => {
-      const txHash = '0x09dfb947dbd17e27bcc117773b6e133829f7cef9646199a93ef019c4f7c0fec6'
+      const txHash = '0x7262f7dbe6c30599edded2137fbbe93c271b37f5c54dd27f713f0cf510e3b4dd'
       const tx = await foreignWeb3.eth.getTransaction(txHash)
       const selector = homeWeb3.utils.soliditySha3('eth_getTransactionByHash(bytes32)')
 
@@ -479,7 +492,7 @@ describe('arbitrary message bridging', () => {
     })
 
     it('should make async eth_getTransactionReceipt', async () => {
-      const txHash = '0x09dfb947dbd17e27bcc117773b6e133829f7cef9646199a93ef019c4f7c0fec6'
+      const txHash = '0x7262f7dbe6c30599edded2137fbbe93c271b37f5c54dd27f713f0cf510e3b4dd'
       const receipt = await foreignWeb3.eth.getTransactionReceipt(txHash)
       const selector = homeWeb3.utils.soliditySha3('eth_getTransactionReceipt(bytes32)')
 
