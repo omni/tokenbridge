@@ -34,7 +34,7 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3.currentProvider.urls.forEach(checkHttps(chain))
+    web3.currentProvider.subProvider.urls.forEach(checkHttps(chain))
 
     await getLastProcessedBlock()
     connectWatcherToQueue({

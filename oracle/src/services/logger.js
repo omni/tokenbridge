@@ -1,15 +1,7 @@
 const pino = require('pino')
 const path = require('path')
-const {
-  web3Home,
-  web3Foreign,
-  web3ForeignArchive,
-  web3Side,
-  web3HomeFallback,
-  web3ForeignFallback,
-  web3HomeRedundant,
-  web3ForeignRedundant
-} = require('./web3')
+
+const { setLogger } = require('./injectedLogger')
 
 const config = process.env.NODE_ENV !== 'test' ? require(path.join('../../config/', process.argv[2])) : {}
 
@@ -25,19 +17,6 @@ const logger = pino({
       : {}
 })
 
-web3Home.currentProvider.setLogger(logger)
-web3Foreign.currentProvider.setLogger(logger)
-web3HomeFallback.currentProvider.setLogger(logger)
-web3ForeignFallback.currentProvider.setLogger(logger)
-web3HomeRedundant.currentProvider.setLogger(logger)
-web3ForeignRedundant.currentProvider.setLogger(logger)
-
-if (web3ForeignArchive) {
-  web3ForeignArchive.currentProvider.setLogger(logger)
-}
-
-if (web3Side) {
-  web3Side.currentProvider.setLogger(logger)
-}
+setLogger(logger)
 
 module.exports = logger
