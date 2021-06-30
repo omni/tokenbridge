@@ -8,6 +8,7 @@ module.exports = {
   web3ForeignArchive: web3ForeignArchive || baseConfig.foreign.web3,
   main: baseConfig.home,
   event: 'UserRequestForInformation',
+  sender: 'home',
   queue: 'home-prioritized',
   name: `watcher-${id}`,
   id

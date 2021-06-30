@@ -102,6 +102,7 @@ async function getEventsFromTx({ web3, contract, event, txHash, filter }) {
     const eventAbi = contract.options.jsonInterface.find(abi => abi.name === event)
     const decodeAbi = contract._decodeEventABI.bind(eventAbi)
     const pastEvents = logs
+      .filter(event => event.address.toLowerCase() === contractAddress.toLowerCase())
       .filter(event => event.topics[0] === eventAbi.signature)
       .map(decodeAbi)
       .filter(event =>

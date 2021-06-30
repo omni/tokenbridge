@@ -16,7 +16,9 @@ if (process.argv.length < 5) {
 }
 
 const config = require(path.join('../config/', process.argv[2]))
-const txHash = process.argv[4]
+const { web3, eventContract, chain } = config.main
+
+const txHashes = process.argv.slice(4).filter(txHash => txHash.length === 66 && web3.utils.isHexStrict(txHash))
 
 const processSignatureRequests = require('./events/processSignatureRequests')(config)
 const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
@@ -27,15 +29,13 @@ const processAMBCollectedSignatures = require('./events/processAMBCollectedSigna
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
 const processAMBInformationRequests = require('./events/processAMBInformationRequests')(config)
 
-const { web3, eventContract } = config.main
-
 let attached
 
 async function initialize() {
   try {
     const checkHttps = checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3.currentProvider.subProvider.urls.forEach(checkHttps(config.chain))
+    web3.currentProvider.subProvider.urls.forEach(checkHttps(chain))
 
     attached = await isAttached()
     if (attached) {
@@ -59,12 +59,12 @@ async function runMain({ sendToQueue }) {
     const sendJob = attached ? sendToQueue : sendJobTx
     if (!attached || connection.isConnected()) {
       if (config.maxProcessingTime) {
-        await watchdog(() => main({ sendJob, txHash }), config.maxProcessingTime, () => {
+        await watchdog(() => main({ sendJob, txHashes }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
           process.exit(EXIT_CODES.MAX_TIME_REACHED)
         })
       } else {
-        await main({ sendJob, txHash })
+        await main({ sendJob, txHashes })
       }
     } else {
       setTimeout(() => {
@@ -99,27 +99,31 @@ function processEvents(events) {
   }
 }
 
-async function main({ sendJob, txHash }) {
-  try {
-    const events = await getEventsFromTx({
-      web3,
-      contract: eventContract,
-      event: config.event,
-      txHash,
-      filter: config.eventFilter
-    })
-    logger.info(`Found ${events.length} ${config.event} events`)
+async function main({ sendJob, txHashes }) {
+  logger.info(`Processing ${txHashes.length} input transactions`)
+  for (const txHash of txHashes) {
+    try {
+      logger.info({ txHash }, `Processing transaction`)
+      const events = await getEventsFromTx({
+        web3,
+        contract: eventContract,
+        event: config.event,
+        txHash,
+        filter: config.eventFilter
+      })
+      logger.info({ txHash }, `Found ${events.length} ${config.event} events`)
 
-    if (events.length) {
-      const job = await processEvents(events)
-      logger.info('Transactions to send:', job.length)
+      if (events.length) {
+        const job = await processEvents(events)
+        logger.info({ txHash }, 'Transactions to send:', job.length)
 
-      if (job.length) {
-        await sendJob(job)
+        if (job.length) {
+          await sendJob(job)
+        }
       }
+    } catch (e) {
+      logger.error(e)
     }
-  } catch (e) {
-    logger.error(e)
   }
 
   await connection.close()
@@ -128,7 +132,11 @@ async function main({ sendJob, txHash }) {
 }
 
 async function sendJobTx(jobs) {
-  const gasPrice = await GasPrice.start(config.chain, true)
+  await GasPrice.start(chain, true)
+  const gasPrice = GasPrice.getPrice().toString(10)
+
+  const { web3 } = config.sender === 'foreign' ? config.foreign : config.home
+
   const chainId = await getChainId(web3)
   let nonce = await getNonce(web3, ORACLE_VALIDATOR_ADDRESS)
 
@@ -145,7 +153,7 @@ async function sendJobTx(jobs) {
       const txHash = await sendTx({
         data: job.data,
         nonce,
-        gasPrice: gasPrice.toString(10),
+        gasPrice,
         amount: '0',
         gasLimit,
         privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
