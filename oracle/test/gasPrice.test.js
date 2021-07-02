@@ -9,7 +9,7 @@ const fetchStub = () => ({
     standard: '103'
   })
 })
-const fakeLogger = { error: sinon.spy() }
+const fakeLogger = { error: sinon.spy(), warn: sinon.spy(), child: () => fakeLogger }
 fetchStub['@global'] = true
 const gasPriceDefault = proxyquire('../src/services/gasPrice', {
   '../utils/utils': utils,
@@ -29,6 +29,7 @@ describe('gasPrice', () => {
   beforeEach(() => {
     utils.setIntervalAndRun.resetHistory()
     fakeLogger.error.resetHistory()
+    fakeLogger.warn.resetHistory()
   })
 
   describe('start', () => {
@@ -133,6 +134,7 @@ describe('gasPrice', () => {
       await gasPrice.fetchGasPrice('standard', 1, null, null)
 
       // then
+      expect(fakeLogger.warn.calledOnce).to.equal(true) // one warning
       expect(fakeLogger.error.calledOnce).to.equal(true) // one error
     })
   })

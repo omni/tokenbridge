@@ -62,6 +62,10 @@ async function start(chainId, fetchOnce) {
     throw new Error(`Unrecognized chainId '${chainId}'`)
   }
 
+  if (!gasPriceSupplierUrl) {
+    logger.warn({ chainId }, 'Gas price API is not configured, will fallback to the contract-supplied gas price')
+  }
+
   if (fetchOnce) {
     await fetchGasPrice(speedType, factor, contract, gasPriceSupplierUrl)
   } else {
