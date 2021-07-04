@@ -11,7 +11,7 @@ const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/con
 
 const { ORACLE_VALIDATOR_ADDRESS, ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_ALLOW_HTTP_FOR_RPC } = process.env
 
-if (process.argv.length < 5) {
+if (process.argv.length < 4) {
   logger.error('Please check the number of arguments, transaction hash is not present')
   process.exit(EXIT_CODES.GENERAL_ERROR)
 }
@@ -29,7 +29,7 @@ function readTxHashes(filePath) {
     .filter(isTxHash)
 }
 
-const txHashesArgs = process.argv.slice(4)
+const txHashesArgs = process.argv.slice(3)
 const rawTxHashes = txHashesArgs.filter(isTxHash)
 const txHashesFiles = txHashesArgs.filter(path => fs.existsSync(path)).flatMap(readTxHashes)
 const txHashes = [...rawTxHashes, ...txHashesFiles]

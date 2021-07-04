@@ -1,19 +1,6 @@
 const baseConfig = require('./base.config')
-const { ERC20_ABI } = require('../../commons')
+const { ERC20_ABI, ZERO_ADDRESS } = require('../../commons')
 const { EXIT_CODES } = require('../src/utils/constants')
-
-const initialChecksJson = process.argv[3]
-
-if (!initialChecksJson) {
-  throw new Error('initial check parameter was not provided.')
-}
-
-let initialChecks
-try {
-  initialChecks = JSON.parse(initialChecksJson)
-} catch (e) {
-  throw new Error('Error on decoding values from initial checks.')
-}
 
 const id = `${baseConfig.id}-transfer`
 
@@ -22,14 +9,14 @@ if (baseConfig.id !== 'erc-native') {
   process.exit(EXIT_CODES.WATCHER_NOT_REQUIRED)
 }
 
+// exact address of the token contract is set in the watcher.js checkConditions() function
+baseConfig.foreign.eventContract = new baseConfig.foreign.web3.eth.Contract(ERC20_ABI, ZERO_ADDRESS)
+
 module.exports = {
   ...baseConfig,
-  main: {
-    ...baseConfig.foreign,
-    eventContract: new baseConfig.foreign.web3.eth.Contract(ERC20_ABI, initialChecks.bridgeableTokenAddress)
-  },
+  main: baseConfig.foreign,
   event: 'Transfer',
-  eventFilter: { to: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS },
+  eventFilter: { to: baseConfig.foreign.bridgeAddress },
   sender: 'home',
   queue: 'home-prioritized',
   name: `watcher-${id}`,
