@@ -11,7 +11,7 @@ async function sendTx({ privateKey, data, nonce, gasPrice, amount, gasLimit, to,
       gasPrice,
       gas: gasLimit
     },
-    `0x${privateKey}`
+    privateKey
   )
 
   return new Promise((res, rej) =>

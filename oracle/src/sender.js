@@ -10,7 +10,6 @@ const { getNonce, getChainId } = require('./tx/web3')
 const {
   addExtraGas,
   checkHTTPS,
-  privateKeyToAddress,
   syncForEach,
   waitForFunds,
   waitForUnsuspend,
@@ -19,9 +18,7 @@ const {
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
-const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_TX_REDUNDANCY } = process.env
-
-const ORACLE_VALIDATOR_ADDRESS = privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
+const { ORACLE_TX_REDUNDANCY } = process.env
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -84,7 +81,7 @@ async function readNonce(forceUpdate) {
   logger.debug('Reading nonce')
   if (forceUpdate) {
     logger.debug('Forcing update of nonce')
-    return getNonce(web3, ORACLE_VALIDATOR_ADDRESS)
+    return getNonce(web3, config.validatorAddress)
   }
 
   const nonce = await redis.get(nonceKey)
@@ -93,7 +90,7 @@ async function readNonce(forceUpdate) {
     return Number(nonce)
   } else {
     logger.warn("Nonce wasn't found in the DB")
-    return getNonce(web3, ORACLE_VALIDATOR_ADDRESS)
+    return getNonce(web3, config.validatorAddress)
   }
 }
 
@@ -168,7 +165,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           gasPrice,
           amount: '0',
           gasLimit,
-          privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
+          privateKey: config.validatorPrivateKey,
           to: job.to,
           chainId,
           web3: web3Redundant
@@ -208,7 +205,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
 
         if (message.includes('insufficient funds')) {
           insufficientFunds = true
-          const currentBalance = await web3.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
+          const currentBalance = await web3.eth.getBalance(config.validatorAddress)
           minimumBalance = gasLimit.multipliedBy(gasPrice)
           logger.error(
             `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
@@ -238,7 +235,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
     if (insufficientFunds) {
       logger.warn('Insufficient funds. Stop sending transactions until the account has the minimum balance')
       channel.close()
-      waitForFunds(web3, ORACLE_VALIDATOR_ADDRESS, minimumBalance, resume, logger)
+      waitForFunds(web3, config.validatorAddress, minimumBalance, resume, logger)
     }
   } catch (e) {
     logger.error(e)

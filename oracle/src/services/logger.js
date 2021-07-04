@@ -9,12 +9,9 @@ const logger = pino({
   enabled: process.env.NODE_ENV !== 'test',
   name: config.name,
   level: process.env.ORACLE_LOG_LEVEL || 'debug',
-  base:
-    process.env.NODE_ENV === 'production'
-      ? {
-          validator: process.env.ORACLE_VALIDATOR_ADDRESS
-        }
-      : {}
+  base: {
+    validator: config.validatorAddress
+  }
 })
 
 setLogger(logger)
