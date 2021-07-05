@@ -1,5 +1,6 @@
 const { toWei, toBN, BN } = require('web3-utils')
 const { GasPriceOracle } = require('gas-price-oracle')
+const fetch = require('node-fetch')
 const { BRIDGE_MODES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
 
@@ -178,17 +179,16 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
   return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
 }
 
-// fetchFn has to be supplied (instead of just url to oracle),
-// because this utility function is shared between Browser and Node,
-// we use built-in 'fetch' on browser side, and `node-fetch` package in Node.
-const gasPriceFromSupplier = async (fetchFn, options = {}) => {
+const gasPriceFromSupplier = async (url, options = {}) => {
   try {
     let json
-    if (fetchFn) {
-      const response = await fetchFn()
+    if (url === 'gas-price-oracle') {
+      json = await gasPriceOracle.fetchGasPricesOffChain()
+    } else if (url) {
+      const response = await fetch(url, { timeout: 2000 })
       json = await response.json()
     } else {
-      json = await gasPriceOracle.fetchGasPricesOffChain()
+      return null
     }
     const oracleGasPrice = json[options.speedType]
 
