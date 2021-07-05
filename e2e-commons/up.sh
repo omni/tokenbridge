@@ -15,7 +15,6 @@ docker network create --driver bridge ultimate || true
 docker-compose up -d parity1 parity2 e2e
 
 startValidator () {
-    echo "$oraclePK"
     db_env="-e ORACLE_QUEUE_URL=amqp://$3 -e ORACLE_REDIS_URL=redis://$2"
 
     docker-compose $1 run -d --name $2 redis
