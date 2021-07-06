@@ -102,7 +102,7 @@ while [ "$1" != "" ]; do
     # these tx hash are hardcoded and need to be updated manually
     # once e2e environment setup process is changed
     echo '0xea625a823bc5018dc3a4efe349f623e5ebb8c987b55f44d50d6556f42af9a400' > txHashes.txt
-    docker-compose -p validator1 run -v ./txHashes.txt:/tmp/txHashes.txt $env oracle-amb yarn confirm:affirmation-request \
+    docker-compose -p validator1 run -v $(pwd)/txHashes.txt:/tmp/txHashes.txt $env oracle-amb yarn confirm:affirmation-request \
       /tmp/txHashes.txt \
       0x031c42e44485002c9215a5b1b75e9516131485ce29884a58765bf7a0038538f9
     docker-compose -p validator1 run $env oracle-amb yarn confirm:signature-request \
