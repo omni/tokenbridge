@@ -1,5 +1,6 @@
 require('../env')
 const path = require('path')
+const fs = require('fs')
 const { isAttached, connectWatcherToQueue, connection } = require('./services/amqpClient')
 const logger = require('./services/logger')
 const GasPrice = require('./services/gasPrice')
@@ -18,7 +19,20 @@ if (process.argv.length < 5) {
 const config = require(path.join('../config/', process.argv[2]))
 const { web3, eventContract, chain } = config.main
 
-const txHashes = process.argv.slice(4).filter(txHash => txHash.length === 66 && web3.utils.isHexStrict(txHash))
+const isTxHash = txHash => txHash.length === 66 && web3.utils.isHexStrict(txHash)
+function readTxHashes(filePath) {
+  return fs
+    .readFileSync(filePath)
+    .toString()
+    .split('\n')
+    .map(v => v.trim())
+    .filter(isTxHash)
+}
+
+const txHashesArgs = process.argv.slice(4)
+const rawTxHashes = txHashesArgs.filter(isTxHash)
+const txHashesFiles = txHashesArgs.filter(path => fs.existsSync(path)).flatMap(readTxHashes)
+const txHashes = [...rawTxHashes, ...txHashesFiles]
 
 const processSignatureRequests = require('./events/processSignatureRequests')(config)
 const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
