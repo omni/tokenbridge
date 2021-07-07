@@ -49,6 +49,12 @@
     "blockedHomeBox": "0xF9698Eb93702dfdd0e2d802088d4c21822a8A977",
     "monitor": "http://monitor-amb:3013/bridge"
   },
+  "amb2": {
+    "home": "0x5A42E119990c3F3A80Fea20aAF4c3Ff4DB240Cc9",
+    "foreign": "0x897527391ad3837604973d78D3514f44c36AB9FC",
+    "homeBox": "0xb008E9076fCbDB2C3AF84225Bc07Eb35B2bE5ECD",
+    "foreignBox": "0x4a58D6d8D416a5fBCAcf3dC52eb8bE8948E25127"
+  },
   "homeRPC": {
     "URL": "http://parity1:8545",
     "ID": "77"

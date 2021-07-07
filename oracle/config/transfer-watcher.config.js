@@ -30,6 +30,7 @@ module.exports = {
   },
   event: 'Transfer',
   eventFilter: { to: process.env.COMMON_FOREIGN_BRIDGE_ADDRESS },
+  sender: 'home',
   queue: 'home-prioritized',
   name: `watcher-${id}`,
   id
