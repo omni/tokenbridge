@@ -106,19 +106,20 @@ while [ "$1" != "" ]; do
   fi
 
   if [ "$1" == "manual-amb-relay" ]; then
+    oraclePK="-e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
     env="-e COMMON_HOME_BRIDGE_ADDRESS=0x5A42E119990c3F3A80Fea20aAF4c3Ff4DB240Cc9 -e COMMON_FOREIGN_BRIDGE_ADDRESS=0x897527391ad3837604973d78D3514f44c36AB9FC"
     # these tx hash are hardcoded and need to be updated manually
     # once e2e environment setup process is changed
     echo '0xea625a823bc5018dc3a4efe349f623e5ebb8c987b55f44d50d6556f42af9a400' > txHashes.txt
-    docker-compose -p validator1 run -v $(pwd)/txHashes.txt:/tmp/txHashes.txt $env oracle-amb yarn confirm:affirmation-request \
+    docker-compose -p validator1 run -v $(pwd)/txHashes.txt:/tmp/txHashes.txt $oraclePK $env oracle-amb yarn confirm:affirmation-request \
       /tmp/txHashes.txt \
       0x031c42e44485002c9215a5b1b75e9516131485ce29884a58765bf7a0038538f9
-    docker-compose -p validator1 run $env oracle-amb yarn confirm:signature-request \
+    docker-compose -p validator1 run $oraclePK $env oracle-amb yarn confirm:signature-request \
       0x1506a18af91afe732167ccbc178b55fc2547da4a814d13c015b6f496cf171754 | tee .tmp.log
     tx_hash=$(cat .tmp.log | grep generatedTransactionHash | jq -r .generatedTransactionHash)
     rm .tmp.log
     rm txHashes.txt
-    docker-compose -p validator1 run $env oracle-amb yarn confirm:collected-signatures $tx_hash
+    docker-compose -p validator1 run $oraclePK $env oracle-amb yarn confirm:collected-signatures $tx_hash
   fi
 
   shift # Shift all the parameters down by one
