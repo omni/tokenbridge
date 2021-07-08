@@ -99,7 +99,22 @@ function privateKeyToAddress(privateKey) {
   return privateKey ? new Web3().eth.accounts.privateKeyToAccount(add0xPrefix(privateKey)).address : null
 }
 
-function nonceError(e) {
+function isGasPriceError(e) {
+  const message = e.message.toLowerCase()
+  return message.includes('replacement transaction underpriced')
+}
+
+function isSameTransactionError(e) {
+  const message = e.message.toLowerCase()
+  return message.includes('transaction with the same hash was already imported') || message.includes('already known')
+}
+
+function isInsufficientBalanceError(e) {
+  const message = e.message.toLowerCase()
+  return message.includes('insufficient funds')
+}
+
+function isNonceError(e) {
   const message = e.message.toLowerCase()
   return (
     message.includes('transaction nonce is too low') ||
@@ -155,7 +170,10 @@ module.exports = {
   watchdog,
   add0xPrefix,
   privateKeyToAddress,
-  nonceError,
+  isGasPriceError,
+  isSameTransactionError,
+  isInsufficientBalanceError,
+  isNonceError,
   getRetrySequence,
   promiseAny,
   readAccessListFile,
