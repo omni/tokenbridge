@@ -8,8 +8,6 @@ const estimateGas = require('./estimateGas')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
 const { EXIT_CODES, MAX_CONCURRENT_EVENTS } = require('../../utils/constants')
 
-const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY } = process.env
-
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
 function processSignatureRequestsBuilder(config) {
@@ -48,7 +46,7 @@ function processSignatureRequestsBuilder(config) {
           expectedMessageLength
         })
 
-        const signature = web3.eth.accounts.sign(message, `0x${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}`)
+        const signature = web3.eth.accounts.sign(message, config.validatorPrivateKey)
 
         let gasEstimate
         try {

@@ -9,9 +9,9 @@ const { sendTx } = require('./tx/sendTx')
 const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
-const { ORACLE_VALIDATOR_ADDRESS, ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_ALLOW_HTTP_FOR_RPC } = process.env
+const { ORACLE_ALLOW_HTTP_FOR_RPC } = process.env
 
-if (process.argv.length < 5) {
+if (process.argv.length < 4) {
   logger.error('Please check the number of arguments, transaction hash is not present')
   process.exit(EXIT_CODES.GENERAL_ERROR)
 }
@@ -29,7 +29,7 @@ function readTxHashes(filePath) {
     .filter(isTxHash)
 }
 
-const txHashesArgs = process.argv.slice(4)
+const txHashesArgs = process.argv.slice(3)
 const rawTxHashes = txHashesArgs.filter(isTxHash)
 const txHashesFiles = txHashesArgs.filter(path => fs.existsSync(path)).flatMap(readTxHashes)
 const txHashes = [...rawTxHashes, ...txHashesFiles]
@@ -152,7 +152,7 @@ async function sendJobTx(jobs) {
   const { web3 } = config.sender === 'foreign' ? config.foreign : config.home
 
   const chainId = await getChainId(web3)
-  let nonce = await getNonce(web3, ORACLE_VALIDATOR_ADDRESS)
+  let nonce = await getNonce(web3, config.validatorAddress)
 
   await syncForEach(jobs, async job => {
     let gasLimit
@@ -170,7 +170,7 @@ async function sendJobTx(jobs) {
         gasPrice,
         amount: '0',
         gasLimit,
-        privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
+        privateKey: config.validatorPrivateKey,
         to: job.to,
         chainId,
         web3
@@ -189,7 +189,7 @@ async function sendJobTx(jobs) {
       )
 
       if (e.message.toLowerCase().includes('insufficient funds')) {
-        const currentBalance = await web3.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
+        const currentBalance = await web3.eth.getBalance(config.validatorAddress)
         const minimumBalance = gasLimit.multipliedBy(gasPrice)
         logger.error(
           `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`

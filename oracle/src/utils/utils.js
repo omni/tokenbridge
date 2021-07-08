@@ -153,6 +153,7 @@ module.exports = {
   addExtraGas,
   setIntervalAndRun,
   watchdog,
+  add0xPrefix,
   privateKeyToAddress,
   nonceError,
   getRetrySequence,

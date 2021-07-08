@@ -8,7 +8,8 @@ const {
   FOREIGN_AMB_ABI
 } = require('../../commons')
 const { web3Home, web3Foreign } = require('../src/services/web3')
-const { privateKeyToAddress } = require('../src/utils/utils')
+const { add0xPrefix, privateKeyToAddress } = require('../src/utils/utils')
+const { EXIT_CODES } = require('../src/utils/constants')
 
 const {
   ORACLE_BRIDGE_MODE,
@@ -79,9 +80,22 @@ const foreignConfig = {
 const maxProcessingTime =
   parseInt(ORACLE_MAX_PROCESSING_TIME, 10) || 4 * Math.max(homeConfig.pollingInterval, foreignConfig.pollingInterval)
 
+let validatorPrivateKey
+if (ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY) {
+  validatorPrivateKey = add0xPrefix(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
+  const derived = privateKeyToAddress(validatorPrivateKey)
+  if (ORACLE_VALIDATOR_ADDRESS && derived.toLowerCase() !== ORACLE_VALIDATOR_ADDRESS.toLowerCase()) {
+    console.error(
+      `Derived address from private key - ${derived} is different from ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}`
+    )
+    process.exit(EXIT_CODES.INCOMPATIBILITY)
+  }
+}
+
 module.exports = {
   eventFilter: {},
-  validatorAddress: ORACLE_VALIDATOR_ADDRESS || privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY),
+  validatorPrivateKey,
+  validatorAddress: ORACLE_VALIDATOR_ADDRESS || privateKeyToAddress(validatorPrivateKey),
   maxProcessingTime,
   shutdownKey: 'oracle-shutdown',
   home: homeConfig,
