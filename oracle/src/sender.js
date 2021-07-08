@@ -14,7 +14,10 @@ const {
   waitForFunds,
   waitForUnsuspend,
   watchdog,
-  nonceError
+  isGasPriceError,
+  isSameTransactionError,
+  isInsufficientBalanceError,
+  isNonceError
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
@@ -189,12 +192,11 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           e.message
         )
 
-        const message = e.message.toLowerCase()
-        if (message.includes('replacement transaction underpriced')) {
+        if (isGasPriceError(e)) {
           logger.info('Replacement transaction underpriced, forcing gas price update')
           GasPrice.start(config.id)
           failedTx.push(job)
-        } else if (isResend || message.includes('transaction with the same hash was already imported')) {
+        } else if (isResend || isSameTransactionError(e)) {
           resendJobs.push(job)
         } else {
           // if initial transaction sending has failed not due to the same hash error
@@ -203,14 +205,14 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           failedTx.push(job)
         }
 
-        if (message.includes('insufficient funds')) {
+        if (isInsufficientBalanceError(e)) {
           insufficientFunds = true
           const currentBalance = await web3.eth.getBalance(config.validatorAddress)
           minimumBalance = gasLimit.multipliedBy(gasPrice)
           logger.error(
             `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
           )
-        } else if (nonceError(e)) {
+        } else if (isNonceError(e)) {
           nonce = await readNonce(true)
         }
       }

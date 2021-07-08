@@ -205,7 +205,7 @@ jobs:
       - name: Login to docker registry
         run: docker login ${DOCKER_REGISTRY} -u ${{ github.actor }} -p ${{ github.token }}
       - name: Deploy contracts
-        run: ${{ steps.cache-repo.outputs.cache-hit }} && e2e-commons/up.sh deploy blocks
+        run: ${{ steps.cache-repo.outputs.cache-hit }} && e2e-commons/up.sh deploy generate-amb-tx blocks
       - name: Pull e2e oracle image
         run: |
          docker-compose -f ./e2e-commons/docker-compose.yml pull oracle-amb
