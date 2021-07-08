@@ -63,17 +63,19 @@ describe('arbitrary message bridging', () => {
       }
     })
   })
-  describe('Confirm Relay', () => {
-    it('should process lost affirmation-request via confirm relay', async () => {
-      const value = await homeBox.methods.value().call()
-      assert(value === '789', 'incorrect value')
-    })
+  if (process.env.ULTIMATE !== 'true') {
+    describe('Confirm Relay', () => {
+      it('should process lost affirmation-request via confirm relay', async () => {
+        const value = await homeBox.methods.value().call()
+        assert(value === '789', 'incorrect value')
+      })
 
-    it('should process lost signature-request & collected-signatures via confirm relay', async () => {
-      const value = await foreignBox.methods.value().call()
-      assert(value === '123', 'incorrect value')
+      it('should process lost signature-request & collected-signatures via confirm relay', async () => {
+        const value = await foreignBox.methods.value().call()
+        assert(value === '123', 'incorrect value')
+      })
     })
-  })
+  }
   describe('Home to Foreign', () => {
     describe('Subsidized Mode', () => {
       it('should bridge message', async () => {
