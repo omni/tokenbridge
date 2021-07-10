@@ -6,6 +6,7 @@ module.exports = {
   ...baseConfig,
   main: baseConfig.home,
   event: 'CollectedSignatures',
+  sender: 'foreign',
   queue: 'foreign-prioritized',
   name: `watcher-${id}`,
   id

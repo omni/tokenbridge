@@ -15,16 +15,19 @@ import { signatureToVRS, packSignatures } from '../utils/signatures'
 import { getSuccessExecutionData } from '../utils/getFinalizationEvent'
 import { TransactionReceipt } from 'web3-eth'
 
-const StyledButton = styled.button`
+const ActionButton = styled.button`
   color: var(--button-color);
   border-color: var(--font-color);
   margin-top: 10px;
+  min-width: 120px;
+  padding: 1rem;
   &:focus {
     outline: var(--button-color);
   }
 `
 
 interface ManualExecutionButtonParams {
+  safeExecutionAvailable: boolean
   messageData: string
   setExecutionData: Function
   signatureCollected: string[]
@@ -32,6 +35,7 @@ interface ManualExecutionButtonParams {
 }
 
 export const ManualExecutionButton = ({
+  safeExecutionAvailable,
   messageData,
   setExecutionData,
   signatureCollected,
@@ -40,6 +44,7 @@ export const ManualExecutionButton = ({
   const { foreign, setError } = useStateProvider()
   const { library, activate, account, active } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
+  const [allowFailures, setAllowFailures] = useState(false)
 
   useEffect(
     () => {
@@ -72,7 +77,11 @@ export const ManualExecutionButton = ({
       const signatures = packSignatures(signatureCollected.map(signatureToVRS))
       const messageId = messageData.slice(0, 66)
       const bridge = foreign.bridgeContract
-      const data = bridge.methods.executeSignatures(messageData, signatures).encodeABI()
+      const executeMethod =
+        safeExecutionAvailable && !allowFailures
+          ? bridge.methods.safeExecuteSignaturesWithAutoGasLimit
+          : bridge.methods.executeSignatures
+      const data = executeMethod(messageData, signatures).encodeABI()
       setManualExecution(false)
 
       library.eth
@@ -132,15 +141,35 @@ export const ManualExecutionButton = ({
       messageData,
       signatureCollected,
       setExecutionData,
-      setPendingExecution
+      setPendingExecution,
+      safeExecutionAvailable,
+      allowFailures
     ]
   )
 
   return (
-    <div className="is-center">
-      <StyledButton className="button outline" onClick={() => setManualExecution(true)}>
-        Execute
-      </StyledButton>
+    <div>
+      <div className="is-center">
+        <ActionButton className="button outline" onClick={() => setManualExecution(true)}>
+          Execute
+        </ActionButton>
+      </div>
+      {safeExecutionAvailable && (
+        <div
+          title="Allow executed message to fail and record its failure on-chain without reverting the whole transaction.
+          Use fixed gas limit for execution."
+          className="is-center"
+          style={{ paddingTop: 10 }}
+        >
+          <input
+            type="checkbox"
+            id="allow-failures"
+            checked={allowFailures}
+            onChange={e => setAllowFailures(e.target.checked)}
+          />
+          <label htmlFor="allow-failures">Unsafe mode</label>
+        </div>
+      )}
     </div>
   )
 }

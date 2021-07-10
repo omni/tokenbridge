@@ -6,6 +6,7 @@ module.exports = {
   ...baseConfig,
   main: baseConfig.foreign,
   event: 'UserRequestForAffirmation',
+  sender: 'home',
   queue: 'home-prioritized',
   name: `watcher-${id}`,
   id

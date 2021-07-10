@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useWindowWidth } from '@react-hook/window-size'
 import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS, ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION } from '../config/constants'
@@ -9,6 +9,7 @@ import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { Thead, AgeTd, StatusTd } from './commons/Table'
 import { ManualExecutionButton } from './ManualExecutionButton'
+import { useStateProvider } from '../state/StateProvider'
 
 const StyledExecutionConfirmation = styled.div`
   margin-top: 30px;
@@ -33,6 +34,8 @@ export const ExecutionConfirmation = ({
   executionEventsFetched,
   setPendingExecution
 }: ExecutionConfirmationParams) => {
+  const { foreign } = useStateProvider()
+  const [safeExecutionAvailable, setSafeExecutionAvailable] = useState(false)
   const availableManualExecution =
     !isHome &&
     (executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ||
@@ -47,6 +50,22 @@ export const ExecutionConfirmation = ({
   const txExplorerLink = getExplorerTxUrl(executionData.txHash, isHome)
   const formattedValidator =
     windowWidth < 850 && executionData.validator ? formatTxHash(executionData.validator) : executionData.validator
+
+  useEffect(
+    () => {
+      if (!availableManualExecution || !foreign.bridgeContract) return
+
+      const p = foreign.bridgeContract.methods.getBridgeInterfacesVersion().call()
+      p.then(({ major, minor }: any) => {
+        major = parseInt(major, 10)
+        minor = parseInt(minor, 10)
+        if (major < 5 || (major === 5 && minor < 7)) return
+
+        setSafeExecutionAvailable(true)
+      })
+    },
+    [availableManualExecution, foreign.bridgeContract]
+  )
 
   const getExecutionStatusElement = (validatorStatus = '') => {
     switch (validatorStatus) {
@@ -105,6 +124,7 @@ export const ExecutionConfirmation = ({
             {availableManualExecution && (
               <td>
                 <ManualExecutionButton
+                  safeExecutionAvailable={safeExecutionAvailable}
                   messageData={messageData}
                   setExecutionData={setExecutionData}
                   signatureCollected={signatureCollected as string[]}

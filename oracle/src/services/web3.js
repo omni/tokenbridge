@@ -1,5 +1,6 @@
 const Web3 = require('web3')
 const { HttpListProvider } = require('./HttpListProvider')
+const { SafeEthLogsProvider } = require('./SafeEthLogsProvider')
 const { RedundantHttpListProvider } = require('./RedundantHttpListProvider')
 const { RETRY_CONFIG } = require('../utils/constants')
 
@@ -37,10 +38,10 @@ const foreignOptions = {
   retry: RETRY_CONFIG
 }
 
-const homeProvider = new HttpListProvider(homeUrls, homeOptions)
+const homeProvider = new SafeEthLogsProvider(new HttpListProvider(homeUrls, homeOptions))
 const web3Home = new Web3(homeProvider)
 
-const foreignProvider = new HttpListProvider(foreignUrls, foreignOptions)
+const foreignProvider = new SafeEthLogsProvider(new HttpListProvider(foreignUrls, foreignOptions))
 const web3Foreign = new Web3(foreignProvider)
 
 let web3ForeignArchive = null

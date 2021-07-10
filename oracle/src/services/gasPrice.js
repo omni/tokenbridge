@@ -1,5 +1,4 @@
 require('../../env')
-const fetch = require('node-fetch')
 const { home, foreign } = require('../../config/base.config')
 const logger = require('../services/logger').child({
   module: 'gasPrice'
@@ -25,11 +24,11 @@ let cachedGasPrice = null
 
 let fetchGasPriceInterval = null
 
-const fetchGasPrice = async (speedType, factor, bridgeContract, gasPriceSupplierFetchFn) => {
+const fetchGasPrice = async (speedType, factor, bridgeContract, gasPriceSupplierUrl) => {
   const contractOptions = { logger }
   const supplierOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
   cachedGasPrice =
-    (await gasPriceFromSupplier(gasPriceSupplierFetchFn, supplierOptions)) ||
+    (await gasPriceFromSupplier(gasPriceSupplierUrl, supplierOptions)) ||
     (await gasPriceFromContract(bridgeContract, contractOptions)) ||
     cachedGasPrice
   return cachedGasPrice
@@ -63,16 +62,15 @@ async function start(chainId, fetchOnce) {
     throw new Error(`Unrecognized chainId '${chainId}'`)
   }
 
-  let fetchFn = null
-  if (gasPriceSupplierUrl !== 'gas-price-oracle') {
-    fetchFn = () => fetch(gasPriceSupplierUrl, { timeout: 2000 })
+  if (!gasPriceSupplierUrl) {
+    logger.warn({ chainId }, 'Gas price API is not configured, will fallback to the contract-supplied gas price')
   }
 
   if (fetchOnce) {
-    await fetchGasPrice(speedType, factor, contract, fetchFn)
+    await fetchGasPrice(speedType, factor, contract, gasPriceSupplierUrl)
   } else {
     fetchGasPriceInterval = await setIntervalAndRun(
-      () => fetchGasPrice(speedType, factor, contract, fetchFn),
+      () => fetchGasPrice(speedType, factor, contract, gasPriceSupplierUrl),
       updateInterval
     )
   }

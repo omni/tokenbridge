@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "mocha --exit",
+    "start": "mocha",
+    "generate-amb-tx": "node ./scripts/generate-amb-tx.js",
     "lint": "eslint . --ignore-path ../.eslintignore",
     "amb": "mocha test/amb.js",
     "erc-to-native": "mocha test/ercToNative.js",

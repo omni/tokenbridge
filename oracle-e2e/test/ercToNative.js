@@ -100,6 +100,8 @@ describe('erc to native', () => {
 
     const transferValue = homeWeb3.utils.toWei('0.05')
 
+    // transfer that should not be processed by the filter
+    await erc20Token.methods.transfer(secondUser.address, transferValue).send({ from: user.address, gas: 100000 })
     // send tokens to foreign bridge
     await erc20Token.methods
       .transfer(COMMON_FOREIGN_BRIDGE_ADDRESS, transferValue)
