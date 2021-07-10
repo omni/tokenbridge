@@ -1,5 +1,6 @@
 const Web3 = require('web3')
 const assert = require('assert')
+const { ASYNC_CALL_ERRORS } = require('../../oracle/src/utils/constants')
 const { user, homeRPC, foreignRPC, amb, validator } = require('../../e2e-commons/constants.json')
 const { uniformRetry } = require('../../e2e-commons/utils')
 const { BOX_ABI, HOME_AMB_ABI, FOREIGN_AMB_ABI, ambInformationSignatures } = require('../../commons')
@@ -264,7 +265,7 @@ describe('arbitrary message bridging', () => {
       await makeAsyncCall(selector, data2)
 
       assert(!(await homeBox.methods.status().call()), 'status is true')
-      assert.strictEqual(await homeBox.methods.data().call(), null, 'returned data is incorrect')
+      assert.strictEqual(await homeBox.methods.data().call(), ASYNC_CALL_ERRORS.REVERT, 'returned data is incorrect')
 
       const data3 = homeWeb3.eth.abi.encodeParameters(
         ['address', 'address', 'uint256', 'bytes'],
@@ -274,7 +275,7 @@ describe('arbitrary message bridging', () => {
       await makeAsyncCall(selector, data3)
 
       assert(!(await homeBox.methods.status().call()), 'status is true')
-      assert.strictEqual(await homeBox.methods.data().call(), null, 'returned data is incorrect')
+      assert.strictEqual(await homeBox.methods.data().call(), ASYNC_CALL_ERRORS.REVERT, 'returned data is incorrect')
     })
 
     it('should make async eth_call for specific block', async () => {
@@ -315,6 +316,11 @@ describe('arbitrary message bridging', () => {
       await makeAsyncCall(selector, data3)
 
       assert(!(await homeBox.methods.status().call()), 'status is true')
+      assert.strictEqual(
+        await homeBox.methods.data().call(),
+        ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE,
+        'returned data is incorrect'
+      )
     })
 
     it('should make async eth_blockNumber', async () => {

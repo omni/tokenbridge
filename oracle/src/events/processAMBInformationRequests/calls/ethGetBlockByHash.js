@@ -1,3 +1,4 @@
+const { ASYNC_CALL_ERRORS } = require('../../../utils/constants')
 const { serializeBlock } = require('./serializers')
 
 async function call(web3, data, foreignBlock) {
@@ -6,7 +7,7 @@ async function call(web3, data, foreignBlock) {
   const block = await web3.eth.getBlock(blockHash)
 
   if (block === null || block.number > foreignBlock.number) {
-    return [false, '0x']
+    return [false, ASYNC_CALL_ERRORS.NOT_FOUND]
   }
 
   return [true, serializeBlock(web3, block)]

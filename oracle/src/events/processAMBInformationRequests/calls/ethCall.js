@@ -1,5 +1,6 @@
 const { toBN } = require('web3').utils
 
+const { ASYNC_CALL_ERRORS } = require('../../../utils/constants')
 const { zipToObject } = require('../../../utils/utils')
 
 const argTypes = {
@@ -17,14 +18,12 @@ function makeCall(argNames) {
     const { blockNumber, ...opts } = zipToObject(argNames, args)
 
     if (blockNumber && toBN(blockNumber).gt(toBN(foreignBlock.number))) {
-      return [false, '0x']
+      return [false, ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE]
     }
 
-    const [status, result] = await web3.eth
+    return web3.eth
       .call(opts, blockNumber || foreignBlock.number)
-      .then(result => [true, result], err => [false, err.data])
-
-    return [status, web3.eth.abi.encodeParameter('bytes', result)]
+      .then(result => [true, web3.eth.abi.encodeParameter('bytes', result)], () => [false, ASYNC_CALL_ERRORS.REVERT])
   }
 }
 
