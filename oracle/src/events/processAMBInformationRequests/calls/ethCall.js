@@ -1,7 +1,7 @@
 const { toBN } = require('web3').utils
 
-const { ASYNC_CALL_ERRORS } = require('../../../utils/constants')
-const { zipToObject } = require('../../../utils/utils')
+const { ASYNC_CALL_ERRORS, ASYNC_ETH_CALL_DEFAULT_GAS_LIMIT } = require('../../../utils/constants')
+const { zipToObject, isRevertError } = require('../../../utils/utils')
 
 const argTypes = {
   to: 'address',
@@ -21,9 +21,19 @@ function makeCall(argNames) {
       return [false, ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE]
     }
 
+    if (!opts.gas) {
+      opts.gas = ASYNC_ETH_CALL_DEFAULT_GAS_LIMIT
+    }
+
     return web3.eth
       .call(opts, blockNumber || foreignBlock.number)
-      .then(result => [true, web3.eth.abi.encodeParameter('bytes', result)], () => [false, ASYNC_CALL_ERRORS.REVERT])
+      .then(result => [true, web3.eth.abi.encodeParameter('bytes', result)])
+      .catch(e => {
+        if (isRevertError(e)) {
+          return [false, ASYNC_CALL_ERRORS.REVERT]
+        }
+        throw e
+      })
   }
 }
 

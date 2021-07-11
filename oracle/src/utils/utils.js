@@ -123,6 +123,18 @@ function isNonceError(e) {
   )
 }
 
+function isRevertError(e) {
+  const message = e.message.toLowerCase()
+  // OE and NE returns "VM execution error"/"Transaction execution error"
+  // Geth returns "out of gas"/"intrinsic gas too low"/"execution reverted"
+  return (
+    message.includes('execution error') ||
+    message.includes('intrinsic gas too low') ||
+    message.includes('out of gas') ||
+    message.includes('execution reverted')
+  )
+}
+
 // Promise.all rejects on the first rejected Promise or fulfills with the list of results
 // inverted Promise.all fulfills with the first obtained result or rejects with the list of errors
 const invert = p => new Promise((res, rej) => p.then(rej, res))
@@ -174,6 +186,7 @@ module.exports = {
   isSameTransactionError,
   isInsufficientBalanceError,
   isNonceError,
+  isRevertError,
   getRetrySequence,
   promiseAny,
   readAccessListFile,
