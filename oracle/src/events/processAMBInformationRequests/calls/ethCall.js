@@ -1,6 +1,6 @@
 const { toBN } = require('web3').utils
 
-const { ASYNC_CALL_ERRORS, ASYNC_ETH_CALL_DEFAULT_GAS_LIMIT } = require('../../../utils/constants')
+const { ASYNC_CALL_ERRORS, ASYNC_ETH_CALL_MAX_GAS_LIMIT } = require('../../../utils/constants')
 const { zipToObject, isRevertError } = require('../../../utils/utils')
 
 const argTypes = {
@@ -21,8 +21,9 @@ function makeCall(argNames) {
       return [false, ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE]
     }
 
-    if (!opts.gas) {
-      opts.gas = ASYNC_ETH_CALL_DEFAULT_GAS_LIMIT
+    // different clients might use different default gas limits, so it makes sense to limit it by some large number
+    if (!opts.gas || toBN(opts.gas).gt(toBN(ASYNC_ETH_CALL_MAX_GAS_LIMIT))) {
+      opts.gas = ASYNC_ETH_CALL_MAX_GAS_LIMIT
     }
 
     return web3.eth
