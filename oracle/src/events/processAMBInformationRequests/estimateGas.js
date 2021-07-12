@@ -51,6 +51,20 @@ async function estimateGas({ web3, homeBridge, validatorContract, messageId, sta
       throw new InvalidValidatorError(`${address} is not a validator`)
     }
 
+    logger.debug('Check if InformationRetrieved event for this message already exists')
+    const logs = await homeBridge.getPastEvents('InformationRetrieved', {
+      fromBlock: '0',
+      toBlock: 'latest',
+      filter: { messageId }
+    })
+    if (logs.length > 0) {
+      logger.warn(
+        'This particular message was already signed and processed by other validators.' +
+          'However, evaluated async call result is different from the one recorded on-chain.'
+      )
+      throw new AlreadyProcessedError(e.message)
+    }
+
     throw new Error('Unknown error while processing message')
   }
 }

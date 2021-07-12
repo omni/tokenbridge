@@ -83,7 +83,6 @@ function processInformationRequestsBuilder(config) {
           if (e instanceof HttpListProviderError) {
             throw e
           }
-          logger.error(e)
           return [false, '0x']
         })
         logger.info({ requestSelector, method: asyncCallMethod, status, result }, 'Request result obtained')
