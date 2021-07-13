@@ -6,7 +6,16 @@ const logger = require('../../services/logger').child({
 const { strip0x } = require('../../../../commons')
 const { AMB_AFFIRMATION_REQUEST_EXTRA_GAS_ESTIMATOR: estimateExtraGas } = require('../../utils/constants')
 
-async function estimateGas({ web3, homeBridge, validatorContract, messageId, status, result, address }) {
+async function estimateGas({
+  web3,
+  homeBridge,
+  validatorContract,
+  messageId,
+  status,
+  result,
+  address,
+  homeBlockNumber
+}) {
   try {
     const gasEstimate = await homeBridge.methods.confirmInformation(messageId, status, result).estimateGas({
       from: address
@@ -53,7 +62,7 @@ async function estimateGas({ web3, homeBridge, validatorContract, messageId, sta
 
     logger.debug('Check if InformationRetrieved event for this message already exists')
     const logs = await homeBridge.getPastEvents('InformationRetrieved', {
-      fromBlock: '0',
+      fromBlock: homeBlockNumber,
       toBlock: 'latest',
       filter: { messageId }
     })

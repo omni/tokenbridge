@@ -97,7 +97,8 @@ function processInformationRequestsBuilder(config) {
             messageId,
             status,
             result,
-            address: config.validatorAddress
+            address: config.validatorAddress,
+            homeBlockNumber: homeBlock.number
           })
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {
