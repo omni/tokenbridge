@@ -1,12 +1,13 @@
 const { toBN } = require('web3').utils
 
+const { ASYNC_CALL_ERRORS } = require('../../../utils/constants')
 const { serializeBlock } = require('./serializers')
 
 async function call(web3, data, foreignBlock) {
   const blockNumber = web3.eth.abi.decodeParameter('uint256', data)
 
   if (toBN(blockNumber).gt(toBN(foreignBlock.number))) {
-    return [false, '0x']
+    return [false, ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE]
   }
 
   const block = await web3.eth.getBlock(blockNumber)

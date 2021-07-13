@@ -19,6 +19,7 @@ COPY --from=contracts /mono/contracts/build ./contracts/build
 COPY commons/package.json ./commons/
 COPY oracle-e2e/package.json ./oracle-e2e/
 COPY monitor-e2e/package.json ./monitor-e2e/
+COPY oracle/src/utils/constants.js ./oracle/src/utils/constants.js
 
 COPY yarn.lock .
 RUN NOYARNPOSTINSTALL=1 yarn install --frozen-lockfile --production
