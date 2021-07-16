@@ -1,3 +1,4 @@
+const { ASYNC_CALL_ERRORS } = require('../../../utils/constants')
 const { serializeReceipt } = require('./serializers')
 
 async function call(web3, data, foreignBlock) {
@@ -6,7 +7,7 @@ async function call(web3, data, foreignBlock) {
   const receipt = await web3.eth.getTransactionReceipt(hash)
 
   if (receipt === null || receipt.blockNumber > foreignBlock.number) {
-    return [false, '0x']
+    return [false, ASYNC_CALL_ERRORS.NOT_FOUND]
   }
 
   return [true, serializeReceipt(web3, receipt)]

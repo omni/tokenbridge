@@ -4,7 +4,13 @@ const { soliditySha3 } = require('web3').utils
 const { HttpListProviderError } = require('../../services/HttpListProvider')
 const rootLogger = require('../../services/logger')
 const makeBlockFinder = require('../../services/blockFinder')
-const { EXIT_CODES, MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/constants')
+const {
+  EXIT_CODES,
+  MAX_CONCURRENT_EVENTS,
+  EXTRA_GAS_ABSOLUTE,
+  ASYNC_CALL_ERRORS,
+  MAX_ASYNC_CALL_RESULT_LENGTH
+} = require('../../utils/constants')
 const estimateGas = require('./estimateGas')
 const { getValidatorContract, getBlock, getBlockNumber, getRequiredBlockConfirmations } = require('../../tx/web3')
 const { AlreadyProcessedError, AlreadySignedError, InvalidValidatorError } = require('../../utils/errors')
@@ -79,12 +85,17 @@ function processInformationRequestsBuilder(config) {
         logger.info({ requestSelector, method: asyncCallMethod, data }, 'Processing async request')
 
         const call = asyncCalls[asyncCallMethod]
-        const [status, result] = await call(web3ForeignArchive, data, foreignClosestBlock).catch(e => {
+        let [status, result] = await call(web3ForeignArchive, data, foreignClosestBlock).catch(e => {
           if (e instanceof HttpListProviderError) {
             throw e
           }
-          return [false, '0x']
+          logger.error({ error: e.message }, 'Unknown error during async call execution')
+          throw e
         })
+        if (result.length > 2 + MAX_ASYNC_CALL_RESULT_LENGTH * 2) {
+          status = false
+          result = ASYNC_CALL_ERRORS.RESULT_IS_TOO_LONG
+        }
         logger.info({ requestSelector, method: asyncCallMethod, status, result }, 'Request result obtained')
 
         let gasEstimate
@@ -97,7 +108,8 @@ function processInformationRequestsBuilder(config) {
             messageId,
             status,
             result,
-            address: config.validatorAddress
+            address: config.validatorAddress,
+            homeBlockNumber: homeBlock.number
           })
           logger.debug({ gasEstimate }, 'Gas estimated')
         } catch (e) {

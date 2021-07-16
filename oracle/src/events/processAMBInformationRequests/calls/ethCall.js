@@ -1,6 +1,7 @@
 const { toBN } = require('web3').utils
 
-const { zipToObject } = require('../../../utils/utils')
+const { ASYNC_CALL_ERRORS, ASYNC_ETH_CALL_MAX_GAS_LIMIT } = require('../../../utils/constants')
+const { zipToObject, isRevertError } = require('../../../utils/utils')
 
 const argTypes = {
   to: 'address',
@@ -17,14 +18,23 @@ function makeCall(argNames) {
     const { blockNumber, ...opts } = zipToObject(argNames, args)
 
     if (blockNumber && toBN(blockNumber).gt(toBN(foreignBlock.number))) {
-      return [false, '0x']
+      return [false, ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE]
     }
 
-    const [status, result] = await web3.eth
-      .call(opts, blockNumber || foreignBlock.number)
-      .then(result => [true, result], err => [false, err.data])
+    // different clients might use different default gas limits, so it makes sense to limit it by some large number
+    if (!opts.gas || toBN(opts.gas).gt(toBN(ASYNC_ETH_CALL_MAX_GAS_LIMIT))) {
+      opts.gas = ASYNC_ETH_CALL_MAX_GAS_LIMIT
+    }
 
-    return [status, web3.eth.abi.encodeParameter('bytes', result)]
+    return web3.eth
+      .call(opts, blockNumber || foreignBlock.number)
+      .then(result => [true, web3.eth.abi.encodeParameter('bytes', result)])
+      .catch(e => {
+        if (isRevertError(e)) {
+          return [false, ASYNC_CALL_ERRORS.REVERT]
+        }
+        throw e
+      })
   }
 }
 

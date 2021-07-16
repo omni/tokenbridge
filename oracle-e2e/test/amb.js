@@ -1,5 +1,6 @@
 const Web3 = require('web3')
 const assert = require('assert')
+const { ASYNC_CALL_ERRORS } = require('../../oracle/src/utils/constants')
 const { user, homeRPC, foreignRPC, amb, validator } = require('../../e2e-commons/constants.json')
 const { uniformRetry } = require('../../e2e-commons/utils')
 const { BOX_ABI, HOME_AMB_ABI, FOREIGN_AMB_ABI, ambInformationSignatures } = require('../../commons')
@@ -25,6 +26,45 @@ const blockHomeBox = new homeWeb3.eth.Contract(BOX_ABI, amb.blockedHomeBox, opts
 const foreignBox = new foreignWeb3.eth.Contract(BOX_ABI, amb.foreignBox, opts)
 const homeBridge = new homeWeb3.eth.Contract(HOME_AMB_ABI, amb.home, opts)
 const foreignBridge = new foreignWeb3.eth.Contract(FOREIGN_AMB_ABI, amb.foreign, opts)
+
+function validateBlock(web3, serialized, block) {
+  assert.strictEqual(serialized.length, 2 + 64 * 12)
+  const values = web3.eth.abi.decodeParameter(
+    '(uint256,bytes32,address,uint256,uint256,bytes32,bytes32,bytes32,bytes32,uint256,uint256,uint256)',
+    serialized
+  )
+  assert.strictEqual(values[0], block.number.toString(), 'wrong block number returned')
+  assert.strictEqual(values[1], block.hash, 'wrong block hash returned')
+  assert.strictEqual(values[2], block.miner, 'wrong block miner returned')
+  assert.strictEqual(values[3], block.gasUsed.toString(), 'wrong block gasUsed returned')
+  assert.strictEqual(values[4], block.gasLimit.toString(), 'wrong block gasLimit returned')
+  assert.strictEqual(values[5], block.parentHash, 'wrong block parentHash returned')
+  assert.strictEqual(values[6], block.receiptsRoot, 'wrong block receiptsRoot returned')
+  assert.strictEqual(values[7], block.stateRoot, 'wrong block stateRoot returned')
+  assert.strictEqual(values[8], block.transactionsRoot, 'wrong block transactionsRoot returned')
+  assert.strictEqual(values[9], block.timestamp.toString(), 'wrong block timestamp returned')
+  assert.strictEqual(values[10], block.difficulty, 'wrong block difficulty returned')
+  assert.strictEqual(values[11], block.totalDifficulty, 'wrong block totalDifficulty returned')
+}
+
+function validateTransaction(web3, serialized, tx) {
+  assert.strictEqual(serialized.length, 64 * 13 + tx.input.length + 56)
+  const values = web3.eth.abi.decodeParameter(
+    '(bytes32,uint256,bytes32,uint256,address,address,uint256,uint256,uint256,uint256,bytes)',
+    serialized
+  )
+  assert.strictEqual(values[0], tx.hash, 'wrong txHash returned')
+  assert.strictEqual(values[1], tx.blockNumber.toString(), 'wrong tx blockNumber returned')
+  assert.strictEqual(values[2], tx.blockHash.toString(), 'wrong tx blockHash returned')
+  assert.strictEqual(values[3], tx.transactionIndex.toString(), 'wrong tx transactionIndex returned')
+  assert.strictEqual(values[4], tx.from, 'wrong tx from returned')
+  assert.strictEqual(values[5], tx.to, 'wrong tx to returned')
+  assert.strictEqual(values[6], tx.value, 'wrong tx value returned')
+  assert.strictEqual(values[7], tx.nonce.toString(), 'wrong tx nonce returned')
+  assert.strictEqual(values[8], tx.gas.toString(), 'wrong tx gas returned')
+  assert.strictEqual(values[9], tx.gasPrice, 'wrong tx gasPrice returned')
+  assert.strictEqual(values[10], tx.input, 'wrong tx data returned')
+}
 
 describe('arbitrary message bridging', () => {
   let requiredSignatures = 1
@@ -264,7 +304,7 @@ describe('arbitrary message bridging', () => {
       await makeAsyncCall(selector, data2)
 
       assert(!(await homeBox.methods.status().call()), 'status is true')
-      assert.strictEqual(await homeBox.methods.data().call(), null, 'returned data is incorrect')
+      assert.strictEqual(await homeBox.methods.data().call(), ASYNC_CALL_ERRORS.REVERT, 'returned data is incorrect')
 
       const data3 = homeWeb3.eth.abi.encodeParameters(
         ['address', 'address', 'uint256', 'bytes'],
@@ -274,7 +314,7 @@ describe('arbitrary message bridging', () => {
       await makeAsyncCall(selector, data3)
 
       assert(!(await homeBox.methods.status().call()), 'status is true')
-      assert.strictEqual(await homeBox.methods.data().call(), null, 'returned data is incorrect')
+      assert.strictEqual(await homeBox.methods.data().call(), ASYNC_CALL_ERRORS.REVERT, 'returned data is incorrect')
     })
 
     it('should make async eth_call for specific block', async () => {
@@ -315,6 +355,11 @@ describe('arbitrary message bridging', () => {
       await makeAsyncCall(selector, data3)
 
       assert(!(await homeBox.methods.status().call()), 'status is true')
+      assert.strictEqual(
+        await homeBox.methods.data().call(),
+        ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE,
+        'returned data is incorrect'
+      )
     })
 
     it('should make async eth_blockNumber', async () => {
@@ -334,15 +379,8 @@ describe('arbitrary message bridging', () => {
 
       assert(await homeBox.methods.status().call(), 'status is false')
       const data = await homeBox.methods.data().call()
-      assert.strictEqual(data.length, 2 + 64 * 3)
-      const { 0: number, 1: hash, 2: miner } = homeWeb3.eth.abi.decodeParameters(
-        ['uint256', 'bytes32', 'address'],
-        data
-      )
       const block = await foreignWeb3.eth.getBlock(blockNumber)
-      assert.strictEqual(number, blockNumber, 'wrong block number returned')
-      assert.strictEqual(hash, block.hash, 'wrong block hash returned')
-      assert.strictEqual(miner, block.miner, 'wrong block miner returned')
+      validateBlock(homeWeb3, data, block)
     })
 
     it('should make async eth_getBlockByNumber and return latest block', async () => {
@@ -352,7 +390,7 @@ describe('arbitrary message bridging', () => {
 
       assert(await homeBox.methods.status().call(), 'status is false')
       const data = await homeBox.methods.data().call()
-      assert.strictEqual(data.length, 2 + 64 * 3)
+      assert.strictEqual(data.length, 2 + 64 * 12)
     })
 
     it('should make async eth_getBlockByHash', async () => {
@@ -364,16 +402,7 @@ describe('arbitrary message bridging', () => {
 
       assert(await homeBox.methods.status().call(), 'status is false')
       const data = await homeBox.methods.data().call()
-      assert.strictEqual(data.length, 2 + 64 * 3)
-
-      const { 0: number, 1: hash, 2: miner } = homeWeb3.eth.abi.decodeParameters(
-        ['uint256', 'bytes32', 'address'],
-        data
-      )
-
-      assert.strictEqual(number, blockNumber, 'wrong block number returned')
-      assert.strictEqual(hash, block.hash, 'wrong block hash returned')
-      assert.strictEqual(miner, block.miner, 'wrong block miner returned')
+      validateBlock(homeWeb3, data, block)
     })
 
     it('should make async eth_getBalance', async () => {
@@ -469,28 +498,7 @@ describe('arbitrary message bridging', () => {
 
       assert(await homeBox.methods.status().call(), 'status is false')
       const data = await homeBox.methods.data().call()
-      const dataTypes = [
-        'bytes32',
-        'uint256',
-        'address',
-        'address',
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'bytes'
-      ]
-      const values = homeWeb3.eth.abi.decodeParameters(dataTypes, data)
-
-      assert.strictEqual(values[0], txHash, 'wrong txHash returned')
-      assert.strictEqual(values[1], tx.blockNumber.toString(), 'wrong tx blockNumber returned')
-      assert.strictEqual(values[2], tx.from, 'wrong tx from returned')
-      assert.strictEqual(values[3], tx.to, 'wrong tx to returned')
-      assert.strictEqual(values[4], tx.value, 'wrong tx value returned')
-      assert.strictEqual(values[5], tx.nonce.toString(), 'wrong tx nonce returned')
-      assert.strictEqual(values[6], tx.gas.toString(), 'wrong tx gas returned')
-      assert.strictEqual(values[7], tx.gasPrice, 'wrong tx gasPrice returned')
-      assert.strictEqual(values[8], tx.input, 'wrong tx data returned')
+      validateTransaction(homeWeb3, data, tx)
     })
 
     it('should make async eth_getTransactionReceipt', async () => {
@@ -502,18 +510,25 @@ describe('arbitrary message bridging', () => {
 
       assert(await homeBox.methods.status().call(), 'status is false')
       const data = await homeBox.methods.data().call()
-      const dataTypes = ['bytes32', 'uint256', 'bool', '(address,bytes32[],bytes)[]']
-      const values = homeWeb3.eth.abi.decodeParameters(dataTypes, data)
+      const values = homeWeb3.eth.abi.decodeParameter(
+        '(bytes32,uint256,bytes32,uint256,address,address,uint256,bool,(address,bytes32[],bytes)[])',
+        data
+      )
 
       assert.strictEqual(values[0], txHash, 'wrong txHash returned')
       assert.strictEqual(values[1], receipt.blockNumber.toString(), 'wrong tx blockNumber returned')
-      assert.strictEqual(values[2], receipt.status, 'wrong tx status returned')
-      assert.strictEqual(values[3].length, 1, 'wrong logs length returned')
-      assert.strictEqual(values[3][0][0], receipt.logs[0].address, 'wrong log address returned')
-      assert.strictEqual(values[3][0][1].length, 2, 'wrong log topics length returned')
-      assert.strictEqual(values[3][0][1][0], receipt.logs[0].topics[0], 'wrong event signature returned')
-      assert.strictEqual(values[3][0][1][1], receipt.logs[0].topics[1], 'wrong message id returned')
-      assert.strictEqual(values[3][0][2], receipt.logs[0].data, 'wrong log data returned')
+      assert.strictEqual(values[2], receipt.blockHash, 'wrong tx blockHash returned')
+      assert.strictEqual(values[3], receipt.transactionIndex.toString(), 'wrong tx transactionIndex returned')
+      assert.strictEqual(values[4].toLowerCase(), receipt.from, 'wrong tx from returned')
+      assert.strictEqual(values[5].toLowerCase(), receipt.to, 'wrong tx to returned')
+      assert.strictEqual(values[6], receipt.gasUsed.toString(), 'wrong gasUsed to returned')
+      assert.strictEqual(values[7], receipt.status, 'wrong tx status returned')
+      assert.strictEqual(values[8].length, 1, 'wrong logs length returned')
+      assert.strictEqual(values[8][0][0], receipt.logs[0].address, 'wrong log address returned')
+      assert.strictEqual(values[8][0][1].length, 2, 'wrong log topics length returned')
+      assert.strictEqual(values[8][0][1][0], receipt.logs[0].topics[0], 'wrong event signature returned')
+      assert.strictEqual(values[8][0][1][1], receipt.logs[0].topics[1], 'wrong message id returned')
+      assert.strictEqual(values[8][0][2], receipt.logs[0].data, 'wrong log data returned')
     })
 
     it('should make async eth_getStorageAt', async () => {
