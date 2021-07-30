@@ -6,7 +6,7 @@ const logger = require('./services/logger')
 const { getShutdownFlag } = require('./services/shutdownState')
 const { getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
-const { EXIT_CODES } = require('./utils/constants')
+const { EXIT_CODES, BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT } = require('./utils/constants')
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -29,12 +29,14 @@ const { getTokensState } = require('./utils/tokenState')
 const { web3, bridgeContract, eventContract, startBlock, pollingInterval, chain } = config.main
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
 let lastProcessedBlock = Math.max(startBlock - 1, 0)
+let lastSeenBlockNumber = 0
+let sameBlockNumberCounter = 0
 
 async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3.currentProvider.subProvider.urls.forEach(checkHttps(chain))
+    web3.currentProvider.urls.forEach(checkHttps(chain))
 
     await getLastProcessedBlock()
     connectWatcherToQueue({
@@ -117,6 +119,31 @@ async function getLastBlockToProcess(web3, bridgeContract) {
     getBlockNumber(web3),
     getRequiredBlockConfirmations(bridgeContract)
   ])
+
+  if (lastBlockNumber < lastSeenBlockNumber) {
+    logger.warn(
+      { lastBlockNumber, lastSeenBlockNumber },
+      'Received block number less than already seen block. Switching to fallback RPC.'
+    )
+  } else if (lastBlockNumber === lastSeenBlockNumber) {
+    sameBlockNumberCounter++
+    if (sameBlockNumberCounter > 1) {
+      logger.info({ sameBlockNumberCounter }, 'Received the same block number for the more than twice')
+      if (sameBlockNumberCounter >= BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT) {
+        sameBlockNumberCounter = 0
+        logger.info(
+          { n: BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT },
+          'Received the same block number for too many times. Probably node is not synced anymore'
+        )
+        if (web3.currentProvider.switchToFallbackRPC) {
+          web3.currentProvider.switchToFallbackRPC()
+        }
+      }
+    }
+  } else {
+    sameBlockNumberCounter = 0
+    lastSeenBlockNumber = lastBlockNumber
+  }
   return lastBlockNumber - requiredBlockConfirmations
 }
 
