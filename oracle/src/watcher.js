@@ -121,23 +121,20 @@ async function getLastBlockToProcess(web3, bridgeContract) {
   ])
 
   if (lastBlockNumber < lastSeenBlockNumber) {
-    logger.warn(
-      { lastBlockNumber, lastSeenBlockNumber },
-      'Received block number less than already seen block. Switching to fallback RPC.'
-    )
+    sameBlockNumberCounter = 0
+    logger.warn({ lastBlockNumber, lastSeenBlockNumber }, 'Received block number less than already seen block')
+    web3.currentProvider.switchToFallbackRPC()
   } else if (lastBlockNumber === lastSeenBlockNumber) {
     sameBlockNumberCounter++
     if (sameBlockNumberCounter > 1) {
-      logger.info({ sameBlockNumberCounter }, 'Received the same block number for the more than twice')
+      logger.info({ lastBlockNumber, sameBlockNumberCounter }, 'Received the same block number more than twice')
       if (sameBlockNumberCounter >= BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT) {
         sameBlockNumberCounter = 0
-        logger.info(
-          { n: BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT },
+        logger.warn(
+          { lastBlockNumber, n: BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT },
           'Received the same block number for too many times. Probably node is not synced anymore'
         )
-        if (web3.currentProvider.switchToFallbackRPC) {
-          web3.currentProvider.switchToFallbackRPC()
-        }
+        web3.currentProvider.switchToFallbackRPC()
       }
     }
   } else {
