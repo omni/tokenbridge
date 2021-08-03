@@ -49,7 +49,7 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3.currentProvider.subProvider.urls.forEach(checkHttps(chain))
+    web3.currentProvider.urls.forEach(checkHttps(chain))
 
     attached = await isAttached()
     if (attached) {

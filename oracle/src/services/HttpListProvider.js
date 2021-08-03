@@ -41,6 +41,20 @@ function HttpListProvider(urls, options = {}) {
   })
 }
 
+HttpListProvider.prototype.switchToFallbackRPC = function() {
+  if (this.urls.length < 2) {
+    return
+  }
+
+  const prevIndex = this.currentIndex
+  const newIndex = (prevIndex + 1) % this.urls.length
+  this.logger.info(
+    { index: newIndex, oldURL: this.urls[prevIndex], newURL: this.urls[newIndex] },
+    'Switching to fallback JSON-RPC URL'
+  )
+  this.currentIndex = newIndex
+}
+
 HttpListProvider.prototype.send = async function send(payload, callback) {
   // if fallback URL is being used for too long, switch back to the primary URL
   if (this.currentIndex > 0 && Date.now() - this.lastTimeUsedPrimary > FALLBACK_RPC_URL_SWITCH_TIMEOUT) {
