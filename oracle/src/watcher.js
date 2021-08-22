@@ -156,14 +156,14 @@ async function main({ sendToQueue }) {
       logger.info(`Oracle watcher was unsuspended.`)
     }
 
-    await checkConditions()
-
     const lastBlockToProcess = await getLastBlockToProcess(web3, bridgeContract)
 
     if (lastBlockToProcess <= lastProcessedBlock) {
       logger.debug('All blocks already processed')
       return
     }
+
+    await checkConditions()
 
     const fromBlock = lastProcessedBlock + 1
     const rangeEndBlock = config.blockPollingLimit ? fromBlock + config.blockPollingLimit : lastBlockToProcess

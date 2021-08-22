@@ -13,12 +13,19 @@ const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 function processTransfersBuilder(config) {
   const { bridgeContract, web3 } = config.home
 
-  const userRequestForAffirmationAbi = config.foreign.bridgeABI.find(
-    e => e.type === 'event' && e.name === 'UserRequestForAffirmation'
-  )
-  const tokensSwappedAbi = config.foreign.bridgeABI.find(e => e.type === 'event' && e.name === 'TokensSwapped')
-  const userRequestForAffirmationHash = web3.eth.abi.encodeEventSignature(userRequestForAffirmationAbi)
-  const tokensSwappedHash = tokensSwappedAbi ? web3.eth.abi.encodeEventSignature(tokensSwappedAbi) : '0x'
+  const userRequestForAffirmationHash = web3.eth.abi.encodeEventSignature('UserRequestForAffirmation(address,uint256)')
+  const redeemHash = web3.eth.abi.encodeEventSignature('Redeem(address,uint256,uint256)')
+
+  const foreignBridgeAddress = config.foreign.bridgeAddress
+
+  const decodeAddress = data => web3.eth.abi.decodeParameter('address', data)
+
+  const isUserRequestForAffirmation = e =>
+    e.address.toLowerCase() === foreignBridgeAddress.toLowerCase() && e.topics[0] === userRequestForAffirmationHash
+  const isRedeem = cDaiTokenAddress => e =>
+    e.address.toLowerCase() === cDaiTokenAddress.toLowerCase() &&
+    e.topics[0] === redeemHash &&
+    decodeAddress(e.data.slice(0, 66)).toLowerCase() === foreignBridgeAddress.toLowerCase()
 
   let validatorContract = null
 
@@ -32,37 +39,35 @@ function processTransfersBuilder(config) {
     rootLogger.debug(`Processing ${transfers.length} Transfer events`)
     const callbacks = transfers
       .map(transfer => async () => {
-        const { from, value } = transfer.returnValues
+        const { from, to, value } = transfer.returnValues
 
         const logger = rootLogger.child({
-          eventTransactionHash: transfer.transactionHash
+          eventTransactionHash: transfer.transactionHash,
+          from,
+          to,
+          value
         })
 
-        logger.info({ from, value }, `Processing transfer ${transfer.transactionHash}`)
+        logger.info('Processing transfer')
 
         const receipt = await config.foreign.web3.eth.getTransactionReceipt(transfer.transactionHash)
 
-        const existsAffirmationEvent = receipt.logs.some(
-          e => e.address === config.foreign.bridgeAddress && e.topics[0] === userRequestForAffirmationHash
-        )
-
-        if (existsAffirmationEvent) {
-          logger.info(
-            `Transfer event discarded because a transaction with alternative receiver detected in transaction ${
-              transfer.transactionHash
-            }`
-          )
+        if (receipt.logs.some(isUserRequestForAffirmation)) {
+          logger.info('Transfer event discarded because affirmation is detected in the same transaction')
           return
         }
 
-        const existsTokensSwappedEvent = tokensSwappedAbi
-          ? receipt.logs.some(e => e.address === config.foreign.bridgeAddress && e.topics[0] === tokensSwappedHash)
-          : false
+        if (from === ZERO_ADDRESS) {
+          logger.info('Mint-like transfers from zero address are not processed')
+          return
+        }
 
-        if (from === ZERO_ADDRESS && existsTokensSwappedEvent) {
-          logger.info(
-            `Transfer event discarded because token swap is detected in transaction ${transfer.transactionHash}`
-          )
+        logger.debug('Getting cDai token address')
+        const cDaiAddress = await config.foreign.bridgeContract.methods.cDaiToken().call()
+        logger.debug({ cDaiAddress }, 'cDai token address obtained')
+
+        if (receipt.logs.some(isRedeem(cDaiAddress))) {
+          logger.info('Transfer event discarded because cDai redeem is detected in the same transaction')
           return
         }
 
