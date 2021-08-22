@@ -15,6 +15,7 @@ function processTransfersBuilder(config) {
 
   const userRequestForAffirmationHash = web3.eth.abi.encodeEventSignature('UserRequestForAffirmation(address,uint256)')
   const redeemHash = web3.eth.abi.encodeEventSignature('Redeem(address,uint256,uint256)')
+  const transferHash = web3.eth.abi.encodeEventSignature('Transfer(address,address,uint256)')
 
   const foreignBridgeAddress = config.foreign.bridgeAddress
 
@@ -22,10 +23,15 @@ function processTransfersBuilder(config) {
 
   const isUserRequestForAffirmation = e =>
     e.address.toLowerCase() === foreignBridgeAddress.toLowerCase() && e.topics[0] === userRequestForAffirmationHash
-  const isRedeem = cDaiTokenAddress => e =>
-    e.address.toLowerCase() === cDaiTokenAddress.toLowerCase() &&
+  const isRedeem = cTokenAddress => e =>
+    e.address.toLowerCase() === cTokenAddress.toLowerCase() &&
     e.topics[0] === redeemHash &&
     decodeAddress(e.data.slice(0, 66)).toLowerCase() === foreignBridgeAddress.toLowerCase()
+  const isCTokenTransfer = cTokenAddress => e =>
+    e.address.toLowerCase() === cTokenAddress.toLowerCase() &&
+    e.topics[0] === transferHash &&
+    decodeAddress(e.topics[1]).toLowerCase() === foreignBridgeAddress.toLowerCase() &&
+    decodeAddress(e.topics[2]).toLowerCase() === cTokenAddress.toLowerCase()
 
   let validatorContract = null
 
@@ -62,12 +68,12 @@ function processTransfersBuilder(config) {
           return
         }
 
-        logger.debug('Getting cDai token address')
-        const cDaiAddress = await config.foreign.bridgeContract.methods.cDaiToken().call()
-        logger.debug({ cDaiAddress }, 'cDai token address obtained')
-
-        if (receipt.logs.some(isRedeem(cDaiAddress))) {
-          logger.info('Transfer event discarded because cDai redeem is detected in the same transaction')
+        // when bridge performs a withdrawal from Compound, the following three events occur
+        // * token.Transfer(from=cToken, to=bridge, amount=X)
+        // * cToken.Redeem(redeemer=bridge, amount=X, tokens=Y)
+        // * cToken.Transfer(from=bridge, to=cToken, amount=Y)
+        if (receipt.logs.some(isRedeem(from)) && receipt.logs.some(isCTokenTransfer(from))) {
+          logger.info('Transfer event discarded because cToken redeem is detected in the same transaction')
           return
         }
 

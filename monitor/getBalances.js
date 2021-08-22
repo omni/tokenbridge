@@ -46,24 +46,6 @@ async function main(bridgeMode, eventsInfo) {
     const foreignBridge = new web3Foreign.eth.Contract(FOREIGN_ERC_TO_NATIVE_ABI, COMMON_FOREIGN_BRIDGE_ADDRESS)
     const erc20Address = await foreignBridge.methods.erc20token().call()
     const erc20Contract = new web3Foreign.eth.Contract(ERC20_ABI, erc20Address)
-    let investedAmountInDai = 0
-    let bridgeDsrBalance = 0
-    let displayChaiToken = false
-
-    try {
-      logger.debug('calling foreignBridge.methods.isChaiTokenEnabled')
-      if (await foreignBridge.methods.isChaiTokenEnabled().call()) {
-        displayChaiToken = true
-        logger.debug('calling foreignBridge.methods.investedAmountInDai')
-        investedAmountInDai = await foreignBridge.methods.investedAmountInDai().call()
-        logger.debug('calling foreignBridge.methods.dsrBalance')
-        bridgeDsrBalance = await foreignBridge.methods.dsrBalance().call()
-      } else {
-        logger.debug('Chai token is currently disabled')
-      }
-    } catch (e) {
-      logger.debug('Methods for chai token are not present')
-    }
 
     logger.debug('calling erc20Contract.methods.balanceOf')
     const foreignErc20Balance = await erc20Contract.methods
@@ -85,29 +67,16 @@ async function main(bridgeMode, eventsInfo) {
     const burntCoinsBN = new BN(burntCoins)
     const totalSupplyBN = mintedCoinsBN.minus(burntCoinsBN)
     const foreignErc20BalanceBN = new BN(foreignErc20Balance).plus(lateForeignConfirmationsTotalValue)
-    const investedAmountInDaiBN = new BN(investedAmountInDai)
-    const bridgeDsrBalanceBN = new BN(bridgeDsrBalance)
 
-    const diff = foreignErc20BalanceBN
-      .plus(investedAmountInDaiBN)
-      .minus(totalSupplyBN)
-      .toFixed()
-
-    const foreign = {
-      erc20Balance: Web3Utils.fromWei(foreignErc20Balance)
-    }
-
-    if (displayChaiToken) {
-      foreign.investedErc20Balance = Web3Utils.fromWei(investedAmountInDai)
-      foreign.accumulatedInterest = Web3Utils.fromWei(bridgeDsrBalanceBN.minus(investedAmountInDaiBN).toString(10))
-    }
-
+    const diff = foreignErc20BalanceBN.minus(totalSupplyBN).toFixed()
     logger.debug('Done')
     return {
       home: {
         totalSupply: Web3Utils.fromWei(totalSupplyBN.toFixed())
       },
-      foreign,
+      foreign: {
+        erc20Balance: Web3Utils.fromWei(foreignErc20Balance)
+      },
       balanceDiff: Number(Web3Utils.fromWei(diff)),
       ...blockRanges,
       lastChecked: Math.floor(Date.now() / 1000)
