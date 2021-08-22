@@ -38,7 +38,7 @@
   "ercToNativeBridge": {
     "home": "0x5118AC62AE912Dd5B51EEfF7338c4fcb0248Ba8c",
     "foreign": "0x32198D570fffC7033641F8A9094FFDCaAEF42624",
-    "foreignToken": "0x7cc4b1851c35959d34e635a470f6b5c43ba3c9c9",
+    "foreignToken": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "monitor": "http://monitor-erc20-native:3012/bridge"
   },
   "amb": {
