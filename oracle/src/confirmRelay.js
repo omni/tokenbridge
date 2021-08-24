@@ -6,6 +6,7 @@ const logger = require('./services/logger')
 const GasPrice = require('./services/gasPrice')
 const { getNonce, getChainId, getEventsFromTx } = require('./tx/web3')
 const { sendTx } = require('./tx/sendTx')
+const { getTokensState } = require('./utils/tokenState')
 const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
@@ -17,7 +18,7 @@ if (process.argv.length < 4) {
 }
 
 const config = require(path.join('../config/', process.argv[2]))
-const { web3, eventContract, chain } = config.main
+const { web3, eventContract, chain, bridgeContract } = config.main
 
 const isTxHash = txHash => txHash.length === 66 && web3.utils.isHexStrict(txHash)
 function readTxHashes(filePath) {
@@ -114,6 +115,12 @@ function processEvents(events) {
 }
 
 async function main({ sendJob, txHashes }) {
+  if (config.id === 'erc-native-transfer') {
+    logger.debug('Getting token address to listen Transfer events')
+    const state = await getTokensState(bridgeContract, logger)
+    eventContract.options.address = state.bridgeableTokenAddress
+  }
+
   logger.info(`Processing ${txHashes.length} input transactions`)
   for (const txHash of txHashes) {
     try {

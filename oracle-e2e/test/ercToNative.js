@@ -33,6 +33,10 @@ const homeBridge = new homeWeb3.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME
 
 describe('erc to native', () => {
   before(async () => {
+    console.log('Initializing interest')
+    await foreignBridge.methods
+      .initializeInterest(ercToNativeBridge.foreignToken, 1, 1, validator.address)
+      .send({ from: validator.address, gas: '4000000' })
     if (process.env.ULTIMATE === 'true') {
       return
     }
@@ -112,6 +116,7 @@ describe('erc to native', () => {
       .catch(e => {
         console.error(e)
       })
+    await foreignBridge.methods.investDai().send({ from: validator.address, gas: '4000000' })
 
     // check that balance increases
     await uniformRetry(async retry => {
