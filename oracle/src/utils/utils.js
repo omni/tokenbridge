@@ -106,7 +106,11 @@ function isGasPriceError(e) {
 
 function isSameTransactionError(e) {
   const message = e.message.toLowerCase()
-  return message.includes('transaction with the same hash was already imported') || message.includes('already known')
+  return (
+    message.includes('transaction with the same hash was already imported') ||
+    message.includes('already known') ||
+    message.includes('alreadyknown')
+  )
 }
 
 function isInsufficientBalanceError(e) {
@@ -119,7 +123,8 @@ function isNonceError(e) {
   return (
     message.includes('transaction nonce is too low') ||
     message.includes('nonce too low') ||
-    message.includes('transaction with same nonce in the queue')
+    message.includes('transaction with same nonce in the queue') ||
+    message.includes('oldnonce')
   )
 }
 
