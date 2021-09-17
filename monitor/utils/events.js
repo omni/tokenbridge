@@ -100,6 +100,21 @@ async function main(mode) {
     chain: 'home'
   })).map(normalizeEvent)
   homeToForeignRequests = [...homeToForeignRequests, ...homeToForeignRequestsNew]
+  if (bridgeMode === BRIDGE_MODES.ARBITRARY_MESSAGE) {
+    const used = {}
+    const total = homeToForeignRequests.length
+    const onlyFirstUniqueFilter = e => {
+      const msgId = e.returnValues.messageId || e.transactionHash
+      if (used[msgId]) {
+        return false
+      }
+      used[msgId] = true
+      return true
+    }
+    homeToForeignRequests = homeToForeignRequests.filter(onlyFirstUniqueFilter)
+    const dropped = total - homeToForeignRequests.length
+    logger.debug(`Dropped ${dropped}/${total} UserRequestForSignature events with same message id`)
+  }
 
   logger.debug("calling foreignBridge.getPastEvents('RelayedMessage')")
   const homeToForeignConfirmations = (await getPastEvents(foreignBridge, {
