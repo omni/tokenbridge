@@ -7,10 +7,26 @@
   loop_control:
     loop_var: file
 
-- name: Set the local container logs configuration file
+- name: Set the oracle's containers local logs configuration file
   template:
     src: 31-oracle-docker.conf.j2
     dest: /etc/rsyslog.d/31-oracle-docker.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set the redis container local logs configuration file
+  template:
+    src: 32-redis-docker.conf.j2
+    dest: /etc/rsyslog.d/32-redis-docker.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set the rabbit MQ container local logs configuration file
+  template:
+    src: 33-rabbit-docker.conf.j2
+    dest: /etc/rsyslog.d/33-rabbit-docker.conf
     owner: root
     group: root
     mode: 0644
