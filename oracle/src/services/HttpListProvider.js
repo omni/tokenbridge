@@ -4,8 +4,12 @@ const { FALLBACK_RPC_URL_SWITCH_TIMEOUT } = require('../utils/constants')
 
 const { onInjected } = require('./injectedLogger')
 
+const { ORACLE_JSONRPC_ERROR_CODES } = process.env
+
 // From EIP-1474 and Infura documentation
-const JSONRPC_ERROR_CODES = [-32603, -32002, -32005]
+const JSONRPC_ERROR_CODES = ORACLE_JSONRPC_ERROR_CODES
+  ? ORACLE_JSONRPC_ERROR_CODES.split(',').map(s => parseInt(s, 10))
+  : [-32603, -32002, -32005]
 
 const defaultOptions = {
   name: 'main',
@@ -39,6 +43,20 @@ function HttpListProvider(urls, options = {}) {
   onInjected(logger => {
     this.logger = logger.child({ module: `HttpListProvider:${this.options.name}` })
   })
+}
+
+HttpListProvider.prototype.switchToFallbackRPC = function() {
+  if (this.urls.length < 2) {
+    return
+  }
+
+  const prevIndex = this.currentIndex
+  const newIndex = (prevIndex + 1) % this.urls.length
+  this.logger.info(
+    { index: newIndex, oldURL: this.urls[prevIndex], newURL: this.urls[newIndex] },
+    'Switching to fallback JSON-RPC URL'
+  )
+  this.currentIndex = newIndex
 }
 
 HttpListProvider.prototype.send = async function send(payload, callback) {

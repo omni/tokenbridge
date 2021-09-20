@@ -1,6 +1,6 @@
 /var/log/docker/*/docker.log {
   rotate 5
-  size 1G
+  size 100M
   compress
   missingok
   delaycompress
@@ -8,7 +8,7 @@
 }
 /var/log/docker/*.log {
   rotate 5
-  size 1G
+  size 100M
   compress
   missingok
   delaycompress

@@ -11,7 +11,6 @@ const {
   OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI
 } = require('../../commons')
 const { normalizeEventInformation } = require('./message')
-const { filterTransferBeforeES } = require('./tokenUtils')
 const { writeFile, readCacheFile } = require('./file')
 const { web3Home, web3Foreign, getHomeBlockNumber, getForeignBlockNumber } = require('./web3')
 const { getPastEvents } = require('./web3Cache')
@@ -160,80 +159,32 @@ async function main(mode) {
         filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
       },
       chain: 'foreign'
+    }))
+      .map(normalizeEvent)
+      .filter(e => e.recipient !== ZERO_ADDRESS) // filter mint operation during SCD-to-MCD swaps
+      .filter(e => e.recipient.toLowerCase() !== '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643') // filter cDai withdraws during compounding
+
+    // Get transfer events for each previously used Sai token
+    const saiTokenAddress = '0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359'
+    const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, saiTokenAddress)
+    logger.debug('Half duplex token:', saiTokenAddress)
+    logger.debug("calling halfDuplexTokenContract.getPastEvents('Transfer')")
+    // https://etherscan.io/tx/0xd0c3c92c94e05bc71256055ce8c4c993e047f04e04f3283a04e4cb077b71f6c6
+    const blockNumberHalfDuplexDisabled = 9884448
+    const halfDuplexTransferEvents = (await getPastEvents(halfDuplexTokenContract, {
+      event: 'Transfer',
+      fromBlock: MONITOR_FOREIGN_START_BLOCK,
+      toBlock: Math.min(blockNumberHalfDuplexDisabled, foreignDelayedBlockNumber),
+      options: {
+        filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
+      },
+      chain: 'foreign'
     })).map(normalizeEvent)
 
-    let directTransfers = transferEvents
-    const tokensSwappedAbiExists = FOREIGN_ABI.filter(e => e.type === 'event' && e.name === 'TokensSwapped')[0]
-    if (tokensSwappedAbiExists) {
-      logger.debug('collecting half duplex tokens participated in the bridge balance')
-      logger.debug("calling foreignBridge.getPastEvents('TokensSwapped')")
-      const tokensSwappedEvents = await getPastEvents(foreignBridge, {
-        event: 'TokensSwapped',
-        fromBlock: MONITOR_FOREIGN_START_BLOCK,
-        toBlock: foreignBlockNumber,
-        chain: 'foreign',
-        safeToBlock: foreignDelayedBlockNumber
-      })
-
-      // Get token swap events emitted by foreign bridge
-      const bridgeTokensSwappedEvents = tokensSwappedEvents.filter(e => e.address === COMMON_FOREIGN_BRIDGE_ADDRESS)
-
-      // Get transfer events for each previous erc20
-      const uniqueTokenAddressesSet = new Set(bridgeTokensSwappedEvents.map(e => e.returnValues.from))
-
-      // Exclude chai token from previous erc20
-      try {
-        logger.debug('calling foreignBridge.chaiToken() to remove it from half duplex tokens list')
-        const chaiToken = await foreignBridge.methods.chaiToken().call()
-        uniqueTokenAddressesSet.delete(chaiToken)
-      } catch (e) {
-        logger.debug('call to foreignBridge.chaiToken() failed')
-      }
-      // Exclude dai token from previous erc20
-      try {
-        logger.debug('calling foreignBridge.erc20token()  to remove it from half duplex tokens list')
-        const daiToken = await foreignBridge.methods.erc20token().call()
-        uniqueTokenAddressesSet.delete(daiToken)
-      } catch (e) {
-        logger.debug('call to foreignBridge.erc20token() failed')
-      }
-
-      const uniqueTokenAddresses = [...uniqueTokenAddressesSet]
-      await Promise.all(
-        uniqueTokenAddresses.map(async tokenAddress => {
-          const halfDuplexTokenContract = new web3Foreign.eth.Contract(ERC20_ABI, tokenAddress)
-
-          logger.debug('Half duplex token:', tokenAddress)
-          logger.debug("calling halfDuplexTokenContract.getPastEvents('Transfer')")
-          const halfDuplexTransferEvents = (await getPastEvents(halfDuplexTokenContract, {
-            event: 'Transfer',
-            fromBlock: MONITOR_FOREIGN_START_BLOCK,
-            toBlock: foreignDelayedBlockNumber,
-            options: {
-              filter: { to: COMMON_FOREIGN_BRIDGE_ADDRESS }
-            },
-            chain: 'foreign'
-          })).map(normalizeEvent)
-
-          // Remove events after the ES
-          logger.debug('filtering half duplex transfers happened before ES')
-          const validHalfDuplexTransfers = await filterTransferBeforeES(halfDuplexTransferEvents)
-
-          transferEvents = [...validHalfDuplexTransfers, ...transferEvents]
-        })
-      )
-
-      // filter transfer that is part of a token swap
-      directTransfers = transferEvents.filter(
-        e =>
-          bridgeTokensSwappedEvents.findIndex(
-            t => t.transactionHash === e.referenceTx && e.recipient === ZERO_ADDRESS
-          ) === -1
-      )
-    }
+    transferEvents = [...halfDuplexTransferEvents, ...transferEvents]
 
     // Get transfer events that didn't have a UserRequestForAffirmation event in the same transaction
-    directTransfers = directTransfers.filter(
+    const directTransfers = transferEvents.filter(
       e => foreignToHomeRequests.findIndex(t => t.referenceTx === e.referenceTx) === -1
     )
 

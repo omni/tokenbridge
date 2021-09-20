@@ -1,5 +1,5 @@
 const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/ForeignBridgeErcToNative').abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/XDaiForeignBridge.json').abi
 const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
 const BLOCK_REWARD_ABI = require('../contracts/build/contracts/BlockRewardMock').abi
 const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi

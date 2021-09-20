@@ -40,7 +40,7 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3.currentProvider.subProvider.urls.forEach(checkHttps(config.id))
+    web3.currentProvider.urls.forEach(checkHttps(config.id))
 
     GasPrice.start(config.id)
 

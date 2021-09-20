@@ -38,10 +38,10 @@ const foreignOptions = {
   retry: RETRY_CONFIG
 }
 
-const homeProvider = new SafeEthLogsProvider(new HttpListProvider(homeUrls, homeOptions))
+const homeProvider = SafeEthLogsProvider(new HttpListProvider(homeUrls, homeOptions))
 const web3Home = new Web3(homeProvider)
 
-const foreignProvider = new SafeEthLogsProvider(new HttpListProvider(foreignUrls, foreignOptions))
+const foreignProvider = SafeEthLogsProvider(new HttpListProvider(foreignUrls, foreignOptions))
 const web3Foreign = new Web3(foreignProvider)
 
 let web3ForeignArchive = null
