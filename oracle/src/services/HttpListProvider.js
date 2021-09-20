@@ -4,8 +4,12 @@ const { FALLBACK_RPC_URL_SWITCH_TIMEOUT } = require('../utils/constants')
 
 const { onInjected } = require('./injectedLogger')
 
+const { ORACLE_JSONRPC_ERROR_CODES } = process.env
+
 // From EIP-1474 and Infura documentation
-const JSONRPC_ERROR_CODES = [-32603, -32002, -32005]
+const JSONRPC_ERROR_CODES = ORACLE_JSONRPC_ERROR_CODES
+  ? ORACLE_JSONRPC_ERROR_CODES.split(',').map(s => parseInt(s, 10))
+  : [-32603, -32002, -32005]
 
 const defaultOptions = {
   name: 'main',
