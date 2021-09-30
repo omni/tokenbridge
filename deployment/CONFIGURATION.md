@@ -54,7 +54,7 @@ The config above would install the Oracle on `<host_ip_A>`, and both Oracle and 
 | syslog_server_port: `"<protocol>://<ip>:<port>"` | Optional port specification for bridge logs. This value will be provided by an administrator if required.  |
 
 `hosts.yml` can contain multiple bridge configurations at once.
-
+```
 3. Copy the bridge name(s) to the hosts.yml file. 
    1. Go to the group_vars folder. 
    `cd group_vars`
