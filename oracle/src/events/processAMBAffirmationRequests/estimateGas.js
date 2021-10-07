@@ -15,7 +15,7 @@ async function estimateGas({ web3, homeBridge, validatorContract, message, addre
     const gasEstimate = await homeBridge.methods.executeAffirmation(message).estimateGas({
       from: address
     })
-    const msgGasLimit = parseAMBHeader(message).gasLimit
+    const msgGasLimit = Math.ceil((parseAMBHeader(message).gasLimit * 64) / 63)
     // message length in bytes
     const len = strip0x(message).length / 2 - MIN_AMB_HEADER_LENGTH
 

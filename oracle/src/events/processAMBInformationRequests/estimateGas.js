@@ -24,7 +24,8 @@ async function estimateGas({
     // message length in bytes
     const len = strip0x(result).length / 2
 
-    const callbackGasLimit = parseInt(await homeBridge.methods.maxGasPerTx().call(), 10)
+    let callbackGasLimit = parseInt(await homeBridge.methods.maxGasPerTx().call(), 10)
+    callbackGasLimit = Math.ceil((callbackGasLimit * 64) / 63)
 
     return gasEstimate + callbackGasLimit + estimateExtraGas(len)
   } catch (e) {
