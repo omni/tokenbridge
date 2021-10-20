@@ -27,6 +27,7 @@ if (!isAddress(contractAddress)) {
 const gasPrice = process.env.COMMON_HOME_GAS_PRICE_FALLBACK || '1000000000'
 
 async function main() {
+  // assuming that we are using this contract - https://github.com/omni/interest-fetcher-contract
   const contract = new web3Home.eth.Contract([{ name: 'fetchInterest', type: 'function', inputs: [] }], contractAddress)
   const chainId = await web3Home.eth.getChainId()
   const data = contract.methods.fetchInterest().encodeABI()
