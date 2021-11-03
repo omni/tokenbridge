@@ -86,6 +86,14 @@ export const getConfirmationsForTx = async (
     setPendingConfirmations(validatorPendingConfirmations.length > 0)
   } else {
     setPendingConfirmations(false)
+    if (fromHome) {
+      // fetch collected signatures for possible manual processing
+      setSignatureCollected(
+        await Promise.all(
+          Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
+        )
+      )
+    }
   }
 
   const undefinedConfirmations = validatorConfirmations.filter(
@@ -115,15 +123,6 @@ export const getConfirmationsForTx = async (
       status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED
     }))
     updateConfirmations(notRequiredConfirmations)
-
-    if (fromHome) {
-      // fetch collected signatures for possible manual processing
-      setSignatureCollected(
-        await Promise.all(
-          Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
-        )
-      )
-    }
   }
 
   // get transactions from success signatures
