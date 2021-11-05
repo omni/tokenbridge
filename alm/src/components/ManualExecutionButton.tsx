@@ -45,6 +45,7 @@ export const ManualExecutionButton = ({
   const { library, activate, account, active } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
   const [allowFailures, setAllowFailures] = useState(false)
+  const notReady = !foreign.bridgeContract || !signatureCollected || !signatureCollected.length
 
   useEffect(
     () => {
@@ -150,7 +151,7 @@ export const ManualExecutionButton = ({
   return (
     <div>
       <div className="is-center">
-        <ActionButton className="button outline" onClick={() => setManualExecution(true)}>
+        <ActionButton disabled={notReady} className="button outline" onClick={() => setManualExecution(true)}>
           Execute
         </ActionButton>
       </div>

@@ -51,6 +51,14 @@ async function main(bridgeMode, eventsInfo) {
     const foreignErc20Balance = await erc20Contract.methods
       .balanceOf(COMMON_FOREIGN_BRIDGE_ADDRESS)
       .call({}, foreignDelayedBlockNumber)
+    let foreignErc20BalanceBN = new BN(foreignErc20Balance).plus(lateForeignConfirmationsTotalValue)
+    try {
+      logger.debug('calling foreignBridge.methods.investedAmount')
+      const invested = await foreignBridge.methods.investedAmount(erc20Address).call({}, foreignDelayedBlockNumber)
+      foreignErc20BalanceBN = foreignErc20BalanceBN.plus(invested)
+    } catch (_) {
+      logger.debug('compounding related methods are not present in the foreign bridge')
+    }
 
     const homeBridge = new web3Home.eth.Contract(HOME_ERC_TO_NATIVE_ABI, COMMON_HOME_BRIDGE_ADDRESS)
     logger.debug('calling homeBridge.methods.blockRewardContract')
@@ -66,7 +74,6 @@ async function main(bridgeMode, eventsInfo) {
     const mintedCoinsBN = new BN(mintedCoins)
     const burntCoinsBN = new BN(burntCoins)
     const totalSupplyBN = mintedCoinsBN.minus(burntCoinsBN)
-    const foreignErc20BalanceBN = new BN(foreignErc20Balance).plus(lateForeignConfirmationsTotalValue)
 
     const diff = foreignErc20BalanceBN.minus(totalSupplyBN).toFixed()
     logger.debug('Done')
