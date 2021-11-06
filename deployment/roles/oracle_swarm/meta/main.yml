@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: common, skip_repo: true, skip_compose: true }

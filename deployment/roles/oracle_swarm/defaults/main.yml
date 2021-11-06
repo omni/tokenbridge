@@ -1,0 +1,9 @@
+---
+bridge_path: "/home/{{ compose_service_user }}/bridge"
+bridge_data_path: "/home/{{ compose_service_user }}/bridge_data"
+ORACLE_ALLOW_HTTP_FOR_RPC: no
+ORACLE_QUEUE_URL: amqp://rabbit
+ORACLE_REDIS_URL: redis://redis
+keyfile_path: "/root/.key"
+keystore_path: "/root/.keystore.json"
+oracle_image: poanetwork/tokenbridge-oracle:latest

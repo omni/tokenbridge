@@ -1,0 +1,41 @@
+---
+- name: Leave swarm cluster
+  become_user: "{{ compose_service_user }}"
+  shell: docker swarm leave --force
+  ignore_errors: true
+
+- name: Init docker swarm
+  become_user: "{{ compose_service_user }}"
+  shell: docker swarm init --autolock
+  register: swarm_init
+
+- name: Print unlock token
+  debug: var=swarm_init.stdout_lines
+
+- name: Create oracle directory
+  file:
+    path: "{{ bridge_path }}/oracle"
+    state: directory
+    mode: '0755'
+
+- name: Create rabbitmq directory
+  file:
+    path: "{{ bridge_data_path }}/{{ item }}"
+    state: directory
+    mode: '0775'
+  loop:
+    - rabbitmq
+    - redis
+
+- name: Install .env config
+  template:
+    src: .env.j2
+    dest: "{{ bridge_path }}/oracle/.env"
+    owner: "{{ compose_service_user }}"
+    mode: '0640'
+
+- name: Install docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ bridge_path }}/oracle/docker-compose.yml"
+    mode: '0755'

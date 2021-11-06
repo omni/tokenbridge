@@ -4,6 +4,11 @@
   become: true
   roles:
     - { role: oracle }
+- name: Install Oracle as a Docker Swarm service
+  hosts: oracle_swarm
+  become: true
+  roles:
+    - { role: oracle_swarm }
 - name: Install Monitor
   hosts: monitor
   become: true

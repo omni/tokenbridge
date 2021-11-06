@@ -1,0 +1,19 @@
+# This role creates a poabridge service which is designed to manage docker-compose bridge deployment.
+# /etc/init.d/poabridge start, status, stop, restart - does what the services usually do in such cases.
+---
+- name: "Set poabridge service"
+  template:
+    src: poabridge.j2
+    dest: "/etc/init.d/poabridge"
+    owner: root
+    mode: 755
+
+- name: "Enable the service"
+  service:
+    name: "poabridge"
+    state: started
+    enabled: yes
+    use: service
+
+- name: Start the service
+  shell: service poabridge start

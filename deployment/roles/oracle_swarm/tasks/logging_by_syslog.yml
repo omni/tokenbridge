@@ -1,0 +1,5 @@
+---
+- name: Change logging facility to forward logs to syslog
+  script: modify_to_use_syslog.py "{{ bridge_path }}/oracle/{{ file }}.yml"
+  args:
+    executable: python3

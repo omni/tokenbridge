@@ -99,6 +99,11 @@ function privateKeyToAddress(privateKey) {
   return privateKey ? new Web3().eth.accounts.privateKeyToAccount(add0xPrefix(privateKey)).address : null
 }
 
+function loadKeystore(keystorePath, password) {
+  const keystore = JSON.parse(fs.readFileSync(keystorePath).toString())
+  return new Web3().eth.accounts.wallet.decrypt(keystore, password)[0]
+}
+
 function isGasPriceError(e) {
   const message = e.message.toLowerCase()
   return message.includes('replacement transaction underpriced')
@@ -195,5 +200,6 @@ module.exports = {
   getRetrySequence,
   promiseAny,
   readAccessListFile,
-  zipToObject
+  zipToObject,
+  loadKeystore
 }

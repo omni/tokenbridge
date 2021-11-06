@@ -8,13 +8,15 @@ const {
   FOREIGN_AMB_ABI
 } = require('../../commons')
 const { web3Home, web3Foreign } = require('../src/services/web3')
-const { add0xPrefix, privateKeyToAddress } = require('../src/utils/utils')
+const { add0xPrefix, privateKeyToAddress, loadKeystore } = require('../src/utils/utils')
 const { EXIT_CODES } = require('../src/utils/constants')
 
 const {
   ORACLE_BRIDGE_MODE,
   ORACLE_VALIDATOR_ADDRESS,
   ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
+  ORACLE_VALIDATOR_KEYSTORE_PATH,
+  ORACLE_VALIDATOR_KEYSTORE_PASSWORD,
   ORACLE_MAX_PROCESSING_TIME,
   COMMON_HOME_BRIDGE_ADDRESS,
   COMMON_FOREIGN_BRIDGE_ADDRESS,
@@ -81,6 +83,7 @@ const maxProcessingTime =
   parseInt(ORACLE_MAX_PROCESSING_TIME, 10) || 4 * Math.max(homeConfig.pollingInterval, foreignConfig.pollingInterval)
 
 let validatorPrivateKey
+let validatorAddress = ORACLE_VALIDATOR_ADDRESS
 if (ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY) {
   validatorPrivateKey = add0xPrefix(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
   const derived = privateKeyToAddress(validatorPrivateKey)
@@ -90,12 +93,22 @@ if (ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY) {
     )
     process.exit(EXIT_CODES.INCOMPATIBILITY)
   }
+  validatorAddress = derived
+} else if (ORACLE_VALIDATOR_KEYSTORE_PATH) {
+  try {
+    const keystore = loadKeystore(ORACLE_VALIDATOR_KEYSTORE_PATH, ORACLE_VALIDATOR_KEYSTORE_PASSWORD)
+    validatorPrivateKey = keystore.privateKey
+    validatorAddress = keystore.address
+  } catch (e) {
+    console.error(`Can't load keystore file: ${e.message}`)
+    process.exit(EXIT_CODES.INCOMPATIBILITY)
+  }
 }
 
 module.exports = {
   eventFilter: {},
   validatorPrivateKey,
-  validatorAddress: ORACLE_VALIDATOR_ADDRESS || privateKeyToAddress(validatorPrivateKey),
+  validatorAddress,
   maxProcessingTime,
   shutdownKey: 'oracle-shutdown',
   home: homeConfig,

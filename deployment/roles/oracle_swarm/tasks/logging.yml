@@ -1,0 +1,47 @@
+---
+- include_tasks: logging_by_syslog.yml
+  with_items:
+    - docker-compose
+  loop_control:
+    loop_var: file
+
+- name: Set the oracle's containers local logs configuration file
+  template:
+    src: 31-oracle-docker.conf.j2
+    dest: /etc/rsyslog.d/31-oracle-docker.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set the redis container local logs configuration file
+  template:
+    src: 32-redis-docker.conf.j2
+    dest: /etc/rsyslog.d/32-redis-docker.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set the rabbit MQ container local logs configuration file
+  template:
+    src: 33-rabbit-docker.conf.j2
+    dest: /etc/rsyslog.d/33-rabbit-docker.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set the log configuration file to send container logs to remote server
+  template:
+    src: 36-oracle-remote-logging.conf.j2
+    dest: /etc/rsyslog.d/36-oracle-remote-logging.conf
+    owner: root
+    group: root
+    mode: 0644
+  when: syslog_server_port is defined
+
+- name: Discarding unwanted messages in rsyslog
+  blockinfile:
+    path: /etc/rsyslog.conf
+    insertbefore: "# Where to place spool and state files"
+    marker: "#{mark} add string to discarding unwanted messages"
+    content: ':msg, contains, "ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY" ~'
+  notify: restart rsyslog

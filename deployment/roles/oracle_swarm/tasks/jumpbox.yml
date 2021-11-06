@@ -1,0 +1,6 @@
+---
+- name: Pull the containers images
+  shell: docker pull {{ oracle_image }}
+  args:
+    chdir: "{{ bridge_path }}/oracle"
+  when: skip_pull is undefined

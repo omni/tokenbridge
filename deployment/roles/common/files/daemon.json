@@ -1,4 +1,4 @@
 {
-    "live-restore": true,
+    "live-restore": false,
     "no-new-privileges": true
 }

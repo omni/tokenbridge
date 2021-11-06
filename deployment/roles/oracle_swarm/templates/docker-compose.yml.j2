@@ -1,0 +1,130 @@
+version: '3.9'
+x-deploy: &x-deploy
+  resources:
+    limits:
+      cpus: '0.3'
+      memory: 500M
+    reservations:
+      memory: 100M
+x-keystore-access: &x-keystore-access
+  environment:
+    ORACLE_VALIDATOR_KEYSTORE_PATH: /run/secrets/oracle_keystore
+    ORACLE_VALIDATOR_KEYSTORE_PASSWORD:
+  secrets:
+    - oracle_keystore
+services:
+  rabbit:
+    image: rabbitmq:3
+    hostname: rabbit
+    deploy: *x-deploy
+    environment: [ 'RABBITMQ_NODENAME=node@rabbit' ]
+    networks:
+      - net_rabbit_bridge_request
+      - net_rabbit_bridge_collected
+      - net_rabbit_bridge_affirmation
+      - net_rabbit_bridge_senderhome
+      - net_rabbit_bridge_senderforeign
+    volumes: [ '{{ bridge_data_path }}/rabbitmq:/var/lib/rabbitmq/mnesia' ]
+  redis:
+    image: redis:4
+    hostname: redis
+    deploy: *x-deploy
+    command: [ redis-server, --appendonly, 'yes' ]
+    networks:
+      - net_db_bridge_request
+      - net_db_bridge_collected
+      - net_db_bridge_affirmation
+      - net_db_bridge_senderhome
+      - net_db_bridge_senderforeign
+      - net_db_bridge_shutdown
+    volumes: [ '{{ bridge_data_path }}/redis:/data' ]
+  bridge_request:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    <<: *x-keystore-access
+    entrypoint: yarn watcher:signature-request
+    networks:
+      - net_db_bridge_request
+      - net_rabbit_bridge_request
+  bridge_collected:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    entrypoint: yarn watcher:collected-signatures
+    networks:
+      - net_db_bridge_collected
+      - net_rabbit_bridge_collected
+  bridge_affirmation:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    entrypoint: yarn watcher:affirmation-request
+    networks:
+      - net_db_bridge_affirmation
+      - net_rabbit_bridge_affirmation
+  bridge_senderhome:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    <<: *x-keystore-access
+    entrypoint: yarn sender:home
+    networks:
+      - net_db_bridge_senderhome
+      - net_rabbit_bridge_senderhome
+  bridge_senderforeign:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    <<: *x-keystore-access
+    entrypoint: yarn sender:foreign
+    networks:
+      - net_db_bridge_senderforeign
+      - net_rabbit_bridge_senderforeign
+  bridge_shutdown:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    entrypoint: yarn manager:shutdown
+    networks:
+      - net_db_bridge_shutdown
+{% if ORACLE_BRIDGE_MODE == "ERC_TO_NATIVE" %}
+  bridge_transfer:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    entrypoint: yarn watcher:transfer
+    networks:
+      - net_db_bridge_transfer
+      - net_rabbit_bridge_transfer
+{% endif %}
+{% if ORACLE_BRIDGE_MODE == "ARBITRARY_MESSAGE" %}
+  bridge_information:
+    image: {{ oracle_image }}
+    deploy: *x-deploy
+    env_file: ./.env
+    entrypoint: yarn watcher:information-request
+    networks:
+      - net_db_bridge_information
+      - net_rabbit_bridge_information
+{% endif %}
+networks:
+  net_db_bridge_request:
+  net_db_bridge_collected:
+  net_db_bridge_affirmation:
+  net_db_bridge_senderhome:
+  net_db_bridge_senderforeign:
+  net_db_bridge_shutdown:
+  net_db_bridge_transfer:
+  net_db_bridge_information:
+  net_rabbit_bridge_request:
+  net_rabbit_bridge_collected:
+  net_rabbit_bridge_affirmation:
+  net_rabbit_bridge_senderhome:
+  net_rabbit_bridge_senderforeign:
+  net_rabbit_bridge_transfer:
+  net_rabbit_bridge_information:
+
+secrets:
+  oracle_keystore:
+    external: true

@@ -1,0 +1,66 @@
+#! /bin/bash
+
+### BEGIN INIT INFO
+# Provides:          poabridge
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+
+WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridge_path + '/oracle' if bridge_path[:1] != "/" else bridge_path + '/oracle' }}"
+
+#Getting path to private key file and variable name for parsing key file
+source {{ keyfile_path }}
+
+start(){
+    echo "Starting bridge.."
+    cd $WORKDIR
+    sudo -u "{{ compose_service_user }}" docker stack rm oracle
+    sudo -u "{{ compose_service_user }}" "ORACLE_VALIDATOR_KEYSTORE_PASSWORD=$ORACLE_VALIDATOR_KEYSTORE_PASSWORD" docker stack deploy oracle -c docker-compose.yml
+}
+
+stop(){
+    echo "Stopping bridge.."
+    cd $WORKDIR
+    sudo -u "{{ compose_service_user }}" docker stack rm oracle
+    sleep 2
+}
+
+status(){
+    echo "Bridge status:"
+    cd $WORKDIR
+    sudo -u "{{ compose_service_user }}" docker service ls
+}
+
+
+case "$1" in
+
+  start)
+      start
+    ;;
+
+  stop)
+      stop
+    ;;
+
+  status)
+      status
+    ;;
+
+  restart)
+    echo "Restarting bridge.."
+    stop
+    start
+    ;;
+
+  *)
+    echo $"Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+
+esac
+
+exit 0
