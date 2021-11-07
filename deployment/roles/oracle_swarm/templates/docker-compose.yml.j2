@@ -12,11 +12,15 @@ x-keystore-access: &x-keystore-access
     ORACLE_VALIDATOR_KEYSTORE_PASSWORD:
   secrets:
     - oracle_keystore
+x-logging: &x-logging
+  driver: 'syslog'
+  options: {tag: '{{ '{{.Name}}/{{.ID}}' }}' }
 services:
   rabbit:
     image: rabbitmq:3
     hostname: rabbit
     deploy: *x-deploy
+    logging: *x-logging
     environment: [ 'RABBITMQ_NODENAME=node@rabbit' ]
     networks:
       - net_rabbit_bridge_request
@@ -29,6 +33,7 @@ services:
     image: redis:4
     hostname: redis
     deploy: *x-deploy
+    logging: *x-logging
     command: [ redis-server, --appendonly, 'yes' ]
     networks:
       - net_db_bridge_request
@@ -41,6 +46,7 @@ services:
   bridge_request:
     image: {{ oracle_image }}
     deploy: *x-deploy
+    logging: *x-logging
     env_file: ./.env
     <<: *x-keystore-access
     entrypoint: yarn watcher:signature-request
@@ -58,6 +64,7 @@ services:
   bridge_affirmation:
     image: {{ oracle_image }}
     deploy: *x-deploy
+    logging: *x-logging
     env_file: ./.env
     entrypoint: yarn watcher:affirmation-request
     networks:
@@ -75,6 +82,7 @@ services:
   bridge_senderforeign:
     image: {{ oracle_image }}
     deploy: *x-deploy
+    logging: *x-logging
     env_file: ./.env
     <<: *x-keystore-access
     entrypoint: yarn sender:foreign
@@ -92,6 +100,7 @@ services:
   bridge_transfer:
     image: {{ oracle_image }}
     deploy: *x-deploy
+    logging: *x-logging
     env_file: ./.env
     entrypoint: yarn watcher:transfer
     networks:
@@ -102,6 +111,7 @@ services:
   bridge_information:
     image: {{ oracle_image }}
     deploy: *x-deploy
+    logging: *x-logging
     env_file: ./.env
     entrypoint: yarn watcher:information-request
     networks:
@@ -115,15 +125,19 @@ networks:
   net_db_bridge_senderhome:
   net_db_bridge_senderforeign:
   net_db_bridge_shutdown:
+{% if ORACLE_BRIDGE_MODE == "ERC_TO_NATIVE" %}
   net_db_bridge_transfer:
+  net_rabbit_bridge_transfer:
+{% endif %}
+{% if ORACLE_BRIDGE_MODE == "ARBITRARY_MESSAGE" %}
   net_db_bridge_information:
+  net_rabbit_bridge_information:
+{% endif %}
   net_rabbit_bridge_request:
   net_rabbit_bridge_collected:
   net_rabbit_bridge_affirmation:
   net_rabbit_bridge_senderhome:
   net_rabbit_bridge_senderforeign:
-  net_rabbit_bridge_transfer:
-  net_rabbit_bridge_information:
 
 secrets:
   oracle_keystore:

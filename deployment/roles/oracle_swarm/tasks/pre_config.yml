@@ -1,16 +1,18 @@
 ---
-- name: Leave swarm cluster
-  become_user: "{{ compose_service_user }}"
-  shell: docker swarm leave --force
-  ignore_errors: true
-
 - name: Init docker swarm
-  become_user: "{{ compose_service_user }}"
-  shell: docker swarm init --autolock
-  register: swarm_init
+  community.docker.docker_swarm:
+    state: present
+    autolock_managers: yes
+    listen_addr: 127.0.0.1:2377
+
+- name: Get unlock token
+  community.docker.docker_swarm_info:
+    unlock_key: yes
+  register: result
 
 - name: Print unlock token
-  debug: var=swarm_init.stdout_lines
+  debug:
+    var: result.swarm_unlock_key
 
 - name: Create oracle directory
   file:

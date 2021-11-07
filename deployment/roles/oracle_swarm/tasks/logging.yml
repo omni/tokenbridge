@@ -1,10 +1,4 @@
 ---
-- include_tasks: logging_by_syslog.yml
-  with_items:
-    - docker-compose
-  loop_control:
-    loop_var: file
-
 - name: Set the oracle's containers local logs configuration file
   template:
     src: 31-oracle-docker.conf.j2

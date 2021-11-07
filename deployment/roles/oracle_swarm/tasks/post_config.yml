@@ -25,7 +25,10 @@
     mode: 0600
 
 - name: Create swarm secret
-  shell: docker secret create oracle_keystore {{ keystore_path }}
+  community.docker.docker_secret:
+    name: oracle_keystore
+    state: present
+    data_src: "{{ keystore_path }}"
 
 - name: Remove unencrypted keystore file
   file:

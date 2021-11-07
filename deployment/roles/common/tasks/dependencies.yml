@@ -45,7 +45,6 @@
     comment: user to run docker-compose
     group: docker
     createhome: yes
-  when: skip_compose is undefined
 
 - name: Install auditd
   apt:
