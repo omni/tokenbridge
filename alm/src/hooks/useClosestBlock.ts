@@ -3,6 +3,7 @@ import { TransactionReceipt } from 'web3-eth'
 import { useStateProvider } from '../state/StateProvider'
 import { FOREIGN_EXPLORER_API, HOME_EXPLORER_API } from '../config/constants'
 import { getClosestBlockByTimestamp } from '../utils/explorer'
+import { getBlockByTimestamp } from '../utils/web3'
 
 export function useClosestBlock(
   searchHome: boolean,
@@ -31,7 +32,12 @@ export function useClosestBlock(
           const api = searchHome ? HOME_EXPLORER_API : FOREIGN_EXPLORER_API
           setBlockNumber(await getClosestBlockByTimestamp(api, timestamp))
           return
-        } catch {}
+        } catch { }
+
+        try{
+          setBlockNumber(await getBlockByTimestamp(web3, timestamp))
+          return
+        } catch { }
 
         const lastBlock = await web3.eth.getBlock('latest')
         if (lastBlock.timestamp <= timestamp) {
