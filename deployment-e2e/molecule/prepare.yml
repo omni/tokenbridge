@@ -11,3 +11,8 @@
           - rsyslog
     - shell: service rsyslog start
     - shell: groupadd docker && chgrp docker /var/run/docker.sock
+    - name: Copy keystore file
+      copy:
+        src: ../../e2e-commons/keystore.json
+        dest: /tmp/keystore.json
+        mode: '0755'

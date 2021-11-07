@@ -4,11 +4,15 @@
     state: present
     autolock_managers: yes
     listen_addr: 127.0.0.1:2377
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Get unlock token
   community.docker.docker_swarm_info:
     unlock_key: yes
   register: result
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Print unlock token
   debug:
