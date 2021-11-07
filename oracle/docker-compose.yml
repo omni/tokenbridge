@@ -58,7 +58,7 @@ services:
   bridge_affirmation:
     cpus: 0.1
     mem_limit: 500m
-    image: fusenet/tokenbridge-oracle:latest
+    image: poanetwork/tokenbridge-oracle:latest
     env_file: ./.env
     environment: 
       - NODE_ENV=production 

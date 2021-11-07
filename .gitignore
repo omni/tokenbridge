@@ -12,7 +12,6 @@ dist
 .DS_Store
 *.env*
 !.env.example
-!.env.*.example
 .idea
 .nyc_output
 logs/

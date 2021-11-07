@@ -18,11 +18,10 @@ export const useBlockConfirmations = ({ receipt, fromHome }: UseBlockConfirmatio
   const callRequireBlockConfirmations = async (
     contract: Contract,
     receipt: TransactionReceipt,
-    fromHome: boolean,
     setResult: Function,
     snapshotProvider: SnapshotProvider
   ) => {
-    const result = await getRequiredBlockConfirmations(contract, receipt.blockNumber, fromHome, snapshotProvider)
+    const result = await getRequiredBlockConfirmations(contract, receipt.blockNumber, snapshotProvider)
     setResult(result)
   }
 
@@ -31,7 +30,7 @@ export const useBlockConfirmations = ({ receipt, fromHome }: UseBlockConfirmatio
       const bridgeContract = fromHome ? home.bridgeContract : foreign.bridgeContract
       const snapshotProvider = fromHome ? homeSnapshotProvider : foreignSnapshotProvider
       if (!bridgeContract || !receipt) return
-      callRequireBlockConfirmations(bridgeContract, receipt, fromHome, setBlockConfirmations, snapshotProvider)
+      callRequireBlockConfirmations(bridgeContract, receipt, setBlockConfirmations, snapshotProvider)
     },
     [home.bridgeContract, foreign.bridgeContract, receipt, fromHome]
   )
