@@ -29,6 +29,8 @@
     name: oracle_keystore
     state: present
     data_src: "{{ keystore_path }}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
 - name: Remove unencrypted keystore file
   file:

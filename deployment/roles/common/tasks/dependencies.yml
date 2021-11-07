@@ -46,6 +46,9 @@
     group: docker
     createhome: yes
 
+- name: reset ssh connection to allow user changes to affect ansible user
+  meta: reset_connection
+
 - name: Install auditd
   apt:
     name: auditd
