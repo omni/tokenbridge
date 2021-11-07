@@ -35,8 +35,10 @@
     "web3-utils": "1.2.11"
   },
   "scripts": {
-    "start": "yarn createSnapshots && ./load-env.sh react-app-rewired start",
-    "build": "yarn createSnapshots && ./load-env.sh react-app-rewired build",
+    "start": "./load-env.sh react-app-rewired start",
+    "start:snapshots": "yarn createSnapshots && ./load-env.sh react-app-rewired start",
+    "build": "./load-env.sh react-app-rewired build",
+    "build:snapshots": "yarn createSnapshots && ./load-env.sh react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --ignore-path ../.eslintignore",
