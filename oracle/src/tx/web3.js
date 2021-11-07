@@ -87,7 +87,7 @@ async function getEvents({ contract, event, fromBlock, toBlock, filter }) {
     )
     const pastEvents = await contract.getPastEvents(event, { fromBlock, toBlock, filter })
     logger.debug({ contractAddress, event, count: pastEvents.length }, 'Past events obtained')
-    return pastEvents
+    return pastEvents.sort((a, b) => a.blockNumber - b.blockNumber || a.transactionIndex - b.transactionIndex)
   } catch (e) {
     logger.error(e.message)
     throw new Error(`${event} events cannot be obtained`)
