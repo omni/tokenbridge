@@ -19,7 +19,7 @@ export const useTransactionFinder = ({ txHash, web3 }: { txHash: string; web3: M
 
         if (!txReceipt) {
           setStatus(TRANSACTION_STATUS.NOT_FOUND)
-          timeoutId = setTimeout(getReceipt, HOME_RPC_POLLING_INTERVAL)
+          timeoutId = window.setTimeout(getReceipt, HOME_RPC_POLLING_INTERVAL)
         } else {
           setStatus(TRANSACTION_STATUS.FOUND)
         }

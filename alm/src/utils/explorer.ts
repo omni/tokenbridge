@@ -95,7 +95,6 @@ export const getClosestBlockByTimestamp = async (api: string, timestamp: number)
   if (api.includes('blockscout')) {
     throw new Error('Blockscout does not support getblocknobytime')
   }
-
   const url = new URL(api)
   url.searchParams.append('module', 'block')
   url.searchParams.append('action', 'getblocknobytime')
@@ -103,6 +102,9 @@ export const getClosestBlockByTimestamp = async (api: string, timestamp: number)
   url.searchParams.append('closest', 'before')
 
   const blockNumber = await fetch(url.toString()).then(res => res.json())
+  console.log(blockNumber)
+  if(blockNumber.result === null)
+    throw new Error('Older versions of Blockscout don\'t support getblocknobytime')
 
   return parseInt(blockNumber.result)
 }

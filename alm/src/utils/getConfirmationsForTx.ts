@@ -142,7 +142,7 @@ export const getConfirmationsForTx = async (
     successConfirmationWithTxFound.length < successConfirmationWithData.length
   ) {
     if (!isCancelled()) {
-      const timeoutId = setTimeout(
+      const timeoutId = window.setTimeout(
         () =>
           getConfirmationsForTx(
             messageData,

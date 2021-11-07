@@ -124,9 +124,9 @@ export const useMessageConfirmations = ({
         } else if (currentBlock) {
           setWaitingBlocks(true)
           setConfirmations(validatorsWaiting)
-          timeoutId = setTimeout(checkSignaturesWaitingForBLocks, interval)
+          timeoutId = window.setTimeout(checkSignaturesWaitingForBLocks, interval)
         } else {
-          timeoutId = setTimeout(checkSignaturesWaitingForBLocks, 500)
+          timeoutId = window.setTimeout(checkSignaturesWaitingForBLocks, 500)
         }
       }
 
@@ -165,10 +165,10 @@ export const useMessageConfirmations = ({
           if (event) {
             setCollectedSignaturesEvent(event)
           } else if (!isCancelled) {
-            timeoutId = setTimeout(() => getCollectedSignaturesEvent(securedToBlock, securedToBlock + BLOCK_RANGE), 500)
+            timeoutId = window.setTimeout(() => getCollectedSignaturesEvent(securedToBlock, securedToBlock + BLOCK_RANGE), 500)
           }
         } else if (!isCancelled) {
-          timeoutId = setTimeout(() => getCollectedSignaturesEvent(fromBlock, toBlock), 500)
+          timeoutId = window.setTimeout(() => getCollectedSignaturesEvent(fromBlock, toBlock), 500)
         }
       }
 
@@ -229,9 +229,9 @@ export const useMessageConfirmations = ({
                 ? waitingExecutionState
                 : data
           )
-          timeoutId = setTimeout(() => checkWaitingBlocksForExecution(), HOME_RPC_POLLING_INTERVAL)
+          timeoutId = window.setTimeout(() => checkWaitingBlocksForExecution(), HOME_RPC_POLLING_INTERVAL)
         } else {
-          timeoutId = setTimeout(() => checkWaitingBlocksForExecution(), 500)
+          timeoutId = window.setTimeout(() => checkWaitingBlocksForExecution(), 500)
         }
       }
 

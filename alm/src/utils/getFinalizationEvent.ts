@@ -153,7 +153,7 @@ export const getFinalizationEvent = async (
     }
 
     if (!isCancelled()) {
-      const timeoutId = setTimeout(
+      const timeoutId = window.setTimeout(
         () =>
           getFinalizationEvent(
             fromHome,

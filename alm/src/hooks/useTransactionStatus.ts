@@ -54,7 +54,7 @@ export const useTransactionStatus = ({
           setStatus(TRANSACTION_STATUS.NOT_FOUND)
           setDescription(getTransactionStatusDescription(TRANSACTION_STATUS.NOT_FOUND))
           setMessages([{ id: txHash, data: '' }])
-          timeoutId = setTimeout(() => getReceipt(), HOME_RPC_POLLING_INTERVAL)
+          timeoutId = window.setTimeout(() => getReceipt(), HOME_RPC_POLLING_INTERVAL)
         } else {
           const blockNumber = txReceipt.blockNumber
           const block = await getBlock(web3, blockNumber)

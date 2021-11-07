@@ -56,7 +56,7 @@ export class BlockNumberProvider {
       this.lastValueTimestamp = now
     }
 
-    this.ref = setTimeout(() => this.fetchLastBlock(), this.interval)
+    this.ref = window.setTimeout(() => this.fetchLastBlock(), this.interval)
   }
 }
 
