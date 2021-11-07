@@ -5,7 +5,6 @@ const connection = require('amqp-connection-manager').connect(process.env.ORACLE
 const logger = require('./logger')
 const { getRetrySequence } = require('../utils/utils')
 const {
-  TRANSACTION_RESEND_TIMEOUT,
   SENDER_QUEUE_MAX_PRIORITY,
   SENDER_QUEUE_SEND_PRIORITY,
   SENDER_QUEUE_CHECK_STATUS_PRIORITY
@@ -27,28 +26,21 @@ async function isAttached() {
   return new Promise(res => dns.lookup(amqpHost, err => res(err === null)))
 }
 
-function connectWatcherToQueue({ queueName, workerQueue, cb }) {
+function connectWatcherToQueue({ queueName, cb }) {
   const channelWrapper = connection.createChannel({
     json: true,
     async setup(channel) {
       await channel.assertQueue(queueName, { durable: true, maxPriority: SENDER_QUEUE_MAX_PRIORITY })
-      if (workerQueue) {
-        await channel.assertQueue(workerQueue, { durable: true })
-      }
     }
   })
 
   const sendToQueue = data =>
     channelWrapper.sendToQueue(queueName, data, { persistent: true, priority: SENDER_QUEUE_SEND_PRIORITY })
-  let sendToWorker
-  if (workerQueue) {
-    sendToWorker = data => channelWrapper.sendToQueue(workerQueue, data, { persistent: true })
-  }
 
-  cb({ sendToQueue, sendToWorker, channel: channelWrapper })
+  cb({ sendToQueue, channel: channelWrapper })
 }
 
-function connectSenderToQueue({ queueName, oldQueueName, cb }) {
+function connectSenderToQueue({ queueName, oldQueueName, cb, resendInterval }) {
   const deadLetterExchange = `${queueName}-retry`
 
   async function resendMessagesToNewQueue(channel) {
@@ -97,43 +89,8 @@ function connectSenderToQueue({ queueName, oldQueueName, cb }) {
             channelWrapper,
             channel,
             queueName,
-            deadLetterExchange
-          })
-        }
-      })
-    )
-  })
-}
-
-function connectWorkerToQueue({ queueName, senderQueue, cb }) {
-  const deadLetterExchange = `${queueName}-retry`
-
-  const channelWrapper = connection.createChannel({
-    json: true
-  })
-
-  channelWrapper.addSetup(async channel => {
-    await channel.assertExchange(deadLetterExchange, 'fanout', { durable: true })
-    await channel.assertQueue(queueName, { durable: true })
-    await channel.assertQueue(senderQueue, { durable: true, maxPriority: SENDER_QUEUE_MAX_PRIORITY })
-    await channel.bindQueue(queueName, deadLetterExchange)
-    await channel.prefetch(1)
-    await channel.consume(queueName, msg =>
-      cb({
-        msg,
-        channel: channelWrapper,
-        ackMsg: job => channelWrapper.ack(job),
-        nackMsg: job => channelWrapper.nack(job, false, true),
-        sendToSenderQueue: data =>
-          channelWrapper.sendToQueue(senderQueue, data, { persistent: true, priority: SENDER_QUEUE_SEND_PRIORITY }),
-        scheduleForRetry: async (data, msgRetries = 0) => {
-          await generateRetry({
-            data,
-            msgRetries,
-            channelWrapper,
-            channel,
-            queueName,
-            deadLetterExchange
+            deadLetterExchange,
+            delay: resendInterval
           })
         }
       })
@@ -164,13 +121,13 @@ async function generateRetry({ data, msgRetries, channelWrapper, channel, queueN
   })
 }
 
-async function generateTransactionResend({ data, channelWrapper, channel, queueName, deadLetterExchange }) {
-  const retryQueue = `${queueName}-check-tx-status`
+async function generateTransactionResend({ data, channelWrapper, channel, queueName, deadLetterExchange, delay }) {
+  const retryQueue = `${queueName}-check-tx-status-${delay}`
   await channel.assertQueue(retryQueue, {
     durable: true,
     deadLetterExchange,
-    messageTtl: TRANSACTION_RESEND_TIMEOUT,
-    expires: TRANSACTION_RESEND_TIMEOUT * 10,
+    messageTtl: delay,
+    expires: delay * 10,
     maxPriority: SENDER_QUEUE_MAX_PRIORITY
   })
   await channelWrapper.sendToQueue(retryQueue, data, {
@@ -183,7 +140,6 @@ module.exports = {
   isAttached,
   connectWatcherToQueue,
   connectSenderToQueue,
-  connectWorkerToQueue,
   connection,
   generateRetry
 }

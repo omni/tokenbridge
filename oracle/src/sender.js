@@ -4,22 +4,24 @@ const { connectSenderToQueue } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const GasPrice = require('./services/gasPrice')
 const logger = require('./services/logger')
+const { getShutdownFlag } = require('./services/shutdownState')
 const { sendTx } = require('./tx/sendTx')
 const { getNonce, getChainId } = require('./tx/web3')
 const {
   addExtraGas,
   checkHTTPS,
-  privateKeyToAddress,
   syncForEach,
   waitForFunds,
+  waitForUnsuspend,
   watchdog,
-  nonceError
+  isGasPriceError,
+  isSameTransactionError,
+  isInsufficientBalanceError,
+  isNonceError
 } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
-const { ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_TX_REDUNDANCY } = process.env
-
-const ORACLE_VALIDATOR_ADDRESS = privateKeyToAddress(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
+const { ORACLE_TX_REDUNDANCY } = process.env
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -28,9 +30,8 @@ if (process.argv.length < 3) {
 
 const config = require(path.join('../config/', process.argv[2]))
 
-const web3Instance = config.web3
-const web3Redundant = ORACLE_TX_REDUNDANCY === 'true' ? config.web3Redundant : config.web3
-const { web3Fallback } = config
+const { web3, web3Fallback } = config
+const web3Redundant = ORACLE_TX_REDUNDANCY === 'true' ? config.web3Redundant : web3
 
 const nonceKey = `${config.id}:nonce`
 let chainId = 0
@@ -39,41 +40,51 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
+    web3.currentProvider.urls.forEach(checkHttps(config.id))
 
     GasPrice.start(config.id)
 
-    chainId = await getChainId(web3Instance)
-    connectSenderToQueue({
-      queueName: config.queue,
-      oldQueueName: config.oldQueue,
-      cb: options => {
-        if (config.maxProcessingTime) {
-          return watchdog(() => main(options), config.maxProcessingTime, () => {
-            logger.fatal('Max processing time reached')
-            process.exit(EXIT_CODES.MAX_TIME_REACHED)
-          })
-        }
-
-        return main(options)
-      }
-    })
+    chainId = await getChainId(web3)
+    connectQueue()
   } catch (e) {
     logger.error(e.message)
     process.exit(EXIT_CODES.GENERAL_ERROR)
   }
 }
 
+function connectQueue() {
+  connectSenderToQueue({
+    queueName: config.queue,
+    oldQueueName: config.oldQueue,
+    resendInterval: config.resendInterval,
+    cb: options => {
+      if (config.maxProcessingTime) {
+        return watchdog(() => main(options), config.maxProcessingTime, () => {
+          logger.fatal('Max processing time reached')
+          process.exit(EXIT_CODES.MAX_TIME_REACHED)
+        })
+      }
+
+      return main(options)
+    }
+  })
+}
+
 function resume(newBalance) {
   logger.info(`Validator balance changed. New balance is ${newBalance}. Resume messages processing.`)
-  initialize()
+  connectQueue()
+}
+
+function unsuspend() {
+  logger.info(`Oracle sender was unsuspended.`)
+  connectQueue()
 }
 
 async function readNonce(forceUpdate) {
   logger.debug('Reading nonce')
   if (forceUpdate) {
     logger.debug('Forcing update of nonce')
-    return getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
+    return getNonce(web3, config.validatorAddress)
   }
 
   const nonce = await redis.get(nonceKey)
@@ -82,7 +93,7 @@ async function readNonce(forceUpdate) {
     return Number(nonce)
   } else {
     logger.warn("Nonce wasn't found in the DB")
-    return getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
+    return getNonce(web3, config.validatorAddress)
   }
 }
 
@@ -98,6 +109,13 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
   try {
     if (redis.status !== 'ready') {
       nackMsg(msg)
+      return
+    }
+
+    if (await getShutdownFlag(logger, config.shutdownKey, true)) {
+      logger.info('Oracle sender was suspended via the remote shutdown process')
+      channel.close()
+      waitForUnsuspend(() => getShutdownFlag(logger, config.shutdownKey, true), unsuspend)
       return
     }
 
@@ -150,7 +168,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           gasPrice,
           amount: '0',
           gasLimit,
-          privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
+          privateKey: config.validatorPrivateKey,
           to: job.to,
           chainId,
           web3: web3Redundant
@@ -173,22 +191,28 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           `Tx Failed for event Tx ${job.transactionReference}.`,
           e.message
         )
-        if (!e.message.toLowerCase().includes('transaction with the same hash was already imported')) {
-          if (isResend) {
-            resendJobs.push(job)
-          } else {
-            failedTx.push(job)
-          }
+
+        if (isGasPriceError(e)) {
+          logger.info('Replacement transaction underpriced, forcing gas price update')
+          GasPrice.start(config.id)
+          failedTx.push(job)
+        } else if (isResend || isSameTransactionError(e)) {
+          resendJobs.push(job)
+        } else {
+          // if initial transaction sending has failed not due to the same hash error
+          // send it to the failed tx queue
+          // this will result in the sooner resend attempt than if using resendJobs
+          failedTx.push(job)
         }
 
-        if (e.message.toLowerCase().includes('insufficient funds')) {
+        if (isInsufficientBalanceError(e)) {
           insufficientFunds = true
-          const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
+          const currentBalance = await web3.eth.getBalance(config.validatorAddress)
           minimumBalance = gasLimit.multipliedBy(gasPrice)
           logger.error(
             `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
           )
-        } else if (nonceError(e)) {
+        } else if (isNonceError(e)) {
           nonce = await readNonce(true)
         }
       }
@@ -204,7 +228,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       await scheduleForRetry(failedTx, msg.properties.headers['x-retries'])
     }
     if (resendJobs.length) {
-      logger.info(`Sending ${resendJobs.length} Tx Delayed Resend Requests to Queue`)
+      logger.info({ delay: config.resendInterval }, `Sending ${resendJobs.length} Tx Delayed Resend Requests to Queue`)
       await scheduleTransactionResend(resendJobs)
     }
     ackMsg(msg)
@@ -213,7 +237,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
     if (insufficientFunds) {
       logger.warn('Insufficient funds. Stop sending transactions until the account has the minimum balance')
       channel.close()
-      waitForFunds(web3Instance, ORACLE_VALIDATOR_ADDRESS, minimumBalance, resume, logger)
+      waitForFunds(web3, config.validatorAddress, minimumBalance, resume, logger)
     }
   } catch (e) {
     logger.error(e)

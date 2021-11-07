@@ -1,14 +1,12 @@
 require('../env')
 const path = require('path')
-const { BN, toBN } = require('web3').utils
 const { connectWatcherToQueue, connection } = require('./services/amqpClient')
-const { getBlockNumber } = require('./tx/web3')
 const { redis } = require('./services/redisClient')
 const logger = require('./services/logger')
-const { getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
+const { getShutdownFlag } = require('./services/shutdownState')
+const { getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
-const { EXIT_CODES } = require('./utils/constants')
-const { isChaiTokenEnabled } = require('./utils/chaiUtils')
+const { EXIT_CODES, BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT } = require('./utils/constants')
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -24,29 +22,25 @@ const processTransfers = require('./events/processTransfers')(config)
 const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
+const processAMBInformationRequests = require('./events/processAMBInformationRequests')(config)
 
 const { getTokensState } = require('./utils/tokenState')
 
-const ZERO = toBN(0)
-const ONE = toBN(1)
-
-const web3Instance = config.web3
-const bridgeContract = new web3Instance.eth.Contract(config.bridgeAbi, config.bridgeContractAddress)
-let { eventContractAddress } = config
-let eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+const { web3, bridgeContract, eventContract, startBlock, pollingInterval, chain } = config.main
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
-let lastProcessedBlock = BN.max(config.startBlock.sub(ONE), ZERO)
+let lastProcessedBlock = Math.max(startBlock - 1, 0)
+let lastSeenBlockNumber = 0
+let sameBlockNumberCounter = 0
 
 async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
+    web3.currentProvider.urls.forEach(checkHttps(chain))
 
     await getLastProcessedBlock()
     connectWatcherToQueue({
       queueName: config.queue,
-      workerQueue: config.workerQueue,
       cb: runMain
     })
   } catch (e) {
@@ -55,16 +49,16 @@ async function initialize() {
   }
 }
 
-async function runMain({ sendToQueue, sendToWorker }) {
+async function runMain({ sendToQueue }) {
   try {
     if (connection.isConnected() && redis.status === 'ready') {
       if (config.maxProcessingTime) {
-        await watchdog(() => main({ sendToQueue, sendToWorker }), config.maxProcessingTime, () => {
+        await watchdog(() => main({ sendToQueue }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
           process.exit(EXIT_CODES.MAX_TIME_REACHED)
         })
       } else {
-        await main({ sendToQueue, sendToWorker })
+        await main({ sendToQueue })
       }
     }
   } catch (e) {
@@ -72,37 +66,29 @@ async function runMain({ sendToQueue, sendToWorker }) {
   }
 
   setTimeout(() => {
-    runMain({ sendToQueue, sendToWorker })
-  }, config.pollingInterval)
+    runMain({ sendToQueue })
+  }, pollingInterval)
 }
 
 async function getLastProcessedBlock() {
   const result = await redis.get(lastBlockRedisKey)
-  logger.debug({ fromRedis: result, fromConfig: lastProcessedBlock.toString() }, 'Last Processed block obtained')
-  lastProcessedBlock = result ? toBN(result) : lastProcessedBlock
+  logger.debug({ fromRedis: result, fromConfig: lastProcessedBlock }, 'Last Processed block obtained')
+  lastProcessedBlock = result ? parseInt(result, 10) : lastProcessedBlock
 }
 
 function updateLastProcessedBlock(lastBlockNumber) {
   lastProcessedBlock = lastBlockNumber
-  return redis.set(lastBlockRedisKey, lastProcessedBlock.toString())
+  return redis.set(lastBlockRedisKey, lastProcessedBlock)
 }
 
 function processEvents(events) {
   switch (config.id) {
-    case 'native-erc-signature-request':
-    case 'erc-erc-signature-request':
     case 'erc-native-signature-request':
       return processSignatureRequests(events)
-    case 'native-erc-collected-signatures':
-    case 'erc-erc-collected-signatures':
     case 'erc-native-collected-signatures':
       return processCollectedSignatures(events)
-    case 'native-erc-affirmation-request':
-    case 'erc677-erc677-affirmation-request':
     case 'erc-native-affirmation-request':
-    case 'erc-erc-affirmation-request':
       return processAffirmationRequests(events)
-    case 'erc-erc-transfer':
     case 'erc-native-transfer':
       return processTransfers(events)
     case 'amb-signature-request':
@@ -122,68 +108,99 @@ async function checkConditions() {
     case 'erc-native-transfer':
       logger.debug('Getting token address to listen Transfer events')
       state = await getTokensState(bridgeContract, logger)
-      updateEventContract(state.bridgeableTokenAddress)
+      eventContract.options.address = state.bridgeableTokenAddress
       break
     default:
   }
 }
 
-function updateEventContract(address) {
-  if (eventContractAddress !== address) {
-    eventContractAddress = address
-    eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
-  }
-}
-
-async function getLastBlockToProcess() {
-  const lastBlockNumberPromise = getBlockNumber(web3Instance).then(toBN)
-  const requiredBlockConfirmationsPromise = getRequiredBlockConfirmations(bridgeContract).then(toBN)
+async function getLastBlockToProcess(web3, bridgeContract) {
   const [lastBlockNumber, requiredBlockConfirmations] = await Promise.all([
-    lastBlockNumberPromise,
-    requiredBlockConfirmationsPromise
+    getBlockNumber(web3),
+    getRequiredBlockConfirmations(bridgeContract)
   ])
 
-  return lastBlockNumber.sub(requiredBlockConfirmations)
-}
-
-async function isWorkerNeeded() {
-  switch (config.id) {
-    case 'erc-native-transfer':
-      return isChaiTokenEnabled(bridgeContract, logger)
-    default:
-      return true
+  if (lastBlockNumber < lastSeenBlockNumber) {
+    sameBlockNumberCounter = 0
+    logger.warn({ lastBlockNumber, lastSeenBlockNumber }, 'Received block number less than already seen block')
+    web3.currentProvider.switchToFallbackRPC()
+  } else if (lastBlockNumber === lastSeenBlockNumber) {
+    sameBlockNumberCounter++
+    if (sameBlockNumberCounter > 1) {
+      logger.info({ lastBlockNumber, sameBlockNumberCounter }, 'Received the same block number more than twice')
+      if (sameBlockNumberCounter >= BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT) {
+        sameBlockNumberCounter = 0
+        logger.warn(
+          { lastBlockNumber, n: BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT },
+          'Received the same block number for too many times. Probably node is not synced anymore'
+        )
+        web3.currentProvider.switchToFallbackRPC()
+      }
+    }
+  } else {
+    sameBlockNumberCounter = 0
+    lastSeenBlockNumber = lastBlockNumber
   }
+  return lastBlockNumber - requiredBlockConfirmations
 }
 
-async function main({ sendToQueue, sendToWorker }) {
+async function main({ sendToQueue }) {
   try {
-    await checkConditions()
+    const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
+    if (await getShutdownFlag(logger, config.shutdownKey, true)) {
+      if (!wasShutdown) {
+        logger.info('Oracle watcher was suspended via the remote shutdown process')
+      }
+      return
+    } else if (wasShutdown) {
+      logger.info(`Oracle watcher was unsuspended.`)
+    }
 
-    const lastBlockToProcess = await getLastBlockToProcess()
+    const lastBlockToProcess = await getLastBlockToProcess(web3, bridgeContract)
 
-    if (lastBlockToProcess.lte(lastProcessedBlock)) {
+    if (lastBlockToProcess <= lastProcessedBlock) {
       logger.debug('All blocks already processed')
       return
     }
 
-    const fromBlock = lastProcessedBlock.add(ONE)
-    const toBlock = lastBlockToProcess
+    await checkConditions()
 
-    const events = await getEvents({
+    const fromBlock = lastProcessedBlock + 1
+    const rangeEndBlock = config.blockPollingLimit ? fromBlock + config.blockPollingLimit : lastBlockToProcess
+    let toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
+
+    const events = (await getEvents({
       contract: eventContract,
       event: config.event,
       fromBlock,
       toBlock,
       filter: config.eventFilter
-    })
+    })).sort((a, b) => a.blockNumber - b.blockNumber)
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      if (sendToWorker && (await isWorkerNeeded())) {
-        await sendToWorker({ blockNumber: toBlock.toString() })
-      }
+      let job
 
-      const job = await processEvents(events)
+      // for async information requests, requests are processed in batches only if they are located in the same block
+      if (config.id === 'amb-information-request') {
+        // obtain block number and events from the earliest block
+        const batchBlockNumber = events[0].blockNumber
+        const batchEvents = events.filter(event => event.blockNumber === batchBlockNumber)
+
+        // if there are some other events in the later blocks,
+        // adjust lastProcessedBlock so that these events will be processed again on the next iteration
+        if (batchEvents.length < events.length) {
+          // pick event outside from the batch
+          toBlock = events[batchEvents.length].blockNumber - 1
+        }
+
+        job = await processAMBInformationRequests(batchEvents)
+        if (job === null) {
+          return
+        }
+      } else {
+        job = await processEvents(events)
+      }
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {
@@ -191,8 +208,8 @@ async function main({ sendToQueue, sendToWorker }) {
       }
     }
 
-    logger.debug({ lastProcessedBlock: lastBlockToProcess.toString() }, 'Updating last processed block')
-    await updateLastProcessedBlock(lastBlockToProcess)
+    logger.debug({ lastProcessedBlock: toBlock.toString() }, 'Updating last processed block')
+    await updateLastProcessedBlock(toBlock)
   } catch (e) {
     logger.error(e)
   }

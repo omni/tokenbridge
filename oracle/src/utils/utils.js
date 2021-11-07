@@ -29,24 +29,30 @@ function checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger) {
   }
 }
 
+const promiseRetryForever = f => promiseRetry(f, { forever: true, factor: 1 })
+
 async function waitForFunds(web3, address, minimumBalance, cb, logger) {
-  promiseRetry(
-    async retry => {
-      logger.debug('Getting balance of validator account')
-      const newBalance = web3.utils.toBN(await web3.eth.getBalance(address))
-      if (newBalance.gte(web3.utils.toBN(minimumBalance.toString(10)))) {
-        logger.debug({ balance: newBalance, minimumBalance }, 'Validator has minimum necessary balance')
-        cb(newBalance)
-      } else {
-        logger.debug({ balance: newBalance, minimumBalance }, 'Balance of validator is still less than the minimum')
-        retry()
-      }
-    },
-    {
-      forever: true,
-      factor: 1
+  promiseRetryForever(async retry => {
+    logger.debug('Getting balance of validator account')
+    const newBalance = web3.utils.toBN(await web3.eth.getBalance(address))
+    if (newBalance.gte(web3.utils.toBN(minimumBalance.toString(10)))) {
+      logger.debug({ balance: newBalance, minimumBalance }, 'Validator has minimum necessary balance')
+      cb(newBalance)
+    } else {
+      logger.debug({ balance: newBalance, minimumBalance }, 'Balance of validator is still less than the minimum')
+      retry()
     }
-  )
+  })
+}
+
+async function waitForUnsuspend(getSuspendFlag, cb) {
+  promiseRetryForever(async retry => {
+    if (await getSuspendFlag()) {
+      retry()
+    } else {
+      cb()
+    }
+  })
 }
 
 function addExtraGas(gas, extraPercentage, maxGasLimit = Infinity) {
@@ -58,9 +64,9 @@ function addExtraGas(gas, extraPercentage, maxGasLimit = Infinity) {
   return BigNumber.min(maxGasLimit, gasWithExtra)
 }
 
-function setIntervalAndRun(f, interval) {
+async function setIntervalAndRun(f, interval) {
   const handler = setInterval(f, interval)
-  f()
+  await f()
   return handler
 }
 
@@ -93,12 +99,44 @@ function privateKeyToAddress(privateKey) {
   return privateKey ? new Web3().eth.accounts.privateKeyToAccount(add0xPrefix(privateKey)).address : null
 }
 
-function nonceError(e) {
+function isGasPriceError(e) {
+  const message = e.message.toLowerCase()
+  return message.includes('replacement transaction underpriced')
+}
+
+function isSameTransactionError(e) {
+  const message = e.message.toLowerCase()
+  return (
+    message.includes('transaction with the same hash was already imported') ||
+    message.includes('already known') ||
+    message.includes('alreadyknown')
+  )
+}
+
+function isInsufficientBalanceError(e) {
+  const message = e.message.toLowerCase()
+  return message.includes('insufficient funds')
+}
+
+function isNonceError(e) {
   const message = e.message.toLowerCase()
   return (
     message.includes('transaction nonce is too low') ||
     message.includes('nonce too low') ||
-    message.includes('transaction with same nonce in the queue')
+    message.includes('transaction with same nonce in the queue') ||
+    message.includes('oldnonce')
+  )
+}
+
+function isRevertError(e) {
+  const message = e.message.toLowerCase()
+  // OE and NE returns "VM execution error"/"Transaction execution error"
+  // Geth returns "out of gas"/"intrinsic gas too low"/"execution reverted"
+  return (
+    message.includes('execution error') ||
+    message.includes('intrinsic gas too low') ||
+    message.includes('out of gas') ||
+    message.includes('execution reverted')
   )
 }
 
@@ -131,16 +169,31 @@ async function readAccessListFile(fileName, logger) {
   return readAccessLists[fileName]
 }
 
+function zipToObject(keys, values) {
+  const res = {}
+  keys.forEach((key, i) => {
+    res[key] = values[i]
+  })
+  return res
+}
+
 module.exports = {
   syncForEach,
   checkHTTPS,
   waitForFunds,
+  waitForUnsuspend,
   addExtraGas,
   setIntervalAndRun,
   watchdog,
+  add0xPrefix,
   privateKeyToAddress,
-  nonceError,
+  isGasPriceError,
+  isSameTransactionError,
+  isInsufficientBalanceError,
+  isNonceError,
+  isRevertError,
   getRetrySequence,
   promiseAny,
-  readAccessListFile
+  readAccessListFile,
+  zipToObject
 }

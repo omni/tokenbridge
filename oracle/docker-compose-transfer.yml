@@ -24,6 +24,9 @@ services:
     extends:
       file: docker-compose.yml
       service: bridge_collected
+    volumes:
+      - '~/bridge_data/access-lists/block_list.txt:/mono/oracle/access-lists/block_list.txt'
+      - '~/bridge_data/access-lists/allowance_list.txt:/mono/oracle/access-lists/allowance_list.txt'
     networks:
       - net_db_bridge_request
       - net_rabbit_bridge_request
@@ -61,6 +64,12 @@ services:
     networks:
       - net_db_bridge_request
       - net_rabbit_bridge_request
+  bridge_shutdown:
+    extends:
+      file: docker-compose.yml
+      service: bridge_shutdown
+    networks:
+      - net_db_bridge_shutdown
 
 networks:
   net_db_bridge_request:
@@ -74,6 +83,8 @@ networks:
   net_db_bridge_senderhome:
     driver: bridge
   net_db_bridge_senderforeign:
+    driver: bridge
+  net_db_bridge_shutdown:
     driver: bridge
   net_rabbit_bridge_request:
     driver: bridge

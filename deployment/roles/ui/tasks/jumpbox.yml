@@ -1,6 +1,0 @@
----
-- name: Build the containers
-  shell: docker-compose build
-  args:
-    chdir: "{{ bridge_path }}/ui"
-  when: skip_build is undefined

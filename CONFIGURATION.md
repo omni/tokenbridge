@@ -22,7 +22,7 @@ COMMON_FOREIGN_GAS_PRICE_FACTOR | A value that will multiply the gas price of th
 
 name | description | value
 --- | --- | ---
-ORACLE_BRIDGE_MODE | The bridge mode. The bridge starts listening to a different set of events based on this parameter. | NATIVE_TO_ERC / ERC_TO_ERC / ERC_TO_NATIVE / ARBITRARY_MESSAGE
+ORACLE_BRIDGE_MODE | The bridge mode. The bridge starts listening to a different set of events based on this parameter. | ERC_TO_NATIVE / ARBITRARY_MESSAGE
 ORACLE_ALLOW_HTTP_FOR_RPC | **Only use in test environments - must be omitted in production environments.**. If this parameter is specified and set to `yes`, RPC URLs can be specified in form of HTTP links. A warning that the connection is insecure will be written to the logs. | `yes` / `no`
 ORACLE_HOME_RPC_POLLING_INTERVAL | The interval in milliseconds used to request the RPC node in the Home network for new blocks. The interval should match the average production time for a new block. | integer
 ORACLE_FOREIGN_RPC_POLLING_INTERVAL | The interval in milliseconds used to request the RPC node in the Foreign network for new blocks. The interval should match the average production time for a new block. | integer
@@ -42,29 +42,17 @@ ORACLE_HOME_TO_FOREIGN_BLOCK_LIST | Filename with a list of addresses, separated
 ORACLE_HOME_TO_FOREIGN_CHECK_SENDER | If set to `true`, instructs the oracle to do an extra check for transaction origin in the block/allowance list. `false` by default. | `true` / `false`
 ORACLE_ALWAYS_RELAY_SIGNATURES | If set to `true`, the oracle will always relay signatures even if it was not the last who finilized the signatures collecting process. The default is `false`. | `true` / `false`
 ORACLE_RPC_REQUEST_TIMEOUT | Timeout in milliseconds for a single RPC request. Default value is `ORACLE_*_RPC_POLLING_INTERVAL * 2`. | integer
-
-
-## UI configuration
-
-name | description | value
---- | --- | ---
-UI_TITLE | The title for the bridge UI page. `%c` will be replaced by the name of the network. | string
-UI_OG_TITLE | The meta title for the deployed bridge page. | string
-UI_DESCRIPTION | The meta description for the deployed bridge page. | string
-UI_NATIVE_TOKEN_DISPLAY_NAME | name of the home native coin | string
-UI_HOME_NETWORK_DISPLAY_NAME | name to be displayed for home network | string
-UI_FOREIGN_NETWORK_DISPLAY_NAME | name to be displayed for foreign network | string
-UI_HOME_WITHOUT_EVENTS | `true` if home network doesn't support events | true/false
-UI_FOREIGN_WITHOUT_EVENTS | `true` if foreign network doesn't support events | true/false
-UI_HOME_EXPLORER_TX_TEMPLATE | template link to transaction on home explorer. `%s` will be replaced by transaction hash | URL template
-UI_FOREIGN_EXPLORER_TX_TEMPLATE | template link to transaction on foreign explorer. `%s` will be replaced by transaction hash | URL template
-UI_HOME_EXPLORER_ADDRESS_TEMPLATE | template link to address on home explorer. `%s` will be replaced by address | URL template
-UI_FOREIGN_EXPLORER_ADDRESS_TEMPLATE | template link to address on foreign explorer. `%s` will be replaced by address | URL template
-UI_HOME_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Home Bridge contract. | integer
-UI_FOREIGN_GAS_PRICE_UPDATE_INTERVAL | An interval in milliseconds used to get the updated gas price value either from the oracle or from the Foreign Bridge contract. | integer
-UI_PORT | The port for the UI app. | integer
-UI_STYLES | The set of styles to render the bridge UI page. | core/classic/stake
-UI_PUBLIC_URL | The public url for the deployed bridge page | string
+ORACLE_HOME_TX_RESEND_INTERVAL | Interval in milliseconds for automatic resending of stuck transactions for Home sender service. Defaults to 20 minutes. | integer  
+ORACLE_FOREIGN_TX_RESEND_INTERVAL | Interval in milliseconds for automatic resending of stuck transactions for Foreign sender service. Defaults to 20 minutes. | integer  
+ORACLE_SHUTDOWN_SERVICE_URL | Optional external URL to some other service/monitor/configuration manager that controls the remote shutdown process. GET request should return `application/json` message with the following schema: `{ shutdown: true/false }`. | URL
+ORACLE_SHUTDOWN_SERVICE_POLLING_INTERVAL | Optional interval in milliseconds used to request the side RPC node or external shutdown service. Default is 120000. | integer
+ORACLE_SIDE_RPC_URL | Optional HTTPS URL(s) for communication with the external shutdown service or side RPC nodes, used for shutdown manager activities. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection. | URL(s)
+ORACLE_FOREIGN_ARCHIVE_RPC_URL | Optional HTTPS URL(s) for communication with the archive nodes on the foreign network. Only used in AMB bridge mode for async information request processing. Several URLs can be specified, delimited by spaces. If the connection to one of these nodes is lost the next URL is used for connection. | URL(s)
+ORACLE_SHUTDOWN_CONTRACT_ADDRESS | Optional contract address in the side chain accessible through `ORACLE_SIDE_RPC_URL`, where the method passed in `ORACLE_SHUTDOWN_CONTRACT_METHOD` is implemented. | `address`
+ORACLE_SHUTDOWN_CONTRACT_METHOD | Method signature to be used in the side chain to identify the current shutdown status. Method should return boolean. Default value is `isShutdown()`. | `function signature`
+ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Foreign chain. Infinite, if not provided. | `integer`
+ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Home chain. Infinite, if not provided. | `integer`
+ORACLE_JSONRPC_ERROR_CODES | Override default JSON rpc error codes that can trigger RPC fallback to the next URL from the list (or a retry in case of a single RPC URL). Default is `-32603,-32002,-32005`. Should be a comma-separated list of negative integers. | `string`
 
 
 ## Monitor configuration

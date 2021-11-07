@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import differenceInMilliseconds from 'date-fns/differenceInMilliseconds'
-import { HOME_RPC_POLLING_INTERVAL } from '../config/constants'
+import { FOREIGN_RPC_POLLING_INTERVAL, HOME_RPC_POLLING_INTERVAL } from '../config/constants'
 
 export class BlockNumberProvider {
   private running: number
@@ -61,4 +61,4 @@ export class BlockNumberProvider {
 }
 
 export const homeBlockNumberProvider = new BlockNumberProvider(HOME_RPC_POLLING_INTERVAL)
-export const foreignBlockNumberProvider = new BlockNumberProvider(HOME_RPC_POLLING_INTERVAL)
+export const foreignBlockNumberProvider = new BlockNumberProvider(FOREIGN_RPC_POLLING_INTERVAL)

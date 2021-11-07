@@ -9,12 +9,15 @@
       - oracle_net_db_bridge_request
       - oracle_net_db_bridge_collected
       - oracle_net_db_bridge_affirmation
+      - oracle_net_db_bridge_information
       - oracle_net_db_bridge_transfer
       - oracle_net_db_bridge_senderhome
       - oracle_net_db_bridge_senderforeign
+      - oracle_net_db_bridge_shutdown
       - oracle_net_rabbit_bridge_request
       - oracle_net_rabbit_bridge_collected
       - oracle_net_rabbit_bridge_affirmation
+      - oracle_net_rabbit_bridge_information
       - oracle_net_rabbit_bridge_transfer
       - oracle_net_rabbit_bridge_senderhome
       - oracle_net_rabbit_bridge_senderforeign

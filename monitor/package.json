@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "check-all": "timeout -s 9 5m node checkWorker.js && timeout -s 9 5m node checkWorker2.js && timeout -s 9 5m node checkWorker3.js",
+    "check-all": "timeout -s 9 5m node checkWorker.js && timeout -s 9 5m node checkWorker2.js && timeout -s 9 5m node checkWorker3.js && timeout -s 9 10s node metricsWorker.js",
     "start": "node index.js",
     "check-and-start": "yarn check-all && yarn start",
     "lint": "eslint . --ignore-path ../.eslintignore",
@@ -22,7 +22,7 @@
     "web3": "^1.3.0"
   },
   "engines": {
-    "node": ">= 10.18"
+    "node": ">= 12.22"
   },
   "devDependencies": {
     "chai": "^4.2.0"

@@ -1,22 +1,39 @@
 require('../env')
 const path = require('path')
+const fs = require('fs')
 const { isAttached, connectWatcherToQueue, connection } = require('./services/amqpClient')
 const logger = require('./services/logger')
 const GasPrice = require('./services/gasPrice')
 const { getNonce, getChainId, getEventsFromTx } = require('./tx/web3')
 const { sendTx } = require('./tx/sendTx')
+const { getTokensState } = require('./utils/tokenState')
 const { checkHTTPS, watchdog, syncForEach, addExtraGas } = require('./utils/utils')
 const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
 
-const { ORACLE_VALIDATOR_ADDRESS, ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY, ORACLE_ALLOW_HTTP_FOR_RPC } = process.env
+const { ORACLE_ALLOW_HTTP_FOR_RPC } = process.env
 
-if (process.argv.length < 5) {
+if (process.argv.length < 4) {
   logger.error('Please check the number of arguments, transaction hash is not present')
   process.exit(EXIT_CODES.GENERAL_ERROR)
 }
 
 const config = require(path.join('../config/', process.argv[2]))
-const txHash = process.argv[4]
+const { web3, eventContract, chain, bridgeContract } = config.main
+
+const isTxHash = txHash => txHash.length === 66 && web3.utils.isHexStrict(txHash)
+function readTxHashes(filePath) {
+  return fs
+    .readFileSync(filePath)
+    .toString()
+    .split('\n')
+    .map(v => v.trim())
+    .filter(isTxHash)
+}
+
+const txHashesArgs = process.argv.slice(3)
+const rawTxHashes = txHashesArgs.filter(isTxHash)
+const txHashesFiles = txHashesArgs.filter(path => fs.existsSync(path)).flatMap(readTxHashes)
+const txHashes = [...rawTxHashes, ...txHashesFiles]
 
 const processSignatureRequests = require('./events/processSignatureRequests')(config)
 const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
@@ -25,10 +42,7 @@ const processTransfers = require('./events/processTransfers')(config)
 const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
 const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
 const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
-
-const web3Instance = config.web3
-const { eventContractAddress } = config
-const eventContract = new web3Instance.eth.Contract(config.eventAbi, eventContractAddress)
+const processAMBInformationRequests = require('./events/processAMBInformationRequests')(config)
 
 let attached
 
@@ -36,7 +50,7 @@ async function initialize() {
   try {
     const checkHttps = checkHTTPS(ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
-    web3Instance.currentProvider.urls.forEach(checkHttps(config.chain))
+    web3.currentProvider.urls.forEach(checkHttps(chain))
 
     attached = await isAttached()
     if (attached) {
@@ -47,7 +61,6 @@ async function initialize() {
 
     connectWatcherToQueue({
       queueName: config.queue,
-      workerQueue: config.workerQueue,
       cb: runMain
     })
   } catch (e) {
@@ -61,12 +74,12 @@ async function runMain({ sendToQueue }) {
     const sendJob = attached ? sendToQueue : sendJobTx
     if (!attached || connection.isConnected()) {
       if (config.maxProcessingTime) {
-        await watchdog(() => main({ sendJob, txHash }), config.maxProcessingTime, () => {
+        await watchdog(() => main({ sendJob, txHashes }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
           process.exit(EXIT_CODES.MAX_TIME_REACHED)
         })
       } else {
-        await main({ sendJob, txHash })
+        await main({ sendJob, txHashes })
       }
     } else {
       setTimeout(() => {
@@ -80,20 +93,12 @@ async function runMain({ sendToQueue }) {
 
 function processEvents(events) {
   switch (config.id) {
-    case 'native-erc-signature-request':
-    case 'erc-erc-signature-request':
     case 'erc-native-signature-request':
       return processSignatureRequests(events)
-    case 'native-erc-collected-signatures':
-    case 'erc-erc-collected-signatures':
     case 'erc-native-collected-signatures':
       return processCollectedSignatures(events)
-    case 'native-erc-affirmation-request':
-    case 'erc677-erc677-affirmation-request':
     case 'erc-native-affirmation-request':
-    case 'erc-erc-affirmation-request':
       return processAffirmationRequests(events)
-    case 'erc-erc-transfer':
     case 'erc-native-transfer':
       return processTransfers(events)
     case 'amb-signature-request':
@@ -102,32 +107,44 @@ function processEvents(events) {
       return processAMBCollectedSignatures(events)
     case 'amb-affirmation-request':
       return processAMBAffirmationRequests(events)
+    case 'amb-information-request':
+      return processAMBInformationRequests(events)
     default:
       return []
   }
 }
 
-async function main({ sendJob, txHash }) {
-  try {
-    const events = await getEventsFromTx({
-      web3: web3Instance,
-      contract: eventContract,
-      event: config.event,
-      txHash,
-      filter: config.eventFilter
-    })
-    logger.info(`Found ${events.length} ${config.event} events`)
+async function main({ sendJob, txHashes }) {
+  if (config.id === 'erc-native-transfer') {
+    logger.debug('Getting token address to listen Transfer events')
+    const state = await getTokensState(bridgeContract, logger)
+    eventContract.options.address = state.bridgeableTokenAddress
+  }
 
-    if (events.length) {
-      const job = await processEvents(events)
-      logger.info('Transactions to send:', job.length)
+  logger.info(`Processing ${txHashes.length} input transactions`)
+  for (const txHash of txHashes) {
+    try {
+      logger.info({ txHash }, `Processing transaction`)
+      const events = await getEventsFromTx({
+        web3,
+        contract: eventContract,
+        event: config.event,
+        txHash,
+        filter: config.eventFilter
+      })
+      logger.info({ txHash }, `Found ${events.length} ${config.event} events`)
 
-      if (job.length) {
-        await sendJob(job)
+      if (events.length) {
+        const job = await processEvents(events)
+        logger.info({ txHash }, 'Transactions to send:', job.length)
+
+        if (job.length) {
+          await sendJob(job)
+        }
       }
+    } catch (e) {
+      logger.error(e)
     }
-  } catch (e) {
-    logger.error(e)
   }
 
   await connection.close()
@@ -136,9 +153,13 @@ async function main({ sendJob, txHash }) {
 }
 
 async function sendJobTx(jobs) {
-  const gasPrice = await GasPrice.start(config.chain, true)
-  const chainId = await getChainId(web3Instance)
-  let nonce = await getNonce(web3Instance, ORACLE_VALIDATOR_ADDRESS)
+  await GasPrice.start(chain, true)
+  const gasPrice = GasPrice.getPrice().toString(10)
+
+  const { web3 } = config.sender === 'foreign' ? config.foreign : config.home
+
+  const chainId = await getChainId(web3)
+  let nonce = await getNonce(web3, config.validatorAddress)
 
   await syncForEach(jobs, async job => {
     let gasLimit
@@ -153,13 +174,13 @@ async function sendJobTx(jobs) {
       const txHash = await sendTx({
         data: job.data,
         nonce,
-        gasPrice: gasPrice.toString(10),
+        gasPrice,
         amount: '0',
         gasLimit,
-        privateKey: ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY,
+        privateKey: config.validatorPrivateKey,
         to: job.to,
         chainId,
-        web3: web3Instance
+        web3
       })
 
       nonce++
@@ -175,7 +196,7 @@ async function sendJobTx(jobs) {
       )
 
       if (e.message.toLowerCase().includes('insufficient funds')) {
-        const currentBalance = await web3Instance.eth.getBalance(ORACLE_VALIDATOR_ADDRESS)
+        const currentBalance = await web3.eth.getBalance(config.validatorAddress)
         const minimumBalance = gasLimit.multipliedBy(gasPrice)
         logger.error(
           `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`

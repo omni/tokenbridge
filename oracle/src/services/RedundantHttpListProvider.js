@@ -1,6 +1,7 @@
 const promiseRetry = require('promise-retry')
 const { promiseAny } = require('../utils/utils')
 const { defaultOptions, HttpListProviderError, send } = require('./HttpListProvider')
+const { onInjected } = require('./injectedLogger')
 
 function RedundantHttpListProvider(urls, options = {}) {
   if (!(this instanceof RedundantHttpListProvider)) {
@@ -13,10 +14,9 @@ function RedundantHttpListProvider(urls, options = {}) {
 
   this.urls = urls
   this.options = { ...defaultOptions, ...options }
-}
-
-RedundantHttpListProvider.prototype.setLogger = function(logger) {
-  this.logger = logger.child({ module: `RedundantHttpListProvider:${this.options.name}` })
+  onInjected(logger => {
+    this.logger = logger.child({ module: `RedundantHttpListProvider:${this.options.name}` })
+  })
 }
 
 RedundantHttpListProvider.prototype.send = async function send(payload, callback) {

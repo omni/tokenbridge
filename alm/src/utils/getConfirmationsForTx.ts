@@ -1,12 +1,7 @@
 import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { HOME_RPC_POLLING_INTERVAL, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
-import {
-  GetFailedTransactionParams,
-  APITransaction,
-  APIPendingTransaction,
-  GetPendingTransactionParams
-} from './explorer'
+import { GetTransactionParams, APITransaction, APIPendingTransaction, GetPendingTransactionParams } from './explorer'
 import { getAffirmationsSigned, getMessagesSigned } from './contract'
 import {
   getValidatorConfirmation,
@@ -34,24 +29,22 @@ const mergeConfirmations = (oldConfirmations: BasicConfirmationParam[], newConfi
 
 export const getConfirmationsForTx = async (
   messageData: string,
-  web3: Maybe<Web3>,
+  web3: Web3,
   validatorList: string[],
-  bridgeContract: Maybe<Contract>,
+  bridgeContract: Contract,
   fromHome: boolean,
   setResult: Function,
   requiredSignatures: number,
   setSignatureCollected: Function,
-  waitingBlocksResolved: boolean,
-  subscriptions: number[],
-  timestamp: number,
-  getFailedTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>,
+  setTimeoutId: (timeoutId: number) => void,
+  isCancelled: () => boolean,
+  startBlock: number,
+  getFailedTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>,
   setFailedConfirmations: Function,
   getPendingTransactions: (args: GetPendingTransactionParams) => Promise<APIPendingTransaction[]>,
   setPendingConfirmations: Function,
-  getSuccessTransactions: (args: GetFailedTransactionParams) => Promise<APITransaction[]>
+  getSuccessTransactions: (args: GetTransactionParams) => Promise<APITransaction[]>
 ) => {
-  if (!web3 || !validatorList || !validatorList.length || !bridgeContract || !waitingBlocksResolved) return
-
   const confirmationContractMethod = fromHome ? getMessagesSigned : getAffirmationsSigned
 
   const hashMsg = web3.utils.soliditySha3Raw(messageData)
@@ -93,6 +86,14 @@ export const getConfirmationsForTx = async (
     setPendingConfirmations(validatorPendingConfirmations.length > 0)
   } else {
     setPendingConfirmations(false)
+    if (fromHome) {
+      // fetch collected signatures for possible manual processing
+      setSignatureCollected(
+        await Promise.all(
+          Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
+        )
+      )
+    }
   }
 
   const undefinedConfirmations = validatorConfirmations.filter(
@@ -102,7 +103,7 @@ export const getConfirmationsForTx = async (
   // Check if confirmation failed
   const validatorFailedConfirmationsChecks = await Promise.all(
     undefinedConfirmations.map(
-      getValidatorFailedTransaction(bridgeContract, messageData, timestamp, getFailedTransactions)
+      getValidatorFailedTransaction(bridgeContract, messageData, startBlock, getFailedTransactions)
     )
   )
   const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
@@ -122,21 +123,12 @@ export const getConfirmationsForTx = async (
       status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED
     }))
     updateConfirmations(notRequiredConfirmations)
-
-    if (fromHome) {
-      // fetch collected signatures for possible manual processing
-      setSignatureCollected(
-        await Promise.all(
-          Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
-        )
-      )
-    }
   }
 
   // get transactions from success signatures
   const successConfirmationWithData = await Promise.all(
     successConfirmations.map(
-      getSuccessExecutionTransaction(web3, bridgeContract, fromHome, messageData, timestamp, getSuccessTransactions)
+      getSuccessExecutionTransaction(web3, bridgeContract, fromHome, messageData, startBlock, getSuccessTransactions)
     )
   )
 
@@ -149,28 +141,30 @@ export const getConfirmationsForTx = async (
     (!hasEnoughSignatures && missingConfirmations.length > 0) ||
     successConfirmationWithTxFound.length < successConfirmationWithData.length
   ) {
-    const timeoutId = setTimeout(
-      () =>
-        getConfirmationsForTx(
-          messageData,
-          web3,
-          validatorList,
-          bridgeContract,
-          fromHome,
-          setResult,
-          requiredSignatures,
-          setSignatureCollected,
-          waitingBlocksResolved,
-          subscriptions,
-          timestamp,
-          getFailedTransactions,
-          setFailedConfirmations,
-          getPendingTransactions,
-          setPendingConfirmations,
-          getSuccessTransactions
-        ),
-      HOME_RPC_POLLING_INTERVAL
-    )
-    subscriptions.push(timeoutId)
+    if (!isCancelled()) {
+      const timeoutId = setTimeout(
+        () =>
+          getConfirmationsForTx(
+            messageData,
+            web3,
+            validatorList,
+            bridgeContract,
+            fromHome,
+            setResult,
+            requiredSignatures,
+            setSignatureCollected,
+            setTimeoutId,
+            isCancelled,
+            startBlock,
+            getFailedTransactions,
+            setFailedConfirmations,
+            getPendingTransactions,
+            setPendingConfirmations,
+            getSuccessTransactions
+          ),
+        HOME_RPC_POLLING_INTERVAL
+      )
+      setTimeoutId(timeoutId)
+    }
   }
 }

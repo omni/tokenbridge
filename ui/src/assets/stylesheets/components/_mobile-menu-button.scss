@@ -1,9 +1,0 @@
-.mobile-menu-button {
-    display: none;
-    @media screen and (max-width: $mobile-width) {
-        display: block;
-    }
-    path {
-        fill: $header-menu-icon-color;
-    }
-}

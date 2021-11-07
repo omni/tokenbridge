@@ -1,0 +1,11 @@
+$FileCreateMode 0644
+template(name="DockerLogFileName_Rabbit" type="list") {
+   constant(value="/var/log/docker/")
+   property(name="syslogtag" securepath="replace" regex.type="ERE" regex.submatch="1" regex.expression="oracle_(.*rabbit.*)\\/[a-zA-Z0-9]+\\[")
+   constant(value="/docker.log")
+}
+
+if $programname contains 'oracle' and $programname contains 'rabbit' then \
+  ?DockerLogFileName_Rabbit
+
+$FileCreateMode 0600

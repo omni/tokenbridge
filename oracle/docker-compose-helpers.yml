@@ -1,0 +1,15 @@
+---
+version: '2.4'
+services:
+  interestFetcher:
+    cpus: 0.1
+    mem_limit: 500m
+    image: poanetwork/tokenbridge-oracle:latest
+    env_file: ./.env
+    environment:
+      NODE_ENV: production
+      INTEREST_FETCHER_PRIVATE_KEY: ${INTEREST_FETCHER_PRIVATE_KEY}
+      INTEREST_FETCH_CONTRACT_ADDRESS: '0xCd152c7Bd4189Ddee97EaBb783FC5cD93CF2D230'
+      INTERVAL: 300000
+    restart: unless-stopped
+    entrypoint: yarn helper:interestFether

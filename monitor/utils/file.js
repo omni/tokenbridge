@@ -1,23 +1,30 @@
 const fs = require('fs')
 const path = require('path')
 
-async function readFile(filePath) {
+function readFile(filePath, parseJson = true) {
   try {
-    const content = await fs.readFileSync(filePath)
+    const content = fs.readFileSync(filePath)
+    if (!parseJson) return content
     const json = JSON.parse(content)
     const timeDiff = Math.floor(Date.now() / 1000) - json.lastChecked
     return Object.assign({}, json, { timeDiff })
-  } catch (e) {
-    console.error(e)
+  } catch (_) {
+    console.error(`File ${filePath} does not exist`)
     return {
       error: 'the bridge statistics are not available'
     }
   }
 }
 
-function writeFile(filePath, object, useCwd = true) {
+function writeFile(filePath, object, paramOptions = {}) {
+  const defaultOptions = {
+    useCwd: true,
+    stringify: true
+  }
+  const { useCwd, stringify } = Object.assign({}, defaultOptions, paramOptions)
+
   const fullPath = useCwd ? path.join(process.cwd(), filePath) : filePath
-  fs.writeFileSync(fullPath, JSON.stringify(object, null, 4))
+  fs.writeFileSync(fullPath, stringify ? JSON.stringify(object, null, 4) : object)
 }
 
 function createDir(dirPath) {

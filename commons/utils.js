@@ -1,22 +1,17 @@
-const { toWei, toBN } = require('web3-utils')
+const { toWei, toBN, BN } = require('web3-utils')
 const { GasPriceOracle } = require('gas-price-oracle')
-const { BRIDGE_MODES, FEE_MANAGER_MODE, ERC_TYPES } = require('./constants')
+const fetch = require('node-fetch')
+const { BRIDGE_MODES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
 
 const gasPriceOracle = new GasPriceOracle()
 
 function decodeBridgeMode(bridgeModeHash) {
   switch (bridgeModeHash) {
-    case '0x92a8d7fe':
-      return BRIDGE_MODES.NATIVE_TO_ERC
-    case '0xba4690f5':
-      return BRIDGE_MODES.ERC_TO_ERC
     case '0x18762d46':
       return BRIDGE_MODES.ERC_TO_NATIVE
     case '0x2544fbb9':
       return BRIDGE_MODES.ARBITRARY_MESSAGE
-    case '0x16ea01e9':
-      return BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
     case '0x76595b56':
       return BRIDGE_MODES.AMB_ERC_TO_ERC
     default:
@@ -24,80 +19,9 @@ function decodeBridgeMode(bridgeModeHash) {
   }
 }
 
-const decodeFeeManagerMode = managerModeHash => {
-  switch (managerModeHash) {
-    case '0xf2aed8f7':
-      return FEE_MANAGER_MODE.ONE_DIRECTION
-    case '0xd7de965f':
-      return FEE_MANAGER_MODE.BOTH_DIRECTIONS
-    default:
-      throw new Error(`Unrecognized fee manager mode hash: '${managerModeHash}'`)
-  }
-}
-
 async function getBridgeMode(contract) {
-  try {
-    const bridgeModeHash = await contract.methods.getBridgeMode().call()
-    return decodeBridgeMode(bridgeModeHash)
-  } catch (e) {
-    return BRIDGE_MODES.NATIVE_TO_ERC_V1
-  }
-}
-
-const getTokenType = async (bridgeTokenContract, bridgeAddress) => {
-  try {
-    const resultBridgeAddress = await bridgeTokenContract.methods.bridgeContract().call()
-    if (resultBridgeAddress === bridgeAddress) {
-      return ERC_TYPES.ERC677
-    } else {
-      return ERC_TYPES.ERC20
-    }
-  } catch (e) {
-    try {
-      const isBridge = await bridgeTokenContract.methods.isBridge(bridgeAddress).call()
-      if (isBridge) {
-        return ERC_TYPES.ERC677
-      } else {
-        return ERC_TYPES.ERC20
-      }
-    } catch (e) {
-      return ERC_TYPES.ERC20
-    }
-  }
-}
-
-const isErcToErcMode = bridgeMode => {
-  return (
-    bridgeMode === BRIDGE_MODES.ERC_TO_ERC ||
-    bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC ||
-    bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
-  )
-}
-
-const isMediatorMode = bridgeMode => {
-  return bridgeMode === BRIDGE_MODES.AMB_ERC_TO_ERC || bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC
-}
-
-const getUnit = bridgeMode => {
-  let unitHome = null
-  let unitForeign = null
-  if (bridgeMode === BRIDGE_MODES.NATIVE_TO_ERC) {
-    unitHome = 'Native coins'
-    unitForeign = 'Tokens'
-  } else if (bridgeMode === BRIDGE_MODES.ERC_TO_ERC) {
-    unitHome = 'Tokens'
-    unitForeign = 'Tokens'
-  } else if (bridgeMode === BRIDGE_MODES.ERC_TO_NATIVE) {
-    unitHome = 'Native coins'
-    unitForeign = 'Tokens'
-  } else if (bridgeMode === BRIDGE_MODES.STAKE_AMB_ERC_TO_ERC) {
-    unitHome = 'Tokens'
-    unitForeign = 'Tokens'
-  } else {
-    throw new Error(`Unrecognized bridge mode: ${bridgeMode}`)
-  }
-
-  return { unitHome, unitForeign }
+  const bridgeModeHash = await contract.methods.getBridgeMode().call()
+  return decodeBridgeMode(bridgeModeHash)
 }
 
 const parseValidatorEvent = event => {
@@ -150,11 +74,8 @@ const tryCall = async (method, fallbackValue) => {
 
 const getDeployedAtBlock = async contract => tryCall(contract.methods.deployedAtBlock(), 0)
 
-const getPastEvents = async (
-  contract,
-  { event = 'allEvents', fromBlock = toBN(0), toBlock = 'latest', options = {} }
-) => {
-  let events
+const getPastEventsOrSplit = async (contract, { event, fromBlock, toBlock, options }) => {
+  let events = []
   try {
     events = await contract.getPastEvents(event, {
       ...options,
@@ -162,19 +83,19 @@ const getPastEvents = async (
       toBlock
     })
   } catch (e) {
-    if (e.message.includes('query returned more than') && toBlock !== 'latest') {
+    if (e.message.includes('query returned more than') || e.message.toLowerCase().includes('timeout')) {
       const middle = toBN(fromBlock)
         .add(toBN(toBlock))
         .divRound(toBN(2))
       const middlePlusOne = middle.add(toBN(1))
 
-      const firstHalfEvents = await getPastEvents(contract, {
+      const firstHalfEvents = await getPastEventsOrSplit(contract, {
         options,
         event,
         fromBlock,
         toBlock: middle
       })
-      const secondHalfEvents = await getPastEvents(contract, {
+      const secondHalfEvents = await getPastEventsOrSplit(contract, {
         options,
         event,
         fromBlock: middlePlusOne,
@@ -186,6 +107,31 @@ const getPastEvents = async (
     }
   }
   return events
+}
+
+const getPastEvents = async (
+  contract,
+  { event = 'allEvents', fromBlock = toBN(0), toBlock = 'latest', options = {} }
+) => {
+  if (toBlock === 'latest') {
+    return contract.getPastEvents(event, {
+      ...options,
+      fromBlock,
+      toBlock
+    })
+  }
+
+  const batchSize = 1000000
+  const to = toBN(toBlock)
+  const events = []
+
+  for (let from = toBN(fromBlock); from.lte(to); from = from.addn(batchSize + 1)) {
+    const opts = { event, fromBlock: from, toBlock: BN.min(to, from.addn(batchSize)), options }
+    const batch = await getPastEventsOrSplit(contract, opts)
+    events.push(batch)
+  }
+
+  return [].concat(...events)
 }
 
 const getValidatorList = async (address, eth, options) => {
@@ -233,17 +179,16 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
   return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
 }
 
-// fetchFn has to be supplied (instead of just url to oracle),
-// because this utility function is shared between Browser and Node,
-// we use built-in 'fetch' on browser side, and `node-fetch` package in Node.
-const gasPriceFromSupplier = async (fetchFn, options = {}) => {
+const gasPriceFromSupplier = async (url, options = {}) => {
   try {
     let json
-    if (fetchFn) {
-      const response = await fetchFn()
+    if (url === 'gas-price-oracle') {
+      json = await gasPriceOracle.fetchGasPricesOffChain()
+    } else if (url) {
+      const response = await fetch(url, { timeout: 2000 })
       json = await response.json()
     } else {
-      json = await gasPriceOracle.fetchGasPricesOffChain()
+      return null
     }
     const oracleGasPrice = json[options.speedType]
 
@@ -284,10 +229,7 @@ const gasPriceFromContract = async (bridgeContract, options = {}) => {
 
 module.exports = {
   decodeBridgeMode,
-  decodeFeeManagerMode,
   getBridgeMode,
-  getTokenType,
-  getUnit,
   parseValidatorEvent,
   processValidatorsEvents,
   getValidatorList,
@@ -296,7 +238,5 @@ module.exports = {
   normalizeGasPrice,
   gasPriceFromSupplier,
   gasPriceFromContract,
-  gasPriceWithinLimits,
-  isErcToErcMode,
-  isMediatorMode
+  gasPriceWithinLimits
 }

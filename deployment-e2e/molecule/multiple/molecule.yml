@@ -16,7 +16,6 @@ platforms:
     children:
       - oracle
       - monitor
-      - ui
     image: ubuntu:16.04
     privileged: true
     network_mode: host
@@ -35,7 +34,7 @@ provisioner:
   inventory:
     host_vars:
       multiple-host:
-        ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "8e829f695aed89a154550f30262f1529582cc49dc30eff74a6b491359e0230f9"
+        ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: "6c48435bd464a53ed66ed62127c4dba8af75cf1a99a8ebe2680599948fbfbc6d"
         MONITOR_PORT: 3003
         syslog_server_port: "udp://127.0.0.1:514"
 verifier:

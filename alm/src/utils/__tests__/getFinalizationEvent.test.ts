@@ -4,7 +4,6 @@ import Web3 from 'web3'
 import { getFinalizationEvent } from '../getFinalizationEvent'
 import { VALIDATOR_CONFIRMATION_STATUS } from '../../config/constants'
 
-const eventName = 'RelayedMessage'
 const timestamp = 1594045859
 const validator1 = '0x45b96809336A8b714BFbdAB3E4B5e0fe5d839908'
 const txHash = '0xdab36c9210e7e45fb82af10ffe4960461e41661dce0c9cd36b2843adaa1df156'
@@ -20,12 +19,11 @@ const web3 = ({
     toChecksumAddress: (a: string) => a
   }
 } as unknown) as Web3
-const waitingBlocksResolved = true
 const message = {
   id: '0x123',
   data: '0x123456789'
 }
-const interval = 10000
+const isCancelled = () => false
 let subscriptions: Array<number> = []
 
 const event = {
@@ -50,7 +48,7 @@ beforeEach(() => {
 describe('getFinalizationEvent', () => {
   test('should get finalization event and not try to get failed or pending transactions', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return [event]
       }
     } as unknown) as Contract
@@ -64,14 +62,13 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
-      eventName,
       web3,
       setResult,
-      waitingBlocksResolved,
       message,
-      interval,
-      subscriptions,
+      subscriptions.push.bind(subscriptions),
+      isCancelled,
       timestamp,
       collectedSignaturesEvent,
       getFailedExecution,
@@ -101,7 +98,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event and not try to get failed or pending transactions if foreign to home transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       }
     } as unknown) as Contract
@@ -115,14 +112,13 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
-      eventName,
       web3,
       setResult,
-      waitingBlocksResolved,
       message,
-      interval,
-      subscriptions,
+      subscriptions.push.bind(subscriptions),
+      isCancelled,
       timestamp,
       collectedSignaturesEvent,
       getFailedExecution,
@@ -145,7 +141,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event and try to get failed and pending transactions if home to foreign transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       },
       options: {
@@ -166,14 +162,13 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
-      eventName,
       web3,
       setResult,
-      waitingBlocksResolved,
       message,
-      interval,
-      subscriptions,
+      subscriptions.push.bind(subscriptions),
+      isCancelled,
       timestamp,
       collectedSignaturesEvent,
       getFailedExecution,
@@ -196,7 +191,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event and not to try to get failed transaction if pending transactions found if home to foreign transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       },
       options: {
@@ -217,14 +212,13 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
-      eventName,
       web3,
       setResult,
-      waitingBlocksResolved,
       message,
-      interval,
-      subscriptions,
+      subscriptions.push.bind(subscriptions),
+      isCancelled,
       timestamp,
       collectedSignaturesEvent,
       getFailedExecution,
@@ -254,7 +248,7 @@ describe('getFinalizationEvent', () => {
   })
   test('should retry to get finalization event even if failed transaction found if home to foreign transaction', async () => {
     const contract = ({
-      getPastEvents: () => {
+      getPastEvents: async () => {
         return []
       },
       options: {
@@ -275,14 +269,13 @@ describe('getFinalizationEvent', () => {
     const setExecutionEventsFetched = jest.fn()
 
     await getFinalizationEvent(
+      true,
       contract,
-      eventName,
       web3,
       setResult,
-      waitingBlocksResolved,
       message,
-      interval,
-      subscriptions,
+      subscriptions.push.bind(subscriptions),
+      isCancelled,
       timestamp,
       collectedSignaturesEvent,
       getFailedExecution,

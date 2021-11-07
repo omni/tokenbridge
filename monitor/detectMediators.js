@@ -1,10 +1,9 @@
 require('dotenv').config()
-const logger = require('./logger')('stuckTransfers.js')
-const { isHomeContract, isForeignContract } = require('./utils/web3Cache')
+const logger = require('./logger')('detectMediators.js')
 const eventsInfo = require('./utils/events')
-const { getHomeTxSender, getForeignTxSender } = require('./utils/web3Cache')
-const { addExecutionStatus } = require('./utils/message')
-const { normalizeAMBMessageEvent } = require('../commons')
+const { getHomeTxSender, getForeignTxSender, isHomeContract, isForeignContract } = require('./utils/web3Cache')
+const { addExecutionStatus, addRetrievalStatus } = require('./utils/message')
+const { normalizeAMBMessageEvent, normalizeAMBInfoRequest } = require('../commons')
 
 function countInteractions(requests) {
   const stats = {}
@@ -13,9 +12,54 @@ function countInteractions(requests) {
       stats[msg.sender] = {}
     }
     if (!stats[msg.sender][msg.executor]) {
-      stats[msg.sender][msg.executor] = 0
+      stats[msg.sender][msg.executor] = {
+        success: 0,
+        failed: 0,
+        pending: 0
+      }
     }
-    stats[msg.sender][msg.executor] += 1
+    if (msg.status === true) {
+      stats[msg.sender][msg.executor].success += 1
+    } else if (msg.status === false) {
+      stats[msg.sender][msg.executor].failed += 1
+    } else {
+      stats[msg.sender][msg.executor].pending += 1
+    }
+  })
+  return stats
+}
+
+function countInfoRequests(requests) {
+  const stats = {}
+  requests.forEach(msg => {
+    if (!stats[msg.sender]) {
+      stats[msg.sender] = {}
+    }
+    if (!stats[msg.sender][msg.requestSelector]) {
+      stats[msg.sender][msg.requestSelector] = {
+        callSucceeded: {
+          callbackSucceeded: 0,
+          callbackFailed: 0
+        },
+        callFailed: {
+          callbackSucceeded: 0,
+          callbackFailed: 0
+        },
+        pending: 0
+      }
+    }
+    const stat = stats[msg.sender][msg.requestSelector]
+    if (msg.callStatus === true && msg.callbackStatus === true) {
+      stat.callSucceeded.callbackSucceeded += 1
+    } else if (msg.callStatus === true && msg.callbackStatus === false) {
+      stat.callSucceeded.callbackFailed += 1
+    } else if (msg.callStatus === false && msg.callbackStatus === true) {
+      stat.callFailed.callbackSucceeded += 1
+    } else if (msg.callStatus === false && msg.callbackStatus === false) {
+      stat.callFailed.callbackFailed += 1
+    } else {
+      stat.pending += 1
+    }
   })
   return stats
 }
@@ -78,16 +122,13 @@ async function main(mode) {
     homeToForeignRequests,
     foreignToHomeRequests,
     homeToForeignConfirmations,
-    foreignToHomeConfirmations
+    foreignToHomeConfirmations,
+    informationRequests,
+    informationResponses
   } = await eventsInfo(mode)
-  const homeToForeign = homeToForeignRequests
-    .map(normalize)
-    .map(addExecutionStatus(homeToForeignConfirmations))
-    .filter(x => typeof x.status === 'boolean')
-  const foreignToHome = foreignToHomeRequests
-    .map(normalize)
-    .map(addExecutionStatus(foreignToHomeConfirmations))
-    .filter(x => typeof x.status === 'boolean')
+  const homeToForeign = homeToForeignRequests.map(normalize).map(addExecutionStatus(homeToForeignConfirmations))
+  const foreignToHome = foreignToHomeRequests.map(normalize).map(addExecutionStatus(foreignToHomeConfirmations))
+  const infoRequests = informationRequests.map(normalizeAMBInfoRequest).map(addRetrievalStatus(informationResponses))
 
   for (const event of homeToForeign) {
     // AMB contract emits a single UserRequestForSignature event for every home->foreign request.
@@ -98,7 +139,7 @@ async function main(mode) {
 
     // Executor is definitely a contract if a message execution failed, since message calls to EOA always succeed.
     // Alternatively, the executor is checked to be a contract by looking at its bytecode size.
-    event.isExecutorAContract = !event.status || (await isForeignContract(event.executor))
+    event.isExecutorAContract = event.status === false || (await isForeignContract(event.executor))
   }
   for (const event of foreignToHome) {
     // AMB contract emits a single UserRequestForAffirmation event for every foreign->home request.
@@ -109,7 +150,7 @@ async function main(mode) {
 
     // Executor is definitely a contract if a message execution failed, since message calls to EOA always succeed.
     // Alternatively, the executor is checked to be a contract by looking at its bytecode size.
-    event.isExecutorAContract = !event.status || (await isHomeContract(event.executor))
+    event.isExecutorAContract = event.status === false || (await isHomeContract(event.executor))
   }
   const C2C = event => event.isSenderAContract && event.isExecutorAContract
   const U2C = event => !event.isSenderAContract && event.isExecutorAContract
@@ -142,6 +183,7 @@ async function main(mode) {
     floatingMediators,
     remotelyControlledMediators,
     unknown,
+    informationReceivers: countInfoRequests(infoRequests),
     lastChecked: Math.floor(Date.now() / 1000)
   }
 }

@@ -1,4 +1,4 @@
-FROM node:10 as contracts
+FROM node:12 as contracts
 
 WORKDIR /mono
 
@@ -11,7 +11,7 @@ COPY ./contracts/truffle-config.js ./
 COPY ./contracts/contracts ./contracts
 RUN npm run compile
 
-FROM node:10
+FROM node:12
 
 WORKDIR /mono
 COPY package.json .

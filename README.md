@@ -20,12 +20,10 @@ Sub-repositories maintained within this monorepo are listed below.
 | Sub-repository | Description |
 | --- | --- |
 | [Oracle](oracle/README.md) | Oracle responsible for listening to bridge related events and authorizing asset transfers. |
-| [UI](ui/README.md) | DApp interface to transfer tokens and coins between chains. |
 | [Monitor](monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
 | [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
 | [Monitor-E2E](monitor-e2e/README.md) | End to end tests for the Monitor |
-| [UI-E2E](ui-e2e/README.md) | End to end tests for the UI |
 | [Deployment-E2E](deployment-e2e/README.md) | End to end tests for the Deployment |
 | [Commons](commons/README.md) | Interfaces, constants and utilities shared between the sub-repositories |
 | [E2E-Commons](e2e-commons/README.md) | Common utilities and configuration used in end to end tests |
@@ -56,8 +54,6 @@ Additionally there are [Smart Contracts](https://github.com/poanetwork/tokenbrid
 
 The POA TokenBridge provides four operational modes:
 
-- [x] `Native-to-ERC20` **Coins** on a Home network can be converted to ERC20-compatible **tokens** on a Foreign network. Coins are locked on the Home side and the corresponding amount of ERC20 tokens are minted on the Foreign side. When the operation is reversed, tokens are burnt on the Foreign side and unlocked in the Home network. **More Information: [POA-to-POA20 Bridge](https://medium.com/poa-network/introducing-poa-bridge-and-poa20-55d8b78058ac)**
-- [x] `ERC20-to-ERC20` ERC20-compatible tokens on the Foreign network are locked and minted as ERC20-compatible tokens (ERC677 tokens) on the Home network. When transferred from Home to Foreign, they are burnt on the Home side and unlocked in the Foreign network. This can be considered a form of atomic swap when a user swaps the token "X" in network "A" to the token "Y" in network "B". **More Information: [ERC20-to-ERC20](https://medium.com/poa-network/introducing-the-erc20-to-erc20-tokenbridge-ce266cc1a2d0)**
 - [x] `ERC20-to-Native`: Pre-existing **tokens** in the Foreign network are locked and **coins** are minted in the `Home` network. In this mode, the Home network consensus engine invokes [Parity's Block Reward contract](https://wiki.parity.io/Block-Reward-Contract.html) to mint coins per the bridge contract request. **More Information: [xDai Chain](https://medium.com/poa-network/poa-network-partners-with-makerdao-on-xdai-chain-the-first-ever-usd-stable-blockchain-65a078c41e6a)**
 - [x] `Arbitrary-Message`: Transfer arbitrary data between two networks as so the data could be interpreted as an arbitrary contract method invocation.
 
@@ -68,7 +64,7 @@ Clone the repository:
 git clone https://github.com/poanetwork/tokenbridge
 ```
 
-If there is no need to build docker images for the TokenBridge components (oracle, monitor, UI), initialize submodules, install dependencies, compile the Smart Contracts:
+If there is no need to build docker images for the TokenBridge components (oracle, monitor), initialize submodules, install dependencies, compile the Smart Contracts:
 ```
 yarn initialize
 ```
@@ -91,7 +87,7 @@ Running tests for all projects:
 yarn test
 ```
 
-Additionally there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [UI](ui-e2e/README.md).
+Additionally there are end-to-end tests for [Oracle](oracle-e2e/README.md) and [Monitor](monitor-e2e/README.md).
 
 For details on building, running and developing please refer to respective READMEs in sub-repositories.
 
