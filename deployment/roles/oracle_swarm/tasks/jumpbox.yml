@@ -1,0 +1,8 @@
+---
+- name: Pull the containers images
+  community.docker.docker_image:
+    name: "{{ oracle_image }}"
+    source: pull
+  when: skip_pull is undefined
+  vars:
+    ansible_python_interpreter: /usr/bin/python3

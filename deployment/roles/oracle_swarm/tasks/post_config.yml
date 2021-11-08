@@ -1,0 +1,46 @@
+---
+- name: Get blocks
+  become_user: "{{ compose_service_user }}"
+  shell: docker run --env-file .env --rm {{ oracle_image }} scripts/getValidatorStartBlocks.js
+  args:
+    chdir: "{{ bridge_path }}/oracle"
+  register: BLOCKS
+  when: (ORACLE_HOME_START_BLOCK is not defined) or (ORACLE_FOREIGN_START_BLOCK is not defined)
+
+- name: Write blocks
+  blockinfile:
+    path: "{{ bridge_path }}/oracle/.env"
+    marker: "## {mark} Calculated by scripts/getValidatorStartBlocks.js"
+    block: |
+      ORACLE_HOME_START_BLOCK={{ (BLOCKS.stdout | from_json).homeStartBlock }}
+      ORACLE_FOREIGN_START_BLOCK={{ (BLOCKS.stdout | from_json).foreignStartBlock }}
+  when: (ORACLE_HOME_START_BLOCK is not defined) or (ORACLE_FOREIGN_START_BLOCK is not defined)
+
+- name: Copy keystore file
+  copy:
+    src: "{{ ORACLE_VALIDATOR_KEYSTORE_PATH }}"
+    dest: "{{ keystore_path }}"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Create swarm secret
+  community.docker.docker_secret:
+    name: oracle_keystore
+    state: present
+    data_src: "{{ keystore_path }}"
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: Remove unencrypted keystore file
+  file:
+    path: "{{ keystore_path }}"
+    state: absent
+
+- name: Install .key config
+  template:
+    src: key.j2
+    dest: "{{ keyfile_path }}"
+    owner: root
+    group: root
+    mode: 0600

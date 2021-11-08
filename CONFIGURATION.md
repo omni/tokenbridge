@@ -53,6 +53,8 @@ ORACLE_SHUTDOWN_CONTRACT_METHOD | Method signature to be used in the side chain 
 ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Foreign chain. Infinite, if not provided. | `integer`
 ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT | Max length for the block range used in `eth_getLogs` requests for polling contract events for the Home chain. Infinite, if not provided. | `integer`
 ORACLE_JSONRPC_ERROR_CODES | Override default JSON rpc error codes that can trigger RPC fallback to the next URL from the list (or a retry in case of a single RPC URL). Default is `-32603,-32002,-32005`. Should be a comma-separated list of negative integers. | `string`
+ORACLE_VALIDATOR_KEYSTORE_PATH | Path to the keystore v3 json file with the encrypted validator key. | `string`  
+ORACLE_VALIDATOR_KEYSTORE_PASSWORD | Password from the provided keystore file, oracle won't startup properly, if the provided password is invalid | `string`
 
 
 ## Monitor configuration

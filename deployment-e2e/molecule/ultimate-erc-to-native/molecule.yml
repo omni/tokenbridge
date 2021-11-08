@@ -27,8 +27,6 @@ provisioner:
         ORACLE_FOREIGN_START_BLOCK: 1
 verifier:
   name: testinfra
-  lint:
-    name: flake8
 scenario:
   name: ultimate-erc-to-native
   test_sequence:

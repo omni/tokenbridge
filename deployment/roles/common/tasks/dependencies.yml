@@ -31,6 +31,7 @@
     owner: "root"
     group: "root"
     mode: "0755"
+  when: skip_compose is undefined
 
 - name: Upgrade pip version
   shell: pip3 install --upgrade pip==19.3.1
@@ -44,6 +45,9 @@
     comment: user to run docker-compose
     group: docker
     createhome: yes
+
+- name: reset ssh connection to allow user changes to affect ansible user
+  meta: reset_connection
 
 - name: Install auditd
   apt:

@@ -1,0 +1,47 @@
+---
+- name: Init docker swarm
+  community.docker.docker_swarm:
+    state: present
+    autolock_managers: yes
+    listen_addr: 127.0.0.1:2377
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: Get unlock token
+  community.docker.docker_swarm_info:
+    unlock_key: yes
+  register: result
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: Print unlock token
+  debug:
+    var: result.swarm_unlock_key
+
+- name: Create oracle directory
+  file:
+    path: "{{ bridge_path }}/oracle"
+    state: directory
+    mode: '0755'
+
+- name: Create rabbitmq directory
+  file:
+    path: "{{ bridge_data_path }}/{{ item }}"
+    state: directory
+    mode: '0775'
+  loop:
+    - rabbitmq
+    - redis
+
+- name: Install .env config
+  template:
+    src: .env.j2
+    dest: "{{ bridge_path }}/oracle/.env"
+    owner: "{{ compose_service_user }}"
+    mode: '0640'
+
+- name: Install docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ bridge_path }}/oracle/docker-compose.yml"
+    mode: '0755'
