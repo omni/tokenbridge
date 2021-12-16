@@ -45,5 +45,8 @@
     "compile:contracts": "yarn workspace tokenbridge-contracts run compile",
     "install:deploy": "cd contracts/deploy && npm install --unsafe-perm --silent",
     "postinstall": "test -n \"$NOYARNPOSTINSTALL\" || ln -sf $(pwd)/node_modules/openzeppelin-solidity/ contracts/node_modules/openzeppelin-solidity"
+  },
+  "resolutions": {
+    "**/@mycrypto/eth-scan": "3.5.3"
   }
 }

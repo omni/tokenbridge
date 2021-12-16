@@ -20,21 +20,21 @@ const {
   COMMON_HOME_GAS_PRICE_FACTOR
 } = process.env
 
-let cachedGasPrice = null
+let cachedGasPriceOptions = null
 
 let fetchGasPriceInterval = null
 
-const fetchGasPrice = async (speedType, factor, bridgeContract, gasPriceSupplierUrl) => {
+const fetchGasPrice = async (speedType, factor, web3, bridgeContract, gasPriceSupplierUrl) => {
   const contractOptions = { logger }
   const supplierOptions = { speedType, factor, limits: GAS_PRICE_BOUNDARIES, logger }
-  cachedGasPrice =
-    (await gasPriceFromSupplier(gasPriceSupplierUrl, supplierOptions)) ||
+  cachedGasPriceOptions =
+    (await gasPriceFromSupplier(web3, gasPriceSupplierUrl, supplierOptions)) ||
     (await gasPriceFromContract(bridgeContract, contractOptions)) ||
-    cachedGasPrice
-  return cachedGasPrice
+    cachedGasPriceOptions
+  return cachedGasPriceOptions
 }
 
-async function start(chainId, fetchOnce) {
+async function start(chainId, web3, fetchOnce) {
   clearInterval(fetchGasPriceInterval)
 
   let contract = null
@@ -49,7 +49,7 @@ async function start(chainId, fetchOnce) {
     updateInterval = ORACLE_HOME_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
     factor = Number(COMMON_HOME_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
 
-    cachedGasPrice = COMMON_HOME_GAS_PRICE_FALLBACK
+    cachedGasPriceOptions = { gasPrice: COMMON_HOME_GAS_PRICE_FALLBACK }
   } else if (chainId === 'foreign') {
     contract = foreign.bridgeContract
     gasPriceSupplierUrl = COMMON_FOREIGN_GAS_PRICE_SUPPLIER_URL
@@ -57,7 +57,7 @@ async function start(chainId, fetchOnce) {
     updateInterval = ORACLE_FOREIGN_GAS_PRICE_UPDATE_INTERVAL || DEFAULT_UPDATE_INTERVAL
     factor = Number(COMMON_FOREIGN_GAS_PRICE_FACTOR) || DEFAULT_GAS_PRICE_FACTOR
 
-    cachedGasPrice = COMMON_FOREIGN_GAS_PRICE_FALLBACK
+    cachedGasPriceOptions = { gasPrice: COMMON_FOREIGN_GAS_PRICE_FALLBACK }
   } else {
     throw new Error(`Unrecognized chainId '${chainId}'`)
   }
@@ -67,21 +67,21 @@ async function start(chainId, fetchOnce) {
   }
 
   if (fetchOnce) {
-    await fetchGasPrice(speedType, factor, contract, gasPriceSupplierUrl)
+    await fetchGasPrice(speedType, factor, web3, contract, gasPriceSupplierUrl)
   } else {
     fetchGasPriceInterval = await setIntervalAndRun(
-      () => fetchGasPrice(speedType, factor, contract, gasPriceSupplierUrl),
+      () => fetchGasPrice(speedType, factor, web3, contract, gasPriceSupplierUrl),
       updateInterval
     )
   }
 }
 
-function getPrice() {
-  return cachedGasPrice
+function gasPriceOptions() {
+  return cachedGasPriceOptions
 }
 
 module.exports = {
   start,
-  getPrice,
+  gasPriceOptions,
   fetchGasPrice
 }

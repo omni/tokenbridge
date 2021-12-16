@@ -1,5 +1,6 @@
 const { toWei, toBN, BN } = require('web3-utils')
 const { GasPriceOracle } = require('gas-price-oracle')
+const { estimateFees } = require('@mycrypto/gas-estimation')
 const fetch = require('node-fetch')
 const { BRIDGE_MODES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
@@ -176,12 +177,20 @@ const gasPriceWithinLimits = (gasPrice, limits) => {
 const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
   let gasPrice = oracleGasPrice * factor
   gasPrice = gasPriceWithinLimits(gasPrice, limits)
-  return toBN(toWei(gasPrice.toFixed(2).toString(), 'gwei'))
+  return toWei(gasPrice.toFixed(2).toString(), 'gwei')
 }
 
-const gasPriceFromSupplier = async (url, options = {}) => {
+const gasPriceFromSupplier = async (web3, url, options = {}) => {
   try {
     let json
+    if (url === 'eip1559-gas-estimation') {
+      const { maxFeePerGas, maxPriorityFeePerGas } = await estimateFees(web3)
+      const res = { maxFeePerGas: maxFeePerGas.toString(10), maxPriorityFeePerGas: maxPriorityFeePerGas.toString(10) }
+      options.logger &&
+        options.logger.debug &&
+        options.logger.debug(res, 'Gas price updated using eip1559-gas-estimation')
+      return res
+    }
     if (url === 'gas-price-oracle') {
       json = await gasPriceOracle.fetchGasPricesOffChain()
     } else if (url) {
@@ -205,7 +214,7 @@ const gasPriceFromSupplier = async (url, options = {}) => {
       options.logger.debug &&
       options.logger.debug({ oracleGasPrice, normalizedGasPrice }, 'Gas price updated using the API')
 
-    return normalizedGasPrice
+    return { gasPrice: normalizedGasPrice }
   } catch (e) {
     options.logger && options.logger.error && options.logger.error(`Gas Price API is not available. ${e.message}`)
   }
@@ -214,11 +223,11 @@ const gasPriceFromSupplier = async (url, options = {}) => {
 
 const gasPriceFromContract = async (bridgeContract, options = {}) => {
   try {
-    const gasPrice = await bridgeContract.methods.gasPrice().call()
+    const gasPrice = (await bridgeContract.methods.gasPrice().call()).toString()
     options.logger &&
       options.logger.debug &&
       options.logger.debug({ gasPrice }, 'Gas price updated using the contracts')
-    return gasPrice
+    return { gasPrice }
   } catch (e) {
     options.logger &&
       options.logger.error &&

@@ -71,10 +71,10 @@ describe('gasPrice', () => {
       await gasPrice.start('home')
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, null, null)
+      await gasPrice.fetchGasPrice('standard', 1, null, null, null)
 
       // then
-      expect(gasPrice.getPrice()).to.equal('101000000000')
+      expect(gasPrice.gasPriceOptions()).to.eql({ gasPrice: '101000000000' })
     })
 
     it('should fetch gas from supplier', async () => {
@@ -82,10 +82,10 @@ describe('gasPrice', () => {
       await gasPrice.start('home')
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, null, 'url')
+      await gasPrice.fetchGasPrice('standard', 1, null, null, 'url')
 
       // then
-      expect(gasPrice.getPrice().toString()).to.equal('103000000000')
+      expect(gasPrice.gasPriceOptions()).to.eql({ gasPrice: '103000000000' })
     })
 
     it('should fetch gas from contract', async () => {
@@ -101,10 +101,10 @@ describe('gasPrice', () => {
       }
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, null)
+      await gasPrice.fetchGasPrice('standard', 1, null, bridgeContractMock, null)
 
       // then
-      expect(gasPrice.getPrice().toString()).to.equal('102000000000')
+      expect(gasPrice.gasPriceOptions()).to.eql({ gasPrice: '102000000000' })
     })
 
     it('should fetch the gas price from the oracle first', async () => {
@@ -120,10 +120,10 @@ describe('gasPrice', () => {
       }
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, bridgeContractMock, 'url')
+      await gasPrice.fetchGasPrice('standard', 1, null, bridgeContractMock, 'url')
 
       // then
-      expect(gasPrice.getPrice().toString()).to.equal('103000000000')
+      expect(gasPrice.gasPriceOptions()).to.eql({ gasPrice: '103000000000' })
     })
 
     it('log error using the logger', async () => {
@@ -131,7 +131,7 @@ describe('gasPrice', () => {
       await gasPrice.start('home')
 
       // when
-      await gasPrice.fetchGasPrice('standard', 1, null, null)
+      await gasPrice.fetchGasPrice('standard', 1, null, null, null)
 
       // then
       expect(fakeLogger.warn.calledOnce).to.equal(true) // one warning

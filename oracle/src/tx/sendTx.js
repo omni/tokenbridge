@@ -1,6 +1,7 @@
 const { toWei } = require('web3').utils
 
-async function sendTx({ privateKey, data, nonce, gasPrice, amount, gasLimit, to, chainId, web3 }) {
+async function sendTx({ privateKey, data, nonce, gasPrice, gasPriceOptions, amount, gasLimit, to, chainId, web3 }) {
+  const gasOpts = gasPriceOptions || { gasPrice }
   const serializedTx = await web3.eth.accounts.signTransaction(
     {
       nonce: Number(nonce),
@@ -8,8 +9,8 @@ async function sendTx({ privateKey, data, nonce, gasPrice, amount, gasLimit, to,
       to,
       data,
       value: toWei(amount),
-      gasPrice,
-      gas: gasLimit
+      gas: gasLimit,
+      ...gasOpts
     },
     privateKey
   )
