@@ -23,7 +23,13 @@ const {
   ORACLE_HOME_START_BLOCK,
   ORACLE_FOREIGN_START_BLOCK,
   ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT,
-  ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT
+  ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT,
+  ORACLE_HOME_EVENTS_REPROCESSING,
+  ORACLE_HOME_EVENTS_REPROCESSING_BATCH_SIZE,
+  ORACLE_HOME_EVENTS_REPROCESSING_BLOCK_DELAY,
+  ORACLE_FOREIGN_EVENTS_REPROCESSING,
+  ORACLE_FOREIGN_EVENTS_REPROCESSING_BATCH_SIZE,
+  ORACLE_FOREIGN_EVENTS_REPROCESSING_BLOCK_DELAY
 } = process.env
 
 let homeAbi
@@ -61,7 +67,12 @@ const homeConfig = {
   blockPollingLimit: parseInt(ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT, 10),
   web3: web3Home,
   bridgeContract: homeContract,
-  eventContract: homeContract
+  eventContract: homeContract,
+  reprocessingOptions: {
+    enabled: ORACLE_HOME_EVENTS_REPROCESSING === 'true',
+    batchSize: parseInt(ORACLE_HOME_EVENTS_REPROCESSING_BATCH_SIZE, 10) || 1000,
+    blockDelay: parseInt(ORACLE_HOME_EVENTS_REPROCESSING_BLOCK_DELAY, 10) || 500
+  }
 }
 
 const foreignContract = new web3Foreign.eth.Contract(foreignAbi, COMMON_FOREIGN_BRIDGE_ADDRESS)
@@ -74,7 +85,12 @@ const foreignConfig = {
   blockPollingLimit: parseInt(ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT, 10),
   web3: web3Foreign,
   bridgeContract: foreignContract,
-  eventContract: foreignContract
+  eventContract: foreignContract,
+  reprocessingOptions: {
+    enabled: ORACLE_FOREIGN_EVENTS_REPROCESSING === 'true',
+    batchSize: parseInt(ORACLE_FOREIGN_EVENTS_REPROCESSING_BATCH_SIZE, 10) || 500,
+    blockDelay: parseInt(ORACLE_FOREIGN_EVENTS_REPROCESSING_BLOCK_DELAY, 10) || 250
+  }
 }
 
 const maxProcessingTime =

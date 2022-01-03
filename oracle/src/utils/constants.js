@@ -5,6 +5,7 @@ module.exports = {
   MIN_AMB_HEADER_LENGTH: 32 + 20 + 20 + 4 + 2 + 1 + 2,
   MAX_GAS_LIMIT: 10000000,
   MAX_CONCURRENT_EVENTS: 50,
+  MAX_HISTORY_BLOCK_TO_REPROCESS: 10000,
   RETRY_CONFIG: {
     retries: 20,
     factor: 1.4,

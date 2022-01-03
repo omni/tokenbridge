@@ -40,22 +40,8 @@ function connectWatcherToQueue({ queueName, cb }) {
   cb({ sendToQueue, channel: channelWrapper })
 }
 
-function connectSenderToQueue({ queueName, oldQueueName, cb, resendInterval }) {
+function connectSenderToQueue({ queueName, cb, resendInterval }) {
   const deadLetterExchange = `${queueName}-retry`
-
-  async function resendMessagesToNewQueue(channel) {
-    logger.info(`Trying to check messages in the old non-priority queue ${queueName}`)
-    while (true) {
-      const msg = await channel.get(oldQueueName)
-      if (msg === false) {
-        logger.info(`No messages in the old queue ${oldQueueName} left`)
-        break
-      }
-      logger.debug(`Message in the old queue ${oldQueueName} was found, redirecting it to the new queue ${queueName}`)
-      await channel.sendToQueue(queueName, msg.content, { persistent: true, priority: SENDER_QUEUE_SEND_PRIORITY })
-      await channel.ack(msg)
-    }
-  }
 
   const channelWrapper = connection.createChannel({
     json: true
@@ -64,7 +50,6 @@ function connectSenderToQueue({ queueName, oldQueueName, cb, resendInterval }) {
   channelWrapper.addSetup(async channel => {
     await channel.assertExchange(deadLetterExchange, 'fanout', { durable: true })
     await channel.assertQueue(queueName, { durable: true, maxPriority: SENDER_QUEUE_MAX_PRIORITY })
-    await channel.assertQueue(oldQueueName, { durable: true }).then(() => resendMessagesToNewQueue(channel))
     await channel.bindQueue(queueName, deadLetterExchange)
     await channel.prefetch(1)
     await channel.consume(queueName, msg =>

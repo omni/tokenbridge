@@ -55,7 +55,6 @@ async function initialize() {
 function connectQueue() {
   connectSenderToQueue({
     queueName: config.queue,
-    oldQueueName: config.oldQueue,
     resendInterval: config.resendInterval,
     cb: options => {
       if (config.maxProcessingTime) {

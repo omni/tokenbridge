@@ -6,7 +6,11 @@ const logger = require('./services/logger')
 const { getShutdownFlag } = require('./services/shutdownState')
 const { getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
-const { EXIT_CODES, BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT } = require('./utils/constants')
+const {
+  EXIT_CODES,
+  BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT,
+  MAX_HISTORY_BLOCK_TO_REPROCESS
+} = require('./utils/constants')
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -26,9 +30,12 @@ const processAMBInformationRequests = require('./events/processAMBInformationReq
 
 const { getTokensState } = require('./utils/tokenState')
 
-const { web3, bridgeContract, eventContract, startBlock, pollingInterval, chain } = config.main
+const { web3, bridgeContract, eventContract, startBlock, pollingInterval, chain, reprocessingOptions } = config.main
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
+const lastReprocessedBlockRedisKey = `${config.id}:lastReprocessedBlock`
+const seenEventsRedisKey = `${config.id}:seenEvents`
 let lastProcessedBlock = Math.max(startBlock - 1, 0)
+let lastReprocessedBlock
 let lastSeenBlockNumber = 0
 let sameBlockNumberCounter = 0
 
@@ -39,6 +46,8 @@ async function initialize() {
     web3.currentProvider.urls.forEach(checkHttps(chain))
 
     await getLastProcessedBlock()
+    await getLastReprocessedBlock()
+    await checkConditions()
     connectWatcherToQueue({
       queueName: config.queue,
       cb: runMain
@@ -76,9 +85,32 @@ async function getLastProcessedBlock() {
   lastProcessedBlock = result ? parseInt(result, 10) : lastProcessedBlock
 }
 
+async function getLastReprocessedBlock() {
+  if (reprocessingOptions.enabled) {
+    const result = await redis.get(lastReprocessedBlockRedisKey)
+    if (result) {
+      lastReprocessedBlock = Math.max(parseInt(result, 10), lastProcessedBlock - MAX_HISTORY_BLOCK_TO_REPROCESS)
+    } else {
+      lastReprocessedBlock = lastProcessedBlock
+    }
+    logger.debug({ block: lastReprocessedBlock }, 'Last reprocessed block obtained')
+  } else {
+    // when reprocessing is being enabled not for the first time,
+    // we do not want to process blocks for which we didn't recorded seen events,
+    // instead, we want to start from the current block.
+    // Thus we should delete this reprocessing pointer once it is disabled.
+    await redis.del(lastReprocessedBlockRedisKey)
+  }
+}
+
 function updateLastProcessedBlock(lastBlockNumber) {
   lastProcessedBlock = lastBlockNumber
   return redis.set(lastBlockRedisKey, lastProcessedBlock)
+}
+
+function updateLastReprocessedBlock(lastBlockNumber) {
+  lastReprocessedBlock = lastBlockNumber
+  return redis.set(lastReprocessedBlockRedisKey, lastReprocessedBlock)
 }
 
 function processEvents(events) {
@@ -112,6 +144,71 @@ async function checkConditions() {
       break
     default:
   }
+}
+
+const eventKey = e => `${e.transactionHash}-${e.logIndex}`
+
+async function reprocessOldLogs(sendToQueue) {
+  const fromBlock = lastReprocessedBlock + 1
+  let toBlock = lastReprocessedBlock + reprocessingOptions.batchSize
+  const events = await getEvents({
+    contract: eventContract,
+    event: config.event,
+    fromBlock,
+    toBlock,
+    filter: config.eventFilter
+  })
+  const alreadySeenEvents = await getSeenEvents(fromBlock, toBlock)
+  const missingEvents = events.filter(e => !alreadySeenEvents[eventKey(e)])
+  if (missingEvents.length === 0) {
+    logger.debug('No missed events were found')
+  } else {
+    logger.info(`Found ${missingEvents.length} ${config.event} missed events`)
+    let job
+    if (config.id === 'amb-information-request') {
+      // obtain block number and events from the earliest block
+      const batchBlockNumber = missingEvents[0].blockNumber
+      const batchEvents = missingEvents.filter(event => event.blockNumber === batchBlockNumber)
+
+      // if there are some other events in the later blocks,
+      // adjust lastReprocessedBlock so that these events will be processed again on the next iteration
+      if (batchEvents.length < missingEvents.length) {
+        // pick event outside from the batch
+        toBlock = missingEvents[batchEvents.length].blockNumber - 1
+      }
+
+      job = await processAMBInformationRequests(batchEvents)
+      if (job === null) {
+        return
+      }
+    } else {
+      job = await processEvents(missingEvents)
+    }
+    logger.info('Missed events transactions to send:', job.length)
+    if (job.length) {
+      await sendToQueue(job)
+    }
+  }
+
+  await updateLastReprocessedBlock(toBlock)
+  await deleteSeenEvents(0, toBlock)
+}
+
+async function getSeenEvents(fromBlock, toBlock) {
+  const keys = await redis.zrangebyscore(seenEventsRedisKey, fromBlock, toBlock)
+  const res = {}
+  keys.forEach(k => {
+    res[k] = true
+  })
+  return res
+}
+
+function deleteSeenEvents(fromBlock, toBlock) {
+  return redis.zremrangebyscore(seenEventsRedisKey, fromBlock, toBlock)
+}
+
+function addSeenEvents(events) {
+  return redis.zadd(seenEventsRedisKey, ...events.flatMap(e => [e.blockNumber, eventKey(e)]))
 }
 
 async function getLastBlockToProcess(web3, bridgeContract) {
@@ -158,24 +255,29 @@ async function main({ sendToQueue }) {
 
     const lastBlockToProcess = await getLastBlockToProcess(web3, bridgeContract)
 
+    if (reprocessingOptions.enabled) {
+      if (lastReprocessedBlock + reprocessingOptions.batchSize + reprocessingOptions.blockDelay < lastBlockToProcess) {
+        await reprocessOldLogs(sendToQueue)
+        return
+      }
+    }
+
     if (lastBlockToProcess <= lastProcessedBlock) {
       logger.debug('All blocks already processed')
       return
     }
 
-    await checkConditions()
-
     const fromBlock = lastProcessedBlock + 1
     const rangeEndBlock = config.blockPollingLimit ? fromBlock + config.blockPollingLimit : lastBlockToProcess
     let toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
 
-    const events = (await getEvents({
+    let events = await getEvents({
       contract: eventContract,
       event: config.event,
       fromBlock,
       toBlock,
       filter: config.eventFilter
-    })).sort((a, b) => a.blockNumber - b.blockNumber)
+    })
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
@@ -192,9 +294,10 @@ async function main({ sendToQueue }) {
         if (batchEvents.length < events.length) {
           // pick event outside from the batch
           toBlock = events[batchEvents.length].blockNumber - 1
+          events = batchEvents
         }
 
-        job = await processAMBInformationRequests(batchEvents)
+        job = await processAMBInformationRequests(events)
         if (job === null) {
           return
         }
@@ -205,6 +308,9 @@ async function main({ sendToQueue }) {
 
       if (job.length) {
         await sendToQueue(job)
+      }
+      if (reprocessingOptions.enabled) {
+        await addSeenEvents(events)
       }
     }
 
