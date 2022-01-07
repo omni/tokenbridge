@@ -52,6 +52,9 @@ services:
       - NODE_ENV=production
       - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
     restart: unless-stopped
+    volumes:
+      - '~/bridge_data/access-lists/block_list.txt:/mono/oracle/access-lists/block_list.txt'
+      - '~/bridge_data/access-lists/allowance_list.txt:/mono/oracle/access-lists/allowance_list.txt'
     entrypoint: yarn watcher:collected-signatures
     networks:
       - net_db_bridge_collected
