@@ -2,6 +2,9 @@ const fs = require('fs')
 const BigNumber = require('bignumber.js')
 const promiseRetry = require('promise-retry')
 const Web3 = require('web3')
+const { GAS_PRICE_BOUNDARIES } = require('./constants')
+
+const { toBN, toWei } = Web3.utils
 
 const retrySequence = [1, 2, 3, 5, 8, 13, 21, 34, 55, 60]
 
@@ -34,8 +37,8 @@ const promiseRetryForever = f => promiseRetry(f, { forever: true, factor: 1 })
 async function waitForFunds(web3, address, minimumBalance, cb, logger) {
   promiseRetryForever(async retry => {
     logger.debug('Getting balance of validator account')
-    const newBalance = web3.utils.toBN(await web3.eth.getBalance(address))
-    if (newBalance.gte(web3.utils.toBN(minimumBalance.toString(10)))) {
+    const newBalance = toBN(await web3.eth.getBalance(address))
+    if (newBalance.gte(toBN(minimumBalance.toString(10)))) {
       logger.debug({ balance: newBalance, minimumBalance }, 'Validator has minimum necessary balance')
       cb(newBalance)
     } else {
@@ -62,6 +65,48 @@ function addExtraGas(gas, extraPercentage, maxGasLimit = Infinity) {
   const gasWithExtra = gas.multipliedBy(extraPercentage).toFixed(0)
 
   return BigNumber.min(maxGasLimit, gasWithExtra)
+}
+
+function applyMinGasFeeBump(job, bumpFactor = 0.1) {
+  if (!job.gasPriceOptions) {
+    return job
+  }
+  const { gasPrice, maxFeePerGas, maxPriorityFeePerGas } = job.gasPriceOptions
+  const maxGasPrice = toWei(GAS_PRICE_BOUNDARIES.MAX.toString(), 'gwei')
+  if (gasPrice) {
+    return {
+      ...job,
+      gasPriceOptions: {
+        gasPrice: addExtraGas(gasPrice, bumpFactor, maxGasPrice).toString()
+      }
+    }
+  }
+  if (maxFeePerGas && maxPriorityFeePerGas) {
+    return {
+      ...job,
+      gasPriceOptions: {
+        maxFeePerGas: addExtraGas(maxFeePerGas, bumpFactor, maxGasPrice).toString(),
+        maxPriorityFeePerGas: addExtraGas(maxPriorityFeePerGas, bumpFactor, maxGasPrice).toString()
+      }
+    }
+  }
+  return job
+}
+
+function chooseGasPriceOptions(a, b) {
+  if (!a) {
+    return b
+  }
+  if (a && b && a.gasPrice && b.gasPrice) {
+    return { gasPrice: BigNumber.max(a.gasPrice, b.gasPrice).toString() }
+  }
+  if (a && b && a.maxFeePerGas && b.maxFeePerGas && a.maxPriorityFeePerGas && b.maxPriorityFeePerGas) {
+    return {
+      maxFeePerGas: BigNumber.max(a.maxFeePerGas, b.maxFeePerGas).toString(),
+      maxPriorityFeePerGas: BigNumber.max(a.maxPriorityFeePerGas, b.maxPriorityFeePerGas).toString()
+    }
+  }
+  return a
 }
 
 async function setIntervalAndRun(f, interval) {
@@ -183,6 +228,8 @@ module.exports = {
   waitForFunds,
   waitForUnsuspend,
   addExtraGas,
+  chooseGasPriceOptions,
+  applyMinGasFeeBump,
   setIntervalAndRun,
   watchdog,
   add0xPrefix,
