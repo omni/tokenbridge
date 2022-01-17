@@ -9,6 +9,8 @@ const { sendTx } = require('./tx/sendTx')
 const { getNonce, getChainId } = require('./tx/web3')
 const {
   addExtraGas,
+  applyMinGasFeeBump,
+  chooseGasPriceOptions,
   checkHTTPS,
   syncForEach,
   waitForFunds,
@@ -19,7 +21,7 @@ const {
   isInsufficientBalanceError,
   isNonceError
 } = require('./utils/utils')
-const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT } = require('./utils/constants')
+const { EXIT_CODES, EXTRA_GAS_PERCENTAGE, MAX_GAS_LIMIT, MIN_GAS_PRICE_BUMP_FACTOR } = require('./utils/constants')
 
 const { ORACLE_TX_REDUNDANCY } = process.env
 
@@ -146,6 +148,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
       }
 
       try {
+        const newGasPriceOptions = chooseGasPriceOptions(gasPriceOptions, job.gasPriceOptions)
         if (isResend) {
           const tx = await web3Fallback.eth.getTransaction(job.txHash)
 
@@ -159,7 +162,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           }
 
           const oldGasPrice = JSON.stringify(job.gasPriceOptions)
-          const newGasPrice = JSON.stringify(gasPriceOptions)
+          const newGasPrice = JSON.stringify(newGasPriceOptions)
           logger.info(`Transaction ${job.txHash} was not mined, updating gasPrice: ${oldGasPrice} -> ${newGasPrice}`)
         }
         logger.info(`Sending transaction with nonce ${nonce}`)
@@ -172,12 +175,12 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
           to: job.to,
           chainId,
           web3: web3Redundant,
-          gasPriceOptions
+          gasPriceOptions: newGasPriceOptions
         })
         const resendJob = {
+          ...job,
           txHash,
-          gasPriceOptions,
-          ...job
+          gasPriceOptions: newGasPriceOptions
         }
         resendJobs.push(resendJob)
 
@@ -196,7 +199,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         if (isGasPriceError(e)) {
           logger.info('Replacement transaction underpriced, forcing gas price update')
           GasPrice.start(config.id, web3)
-          failedTx.push(job)
+          failedTx.push(applyMinGasFeeBump(job, MIN_GAS_PRICE_BUMP_FACTOR))
         } else if (isResend || isSameTransactionError(e)) {
           resendJobs.push(job)
         } else {

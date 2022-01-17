@@ -3,7 +3,13 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const BigNumber = require('bignumber.js')
 const proxyquire = require('proxyquire')
-const { addExtraGas, syncForEach, promiseAny } = require('../src/utils/utils')
+const {
+  addExtraGas,
+  applyMinGasFeeBump,
+  chooseGasPriceOptions,
+  syncForEach,
+  promiseAny
+} = require('../src/utils/utils')
 
 chai.use(chaiAsPromised)
 chai.should()
@@ -171,6 +177,45 @@ describe('utils', () => {
     it('should reject if all functions failed', async () => {
       const array = [-2, -1, -3]
       await promiseAny(array.map(f)).should.be.rejected
+    })
+  })
+
+  describe('applyMinGasFeeBump', () => {
+    it('should bump pre-eip1559 fee', () => {
+      const job = { gasPriceOptions: { gasPrice: '100000000000' } }
+      const newJob = applyMinGasFeeBump(job)
+      expect(newJob.gasPriceOptions.gasPrice).to.be.equal('110000000000')
+    })
+
+    it('should bump eip1559 fee', () => {
+      const job = { gasPriceOptions: { maxFeePerGas: '100000000000', maxPriorityFeePerGas: '20000000000' } }
+      const newJob = applyMinGasFeeBump(job)
+      expect(newJob.gasPriceOptions.maxFeePerGas).to.be.equal('110000000000')
+      expect(newJob.gasPriceOptions.maxPriorityFeePerGas).to.be.equal('22000000000')
+    })
+  })
+
+  describe('chooseGasPriceOptions', () => {
+    it('should choose max pre-eip1559 fee', () => {
+      const opts1 = { gasPrice: '100000000000' }
+      const opts2 = { gasPrice: '101000000000' }
+      expect(chooseGasPriceOptions(opts1, opts2).gasPrice).to.be.equal('101000000000')
+      expect(chooseGasPriceOptions(opts2, opts1).gasPrice).to.be.equal('101000000000')
+      expect(chooseGasPriceOptions(opts2, undefined).gasPrice).to.be.equal('101000000000')
+      expect(chooseGasPriceOptions(undefined, opts2).gasPrice).to.be.equal('101000000000')
+    })
+
+    it('should choose max eip1559 fee', () => {
+      const opts1 = { maxFeePerGas: '100000000000', maxPriorityFeePerGas: '21000000000' }
+      const opts2 = { maxFeePerGas: '101000000000', maxPriorityFeePerGas: '20000000000' }
+      expect(chooseGasPriceOptions(opts1, opts2).maxFeePerGas).to.be.equal('101000000000')
+      expect(chooseGasPriceOptions(opts1, opts2).maxPriorityFeePerGas).to.be.equal('21000000000')
+      expect(chooseGasPriceOptions(opts2, opts1).maxFeePerGas).to.be.equal('101000000000')
+      expect(chooseGasPriceOptions(opts2, opts1).maxPriorityFeePerGas).to.be.equal('21000000000')
+      expect(chooseGasPriceOptions(opts2, undefined).maxFeePerGas).to.be.equal('101000000000')
+      expect(chooseGasPriceOptions(opts2, undefined).maxPriorityFeePerGas).to.be.equal('20000000000')
+      expect(chooseGasPriceOptions(undefined, opts2).maxFeePerGas).to.be.equal('101000000000')
+      expect(chooseGasPriceOptions(undefined, opts2).maxPriorityFeePerGas).to.be.equal('20000000000')
     })
   })
 })
