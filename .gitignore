@@ -26,6 +26,9 @@ ui/src/contracts
 oracle/abis
 monitor/abis
 
+# oracle
+bridge_data
+
 # compiled css
 *.css
 
