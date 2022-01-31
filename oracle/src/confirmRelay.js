@@ -174,7 +174,7 @@ async function sendJobTx(jobs) {
       const txHash = await sendTx({
         data: job.data,
         nonce,
-        amount: '0',
+        value: '0',
         gasLimit,
         privateKey: config.validatorPrivateKey,
         to: job.to,

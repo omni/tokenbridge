@@ -6,11 +6,9 @@ const logger = require('../../services/logger').child({
 
 async function estimateGas({ web3, homeBridge, validatorContract, recipient, value, txHash, address }) {
   try {
-    const gasEstimate = await homeBridge.methods.executeAffirmation(recipient, value, txHash).estimateGas({
+    return await homeBridge.methods.executeAffirmation(recipient, value, txHash).estimateGas({
       from: address
     })
-
-    return gasEstimate
   } catch (e) {
     if (e instanceof HttpListProviderError) {
       throw e

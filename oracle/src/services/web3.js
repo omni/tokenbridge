@@ -1,4 +1,6 @@
 const Web3 = require('web3')
+const ethers = require('ethers')
+const flashbots = require('@flashbots/ethers-provider-bundle')
 const { HttpListProvider } = require('./HttpListProvider')
 const { SafeEthLogsProvider } = require('./SafeEthLogsProvider')
 const { RedundantHttpListProvider } = require('./RedundantHttpListProvider')
@@ -9,6 +11,8 @@ const {
   COMMON_FOREIGN_RPC_URL,
   ORACLE_SIDE_RPC_URL,
   ORACLE_FOREIGN_ARCHIVE_RPC_URL,
+  ORACLE_MEV_FOREIGN_FLASHBOTS_RPC_URL,
+  ORACLE_MEV_FOREIGN_FLASHBOTS_AUTH_SIGNING_KEY,
   ORACLE_RPC_REQUEST_TIMEOUT,
   ORACLE_HOME_RPC_POLLING_INTERVAL,
   ORACLE_FOREIGN_RPC_POLLING_INTERVAL
@@ -94,6 +98,15 @@ if (foreignUrls.length > 1) {
   web3ForeignRedundant = new Web3(redundantProvider)
 }
 
+let getFlashbotsProvider
+if (ORACLE_MEV_FOREIGN_FLASHBOTS_RPC_URL) {
+  const provider = new ethers.providers.JsonRpcProvider(foreignUrls[0])
+  const authSigner = new ethers.Wallet(ORACLE_MEV_FOREIGN_FLASHBOTS_AUTH_SIGNING_KEY, provider)
+
+  getFlashbotsProvider = chainId =>
+    flashbots.FlashbotsBundleProvider.create(provider, authSigner, ORACLE_MEV_FOREIGN_FLASHBOTS_RPC_URL, chainId)
+}
+
 module.exports = {
   web3Home,
   web3Foreign,
@@ -102,5 +115,6 @@ module.exports = {
   web3HomeRedundant,
   web3ForeignRedundant,
   web3HomeFallback,
-  web3ForeignFallback
+  web3ForeignFallback,
+  getFlashbotsProvider
 }

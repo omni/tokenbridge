@@ -1,11 +1,10 @@
 require('../env')
 const path = require('path')
-const { connectWatcherToQueue, connection } = require('./services/amqpClient')
 const { redis } = require('./services/redisClient')
 const logger = require('./services/logger')
-const { getShutdownFlag } = require('./services/shutdownState')
 const { getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
-const { checkHTTPS, watchdog } = require('./utils/utils')
+const { checkHTTPS, watchdog, syncForEach } = require('./utils/utils')
+const { processCollectedSignaturesBuilder } = require('./events/processAMBCollectedSignaturesMEV')
 const {
   EXIT_CODES,
   BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT,
@@ -19,16 +18,7 @@ if (process.argv.length < 3) {
 
 const config = require(path.join('../config/', process.argv[2]))
 
-const processSignatureRequests = require('./events/processSignatureRequests')(config)
-const processCollectedSignatures = require('./events/processCollectedSignatures')(config)
-const processAffirmationRequests = require('./events/processAffirmationRequests')(config)
-const processTransfers = require('./events/processTransfers')(config)
-const processAMBSignatureRequests = require('./events/processAMBSignatureRequests')(config)
-const processAMBCollectedSignatures = require('./events/processAMBCollectedSignatures')(config)
-const processAMBAffirmationRequests = require('./events/processAMBAffirmationRequests')(config)
-const processAMBInformationRequests = require('./events/processAMBInformationRequests')(config)
-
-const { getTokensState } = require('./utils/tokenState')
+const processAMBCollectedSignaturesMEV = processCollectedSignaturesBuilder(config)
 
 const {
   web3,
@@ -43,6 +33,7 @@ const {
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
 const lastReprocessedBlockRedisKey = `${config.id}:lastReprocessedBlock`
 const seenEventsRedisKey = `${config.id}:seenEvents`
+const mevJobsRedisKey = `${config.id}:mevJobs`
 let lastProcessedBlock = Math.max(startBlock - 1, 0)
 let lastReprocessedBlock
 let lastSeenBlockNumber = 0
@@ -56,11 +47,7 @@ async function initialize() {
 
     await getLastProcessedBlock()
     await getLastReprocessedBlock()
-    await checkConditions()
-    connectWatcherToQueue({
-      queueName: config.queue,
-      cb: runMain
-    })
+    runMain({ sendToQueue: saveJobsToRedis })
   } catch (e) {
     logger.error(e)
     process.exit(EXIT_CODES.GENERAL_ERROR)
@@ -69,7 +56,7 @@ async function initialize() {
 
 async function runMain({ sendToQueue }) {
   try {
-    if (connection.isConnected() && redis.status === 'ready') {
+    if (redis.status === 'ready') {
       if (config.maxProcessingTime) {
         await watchdog(() => main({ sendToQueue }), config.maxProcessingTime, () => {
           logger.fatal('Max processing time reached')
@@ -86,6 +73,10 @@ async function runMain({ sendToQueue }) {
   setTimeout(() => {
     runMain({ sendToQueue })
   }, pollingInterval)
+}
+
+async function saveJobsToRedis(jobs) {
+  return syncForEach(jobs, job => redis.hset(mevJobsRedisKey, job.transactionReference, JSON.stringify(job)))
 }
 
 async function getLastProcessedBlock() {
@@ -124,34 +115,10 @@ function updateLastReprocessedBlock(lastBlockNumber) {
 
 function processEvents(events) {
   switch (config.id) {
-    case 'erc-native-signature-request':
-      return processSignatureRequests(events)
-    case 'erc-native-collected-signatures':
-      return processCollectedSignatures(events)
-    case 'erc-native-affirmation-request':
-      return processAffirmationRequests(events)
-    case 'erc-native-transfer':
-      return processTransfers(events)
-    case 'amb-signature-request':
-      return processAMBSignatureRequests(events)
-    case 'amb-collected-signatures':
-      return processAMBCollectedSignatures(events)
-    case 'amb-affirmation-request':
-      return processAMBAffirmationRequests(events)
+    case 'amb-collected-signatures-mev':
+      return processAMBCollectedSignaturesMEV(events)
     default:
       return []
-  }
-}
-
-async function checkConditions() {
-  let state
-  switch (config.id) {
-    case 'erc-native-transfer':
-      logger.debug('Getting token address to listen Transfer events')
-      state = await getTokensState(bridgeContract, logger)
-      eventContract.options.address = state.bridgeableTokenAddress
-      break
-    default:
   }
 }
 
@@ -159,7 +126,7 @@ const eventKey = e => `${e.transactionHash}-${e.logIndex}`
 
 async function reprocessOldLogs(sendToQueue) {
   const fromBlock = lastReprocessedBlock + 1
-  let toBlock = lastReprocessedBlock + reprocessingOptions.batchSize
+  const toBlock = lastReprocessedBlock + reprocessingOptions.batchSize
   const events = await getEvents({
     contract: eventContract,
     event: config.event,
@@ -173,26 +140,7 @@ async function reprocessOldLogs(sendToQueue) {
     logger.debug('No missed events were found')
   } else {
     logger.info(`Found ${missingEvents.length} ${config.event} missed events`)
-    let job
-    if (config.id === 'amb-information-request') {
-      // obtain block number and events from the earliest block
-      const batchBlockNumber = missingEvents[0].blockNumber
-      const batchEvents = missingEvents.filter(event => event.blockNumber === batchBlockNumber)
-
-      // if there are some other events in the later blocks,
-      // adjust lastReprocessedBlock so that these events will be processed again on the next iteration
-      if (batchEvents.length < missingEvents.length) {
-        // pick event outside from the batch
-        toBlock = missingEvents[batchEvents.length].blockNumber - 1
-      }
-
-      job = await processAMBInformationRequests(batchEvents)
-      if (job === null) {
-        return
-      }
-    } else {
-      job = await processEvents(missingEvents)
-    }
+    const job = await processEvents(missingEvents)
     logger.info('Missed events transactions to send:', job.length)
     if (job.length) {
       await sendToQueue(job)
@@ -252,16 +200,6 @@ async function getLastBlockToProcess(web3, bridgeContract) {
 
 async function main({ sendToQueue }) {
   try {
-    const wasShutdown = await getShutdownFlag(logger, config.shutdownKey, false)
-    if (await getShutdownFlag(logger, config.shutdownKey, true)) {
-      if (!wasShutdown) {
-        logger.info('Oracle watcher was suspended via the remote shutdown process')
-      }
-      return
-    } else if (wasShutdown) {
-      logger.info(`Oracle watcher was unsuspended.`)
-    }
-
     const lastBlockToProcess = await getLastBlockToProcess(web3, bridgeContract)
 
     if (reprocessingOptions.enabled) {
@@ -278,9 +216,9 @@ async function main({ sendToQueue }) {
 
     const fromBlock = lastProcessedBlock + 1
     const rangeEndBlock = blockPollingLimit ? fromBlock + blockPollingLimit : lastBlockToProcess
-    let toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
+    const toBlock = Math.min(lastBlockToProcess, rangeEndBlock)
 
-    let events = await getEvents({
+    const events = await getEvents({
       contract: eventContract,
       event: config.event,
       fromBlock,
@@ -290,29 +228,7 @@ async function main({ sendToQueue }) {
     logger.info(`Found ${events.length} ${config.event} events`)
 
     if (events.length) {
-      let job
-
-      // for async information requests, requests are processed in batches only if they are located in the same block
-      if (config.id === 'amb-information-request') {
-        // obtain block number and events from the earliest block
-        const batchBlockNumber = events[0].blockNumber
-        const batchEvents = events.filter(event => event.blockNumber === batchBlockNumber)
-
-        // if there are some other events in the later blocks,
-        // adjust lastProcessedBlock so that these events will be processed again on the next iteration
-        if (batchEvents.length < events.length) {
-          // pick event outside from the batch
-          toBlock = events[batchEvents.length].blockNumber - 1
-          events = batchEvents
-        }
-
-        job = await processAMBInformationRequests(events)
-        if (job === null) {
-          return
-        }
-      } else {
-        job = await processEvents(events)
-      }
+      const job = await processEvents(events)
       logger.info('Transactions to send:', job.length)
 
       if (job.length) {
