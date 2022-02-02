@@ -51,5 +51,8 @@ services:
       ORACLE_MEV_FOREIGN_MAX_FEE_PER_GAS: '1000000000000' # 1000 gwei
       ORACLE_MEV_FOREIGN_FLASHBOTS_RPC_URL: 'https://relay-goerli.flashbots.net'
       ORACLE_MEV_FOREIGN_FLASHBOTS_AUTH_SIGNING_KEY: 82db7175932f4e6c8e45283b78b54fd5f195149378ec90d95b8fd0ec8bdadf1d
+      FAKE_MEV_RELAY_TX_SENDING: 'true'
+      FAKE_MEV_RELAY_NO_EIP1559: 'true'
+      COMMON_FOREIGN_GAS_PRICE_FALLBACK: 100000000000 # will essentially replace block base fee
     restart: unless-stopped
     entrypoint: yarn mev:sender:foreign

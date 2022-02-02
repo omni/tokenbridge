@@ -15,8 +15,12 @@ if (process.argv.length < 3) {
 }
 
 const config = require(path.join('../config/', process.argv[2]))
+const GasPrice = require('./services/gasPrice')
 
 const { web3, mevForeign, validatorAddress } = config
+
+const FAKE_MEV_RELAY_TX_SENDING = process.env.FAKE_MEV_RELAY_TX_SENDING === 'true'
+const FAKE_MEV_RELAY_NO_EIP1559 = process.env.FAKE_MEV_RELAY_NO_EIP1559 === 'true'
 
 let chainId = 0
 let flashbotsProvider
@@ -28,7 +32,9 @@ async function initialize() {
     web3.currentProvider.urls.forEach(checkHttps(config.id))
 
     chainId = await getChainId(web3)
-    flashbotsProvider = await mevForeign.getFlashbotsProvider(chainId)
+    if (!FAKE_MEV_RELAY_TX_SENDING) {
+      flashbotsProvider = await mevForeign.getFlashbotsProvider(chainId)
+    }
     return runMain()
   } catch (e) {
     logger.error(e.message)
@@ -65,7 +71,13 @@ async function main() {
       return
     }
 
-    const { baseFeePerGas: pendingBaseFee, number: pendingBlockNumber } = await getBlock(web3, 'pending')
+    const { baseFeePerGas, number: pendingBlockNumber } = await getBlock(web3, 'pending')
+    let pendingBaseFee = baseFeePerGas
+    if (FAKE_MEV_RELAY_TX_SENDING && FAKE_MEV_RELAY_NO_EIP1559) {
+      // emulate baseFee with the current gasPrice
+      await GasPrice.start('foreign', web3, true)
+      pendingBaseFee = GasPrice.gasPriceOptions().gasPrice
+    }
     const bestJob = pickBestJob(jobs, pendingBaseFee)
 
     if (!bestJob) {
@@ -115,7 +127,7 @@ async function main() {
       { nonce, fromBlock: pendingBlockNumber, toBlock: pendingBlockNumber + mevForeign.bundlesPerIteration - 1 },
       'Sending MEV bundles'
     )
-    const txHash = await sendTx({
+    const opts = {
       data: bestJob.data,
       nonce,
       value: bestJob.value,
@@ -134,7 +146,14 @@ async function main() {
         toBlock: pendingBlockNumber + mevForeign.bundlesPerIteration - 1,
         logger
       }
-    })
+    }
+    if (FAKE_MEV_RELAY_TX_SENDING) {
+      if (FAKE_MEV_RELAY_NO_EIP1559) {
+        opts.gasPriceOptions = { gasPrice: pendingBaseFee }
+      }
+      delete opts.mevOptions
+    }
+    const txHash = await sendTx(opts)
 
     jobLogger.info({ txHash }, `Tx generated ${txHash} for event Tx ${bestJob.transactionReference}`)
 
