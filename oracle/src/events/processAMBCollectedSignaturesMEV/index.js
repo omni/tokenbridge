@@ -13,6 +13,7 @@ const { MAX_CONCURRENT_EVENTS, EXTRA_GAS_ABSOLUTE } = require('../../utils/const
 const limit = promiseLimit(MAX_CONCURRENT_EVENTS)
 
 const { ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST, ORACLE_HOME_TO_FOREIGN_BLOCK_LIST } = process.env
+const ORACLE_HOME_SKIP_MANUAL_LANE = process.env.ORACLE_HOME_SKIP_MANUAL_LANE === 'true'
 
 function processCollectedSignaturesBuilder(config) {
   const { home, foreign, mevForeign } = config
@@ -63,6 +64,14 @@ function processCollectedSignaturesBuilder(config) {
               return
             }
           }
+        }
+
+        if (ORACLE_HOME_SKIP_MANUAL_LANE && parsedMessage.decodedDataType.manualLane) {
+          logger.info(
+            { dataType: parsedMessage.dataType },
+            'Validator skips a message. Message was forwarded to the manual lane by the extension'
+          )
+          return
         }
 
         logger.debug({ NumberOfCollectedSignatures }, 'Number of signatures to get')
