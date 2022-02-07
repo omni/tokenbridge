@@ -61,7 +61,7 @@ async function main() {
     const totalJobs = jobs.length
 
     if (totalJobs === 0) {
-      logger.info('Nothing to process')
+      logger.debug('Nothing to process')
       return
     }
 
