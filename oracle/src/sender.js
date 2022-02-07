@@ -169,7 +169,7 @@ async function main({ msg, ackMsg, nackMsg, channel, scheduleForRetry, scheduleT
         const txHash = await sendTx({
           data: job.data,
           nonce,
-          amount: '0',
+          value: '0',
           gasLimit,
           privateKey: config.validatorPrivateKey,
           to: job.to,

@@ -1,6 +1,5 @@
-const { toWei } = require('web3').utils
-
-async function sendTx({ privateKey, data, nonce, gasPrice, gasPriceOptions, amount, gasLimit, to, chainId, web3 }) {
+async function sendTx(opts) {
+  const { privateKey, data, nonce, gasPrice, gasPriceOptions, value, gasLimit, to, chainId, web3, mevOptions } = opts
   const gasOpts = gasPriceOptions || { gasPrice }
   const serializedTx = await web3.eth.accounts.signTransaction(
     {
@@ -8,19 +7,32 @@ async function sendTx({ privateKey, data, nonce, gasPrice, gasPriceOptions, amou
       chainId,
       to,
       data,
-      value: toWei(amount),
+      value,
       gas: gasLimit,
       ...gasOpts
     },
     privateKey
   )
 
-  return new Promise((res, rej) =>
-    web3.eth
-      .sendSignedTransaction(serializedTx.rawTransaction)
-      .once('transactionHash', res)
-      .once('error', rej)
+  if (!mevOptions) {
+    return new Promise((res, rej) =>
+      web3.eth
+        .sendSignedTransaction(serializedTx.rawTransaction)
+        .once('transactionHash', res)
+        .once('error', rej)
+    )
+  }
+
+  mevOptions.logger.debug(
+    { rawTx: serializedTx.rawTransaction, txHash: serializedTx.transactionHash },
+    'Signed MEV helper transaction'
   )
+
+  for (let blockNumber = mevOptions.fromBlock; blockNumber <= mevOptions.toBlock; blockNumber++) {
+    mevOptions.logger.debug({ txHash: serializedTx.transactionHash, blockNumber }, 'Sending MEV bundle transaction')
+    await mevOptions.provider.sendRawBundle([serializedTx.rawTransaction], blockNumber)
+  }
+  return Promise.resolve(serializedTx.transactionHash)
 }
 
 module.exports = {
