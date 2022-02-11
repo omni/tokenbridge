@@ -29,7 +29,7 @@ async function main() {
         data: '0x',
         nonce,
         gasPrice: HOME_TEST_TX_GAS_PRICE,
-        amount: HOME_MIN_AMOUNT_PER_TX,
+        value: web3Home.utils.toWei(HOME_MIN_AMOUNT_PER_TX),
         gasLimit: 100000,
         to: COMMON_HOME_BRIDGE_ADDRESS,
         web3: web3Home,

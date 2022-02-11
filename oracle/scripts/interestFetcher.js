@@ -54,7 +54,7 @@ async function main() {
       nonce,
       gasPrice,
       gasLimit: Math.round(gasLimit * 1.5),
-      amount: '0',
+      value: '0',
       chainId,
       web3: web3Home
     })

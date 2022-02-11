@@ -1,6 +1,14 @@
 ---
 version: '2.4'
 services:
+  redis:
+    cpus: 0.1
+    mem_limit: 500m
+    command: [ redis-server, --appendonly, 'yes' ]
+    hostname: redis
+    image: redis:4
+    restart: unless-stopped
+    volumes: [ '~/bridge_data/helpers/redis:/data' ]
   interestFetcher:
     cpus: 0.1
     mem_limit: 500m
@@ -13,3 +21,41 @@ services:
       INTERVAL: 300000
     restart: unless-stopped
     entrypoint: yarn helper:interestFether
+  mevWatcher:
+    cpus: 0.1
+    mem_limit: 500m
+    image: poanetwork/tokenbridge-oracle:latest
+    env_file: ./.env
+    environment:
+      NODE_ENV: production
+      ORACLE_VALIDATOR_ADDRESS: ${ORACLE_VALIDATOR_ADDRESS}
+      ORACLE_MEV_FOREIGN_HELPER_CONTRACT_ADDRESS: 'TBD'
+      ORACLE_MEV_FOREIGN_MIN_GAS_PRICE: '50000000000' # 50 gwei
+      ORACLE_MEV_FOREIGN_FLAT_MINER_FEE: '1500000000000000' # 0.0015 eth = 300k gas * 5 gwei
+      ORACLE_MEV_FOREIGN_MAX_PRIORITY_FEE_PER_GAS: '0' # 0 gwei
+      ORACLE_MEV_FOREIGN_MAX_FEE_PER_GAS: '1000000000000' # 1000 gwei
+      ORACLE_FOREIGN_RPC_POLLING_INTERVAL: '15000' # CollectedSignatures event polling interval
+      ORACLE_HOME_START_BLOCK: 'TBD'
+      ORACLE_HOME_SKIP_MANUAL_LANE: 'true'
+    restart: unless-stopped
+    entrypoint: yarn mev:watcher:collected-signatures
+  mevSender:
+    cpus: 0.1
+    mem_limit: 500m
+    image: poanetwork/tokenbridge-oracle:latest
+    env_file: ./.env
+    environment:
+      NODE_ENV: production
+      ORACLE_VALIDATOR_ADDRESS: ${ORACLE_VALIDATOR_ADDRESS}
+      ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY: ${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}
+      ORACLE_MEV_FOREIGN_HELPER_CONTRACT_ADDRESS: 'TBD'
+      ORACLE_MEV_FOREIGN_MIN_GAS_PRICE: '50000000000' # 50 gwei
+      ORACLE_MEV_FOREIGN_FLAT_MINER_FEE: '1500000000000000' # 0.0015 eth = 300k gas * 5 gwei
+      ORACLE_MEV_FOREIGN_MAX_PRIORITY_FEE_PER_GAS: '0' # 0 gwei
+      ORACLE_MEV_FOREIGN_MAX_FEE_PER_GAS: '1000000000000' # 1000 gwei
+      ORACLE_MEV_FOREIGN_FLASHBOTS_RPC_URL: 'https://relay-goerli.flashbots.net'
+      ORACLE_MEV_FOREIGN_FLASHBOTS_AUTH_SIGNING_KEY: 82db7175932f4e6c8e45283b78b54fd5f195149378ec90d95b8fd0ec8bdadf1d
+      ORACLE_MEV_FOREIGN_BUNDLES_BLOCK_RANGE: '5'
+      ORACLE_FOREIGN_RPC_POLLING_INTERVAL: '70000' # time between sending different batches of MEV bundles (~= 5 blocks * 14 seconds)
+    restart: unless-stopped
+    entrypoint: yarn mev:sender:foreign

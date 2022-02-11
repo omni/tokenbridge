@@ -8,7 +8,6 @@ const { ORACLE_HOME_TX_RESEND_INTERVAL } = process.env
 module.exports = {
   ...baseConfig,
   queue: 'home-prioritized',
-  oldQueue: 'home',
   id: 'home',
   name: 'sender-home',
   web3: web3Home,

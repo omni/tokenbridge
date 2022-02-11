@@ -153,10 +153,10 @@ async function main({ sendJob, txHashes }) {
 }
 
 async function sendJobTx(jobs) {
-  await GasPrice.start(chain, true)
-  const gasPrice = GasPrice.getPrice().toString(10)
-
   const { web3 } = config.sender === 'foreign' ? config.foreign : config.home
+
+  await GasPrice.start(chain, web3, true)
+  const gasPriceOptions = GasPrice.gasPriceOptions()
 
   const chainId = await getChainId(web3)
   let nonce = await getNonce(web3, config.validatorAddress)
@@ -174,13 +174,13 @@ async function sendJobTx(jobs) {
       const txHash = await sendTx({
         data: job.data,
         nonce,
-        gasPrice,
-        amount: '0',
+        value: '0',
         gasLimit,
         privateKey: config.validatorPrivateKey,
         to: job.to,
         chainId,
-        web3
+        web3,
+        gasPriceOptions
       })
 
       nonce++
@@ -197,7 +197,7 @@ async function sendJobTx(jobs) {
 
       if (e.message.toLowerCase().includes('insufficient funds')) {
         const currentBalance = await web3.eth.getBalance(config.validatorAddress)
-        const minimumBalance = gasLimit.multipliedBy(gasPrice)
+        const minimumBalance = gasLimit.multipliedBy(gasPriceOptions.gasPrice || gasPriceOptions.maxFeePerGas)
         logger.error(
           `Insufficient funds: ${currentBalance}. Stop processing messages until the balance is at least ${minimumBalance}.`
         )

@@ -8,7 +8,6 @@ const { ORACLE_FOREIGN_TX_RESEND_INTERVAL } = process.env
 module.exports = {
   ...baseConfig,
   queue: 'foreign-prioritized',
-  oldQueue: 'foreign',
   id: 'foreign',
   name: 'sender-foreign',
   web3: web3Foreign,

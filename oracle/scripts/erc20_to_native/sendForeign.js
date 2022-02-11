@@ -36,7 +36,7 @@ async function main() {
         data,
         nonce,
         gasPrice: FOREIGN_TEST_TX_GAS_PRICE,
-        amount: '0',
+        value: '0',
         gasLimit,
         to: bridgeableTokenAddress,
         web3: web3Foreign,
