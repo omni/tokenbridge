@@ -20,6 +20,8 @@ setLogger(mockLogger)
 
 const limit = promiseLimit(50)
 
+const output = process.argv[2]
+
 async function main() {
   const wallet = web3Home.eth.accounts.wallet.add(ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY)
   const homeBridge = new web3Home.eth.Contract(HOME_AMB_ABI, COMMON_HOME_BRIDGE_ADDRESS)
@@ -46,7 +48,11 @@ async function main() {
   }))
 
   console.log('Writing results')
-  fs.writeFileSync('./signatures.json', JSON.stringify(result))
+  if (output === '-') {
+    console.log(JSON.stringify(result))
+  } else {
+    fs.writeFileSync(output, JSON.stringify(result))
+  }
 }
 
 async function getMessage(homeBridge, foreignBridge, event, i) {

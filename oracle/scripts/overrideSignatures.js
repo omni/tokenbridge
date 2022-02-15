@@ -29,8 +29,9 @@ if (targetValidators.length < targetSignatures) {
 }
 
 const messages = {}
+const output = process.argv[2]
 process.argv
-  .slice(2)
+  .slice(3)
   .map(f => fs.readFileSync(f))
   .flatMap(JSON.parse)
   .forEach(x => {
@@ -53,11 +54,15 @@ async function main() {
 
   const res = {}
   result.filter(x => x).forEach(x => {
-    res[x.message] = x.signatures
+    res[x.msgHash] = x.signatures
   })
 
   console.log('Writing results')
-  fs.writeFileSync('./overrideSignatures.json', JSON.stringify(res))
+  if (output === '-') {
+    console.log(JSON.stringify(res))
+  } else {
+    fs.writeFileSync(output, JSON.stringify(res))
+  }
 }
 
 async function getMessageSignatures(bridge, sigs, i) {
@@ -99,6 +104,7 @@ async function getMessageSignatures(bridge, sigs, i) {
   }
 
   return {
+    msgHash,
     message,
     signatures: packSignatures(signatures.map(signatureToVRS))
   }
