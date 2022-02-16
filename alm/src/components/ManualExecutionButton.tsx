@@ -11,7 +11,6 @@ import {
   VALIDATOR_CONFIRMATION_STATUS
 } from '../config/constants'
 import { useStateProvider } from '../state/StateProvider'
-import { signatureToVRS, packSignatures } from '../utils/signatures'
 import { getSuccessExecutionData } from '../utils/getFinalizationEvent'
 import { TransactionReceipt } from 'web3-eth'
 
@@ -30,7 +29,7 @@ interface ManualExecutionButtonParams {
   safeExecutionAvailable: boolean
   messageData: string
   setExecutionData: Function
-  signatureCollected: string[]
+  signatureCollected: string
   setPendingExecution: Function
 }
 
@@ -73,16 +72,15 @@ export const ManualExecutionButton = ({
         return
       }
 
-      if (!library || !foreign.bridgeContract || !signatureCollected || !signatureCollected.length) return
+      if (!library || !foreign.bridgeContract || !signatureCollected) return
 
-      const signatures = packSignatures(signatureCollected.map(signatureToVRS))
       const messageId = messageData.slice(0, 66)
       const bridge = foreign.bridgeContract
       const executeMethod =
         safeExecutionAvailable && !allowFailures
           ? bridge.methods.safeExecuteSignaturesWithAutoGasLimit
           : bridge.methods.executeSignatures
-      const data = executeMethod(messageData, signatures).encodeABI()
+      const data = executeMethod(messageData, signatureCollected).encodeABI()
       setManualExecution(false)
 
       library.eth
