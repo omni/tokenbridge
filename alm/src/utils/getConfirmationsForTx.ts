@@ -10,15 +10,6 @@ import {
   getSuccessExecutionTransaction
 } from './validatorConfirmationHelpers'
 import { BasicConfirmationParam, ConfirmationParam } from '../hooks/useMessageConfirmations'
-import { packSignatures, signatureToVRS } from './signatures'
-
-let overrideSignatures: { [key: string]: string } = {}
-try {
-  const snapshotName = 'overrideSignatures'
-  overrideSignatures = require(`../snapshots/${snapshotName}.json`)
-} catch (e) {
-  console.log('Signatures overrides are not present')
-}
 
 const mergeConfirmations = (oldConfirmations: BasicConfirmationParam[], newConfirmations: BasicConfirmationParam[]) => {
   const confirmations = [...oldConfirmations]
@@ -96,15 +87,12 @@ export const getConfirmationsForTx = async (
   } else {
     setPendingConfirmations(false)
     if (fromHome) {
-      if (overrideSignatures[hashMsg]) {
-        setSignatureCollected(overrideSignatures[hashMsg])
-      } else {
-        // fetch collected signatures for possible manual processing
-        const signatures = await Promise.all(
+      // fetch collected signatures for possible manual processing
+      setSignatureCollected(
+        await Promise.all(
           Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
         )
-        setSignatureCollected(packSignatures(signatures.map(signatureToVRS)))
-      }
+      )
     }
   }
 

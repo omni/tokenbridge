@@ -52,11 +52,15 @@ export const getValidatorAddress = (contract: Contract) => contract.methods.vali
 
 export const getRequiredSignatures = async (
   contract: Contract,
-  blockNumber: number,
+  blockNumber: number | 'latest',
   snapshotProvider: SnapshotProvider,
   web3: Web3 | null = null,
   api: string = ''
 ) => {
+  if (blockNumber === 'latest') {
+    return contract.methods.requiredSignatures().call()
+  }
+
   const eventsFromSnapshot = snapshotProvider.requiredSignaturesEvents(blockNumber)
   const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()
 
@@ -78,11 +82,15 @@ export const getRequiredSignatures = async (
 
 export const getValidatorList = async (
   contract: Contract,
-  blockNumber: number,
+  blockNumber: number | 'latest',
   snapshotProvider: SnapshotProvider,
   web3: Web3 | null = null,
   api: string = ''
 ) => {
+  if (blockNumber === 'latest') {
+    return contract.methods.validatorList().call()
+  }
+
   const addedEventsFromSnapshot = snapshotProvider.validatorAddedEvents(blockNumber)
   const removedEventsFromSnapshot = snapshotProvider.validatorRemovedEvents(blockNumber)
   const snapshotBlockNumber = snapshotProvider.snapshotBlockNumber()

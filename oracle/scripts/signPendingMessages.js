@@ -40,12 +40,10 @@ async function main() {
   )
   messages = messages.filter(x => x)
   console.log(`Filtered ${messages.length} pending messages`)
-  const result = messages.map(msg => ({
-    msgHash: msg.msgHash,
-    message: msg.message,
-    signer: wallet.address,
-    signature: wallet.sign(msg.message).signature
-  }))
+  const result = {}
+  messages.forEach(msg => {
+    result[msg.msgHash] = wallet.sign(msg.message).signature
+  })
 
   console.log('Writing results')
   if (output === '-') {
