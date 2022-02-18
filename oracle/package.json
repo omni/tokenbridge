@@ -19,6 +19,7 @@
     "confirm:information-request": "./scripts/start-worker.sh confirmRelay information-request-watcher",
     "manager:shutdown": "./scripts/start-worker.sh shutdownManager shutdown-manager",
     "helper:interestFether": "node ./scripts/interestFetcher.js",
+    "helper:signPendingMessages": "node ./scripts/signPendingMessages.js",
     "mev:watcher:collected-signatures": "./scripts/start-worker.sh mevWatcher mev-collected-signatures-watcher",
     "mev:sender:foreign": "./scripts/start-worker.sh mevSender foreign-mev-sender",
     "dev": "concurrently -n 'watcher:signature-request,watcher:collected-signatures,watcher:affirmation-request,watcher:transfer, sender:home,sender:foreign' -c 'red,green,yellow,blue,magenta,cyan' 'yarn watcher:signature-request' 'yarn watcher:collected-signatures' 'yarn watcher:affirmation-request' 'yarn watcher:transfer' 'yarn sender:home' 'yarn sender:foreign'",
