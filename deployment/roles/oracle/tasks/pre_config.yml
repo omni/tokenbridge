@@ -12,12 +12,8 @@
     owner: "{{ compose_service_user }}"
     mode: '0640'
 
-- name: Copy docker-compose files
+- name: Copy docker-compose file
   copy:
-    src: ../../../../oracle/{{ item }}
-    dest: "{{ bridge_path }}/oracle/"
+    src: ../../../../oracle/docker-compose-combined.yml
+    dest: "{{ bridge_path }}/oracle/docker-compose.yml"
     mode: '0755'
-  with_items:
-    - docker-compose.yml
-    - docker-compose-transfer.yml
-    - docker-compose-amb.yml

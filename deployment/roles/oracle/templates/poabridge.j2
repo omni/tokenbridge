@@ -14,19 +14,26 @@ WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridg
 
 #Getting path to private key file and variable name for parsing key file
 keyfile="{{ keyfile_path }}"
-vaddr="ORACLE_VALIDATOR_ADDRESS="
-vkey="ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="
-composefileoverride="{{ composefileoverride | default('') }}"
+tbvaddr="TB_ORACLE_VALIDATOR_ADDRESS="
+tbvkey="TB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="
+ambvaddr="AMB_ORACLE_VALIDATOR_ADDRESS="
+ambvkey="AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="
 
 #Parsing file content and add key to variable
 while read -r line
 do
     case $line in
-        $vaddr*)
-            vaddr=${line#$vaddr}
+        $tbvaddr*)
+            tbvaddr=${line#$tbvaddr}
             ;;
-        $vkey*)
-            vkey=${line#$vkey}
+        $tbvkey*)
+            tbvkey=${line#$tbvkey}
+            ;;
+        $ambvaddr*)
+            ambvaddr=${line#$ambvaddr}
+            ;;
+        $ambvkey*)
+            ambvkey=${line#$ambvkey}
             ;;
     esac
 done < $keyfile
@@ -34,22 +41,29 @@ done < $keyfile
 start(){
     echo "Starting bridge.."
     cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $composefileoverride down -v
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $composefileoverride rm -fv
-    sudo -u "{{ compose_service_user }}" ORACLE_VALIDATOR_ADDRESS=$vaddr ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$vkey /usr/local/bin/docker-compose $composefileoverride up --detach
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose down -v
+    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose rm -fv
+    sudo -u "{{ compose_service_user }}" \
+      TB_ORACLE_VALIDATOR_ADDRESS=$tbvaddr \
+      TB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$tbvkey \
+      AMB_ORACLE_VALIDATOR_ADDRESS=$ambvaddr \
+      AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$ambvkey \
+      /usr/local/bin/docker-compose up --detach
 }
 
 stop(){
     echo "Stopping bridge.."
     cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $composefileoverride  down -v
+    sudo -u "{{ compose_service_user }}" \
+      /usr/local/bin/docker-compose down -v
     sleep 2
 }
 
 status(){
     echo "Bridge status:"
     cd $WORKDIR
-    sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose $composefileoverride  ps
+    sudo -u "{{ compose_service_user }}" \
+      /usr/local/bin/docker-compose ps
 }
 
 

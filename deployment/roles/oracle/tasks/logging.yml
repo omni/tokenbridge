@@ -2,8 +2,6 @@
 - include_tasks: logging_by_syslog.yml
   with_items:
     - docker-compose
-    - docker-compose-transfer
-    - docker-compose-amb
   loop_control:
     loop_var: file
 
