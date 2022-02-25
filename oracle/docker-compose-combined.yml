@@ -102,7 +102,6 @@ services:
     logging:
       driver: syslog
       options: {tag: '{{.Name}}/{{.ID}}'}    
-    networks: []
     depends_on:
       - redis
       - rabbit  
