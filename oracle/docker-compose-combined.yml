@@ -166,15 +166,16 @@ services:
                net_parity_bridge_amb_red]
     user: root
     command:
-      --config=/root/data/config.toml
+      --chain=xdai
       --base-path=/root/data
       --jsonrpc-port=8545
       --jsonrpc-cors=all
       --jsonrpc-interface=all
       --jsonrpc-hosts=all
       --jsonrpc-apis=web3,eth,net,parity
+      --no-ancient-blocks
+      --tx-queue-no-early-reject
       --max-peers=25
-      --tx-time-limit=1000
     volumes:
       - ~/chaindata:/root/data
     expose:
