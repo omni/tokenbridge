@@ -54,7 +54,8 @@ export const CONFIRMATIONS_STATUS = {
 }
 
 export const VALIDATOR_CONFIRMATION_STATUS = {
-  SUCCESS: 'Success',
+  SUCCESS: 'Confirmed',
+  EXECUTION_SUCCESS: 'Executed',
   FAILED: 'Failed',
   PENDING: 'Pending',
   WAITING: 'Waiting',

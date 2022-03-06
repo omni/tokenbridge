@@ -59,7 +59,7 @@ export const getSuccessExecutionData = async (
     const validatorAddress = web3.utils.toChecksumAddress(txReceipt.from)
 
     return {
-      status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
+      status: VALIDATOR_CONFIRMATION_STATUS.EXECUTION_SUCCESS,
       validator: validatorAddress,
       txHash: event.transactionHash,
       timestamp: blockTimestamp,

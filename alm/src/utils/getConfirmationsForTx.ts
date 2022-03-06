@@ -72,6 +72,28 @@ export const getConfirmationsForTx = async (
   updateConfirmations(validatorConfirmations)
   setSignatureCollected(hasEnoughSignatures)
 
+  if (hasEnoughSignatures) {
+    setPendingConfirmations(false)
+    if (fromHome) {
+      // fetch collected signatures for possible manual processing
+      setSignatureCollected(
+        await Promise.all(
+          Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
+        )
+      )
+    }
+  }
+
+  // get transactions from success signatures
+  const successConfirmationWithData = await Promise.all(
+    successConfirmations.map(
+      getSuccessExecutionTransaction(web3, bridgeContract, fromHome, messageData, startBlock, getSuccessTransactions)
+    )
+  )
+
+  const successConfirmationWithTxFound = successConfirmationWithData.filter(v => v.txHash !== '')
+  updateConfirmations(successConfirmationWithTxFound)
+
   // If signatures not collected, look for pending transactions
   if (!hasEnoughSignatures) {
     // Check if confirmation is pending
@@ -84,16 +106,6 @@ export const getConfirmationsForTx = async (
     )
     updateConfirmations(validatorPendingConfirmations)
     setPendingConfirmations(validatorPendingConfirmations.length > 0)
-  } else {
-    setPendingConfirmations(false)
-    if (fromHome) {
-      // fetch collected signatures for possible manual processing
-      setSignatureCollected(
-        await Promise.all(
-          Array.from(Array(requiredSignatures).keys()).map(i => bridgeContract.methods.signature(hashMsg, i).call())
-        )
-      )
-    }
   }
 
   const undefinedConfirmations = validatorConfirmations.filter(
@@ -106,9 +118,21 @@ export const getConfirmationsForTx = async (
       getValidatorFailedTransaction(bridgeContract, messageData, startBlock, getFailedTransactions)
     )
   )
-  const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
+  let validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
     c => c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED
   )
+  if (hasEnoughSignatures) {
+    const lastTS = Math.max(...successConfirmationWithTxFound.map(c => c.timestamp || 0))
+    validatorFailedConfirmations = validatorFailedConfirmations.map(
+      c =>
+        c.timestamp < lastTS
+          ? c
+          : {
+              ...c,
+              status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS
+            }
+    )
+  }
   setFailedConfirmations(validatorFailedConfirmations.length > validatorList.length - requiredSignatures)
   updateConfirmations(validatorFailedConfirmations)
 
@@ -124,16 +148,6 @@ export const getConfirmationsForTx = async (
     }))
     updateConfirmations(notRequiredConfirmations)
   }
-
-  // get transactions from success signatures
-  const successConfirmationWithData = await Promise.all(
-    successConfirmations.map(
-      getSuccessExecutionTransaction(web3, bridgeContract, fromHome, messageData, startBlock, getSuccessTransactions)
-    )
-  )
-
-  const successConfirmationWithTxFound = successConfirmationWithData.filter(v => v.txHash !== '')
-  updateConfirmations(successConfirmationWithTxFound)
 
   // retry if not all signatures are collected and some confirmations are still missing
   // or some success transactions were not fetched successfully

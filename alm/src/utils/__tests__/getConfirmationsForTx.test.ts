@@ -281,9 +281,9 @@ describe('getConfirmationsForTx', () => {
     )
     expect(res2).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res3).toEqual(
@@ -382,25 +382,25 @@ describe('getConfirmationsForTx', () => {
     )
     expect(res2).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
         { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res3).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res4).toEqual(
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED }
       ])
     )
@@ -492,15 +492,15 @@ describe('getConfirmationsForTx', () => {
     )
     expect(res2).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res3).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
         { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
       ])
     )
@@ -596,9 +596,9 @@ describe('getConfirmationsForTx', () => {
     )
     expect(res2).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res3).toEqual(
@@ -610,9 +610,13 @@ describe('getConfirmationsForTx', () => {
     )
   })
   test('should remove pending state after transaction mined', async () => {
-    // Validator1 success
-    // Validator2 failed
-    // Validator3 Pending
+    const validator4 = '0x9d2dC11C342F4eF3C5491A048D0f0eBCd2D8f7C3'
+    const validatorList = [validator1, validator2, validator3, validator4]
+
+    // Validator1 success (ts=100)
+    // Validator2 failed (ts=200)
+    // Validator3 Pending (ts=300)
+    // Validator4 Excess confirmation (Failed) (ts=400)
 
     getValidatorConfirmation
       .mockImplementationOnce(() => async (validator: string) => ({
@@ -623,30 +627,44 @@ describe('getConfirmationsForTx', () => {
       .mockImplementation(() => async (validator: string) => ({
         validator,
         status:
-          validator !== validator2 ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
+          validator === validator1 || validator === validator3
+            ? VALIDATOR_CONFIRMATION_STATUS.SUCCESS
+            : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED
       }))
     getSuccessExecutionTransaction
       .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
         validator: validatorData.validator,
         status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
-        txHash: validatorData.validator === validator1 ? '0x123' : '',
-        timestamp: validatorData.validator === validator1 ? 123 : 0
+        txHash: validatorData.validator === validator1 ? '0x100' : '',
+        timestamp: validatorData.validator === validator1 ? 100 : 0
       }))
       .mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
         validator: validatorData.validator,
         status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
-        txHash: validatorData.validator !== validator2 ? '0x123' : '',
-        timestamp: validatorData.validator !== validator2 ? 123 : 0
+        txHash:
+          validatorData.validator === validator1 ? '0x100' : validatorData.validator === validator3 ? '0x300' : '',
+        timestamp: validatorData.validator === validator1 ? 100 : validatorData.validator === validator3 ? 300 : ''
       }))
-    getValidatorFailedTransaction.mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
-      validator: validatorData.validator,
-      status:
-        validatorData.validator === validator2
-          ? VALIDATOR_CONFIRMATION_STATUS.FAILED
-          : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
-      txHash: validatorData.validator === validator2 ? '0x123' : '',
-      timestamp: validatorData.validator === validator2 ? 123 : 0
-    }))
+    getValidatorFailedTransaction
+      .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
+        validator: validatorData.validator,
+        status:
+          validatorData.validator === validator2
+            ? VALIDATOR_CONFIRMATION_STATUS.FAILED
+            : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+        txHash: validatorData.validator === validator2 ? '0x200' : '',
+        timestamp: validatorData.validator === validator2 ? 200 : 0
+      }))
+      .mockImplementation(() => async (validatorData: BasicConfirmationParam) => ({
+        validator: validatorData.validator,
+        status:
+          validatorData.validator === validator2 || validatorData.validator === validator4
+            ? VALIDATOR_CONFIRMATION_STATUS.FAILED
+            : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
+        txHash:
+          validatorData.validator === validator2 ? '0x200' : validatorData.validator === validator4 ? '0x400' : '',
+        timestamp: validatorData.validator === validator2 ? 200 : validatorData.validator === validator4 ? 400 : ''
+      }))
     getValidatorPendingTransaction
       .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
         validator: validatorData.validator,
@@ -654,8 +672,8 @@ describe('getConfirmationsForTx', () => {
           validatorData.validator === validator3
             ? VALIDATOR_CONFIRMATION_STATUS.PENDING
             : VALIDATOR_CONFIRMATION_STATUS.UNDEFINED,
-        txHash: validatorData.validator === validator3 ? '0x123' : '',
-        timestamp: validatorData.validator === validator3 ? 123 : 0
+        txHash: validatorData.validator === validator3 ? '0x300' : '',
+        timestamp: validatorData.validator === validator3 ? 300 : 0
       }))
       .mockImplementationOnce(() => async (validatorData: BasicConfirmationParam) => ({
         validator: validatorData.validator,
@@ -712,28 +730,32 @@ describe('getConfirmationsForTx', () => {
       expect.arrayContaining([
         { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res2).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x100', timestamp: 100 },
         { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res3).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x100', timestamp: 100 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x300', timestamp: 300 },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res4).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x123', timestamp: 123 }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x100', timestamp: 100 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x200', timestamp: 200 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.PENDING, txHash: '0x300', timestamp: 300 },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
 
@@ -781,23 +803,26 @@ describe('getConfirmationsForTx', () => {
     const res7 = setResult.mock.calls[6][0](res6)
     expect(res5).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x100', timestamp: 100 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x200', timestamp: 200 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res6).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x100', timestamp: 100 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x200', timestamp: 200 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x300', timestamp: 300 },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.UNDEFINED }
       ])
     )
     expect(res7).toEqual(
       expect.arrayContaining([
-        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 },
-        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x123', timestamp: 123 },
-        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x123', timestamp: 123 }
+        { validator: validator1, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x100', timestamp: 100 },
+        { validator: validator2, status: VALIDATOR_CONFIRMATION_STATUS.FAILED, txHash: '0x200', timestamp: 200 },
+        { validator: validator3, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x300', timestamp: 300 },
+        { validator: validator4, status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS, txHash: '0x400', timestamp: 400 }
       ])
     )
   })
