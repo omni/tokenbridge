@@ -10,13 +10,14 @@ import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { Thead, AgeTd, StatusTd } from './commons/Table'
 import { ManualExecutionButton } from './ManualExecutionButton'
 import { useStateProvider } from '../state/StateProvider'
+import { matchesRule, MessageObject, WarnRule } from '../utils/web3'
 
 const StyledExecutionConfirmation = styled.div`
   margin-top: 30px;
 `
 
 export interface ExecutionConfirmationParams {
-  messageData: string
+  message: MessageObject
   executionData: ExecutionData
   setExecutionData: Function
   signatureCollected: boolean | string[]
@@ -26,7 +27,7 @@ export interface ExecutionConfirmationParams {
 }
 
 export const ExecutionConfirmation = ({
-  messageData,
+  message,
   executionData,
   setExecutionData,
   signatureCollected,
@@ -34,7 +35,7 @@ export const ExecutionConfirmation = ({
   executionEventsFetched,
   setPendingExecution
 }: ExecutionConfirmationParams) => {
-  const { foreign } = useStateProvider()
+  const { foreign, setWarning } = useStateProvider()
   const [safeExecutionAvailable, setSafeExecutionAvailable] = useState(false)
   const availableManualExecution =
     !isHome &&
@@ -65,6 +66,24 @@ export const ExecutionConfirmation = ({
       })
     },
     [availableManualExecution, foreign.bridgeContract]
+  )
+
+  useEffect(
+    () => {
+      if (!message.data || !executionData || !availableManualExecution) return
+
+      try {
+        const fileName = 'warnRules'
+        const rules: WarnRule[] = require(`../snapshots/${fileName}.json`)
+        for (let rule of rules) {
+          if (matchesRule(rule, message)) {
+            setWarning(rule.message)
+            return
+          }
+        }
+      } catch (e) {}
+    },
+    [availableManualExecution, executionData, message, message.data, setWarning]
   )
 
   const getExecutionStatusElement = (validatorStatus = '') => {
@@ -125,7 +144,7 @@ export const ExecutionConfirmation = ({
               <td>
                 <ManualExecutionButton
                   safeExecutionAvailable={safeExecutionAvailable}
-                  messageData={messageData}
+                  messageData={message.data}
                   setExecutionData={setExecutionData}
                   signatureCollected={signatureCollected as string[]}
                   setPendingExecution={setPendingExecution}

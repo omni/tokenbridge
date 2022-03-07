@@ -28,5 +28,7 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
     --not-required-bg-color: ${props => props.theme.notRequired.backgroundColor};
     --failed-color: ${props => props.theme.failed.textColor};
     --failed-bg-color: ${props => props.theme.failed.backgroundColor};
+    --warning-color: ${props => props.theme.warning.textColor};
+    --warning-bg-color: ${props => props.theme.warning.backgroundColor};
   }
 `
