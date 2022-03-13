@@ -94,7 +94,7 @@ export const ValidatorsConfirmations = ({
         </tbody>
       </table>
       <RequiredConfirmations>
-        {requiredSignatures} of {validatorList.length} confirmations required
+        At least <strong>{requiredSignatures}</strong> of <strong>{validatorList.length}</strong> confirmations required
       </RequiredConfirmations>
     </div>
   )

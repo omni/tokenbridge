@@ -69,7 +69,7 @@ export const ExecutionConfirmation = ({
 
   const getExecutionStatusElement = (validatorStatus = '') => {
     switch (validatorStatus) {
-      case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
+      case VALIDATOR_CONFIRMATION_STATUS.EXECUTION_SUCCESS:
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
       case VALIDATOR_CONFIRMATION_STATUS.FAILED:
         return <RedLabel>{validatorStatus}</RedLabel>
