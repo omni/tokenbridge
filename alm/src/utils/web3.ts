@@ -13,13 +13,15 @@ export interface MessageObject {
   sender?: string
   executor?: string
   obToken?: string
+  obReceiver?: string
 }
 
 export interface WarnRule {
   message: string
-  obToken?: string
   sender?: string
   executor?: string
+  obToken?: string
+  obReceiver?: string
 }
 
 export const matchesRule = (rule: WarnRule, msg: MessageObject) => {
@@ -33,6 +35,9 @@ export const matchesRule = (rule: WarnRule, msg: MessageObject) => {
     return false
   }
   if (!!rule.obToken && (!msg.obToken || rule.obToken.toLowerCase() !== msg.obToken.toLowerCase())) {
+    return false
+  }
+  if (!!rule.obReceiver && (!msg.obReceiver || rule.obReceiver.toLowerCase() !== msg.obReceiver.toLowerCase())) {
     return false
   }
   return true
@@ -58,14 +63,17 @@ export const filterEventsByAbi = (
   const inputs = eventAbi.inputs
   return events.map(e => {
     const { messageId, encodedData } = web3.eth.abi.decodeLog(inputs, e.data, [e.topics[1]])
-    let sender, executor, obToken
+    let sender, executor, obToken, obReceiver
     if (encodedData.length >= 160) {
       sender = `0x${encodedData.slice(66, 106)}`
       executor = `0x${encodedData.slice(106, 146)}`
       const dataOffset =
-        160 + (parseInt(encodedData.slice(154, 156), 16) + parseInt(encodedData.slice(156, 158), 16)) * 2
-      if (encodedData.length >= dataOffset + 8 + 64) {
-        obToken = `0x${encodedData.slice(dataOffset + 8 + 24, dataOffset + 8 + 64)}`
+        160 + (parseInt(encodedData.slice(154, 156), 16) + parseInt(encodedData.slice(156, 158), 16)) * 2 + 8
+      if (encodedData.length >= dataOffset + 64) {
+        obToken = `0x${encodedData.slice(dataOffset + 24, dataOffset + 64)}`
+      }
+      if (encodedData.length >= dataOffset + 128) {
+        obReceiver = `0x${encodedData.slice(dataOffset + 88, dataOffset + 128)}`
       }
     }
     return {
@@ -73,7 +81,8 @@ export const filterEventsByAbi = (
       data: encodedData || '',
       sender,
       executor,
-      obToken
+      obToken,
+      obReceiver
     }
   })
 }
