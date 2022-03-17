@@ -27,6 +27,8 @@ export interface StateContext {
   loading: boolean
   error: string
   setError: Function
+  warning: string
+  setWarning: Function
 }
 
 const initialState = {
@@ -46,7 +48,9 @@ const initialState = {
   },
   loading: true,
   error: '',
-  setError: () => {}
+  setError: () => {},
+  warning: '',
+  setWarning: () => {}
 }
 
 const StateContext = createContext<StateContext>(initialState)
@@ -59,6 +63,7 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
     foreignWeb3: foreignNetwork.web3
   })
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
 
   const value = {
     home: {
@@ -75,7 +80,9 @@ export const StateProvider = ({ children }: { children: ReactNode }) => {
     },
     loading: homeNetwork.loading || foreignNetwork.loading,
     error,
-    setError
+    setError,
+    warning,
+    setWarning
   }
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>

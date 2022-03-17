@@ -121,7 +121,7 @@ export const ConfirmationsContainer = ({
         />
         {signatureCollected && (
           <ExecutionConfirmation
-            messageData={message.data}
+            message={message}
             executionData={executionData}
             isHome={!fromHome}
             signatureCollected={signatureCollected}
