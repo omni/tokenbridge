@@ -11,6 +11,8 @@ import { Thead, AgeTd, StatusTd } from './commons/Table'
 import { ManualExecutionButton } from './ManualExecutionButton'
 import { useStateProvider } from '../state/StateProvider'
 import { matchesRule, MessageObject, WarnRule } from '../utils/web3'
+import { WarningAlert } from './commons/WarningAlert'
+import { ErrorAlert } from './commons/ErrorAlert'
 
 const StyledExecutionConfirmation = styled.div`
   margin-top: 30px;
@@ -35,8 +37,10 @@ export const ExecutionConfirmation = ({
   executionEventsFetched,
   setPendingExecution
 }: ExecutionConfirmationParams) => {
-  const { foreign, setWarning } = useStateProvider()
+  const { foreign } = useStateProvider()
   const [safeExecutionAvailable, setSafeExecutionAvailable] = useState(false)
+  const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
   const availableManualExecution =
     !isHome &&
     (executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ||
@@ -106,6 +110,8 @@ export const ExecutionConfirmation = ({
 
   return (
     <StyledExecutionConfirmation>
+      {error && <ErrorAlert onClick={() => setError('')} error={error} />}
+      {warning && <WarningAlert onClick={() => setWarning('')} error={warning} />}
       <table>
         <Thead>
           <tr>
@@ -148,6 +154,7 @@ export const ExecutionConfirmation = ({
                   setExecutionData={setExecutionData}
                   signatureCollected={signatureCollected as string[]}
                   setPendingExecution={setPendingExecution}
+                  setError={setError}
                 />
               </td>
             )}

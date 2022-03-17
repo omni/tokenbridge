@@ -33,6 +33,7 @@ interface ManualExecutionButtonParams {
   setExecutionData: Function
   signatureCollected: string[]
   setPendingExecution: Function
+  setError: Function
 }
 
 export const ManualExecutionButton = ({
@@ -40,9 +41,10 @@ export const ManualExecutionButton = ({
   messageData,
   setExecutionData,
   signatureCollected,
-  setPendingExecution
+  setPendingExecution,
+  setError
 }: ManualExecutionButtonParams) => {
-  const { foreign, setError } = useStateProvider()
+  const { foreign } = useStateProvider()
   const { library, activate, account, active } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
   const [allowFailures, setAllowFailures] = useState(false)

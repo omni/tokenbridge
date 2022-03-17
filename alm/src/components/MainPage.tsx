@@ -8,8 +8,6 @@ import { TransactionReceipt } from 'web3-eth'
 import { InfoAlert } from './commons/InfoAlert'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { FOREIGN_NETWORK_NAME, HOME_NETWORK_NAME } from '../config/constants'
-import { ErrorAlert } from './commons/ErrorAlert'
-import { WarningAlert } from './commons/WarningAlert'
 
 const StyledMainPage = styled.div`
   text-align: center;
@@ -53,7 +51,7 @@ export interface FormSubmitParams {
 
 export const MainPage = () => {
   const history = useHistory()
-  const { home, foreign, error, setError, warning, setWarning } = useStateProvider()
+  const { home, foreign } = useStateProvider()
   const [networkName, setNetworkName] = useState('')
   const [receipt, setReceipt] = useState<Maybe<TransactionReceipt>>(null)
   const [showInfoAlert, setShowInfoAlert] = useState(false)
@@ -133,8 +131,6 @@ export const MainPage = () => {
             </AlertP>
           </InfoAlert>
         )}
-        {error && <ErrorAlert onClick={() => setError('')} error={error} />}
-        {warning && <WarningAlert onClick={() => setWarning('')} error={warning} />}
         <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />
         <Route
           path={['/:chainId/:txHash/:messageIdParam', '/:chainId/:txHash']}

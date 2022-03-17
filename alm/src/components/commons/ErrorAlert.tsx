@@ -33,7 +33,7 @@ export const ErrorAlert = ({ onClick, error }: { onClick: () => void; error: str
   }
   return (
     <div className="row is-center">
-      <StyledErrorAlert className="col-10 is-vertical-align row">
+      <StyledErrorAlert className="col-12 is-vertical-align row">
         <InfoIcon color="var(--failed-color)" />
         <TextContainer className="col-10">
           {text}

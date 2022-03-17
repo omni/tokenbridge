@@ -22,7 +22,7 @@ const TextContainer = styled.div`
 export const WarningAlert = ({ onClick, error }: { onClick: () => void; error: string }) => {
   return (
     <div className="row is-center">
-      <StyledErrorAlert className="col-10 is-vertical-align row">
+      <StyledErrorAlert className="col-12 is-vertical-align row">
         <InfoIcon color="var(--warning-color)" />
         <TextContainer className="col-10">{error}</TextContainer>
         <CloseIconContainer className="col-1 is-vertical-align is-center" onClick={onClick}>
