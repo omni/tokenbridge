@@ -84,7 +84,7 @@ describe('getFinalizationEvent', () => {
     expect(setResult).toBeCalledTimes(1)
     expect(setResult.mock.calls[0][0]).toEqual({
       validator: validator1,
-      status: VALIDATOR_CONFIRMATION_STATUS.SUCCESS,
+      status: VALIDATOR_CONFIRMATION_STATUS.EXECUTION_SUCCESS,
       txHash,
       timestamp,
       executionResult: true

@@ -54,7 +54,7 @@ export const ConfirmationsContainer = ({
     home: { name: homeName },
     foreign: { name: foreignName }
   } = useStateProvider()
-  const { requiredSignatures, validatorList } = useValidatorContract({ fromHome, receipt })
+  const { requiredSignatures, validatorList } = useValidatorContract(fromHome, receipt ? receipt.blockNumber : 0)
   const { blockConfirmations } = useBlockConfirmations({ fromHome, receipt })
   const {
     confirmations,
@@ -121,7 +121,7 @@ export const ConfirmationsContainer = ({
         />
         {signatureCollected && (
           <ExecutionConfirmation
-            messageData={message.data}
+            message={message}
             executionData={executionData}
             isHome={!fromHome}
             signatureCollected={signatureCollected}

@@ -10,13 +10,16 @@ import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { Thead, AgeTd, StatusTd } from './commons/Table'
 import { ManualExecutionButton } from './ManualExecutionButton'
 import { useStateProvider } from '../state/StateProvider'
+import { matchesRule, MessageObject, WarnRule } from '../utils/web3'
+import { WarningAlert } from './commons/WarningAlert'
+import { ErrorAlert } from './commons/ErrorAlert'
 
 const StyledExecutionConfirmation = styled.div`
   margin-top: 30px;
 `
 
 export interface ExecutionConfirmationParams {
-  messageData: string
+  message: MessageObject
   executionData: ExecutionData
   setExecutionData: Function
   signatureCollected: boolean | string[]
@@ -26,7 +29,7 @@ export interface ExecutionConfirmationParams {
 }
 
 export const ExecutionConfirmation = ({
-  messageData,
+  message,
   executionData,
   setExecutionData,
   signatureCollected,
@@ -36,6 +39,8 @@ export const ExecutionConfirmation = ({
 }: ExecutionConfirmationParams) => {
   const { foreign } = useStateProvider()
   const [safeExecutionAvailable, setSafeExecutionAvailable] = useState(false)
+  const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
   const availableManualExecution =
     !isHome &&
     (executionData.status === VALIDATOR_CONFIRMATION_STATUS.WAITING ||
@@ -67,9 +72,27 @@ export const ExecutionConfirmation = ({
     [availableManualExecution, foreign.bridgeContract]
   )
 
+  useEffect(
+    () => {
+      if (!message.data || !executionData || !availableManualExecution) return
+
+      try {
+        const fileName = 'warnRules'
+        const rules: WarnRule[] = require(`../snapshots/${fileName}.json`)
+        for (let rule of rules) {
+          if (matchesRule(rule, message)) {
+            setWarning(rule.message)
+            return
+          }
+        }
+      } catch (e) {}
+    },
+    [availableManualExecution, executionData, message, message.data, setWarning]
+  )
+
   const getExecutionStatusElement = (validatorStatus = '') => {
     switch (validatorStatus) {
-      case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
+      case VALIDATOR_CONFIRMATION_STATUS.EXECUTION_SUCCESS:
         return <SuccessLabel>{validatorStatus}</SuccessLabel>
       case VALIDATOR_CONFIRMATION_STATUS.FAILED:
         return <RedLabel>{validatorStatus}</RedLabel>
@@ -87,6 +110,8 @@ export const ExecutionConfirmation = ({
 
   return (
     <StyledExecutionConfirmation>
+      {error && <ErrorAlert onClick={() => setError('')} error={error} />}
+      {warning && <WarningAlert onClick={() => setWarning('')} error={warning} />}
       <table>
         <Thead>
           <tr>
@@ -125,10 +150,11 @@ export const ExecutionConfirmation = ({
               <td>
                 <ManualExecutionButton
                   safeExecutionAvailable={safeExecutionAvailable}
-                  messageData={messageData}
+                  messageData={message.data}
                   setExecutionData={setExecutionData}
                   signatureCollected={signatureCollected as string[]}
                   setPendingExecution={setPendingExecution}
+                  setError={setError}
                 />
               </td>
             )}
