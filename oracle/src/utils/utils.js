@@ -169,7 +169,8 @@ function isNonceError(e) {
     message.includes('transaction nonce is too low') ||
     message.includes('nonce too low') ||
     message.includes('transaction with same nonce in the queue') ||
-    message.includes('oldnonce')
+    message.includes('oldnonce') ||
+    message.includes(`the tx doesn't have the correct nonce`)
   )
 }
 
