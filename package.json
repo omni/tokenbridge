@@ -35,6 +35,7 @@
     "initialize": "yarn clean && git submodule update --init && yarn install --unsafe-perm --frozen-lockfile && yarn install:deploy && yarn compile:contracts",
     "build": "yarn build:alm && yarn build:plugin",
     "build:alm": "yarn workspace alm run build",
+    "start:alm": "yarn workspace alm run start",
     "build:plugin": "yarn workspace burner-wallet-plugin run build",
     "lint": "yarn wsrun --exclude tokenbridge-contracts lint",
     "test": "yarn wsrun --exclude oracle-e2e --exclude monitor-e2e --exclude alm-e2e test",
