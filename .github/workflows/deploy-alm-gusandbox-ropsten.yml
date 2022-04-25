@@ -43,7 +43,7 @@ jobs:
           COMMON_HOME_BRIDGE_ADDRESS: '0x55af7F974F6B294034000Bb46c6359C5c605B62A'
           COMMON_FOREIGN_BRIDGE_ADDRESS: '0xF1b5cc67c911F67cCC4021C22241AC7c21CB43C8'
 
-          COMMON_HOME_RPC_URL: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net:8545/''
+          COMMON_HOME_RPC_URL: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net:8545/'
           COMMON_FOREIGN_RPC_URL: 'https://ropsten.infura.io/v3/972b939390fe4a298f2afa9907fdb06a'
 
           ALM_HOME_NETWORK_NAME: 'GU Sandbox'
@@ -54,9 +54,6 @@ jobs:
 
           ALM_HOME_EXPLORER_API: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net/api'
           ALM_FOREIGN_EXPLORER_API: 'https://api-ropsten.etherscan.io/?apikey=GMTSS17Q7R3H5W4CVUHUYD8MX48PIAPKTW'
-
-      # - name: Test
-      #   run: yarn dapp:test
 
       - name: Setup Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
