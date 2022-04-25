@@ -50,6 +50,7 @@ jsconfig.json
 .env
 .env.development
 .env.sample
+.env.example
 .sample-env
 
 # VSC configuration
