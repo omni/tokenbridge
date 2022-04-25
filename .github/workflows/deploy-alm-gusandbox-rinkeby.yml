@@ -1,4 +1,4 @@
-name: Deploy ALM GUSandbox-Ropsten
+name: Deploy ALM GUSandbox-Rinkeby
 on:
   push:
     branches: ['main', 'dev-duy-test-ci']
