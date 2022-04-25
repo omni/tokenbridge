@@ -44,7 +44,7 @@ jobs:
           COMMON_FOREIGN_BRIDGE_ADDRESS: '0x0F806D8dd8bb02Ad9dd9bA0e8e351B4319cc45e4'
 
           COMMON_HOME_RPC_URL: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net:8545/'
-          COMMON_FOREIGN_RPC_URL: 'https://rinkeby.infura.io/v3/a1660f116d05434081d0b7104c26de1b'
+          COMMON_FOREIGN_RPC_URL: 'https://rinkeby.infura.io/v3/484725c62d0b462aa48f601db3883157'
 
           ALM_HOME_NETWORK_NAME: 'GU Sandbox'
           ALM_FOREIGN_NETWORK_NAME: 'Rinkeby'
