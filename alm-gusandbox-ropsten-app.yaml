@@ -13,23 +13,3 @@ handlers:
   - url: .*
     static_files: alm/build/index.html
     upload: alm/build/index.html
-
-skip_files:
-  - node_modules/
-  - alm/src/
-  - alm/public/
-  - alm/scripts/
-  - alm-e2e/
-  - audit/
-  - burner-wallet-plugin/
-  - audit/
-  - commons/
-  - contracts/
-  - deployment/
-  - deployment-e2e/
-  - e2e-commons/
-  - monitor/
-  - monitor-e2e/
-  - oracle/
-  - oracle-e2e/
-  - parity/
