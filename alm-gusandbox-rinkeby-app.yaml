@@ -1,6 +1,6 @@
 runtime: nodejs12
 env: standard
-service: default
+service: alm-gusandbox-rinkeby
 
 handlers:
   - url: /static
