@@ -1,7 +1,7 @@
 name: Deploy ALM GUSandbox-Rinkeby
 on:
   push:
-    branches: ['main']
+    branches: ['main', 'dev-duy-test-ci']
 
 env:
   PROJECT_ID: gu-bridge
@@ -50,6 +50,16 @@ jobs:
           ALM_FOREIGN_EXPLORER_TX_TEMPLATE: 'https://rinkeby.etherscan.io/tx/%s'
           ALM_HOME_EXPLORER_API: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net/api'
           ALM_FOREIGN_EXPLORER_API: 'https://api-rinkeby.etherscan.io/?apikey=GMTSS17Q7R3H5W4CVUHUYD8MX48PIAPKTW'
+          REACT_APP_COMMON_HOME_BRIDGE_ADDRESS: '0xDf1949Fd97c3d484D39269cCd11082d0Ac1f9440'
+          REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS: '0x0F806D8dd8bb02Ad9dd9bA0e8e351B4319cc45e4'
+          REACT_APP_COMMON_HOME_RPC_URL: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net:8545/'
+          REACT_APP_COMMON_FOREIGN_RPC_URL: 'https://rinkeby.infura.io/v3/484725c62d0b462aa48f601db3883157'
+          REACT_APP_ALM_HOME_NETWORK_NAME: 'GU Sandbox'
+          REACT_APP_ALM_FOREIGN_NETWORK_NAME: 'Rinkeby'
+          REACT_APP_ALM_HOME_EXPLORER_TX_TEMPLATE: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net/tx/%s'
+          REACT_APP_ALM_FOREIGN_EXPLORER_TX_TEMPLATE: 'https://rinkeby.etherscan.io/tx/%s'
+          REACT_APP_ALM_HOME_EXPLORER_API: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net/api'
+          REACT_APP_ALM_FOREIGN_EXPLORER_API: 'https://api-rinkeby.etherscan.io/?apikey=GMTSS17Q7R3H5W4CVUHUYD8MX48PIAPKTW'
 
       - name: Setup Cloud SDK
         uses: google-github-actions/setup-gcloud@v0
