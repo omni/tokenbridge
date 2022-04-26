@@ -16,7 +16,7 @@
 
 runtime: nodejs12
 env: standard
-entrypoint: npm run start:alm
+entrypoint: yarn start:alm
 service: alm-gusandbox-ropsten
 
 handlers:

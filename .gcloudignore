@@ -19,30 +19,6 @@
 node_modules/
 
 # Source
-alm-e2e
-src
-alm/src/
-alm/public/
-alm/scripts/
-alm-e2e/
-audit/
-burner-wallet-plugin/
-audit/
-commons/
-contracts/
-deployment/
-deployment-e2e/
-e2e-commons/
-monitor/
-monitor-e2e/
-oracle/
-oracle-e2e/
-parity/
-public
-.eslintrc.json
-.prettierrc.json
-README.md
-jsconfig.json
 
 # Env
 .env
