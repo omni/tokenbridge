@@ -41,9 +41,7 @@ parity/
 public
 .eslintrc.json
 .prettierrc.json
-package.json
 README.md
-yarn.lock
 jsconfig.json
 
 # Env
