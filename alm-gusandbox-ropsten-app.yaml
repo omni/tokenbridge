@@ -1,38 +1,15 @@
-# runtime: nodejs12
-# env: standard
-# service: alm-gusandbox-ropsten
-
-# handlers:
-#   - url: /static
-#     static_dir: alm/build/static
-
-#   - url: /(.*\.(json|ico|js))$
-#     static_files: alm/build/\1
-#     upload: alm/build/.*\.(json|ico|js)$
-
-#   - url: .*
-#     static_files: alm/build/index.html
-#     upload: alm/build/index.html
-
 runtime: nodejs12
 env: standard
-entrypoint: yarn start:alm
 service: alm-gusandbox-ropsten
 
 handlers:
-  - url: /.*
-    secure: always
-    redirect_http_response_code: 301
-    script: auto
+  - url: /static
+    static_dir: alm/build/static
 
-env_variables:
-  COMMON_HOME_BRIDGE_ADDRESS: '0x55af7F974F6B294034000Bb46c6359C5c605B62A'
-  COMMON_FOREIGN_BRIDGE_ADDRESS: '0xF1b5cc67c911F67cCC4021C22241AC7c21CB43C8'
-  COMMON_HOME_RPC_URL: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net:8545/'
-  COMMON_FOREIGN_RPC_URL: 'https://ropsten.infura.io/v3/484725c62d0b462aa48f601db3883157'
-  ALM_HOME_NETWORK_NAME: 'GU Sandbox'
-  ALM_FOREIGN_NETWORK_NAME: 'Ropsten'
-  ALM_HOME_EXPLORER_TX_TEMPLATE: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net/tx/%s'
-  ALM_FOREIGN_EXPLORER_TX_TEMPLATE: 'https://ropsten.etherscan.io/tx/%s'
-  ALM_HOME_EXPLORER_API: 'https://b32b3f3b-c059-47f5-b171-1a3c952f61b7.4z9mdn90pg6rby7s7iqv9kjgg.ep.bccloud.net/api'
-  ALM_FOREIGN_EXPLORER_API: 'https://api-ropsten.etherscan.io/?apikey=GMTSS17Q7R3H5W4CVUHUYD8MX48PIAPKTW'
+  - url: /(.*\.(json|ico|js))$
+    static_files: alm/build/\1
+    upload: alm/build/.*\.(json|ico|js)$
+
+  - url: .*
+    static_files: alm/build/index.html
+    upload: alm/build/index.html
