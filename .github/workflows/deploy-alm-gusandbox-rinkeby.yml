@@ -1,7 +1,7 @@
 name: Deploy ALM GUSandbox-Rinkeby
 on:
   push:
-    branches: ['main', 'dev-duy-test-ci']
+    branches: ['main']
 
 env:
   PROJECT_ID: gu-bridge
