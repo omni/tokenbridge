@@ -32,14 +32,12 @@ export interface useMessageConfirmationsParams {
   blockConfirmations: number
 }
 
-export interface BasicConfirmationParam {
+export interface ConfirmationParam {
   validator: string
   status: string
-}
-
-export interface ConfirmationParam extends BasicConfirmationParam {
   txHash: string
   timestamp: number
+  signature?: string
 }
 
 export interface ExecutionData {
@@ -65,7 +63,7 @@ export const useMessageConfirmations = ({
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
   const [waitingBlocks, setWaitingBlocks] = useState(false)
   const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
-  const [signatureCollected, setSignatureCollected] = useState<boolean | string[]>(false)
+  const [signatureCollected, setSignatureCollected] = useState(false)
   const [executionEventsFetched, setExecutionEventsFetched] = useState(false)
   const [collectedSignaturesEvent, setCollectedSignaturesEvent] = useState<Maybe<EventData>>(null)
   const [executionData, setExecutionData] = useState<ExecutionData>({
@@ -140,10 +138,9 @@ export const useMessageConfirmations = ({
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
   // the execution tx on the foreign network is waiting for block confirmations
   // This is executed if the message is in Home to Foreign direction only
-  const hasCollectedSignatures = !!signatureCollected // true or string[]
   useEffect(
     () => {
-      if (!fromHome || !receipt || !home.web3 || !home.bridgeContract || !hasCollectedSignatures) return
+      if (!fromHome || !receipt || !home.web3 || !home.bridgeContract || !signatureCollected) return
 
       let timeoutId: number
       let isCancelled = false
@@ -179,7 +176,7 @@ export const useMessageConfirmations = ({
         isCancelled = true
       }
     },
-    [fromHome, home.bridgeContract, home.web3, message.data, receipt, hasCollectedSignatures]
+    [fromHome, home.bridgeContract, home.web3, message.data, receipt, signatureCollected]
   )
 
   // Check if the responsible validator is waiting for block confirmations to execute the message on foreign network
@@ -402,6 +399,7 @@ export const useMessageConfirmations = ({
 
   return {
     confirmations,
+    setConfirmations,
     status,
     signatureCollected,
     executionData,
