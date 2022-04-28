@@ -181,7 +181,9 @@ export const getLogs = async (
     if (topics[i] !== null) {
       url.searchParams.append(`topic${i}`, topics[i] as string)
       for (let j = 0; j < i; j++) {
-        url.searchParams.append(`topic${j}_${i}_opr`, 'and')
+        if (topics[j] !== null) {
+          url.searchParams.append(`topic${j}_${i}_opr`, 'and')
+        }
       }
     }
   }
