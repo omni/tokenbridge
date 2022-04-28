@@ -132,9 +132,21 @@ export const getConfirmationsForTx = async (
       getValidatorFailedTransaction(web3, bridgeContract, messageData, startBlock, getFailedTransactions)
     )
   )
-  const validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
+  let validatorFailedConfirmations = validatorFailedConfirmationsChecks.filter(
     c => c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED || c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED_VALID
   )
+  if (hasEnoughSignatures && !fromHome) {
+    const lastTS = Math.max(...successConfirmationWithTxFound.map(c => c.timestamp || 0))
+    validatorFailedConfirmations = validatorFailedConfirmations.map(
+      c =>
+        c.timestamp < lastTS
+          ? c
+          : {
+              ...c,
+              status: VALIDATOR_CONFIRMATION_STATUS.FAILED_VALID
+            }
+    )
+  }
   setFailedConfirmations(validatorFailedConfirmations.length > validatorList.length - requiredSignatures)
   updateConfirmations(validatorFailedConfirmations)
 
