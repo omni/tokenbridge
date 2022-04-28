@@ -49,7 +49,6 @@ export const ValidatorsConfirmations = ({
     }
   }
 
-  console.log(confirmations)
   return (
     <div>
       <table>
