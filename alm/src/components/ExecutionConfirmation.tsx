@@ -26,7 +26,8 @@ export interface ExecutionConfirmationParams {
   isHome: boolean
   executionEventsFetched: boolean
   setPendingExecution: Function
-  setConfirmations: Function
+  dstRequiredSignatures: number
+  dstValidatorList: string[]
 }
 
 export const ExecutionConfirmation = ({
@@ -37,7 +38,8 @@ export const ExecutionConfirmation = ({
   isHome,
   executionEventsFetched,
   setPendingExecution,
-  setConfirmations
+  dstRequiredSignatures,
+  dstValidatorList
 }: ExecutionConfirmationParams) => {
   const { foreign } = useStateProvider()
   const [safeExecutionAvailable, setSafeExecutionAvailable] = useState(false)
@@ -157,7 +159,8 @@ export const ExecutionConfirmation = ({
                   confirmations={confirmations}
                   setPendingExecution={setPendingExecution}
                   setError={setError}
-                  setConfirmations={setConfirmations}
+                  requiredSignatures={dstRequiredSignatures}
+                  validatorList={dstValidatorList}
                 />
               </td>
             )}

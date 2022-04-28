@@ -11,7 +11,7 @@ import {
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 import { signatureToVRS } from './signatures'
 
-export const mergeConfirmations = (oldConfirmations: ConfirmationParam[], newConfirmations: ConfirmationParam[]) => {
+const mergeConfirmations = (oldConfirmations: ConfirmationParam[], newConfirmations: ConfirmationParam[]) => {
   const confirmations = [...oldConfirmations]
   newConfirmations.forEach(validatorData => {
     const index = confirmations.findIndex(e => e.validator === validatorData.validator)
@@ -22,10 +22,9 @@ export const mergeConfirmations = (oldConfirmations: ConfirmationParam[], newCon
     const currentStatus = confirmations[index].status
     const newStatus = validatorData.status
     if (
-      currentStatus !== VALIDATOR_CONFIRMATION_STATUS.MANUAL &&
-      (validatorData.txHash ||
-        !!validatorData.signature ||
-        (newStatus !== currentStatus && newStatus !== VALIDATOR_CONFIRMATION_STATUS.UNDEFINED))
+      validatorData.txHash ||
+      !!validatorData.signature ||
+      (newStatus !== currentStatus && newStatus !== VALIDATOR_CONFIRMATION_STATUS.UNDEFINED)
     ) {
       confirmations[index] = {
         status: validatorData.status,
@@ -77,7 +76,7 @@ export const getConfirmationsForTx = async (
 
   const successConfirmations = validatorConfirmations.filter(c => c.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
   const notSuccessConfirmations = validatorConfirmations.filter(c => c.status !== VALIDATOR_CONFIRMATION_STATUS.SUCCESS)
-  const hasEnoughSignatures = successConfirmations.length === requiredSignatures
+  const hasEnoughSignatures = successConfirmations.length >= requiredSignatures
 
   updateConfirmations(validatorConfirmations)
   setSignatureCollected(hasEnoughSignatures)
@@ -147,7 +146,9 @@ export const getConfirmationsForTx = async (
             }
     )
   }
-  setFailedConfirmations(validatorFailedConfirmations.length > validatorList.length - requiredSignatures)
+  setFailedConfirmations(
+    !hasEnoughSignatures && validatorFailedConfirmations.some(c => c.status === VALIDATOR_CONFIRMATION_STATUS.FAILED)
+  )
   updateConfirmations(validatorFailedConfirmations)
 
   const missingConfirmations = validatorConfirmations.filter(
