@@ -87,7 +87,8 @@ describe('getFinalizationEvent', () => {
       status: VALIDATOR_CONFIRMATION_STATUS.EXECUTION_SUCCESS,
       txHash,
       timestamp,
-      executionResult: true
+      executionResult: true,
+      blockNumber: 5523145
     })
 
     expect(getFailedExecution).toBeCalledTimes(0)
@@ -237,7 +238,8 @@ describe('getFinalizationEvent', () => {
       status: VALIDATOR_CONFIRMATION_STATUS.PENDING,
       txHash,
       timestamp: expect.any(Number),
-      executionResult: false
+      executionResult: false,
+      blockNumber: 0
     })
 
     expect(getFailedExecution).toBeCalledTimes(0)
@@ -294,7 +296,8 @@ describe('getFinalizationEvent', () => {
       status: VALIDATOR_CONFIRMATION_STATUS.FAILED,
       txHash,
       timestamp: expect.any(Number),
-      executionResult: false
+      executionResult: false,
+      blockNumber: expect.any(Number)
     })
 
     expect(getFailedExecution).toBeCalledTimes(1)

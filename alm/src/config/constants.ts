@@ -55,13 +55,17 @@ export const CONFIRMATIONS_STATUS = {
 
 export const VALIDATOR_CONFIRMATION_STATUS = {
   SUCCESS: 'Confirmed',
+  MANUAL: 'Manual',
   EXECUTION_SUCCESS: 'Executed',
   FAILED: 'Failed',
+  FAILED_VALID: 'Failed valid',
   PENDING: 'Pending',
   WAITING: 'Waiting',
   NOT_REQUIRED: 'Not required',
   UNDEFINED: 'UNDEFINED'
 }
+
+export const RECENT_AGE = 'Recent'
 
 export const SEARCHING_TX = 'Searching Transaction...'
 

@@ -14,37 +14,40 @@ const messageData = '0x123456'
 const OTHER_HASH = 'aabbccdd'
 const bridgeAddress = '0xFe446bEF1DbF7AFE24E81e05BC8B271C1BA9a560'
 const otherAddress = '0xD4075FB57fCf038bFc702c915Ef9592534bED5c1'
+const validator1 = '0x45b96809336A8b714BFbdAB3E4B5e0fe5d839908'
+const validator2 = '0xAe8bFfc8BBc6AAa9E21ED1E4e4957fe798BEA25f'
+const validator3 = '0x285A6eB779be4db94dA65e2F3518B1c5F0f71244'
 
 describe('getFailedTransactions', () => {
   test('should only return failed transactions', async () => {
     const to = otherAddress
     const transactions = [
-      { isError: '0', to },
-      { isError: '1', to },
-      { isError: '0', to },
-      { isError: '1', to },
-      { isError: '1', to }
+      { isError: '0', to, from: validator1 },
+      { isError: '1', to, from: validator1 },
+      { isError: '0', to, from: validator2 },
+      { isError: '1', to, from: validator2 },
+      { isError: '1', to, from: validator3 }
     ]
 
     const fetchAccountTransactions = jest.fn().mockImplementation(() => transactions)
-    const result = await getFailedTransactions('', to, 0, 1, '', fetchAccountTransactions)
-    expect(result.length).toEqual(3)
+    const result = await getFailedTransactions(validator1, to, 0, 1, '', fetchAccountTransactions)
+    expect(result.length).toEqual(1)
   })
 })
 describe('getSuccessTransactions', () => {
   test('should only return success transactions', async () => {
     const to = otherAddress
     const transactions = [
-      { isError: '0', to },
-      { isError: '1', to },
-      { isError: '0', to },
-      { isError: '1', to },
-      { isError: '1', to }
+      { isError: '0', to, from: validator1 },
+      { isError: '1', to, from: validator1 },
+      { isError: '0', to, from: validator2 },
+      { isError: '1', to, from: validator2 },
+      { isError: '1', to, from: validator3 }
     ]
 
     const fetchAccountTransactions = jest.fn().mockImplementation(() => transactions)
-    const result = await getSuccessTransactions('', to, 0, 1, '', fetchAccountTransactions)
-    expect(result.length).toEqual(2)
+    const result = await getSuccessTransactions(validator1, to, 0, 1, '', fetchAccountTransactions)
+    expect(result.length).toEqual(1)
   })
 })
 describe('filterValidatorSignatureTransaction', () => {

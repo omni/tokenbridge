@@ -63,7 +63,8 @@ export const getSuccessExecutionData = async (
       validator: validatorAddress,
       txHash: event.transactionHash,
       timestamp: blockTimestamp,
-      executionResult: event.returnValues.status
+      executionResult: event.returnValues.status,
+      blockNumber: event.blockNumber
     }
   }
   return null
@@ -115,7 +116,8 @@ export const getFinalizationEvent = async (
           validator: validator,
           txHash: pendingTx.hash,
           timestamp: nowTimestamp,
-          executionResult: false
+          executionResult: false,
+          blockNumber: 0
         })
         setPendingExecution(true)
       } else {
@@ -144,7 +146,8 @@ export const getFinalizationEvent = async (
               validator: validator,
               txHash: failedTx.hash,
               timestamp,
-              executionResult: false
+              executionResult: false,
+              blockNumber: parseInt(failedTx.blockNumber)
             })
             setFailedExecution(true)
           }
