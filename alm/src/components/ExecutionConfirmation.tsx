@@ -4,7 +4,7 @@ import { useWindowWidth } from '@react-hook/window-size'
 import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS, ALM_HOME_TO_FOREIGN_MANUAL_EXECUTION } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
-import { ExecutionData } from '../hooks/useMessageConfirmations'
+import { ConfirmationParam, ExecutionData } from '../hooks/useMessageConfirmations'
 import { GreyLabel, RedLabel, SuccessLabel } from './commons/Labels'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { Thead, AgeTd, StatusTd } from './commons/Table'
@@ -22,20 +22,24 @@ export interface ExecutionConfirmationParams {
   message: MessageObject
   executionData: ExecutionData
   setExecutionData: Function
-  signatureCollected: boolean | string[]
+  confirmations: ConfirmationParam[]
   isHome: boolean
   executionEventsFetched: boolean
   setPendingExecution: Function
+  dstRequiredSignatures: number
+  dstValidatorList: string[]
 }
 
 export const ExecutionConfirmation = ({
   message,
   executionData,
   setExecutionData,
-  signatureCollected,
+  confirmations,
   isHome,
   executionEventsFetched,
-  setPendingExecution
+  setPendingExecution,
+  dstRequiredSignatures,
+  dstValidatorList
 }: ExecutionConfirmationParams) => {
   const { foreign } = useStateProvider()
   const [safeExecutionAvailable, setSafeExecutionAvailable] = useState(false)
@@ -152,9 +156,11 @@ export const ExecutionConfirmation = ({
                   safeExecutionAvailable={safeExecutionAvailable}
                   messageData={message.data}
                   setExecutionData={setExecutionData}
-                  signatureCollected={signatureCollected as string[]}
+                  confirmations={confirmations}
                   setPendingExecution={setPendingExecution}
                   setError={setError}
+                  requiredSignatures={dstRequiredSignatures}
+                  validatorList={dstValidatorList}
                 />
               </td>
             )}

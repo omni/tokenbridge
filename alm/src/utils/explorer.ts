@@ -12,6 +12,7 @@ import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 
 export interface APITransaction {
+  from: string
   timeStamp: string
   isError: string
   input: string
@@ -54,7 +55,7 @@ export const fetchAccountTransactions = async ({ account, startBlock, endBlock, 
   url.searchParams.append('module', 'account')
   url.searchParams.append('action', 'txlist')
   url.searchParams.append('address', account)
-  url.searchParams.append('filterby', 'from')
+  url.searchParams.append('filterby', 'to')
   url.searchParams.append('startblock', startBlock.toString())
   url.searchParams.append('endblock', endBlock.toString())
 
@@ -64,7 +65,7 @@ export const fetchAccountTransactions = async ({ account, startBlock, endBlock, 
     return []
   }
 
-  return result.result
+  return result.result || []
 }
 
 export const fetchPendingTransactions = async ({
@@ -180,7 +181,9 @@ export const getLogs = async (
     if (topics[i] !== null) {
       url.searchParams.append(`topic${i}`, topics[i] as string)
       for (let j = 0; j < i; j++) {
-        url.searchParams.append(`topic${j}_${i}_opr`, 'and')
+        if (topics[j] !== null) {
+          url.searchParams.append(`topic${j}_${i}_opr`, 'and')
+        }
       }
     }
   }
@@ -194,7 +197,7 @@ export const getLogs = async (
   }))
 }
 
-const filterReceiver = (to: string) => (tx: APITransaction) => tx.to.toLowerCase() === to.toLowerCase()
+const filterSender = (from: string) => (tx: APITransaction) => tx.from.toLowerCase() === from.toLowerCase()
 
 export const getFailedTransactions = async (
   account: string,
@@ -204,9 +207,9 @@ export const getFailedTransactions = async (
   api: string,
   getAccountTransactionsMethod = getAccountTransactions
 ): Promise<APITransaction[]> => {
-  const transactions = await getAccountTransactionsMethod({ account, startBlock, endBlock, api })
+  const transactions = await getAccountTransactionsMethod({ account: to, startBlock, endBlock, api })
 
-  return transactions.filter(t => t.isError !== '0').filter(filterReceiver(to))
+  return transactions.filter(t => t.isError !== '0').filter(filterSender(account))
 }
 
 export const getSuccessTransactions = async (
@@ -217,9 +220,9 @@ export const getSuccessTransactions = async (
   api: string,
   getAccountTransactionsMethod = getAccountTransactions
 ): Promise<APITransaction[]> => {
-  const transactions = await getAccountTransactionsMethod({ account, startBlock, endBlock, api })
+  const transactions = await getAccountTransactionsMethod({ account: to, startBlock, endBlock, api })
 
-  return transactions.filter(t => t.isError === '0').filter(filterReceiver(to))
+  return transactions.filter(t => t.isError === '0').filter(filterSender(account))
 }
 
 export const filterValidatorSignatureTransaction = (
