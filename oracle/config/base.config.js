@@ -7,7 +7,15 @@ const {
   HOME_AMB_ABI,
   FOREIGN_AMB_ABI
 } = require('../../commons')
-const { web3Home, web3Foreign } = require('../src/services/web3')
+const {
+  web3Home,
+  web3Foreign,
+  web3HomeRedundant,
+  web3HomeFallback,
+  web3ForeignRedundant,
+  web3ForeignFallback,
+  web3ForeignArchive
+} = require('../src/services/web3')
 const { add0xPrefix, privateKeyToAddress } = require('../src/utils/utils')
 const { EXIT_CODES } = require('../src/utils/constants')
 
@@ -27,9 +35,11 @@ const {
   ORACLE_HOME_EVENTS_REPROCESSING,
   ORACLE_HOME_EVENTS_REPROCESSING_BATCH_SIZE,
   ORACLE_HOME_EVENTS_REPROCESSING_BLOCK_DELAY,
+  ORACLE_HOME_RPC_SYNC_STATE_CHECK_INTERVAL,
   ORACLE_FOREIGN_EVENTS_REPROCESSING,
   ORACLE_FOREIGN_EVENTS_REPROCESSING_BATCH_SIZE,
-  ORACLE_FOREIGN_EVENTS_REPROCESSING_BLOCK_DELAY
+  ORACLE_FOREIGN_EVENTS_REPROCESSING_BLOCK_DELAY,
+  ORACLE_FOREIGN_RPC_SYNC_STATE_CHECK_INTERVAL
 } = process.env
 
 let homeAbi
@@ -63,9 +73,12 @@ const homeConfig = {
   bridgeAddress: COMMON_HOME_BRIDGE_ADDRESS,
   bridgeABI: homeAbi,
   pollingInterval: parseInt(ORACLE_HOME_RPC_POLLING_INTERVAL, 10),
+  syncCheckInterval: parseInt(ORACLE_HOME_RPC_SYNC_STATE_CHECK_INTERVAL, 10) || 60000,
   startBlock: parseInt(ORACLE_HOME_START_BLOCK, 10) || 0,
   blockPollingLimit: parseInt(ORACLE_HOME_RPC_BLOCK_POLLING_LIMIT, 10),
   web3: web3Home,
+  web3Redundant: web3HomeRedundant,
+  web3Fallback: web3HomeFallback,
   bridgeContract: homeContract,
   eventContract: homeContract,
   reprocessingOptions: {
@@ -81,9 +94,13 @@ const foreignConfig = {
   bridgeAddress: COMMON_FOREIGN_BRIDGE_ADDRESS,
   bridgeABI: foreignAbi,
   pollingInterval: parseInt(ORACLE_FOREIGN_RPC_POLLING_INTERVAL, 10),
+  syncCheckInterval: parseInt(ORACLE_FOREIGN_RPC_SYNC_STATE_CHECK_INTERVAL, 10) || 60000,
   startBlock: parseInt(ORACLE_FOREIGN_START_BLOCK, 10) || 0,
   blockPollingLimit: parseInt(ORACLE_FOREIGN_RPC_BLOCK_POLLING_LIMIT, 10),
   web3: web3Foreign,
+  web3Redundant: web3ForeignRedundant,
+  web3Fallback: web3ForeignFallback,
+  web3Archive: web3ForeignArchive || web3Foreign,
   bridgeContract: foreignContract,
   eventContract: foreignContract,
   reprocessingOptions: {
