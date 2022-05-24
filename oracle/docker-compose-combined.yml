@@ -5,14 +5,14 @@ networks:
   net_db_bridge_red: {driver: bridge}
   net_rabbit_bridge_green: {driver: bridge}
   net_rabbit_bridge_red: {driver: bridge}
-  net_parity_bridge_red: {driver: bridge}
-  net_parity_bridge_green: {driver: bridge}
+  net_ne_bridge_red: {driver: bridge}
+  net_ne_bridge_green: {driver: bridge}
   net_db_bridge_amb_green: {driver: bridge}
   net_db_bridge_amb_red: {driver: bridge}
   net_rabbit_bridge_amb_green: {driver: bridge}
   net_rabbit_bridge_amb_red: {driver: bridge}
-  net_parity_bridge_amb_red: {driver: bridge}
-  net_parity_bridge_amb_green: {driver: bridge}
+  net_ne_bridge_amb_red: {driver: bridge}
+  net_ne_bridge_amb_green: {driver: bridge}
 services:
   bridge_affirmation:
     cpus: 0.1
@@ -30,7 +30,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_green, 
                net_rabbit_bridge_green,
-               net_parity_bridge_green]
+               net_ne_bridge_green]
     restart: unless-stopped
     logging:
       driver: syslog
@@ -77,7 +77,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_red, 
                net_rabbit_bridge_red,
-               net_parity_bridge_red]
+               net_ne_bridge_red]
     restart: unless-stopped
     depends_on:
       - redis
@@ -97,7 +97,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_red,
                net_rabbit_bridge_red,
-               net_parity_bridge_red]
+               net_ne_bridge_red]
     restart: unless-stopped
     logging:
       driver: syslog
@@ -124,7 +124,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_green, 
                net_rabbit_bridge_green,
-               net_parity_bridge_green]
+               net_ne_bridge_green]
     restart: unless-stopped
     depends_on:
       - redis
@@ -156,44 +156,41 @@ services:
       driver: syslog
       options: {tag: '{{.Name}}/{{.ID}}'}
 
-  parity:
-    container_name: parity
-    image: openethereum/openethereum:latest
-    networks: [net_parity_bridge_green,
-               net_parity_bridge_red,
-               net_parity_bridge_amb_green,
-               net_parity_bridge_amb_red]
-    user: root
+  ne:
+    container_name: ne
+    image: nethermind/nethermind:latest
+    networks: [net_ne_bridge_green,
+               net_ne_bridge_red,
+               net_ne_bridge_amb_green,
+               net_ne_bridge_amb_red]
     command:
-      --chain=xdai
-      --base-path=/root/data
-      --jsonrpc-port=8545
-      --jsonrpc-cors=all
-      --jsonrpc-interface=all
-      --jsonrpc-hosts=all
-      --jsonrpc-apis=web3,eth,net,parity
-      --no-ancient-blocks
-      --tx-queue-no-early-reject
-      --max-peers=25
+      --config xdai
+      --baseDbPath /nethermind
+      --JsonRpc.Enabled true
+      --JsonRpc.Host 0.0.0.0
+      --Init.StoreReceipts false
+      --TxPool.Size 8192
+      --Pruning.Mode Hybrid
+      --Pruning.CacheMb 1024
+      --Sync.FastSync true
+      --Sync.FastBlocks true
+      --Sync.DownloadBodiesInFastSync false
+      --Sync.DownloadReceiptsInFastSync false
+      --Sync.DownloadHeadersInFastSync false
     volumes:
-      - ~/chaindata:/root/data
+      - ~/ne-data/logs:/nethermind/logs
+      - ~/ne-data/nethermind_db:/nethermind/nethermind_db
     expose:
       - "8545"
     ports:
-      - "30303:30303/tcp"
-      - "30303:30303/udp"
+      - "30304:30303/tcp"
+      - "30304:30303/udp"
     restart: unless-stopped
     logging:
       driver: "json-file"
       options:
         max-size: "100m"
         max-file: "1"
-        # CMD curl -f --retry 6 --max-time 5 --retry-delay 10 --retry-max-time 60 "http://localhost:8080/health" || bash -c 'kill -s 15 -1 && (sleep 10; kill -s 9 -1)'
-    healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f --connect-timeout 1 --max-time 2 --retry 2 --retry-delay 3 --retry-max-time 15 -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"eth_chainId\",\"id\":1}' http://localhost:8545/ || sh -c 'pkill -15 openethereum && (sleep 10; pkill -9 openethereum)'"]
-      interval: 60s
-      timeout: 30s
-      start_period: 60s
   bridge_amb_affirmation:
     cpus: 0.1
     entrypoint: yarn watcher:affirmation-request
@@ -213,7 +210,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_amb_green, 
                net_rabbit_bridge_amb_green,
-               net_parity_bridge_amb_green]
+               net_ne_bridge_amb_green]
     restart: unless-stopped
     depends_on:
       - redis-amb
@@ -237,7 +234,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_amb_green,
                net_rabbit_bridge_amb_green,
-               net_parity_bridge_amb_green]
+               net_ne_bridge_amb_green]
     restart: unless-stopped
     depends_on:
       - redis-amb
@@ -261,7 +258,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_amb_red, 
                net_rabbit_bridge_amb_red,
-               net_parity_bridge_amb_red]
+               net_ne_bridge_amb_red]
     restart: unless-stopped
     depends_on:
       - redis-amb
@@ -304,7 +301,7 @@ services:
     mem_limit: 500m
     networks: [net_db_bridge_amb_red, 
                net_rabbit_bridge_amb_red,
-               net_parity_bridge_amb_red]
+               net_ne_bridge_amb_red]
     restart: unless-stopped
     depends_on:
       - redis-amb
