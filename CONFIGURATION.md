@@ -56,9 +56,11 @@ ORACLE_JSONRPC_ERROR_CODES | Override default JSON rpc error codes that can trig
 ORACLE_HOME_EVENTS_REPROCESSING | If set to `true`, home events happened in the past will be refetched and processed once again, to ensure that nothing was missed on the first pass. | `bool`
 ORACLE_HOME_EVENTS_REPROCESSING_BATCH_SIZE | Batch size for one `eth_getLogs` request when reprocessing old logs in the home chain. Defaults to `1000` | `integer`
 ORACLE_HOME_EVENTS_REPROCESSING_BLOCK_DELAY | Block confirmations number, after which old logs are being reprocessed in the home chain. Defaults to `500` | `integer`
+ORACLE_HOME_RPC_SYNC_STATE_CHECK_INTERVAL | Interval for checking JSON RPC sync state, by requesting the latest block number. Oracle will switch to the fallback JSON RPC in case sync process is stuck | `integer`
 ORACLE_FOREIGN_EVENTS_REPROCESSING  | If set to `true`, foreign events happened in the past will be refetched and processed once again, to ensure that nothing was missed on the first pass. | `bool`
 ORACLE_FOREIGN_EVENTS_REPROCESSING_BATCH_SIZE | Batch size for one `eth_getLogs` request when reprocessing old logs in the foreign chain. Defaults to `500` | `integer`
 ORACLE_FOREIGN_EVENTS_REPROCESSING_BLOCK_DELAY | Block confirmations number, after which old logs are being reprocessed in the foreign chain. Defaults to `250` | `integer`
+ORACLE_FOREIGN_RPC_SYNC_STATE_CHECK_INTERVAL | Interval for checking JSON RPC sync state, by requesting the latest block number. Oracle will switch to the fallback JSON RPC in case sync process is stuck | `integer`
 
 
 ## Monitor configuration

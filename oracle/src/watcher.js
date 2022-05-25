@@ -6,11 +6,7 @@ const logger = require('./services/logger')
 const { getShutdownFlag } = require('./services/shutdownState')
 const { getBlockNumber, getRequiredBlockConfirmations, getEvents } = require('./tx/web3')
 const { checkHTTPS, watchdog } = require('./utils/utils')
-const {
-  EXIT_CODES,
-  BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT,
-  MAX_HISTORY_BLOCK_TO_REPROCESS
-} = require('./utils/constants')
+const { EXIT_CODES, MAX_HISTORY_BLOCK_TO_REPROCESS } = require('./utils/constants')
 
 if (process.argv.length < 3) {
   logger.error('Please check the number of arguments, config file was not provided')
@@ -38,21 +34,21 @@ const {
   pollingInterval,
   chain,
   reprocessingOptions,
-  blockPollingLimit
+  blockPollingLimit,
+  syncCheckInterval
 } = config.main
 const lastBlockRedisKey = `${config.id}:lastProcessedBlock`
 const lastReprocessedBlockRedisKey = `${config.id}:lastReprocessedBlock`
 const seenEventsRedisKey = `${config.id}:seenEvents`
 let lastProcessedBlock = Math.max(startBlock - 1, 0)
 let lastReprocessedBlock
-let lastSeenBlockNumber = 0
-let sameBlockNumberCounter = 0
 
 async function initialize() {
   try {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
     web3.currentProvider.urls.forEach(checkHttps(chain))
+    web3.currentProvider.startSyncStateChecker(syncCheckInterval)
 
     await getLastProcessedBlock()
     await getLastReprocessedBlock()
@@ -225,28 +221,6 @@ async function getLastBlockToProcess(web3, bridgeContract) {
     getBlockNumber(web3),
     getRequiredBlockConfirmations(bridgeContract)
   ])
-
-  if (lastBlockNumber < lastSeenBlockNumber) {
-    sameBlockNumberCounter = 0
-    logger.warn({ lastBlockNumber, lastSeenBlockNumber }, 'Received block number less than already seen block')
-    web3.currentProvider.switchToFallbackRPC()
-  } else if (lastBlockNumber === lastSeenBlockNumber) {
-    sameBlockNumberCounter++
-    if (sameBlockNumberCounter > 1) {
-      logger.info({ lastBlockNumber, sameBlockNumberCounter }, 'Received the same block number more than twice')
-      if (sameBlockNumberCounter >= BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT) {
-        sameBlockNumberCounter = 0
-        logger.warn(
-          { lastBlockNumber, n: BLOCK_NUMBER_PROGRESS_ITERATIONS_LIMIT },
-          'Received the same block number for too many times. Probably node is not synced anymore'
-        )
-        web3.currentProvider.switchToFallbackRPC()
-      }
-    }
-  } else {
-    sameBlockNumberCounter = 0
-    lastSeenBlockNumber = lastBlockNumber
-  }
   return lastBlockNumber - requiredBlockConfirmations
 }
 
