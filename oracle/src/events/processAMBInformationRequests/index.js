@@ -35,10 +35,12 @@ Object.keys(asyncCalls).forEach(method => {
 })
 
 function processInformationRequestsBuilder(config) {
-  const { home, foreign, web3ForeignArchive } = config
+  const { home, foreign } = config
 
   let validatorContract = null
   let blockFinder = null
+
+  foreign.web3Archive.currentProvider.startSyncStateChecker(foreign.syncCheckInterval)
 
   return async function processInformationRequests(informationRequests) {
     const txToSend = []
@@ -49,13 +51,15 @@ function processInformationRequestsBuilder(config) {
 
     if (blockFinder === null) {
       rootLogger.debug('Initializing block finder')
-      blockFinder = await makeBlockFinder('foreign', foreign.web3)
+      blockFinder = await makeBlockFinder('foreign', foreign.web3Archive)
     }
 
+    // latest foreign block is requested from an archive RPC, to ensure that it is synced with the network
+    // block confirmations can be requested from the regular JSON RPC
     const foreignBlockNumber =
-      (await getBlockNumber(foreign.web3)) - (await getRequiredBlockConfirmations(foreign.bridgeContract))
+      (await getBlockNumber(foreign.web3Archive)) - (await getRequiredBlockConfirmations(foreign.bridgeContract))
     const homeBlock = await getBlock(home.web3, informationRequests[0].blockNumber)
-    const lastForeignBlock = await getBlock(foreign.web3, foreignBlockNumber)
+    const lastForeignBlock = await getBlock(foreign.web3Archive, foreignBlockNumber)
 
     if (homeBlock.timestamp > lastForeignBlock.timestamp) {
       rootLogger.debug(
@@ -85,7 +89,7 @@ function processInformationRequestsBuilder(config) {
         logger.info({ requestSelector, method: asyncCallMethod, data }, 'Processing async request')
 
         const call = asyncCalls[asyncCallMethod]
-        let [status, result] = await call(web3ForeignArchive, data, foreignClosestBlock).catch(e => {
+        let [status, result] = await call(foreign.web3Archive, data, foreignClosestBlock).catch(e => {
           if (e instanceof HttpListProviderError) {
             throw e
           }

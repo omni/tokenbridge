@@ -32,8 +32,8 @@ if (process.argv.length < 3) {
 
 const config = require(path.join('../config/', process.argv[2]))
 
-const { web3, web3Fallback } = config
-const web3Redundant = ORACLE_TX_REDUNDANCY === 'true' ? config.web3Redundant : web3
+const { web3, web3Fallback, syncCheckInterval } = config.main
+const web3Redundant = ORACLE_TX_REDUNDANCY === 'true' ? config.main.web3Redundant : web3
 
 const nonceKey = `${config.id}:nonce`
 let chainId = 0
@@ -43,6 +43,7 @@ async function initialize() {
     const checkHttps = checkHTTPS(process.env.ORACLE_ALLOW_HTTP_FOR_RPC, logger)
 
     web3.currentProvider.urls.forEach(checkHttps(config.id))
+    web3.currentProvider.startSyncStateChecker(syncCheckInterval)
 
     GasPrice.start(config.id, web3)
 
