@@ -17,6 +17,10 @@ const theme = {
   failed: {
     textColor: '#de4437',
     backgroundColor: 'rgba(222,68,55,.1)'
+  },
+  warning: {
+    textColor: '#ffa758',
+    backgroundColor: 'rgba(222,68,55,.1)'
   }
 }
 export default theme

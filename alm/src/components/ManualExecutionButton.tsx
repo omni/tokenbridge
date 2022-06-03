@@ -14,6 +14,7 @@ import { useStateProvider } from '../state/StateProvider'
 import { signatureToVRS, packSignatures } from '../utils/signatures'
 import { getSuccessExecutionData } from '../utils/getFinalizationEvent'
 import { TransactionReceipt } from 'web3-eth'
+import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
 const ActionButton = styled.button`
   color: var(--button-color);
@@ -30,22 +31,75 @@ interface ManualExecutionButtonParams {
   safeExecutionAvailable: boolean
   messageData: string
   setExecutionData: Function
-  signatureCollected: string[]
+  confirmations: ConfirmationParam[]
   setPendingExecution: Function
+  setError: Function
+  requiredSignatures: number
+  validatorList: string[]
 }
 
 export const ManualExecutionButton = ({
   safeExecutionAvailable,
   messageData,
   setExecutionData,
-  signatureCollected,
-  setPendingExecution
+  confirmations,
+  setPendingExecution,
+  setError,
+  requiredSignatures,
+  validatorList
 }: ManualExecutionButtonParams) => {
-  const { foreign, setError } = useStateProvider()
+  const { foreign } = useStateProvider()
   const { library, activate, account, active } = useWeb3React()
   const [manualExecution, setManualExecution] = useState(false)
   const [allowFailures, setAllowFailures] = useState(false)
-  const notReady = !foreign.bridgeContract || !signatureCollected || !signatureCollected.length
+  const [ready, setReady] = useState(false)
+  const [title, setTitle] = useState('Loading')
+  const [validSignatures, setValidSignatures] = useState<string[]>([])
+
+  useEffect(
+    () => {
+      if (
+        !foreign.bridgeContract ||
+        !foreign.web3 ||
+        !confirmations ||
+        !confirmations.length ||
+        !requiredSignatures ||
+        !validatorList ||
+        !validatorList.length
+      )
+        return
+
+      const signatures = []
+      for (let i = 0; i < confirmations.length && signatures.length < requiredSignatures; i++) {
+        const sig = confirmations[i].signature
+        if (!sig) {
+          continue
+        }
+        const { v, r, s } = signatureToVRS(sig)
+        const signer = foreign.web3.eth.accounts.recover(messageData, `0x${v}`, `0x${r}`, `0x${s}`)
+        if (validatorList.includes(signer)) {
+          signatures.push(sig)
+        }
+      }
+
+      if (signatures.length >= requiredSignatures) {
+        setValidSignatures(signatures.slice(0, requiredSignatures))
+        setTitle('Execute')
+        setReady(true)
+      } else {
+        setTitle('Unavailable')
+      }
+    },
+    [
+      foreign.bridgeContract,
+      foreign.web3,
+      validatorList,
+      requiredSignatures,
+      messageData,
+      setValidSignatures,
+      confirmations
+    ]
+  )
 
   useEffect(
     () => {
@@ -73,9 +127,9 @@ export const ManualExecutionButton = ({
         return
       }
 
-      if (!library || !foreign.bridgeContract || !signatureCollected || !signatureCollected.length) return
+      if (!library || !foreign.bridgeContract || !foreign.web3 || !validSignatures || !validSignatures.length) return
 
-      const signatures = packSignatures(signatureCollected.map(signatureToVRS))
+      const signatures = packSignatures(validSignatures.map(signatureToVRS))
       const messageId = messageData.slice(0, 66)
       const bridge = foreign.bridgeContract
       const executeMethod =
@@ -140,19 +194,20 @@ export const ManualExecutionButton = ({
       foreign.bridgeContract,
       setError,
       messageData,
-      signatureCollected,
       setExecutionData,
       setPendingExecution,
       safeExecutionAvailable,
-      allowFailures
+      allowFailures,
+      foreign.web3,
+      validSignatures
     ]
   )
 
   return (
     <div>
       <div className="is-center">
-        <ActionButton disabled={notReady} className="button outline" onClick={() => setManualExecution(true)}>
-          Execute
+        <ActionButton disabled={!ready} className="button outline" onClick={() => setManualExecution(true)}>
+          {title}
         </ActionButton>
       </div>
       {safeExecutionAvailable && (

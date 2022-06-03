@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { TransactionReceipt } from 'web3-eth'
 import { useMessageConfirmations } from '../hooks/useMessageConfirmations'
 import { MessageObject } from '../utils/web3'
 import styled from 'styled-components'
-import { CONFIRMATIONS_STATUS } from '../config/constants'
+import { CONFIRMATIONS_STATUS, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { CONFIRMATIONS_STATUS_LABEL, CONFIRMATIONS_STATUS_LABEL_HOME } from '../config/descriptions'
 import { SimpleLoading } from './commons/Loading'
 import { ValidatorsConfirmations } from './ValidatorsConfirmations'
@@ -54,7 +54,9 @@ export const ConfirmationsContainer = ({
     home: { name: homeName },
     foreign: { name: foreignName }
   } = useStateProvider()
-  const { requiredSignatures, validatorList } = useValidatorContract({ fromHome, receipt })
+  const src = useValidatorContract(fromHome, receipt ? receipt.blockNumber : 0)
+  const [executionBlockNumber, setExecutionBlockNumber] = useState(0)
+  const dst = useValidatorContract(!fromHome, executionBlockNumber || 'latest')
   const { blockConfirmations } = useBlockConfirmations({ fromHome, receipt })
   const {
     confirmations,
@@ -71,10 +73,20 @@ export const ConfirmationsContainer = ({
     fromHome,
     homeStartBlock,
     foreignStartBlock,
-    requiredSignatures,
-    validatorList,
+    requiredSignatures: src.requiredSignatures,
+    validatorList: src.validatorList,
+    targetValidatorList: dst.validatorList,
     blockConfirmations
   })
+
+  useEffect(
+    () => {
+      if (executionBlockNumber || executionData.status !== VALIDATOR_CONFIRMATION_STATUS.EXECUTION_SUCCESS) return
+
+      setExecutionBlockNumber(executionData.blockNumber)
+    },
+    [executionData.status, executionBlockNumber, executionData.blockNumber]
+  )
 
   const statusLabel = fromHome ? CONFIRMATIONS_STATUS_LABEL_HOME : CONFIRMATIONS_STATUS_LABEL
 
@@ -114,20 +126,22 @@ export const ConfirmationsContainer = ({
           </MultiLine>
         </StatusDescription>
         <ValidatorsConfirmations
-          confirmations={confirmations}
-          requiredSignatures={requiredSignatures}
-          validatorList={validatorList}
+          confirmations={fromHome ? confirmations.filter(c => dst.validatorList.includes(c.validator)) : confirmations}
+          requiredSignatures={dst.requiredSignatures}
+          validatorList={dst.validatorList}
           waitingBlocksResolved={waitingBlocksResolved}
         />
         {signatureCollected && (
           <ExecutionConfirmation
-            messageData={message.data}
+            message={message}
             executionData={executionData}
             isHome={!fromHome}
-            signatureCollected={signatureCollected}
+            confirmations={confirmations}
             setExecutionData={setExecutionData}
             executionEventsFetched={executionEventsFetched}
             setPendingExecution={setPendingExecution}
+            dstRequiredSignatures={dst.requiredSignatures}
+            dstValidatorList={dst.validatorList}
           />
         )}
       </StyledConfirmationContainer>

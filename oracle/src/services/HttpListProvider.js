@@ -1,5 +1,6 @@
 const fetch = require('node-fetch')
 const promiseRetry = require('promise-retry')
+const { utils } = require('web3')
 const { FALLBACK_RPC_URL_SWITCH_TIMEOUT } = require('../utils/constants')
 
 const { onInjected } = require('./injectedLogger')
@@ -39,19 +40,54 @@ function HttpListProvider(urls, options = {}) {
   this.options = { ...defaultOptions, ...options }
   this.currentIndex = 0
   this.lastTimeUsedPrimary = 0
+  this.latestBlock = 0
+  this.syncStateCheckerIntervalId = 0
 
   onInjected(logger => {
     this.logger = logger.child({ module: `HttpListProvider:${this.options.name}` })
   })
 }
 
-HttpListProvider.prototype.switchToFallbackRPC = function() {
-  if (this.urls.length < 2) {
+HttpListProvider.prototype.startSyncStateChecker = function(syncCheckInterval) {
+  if (this.urls.length > 1 && syncCheckInterval > 0 && this.syncStateCheckerIntervalId === 0) {
+    this.syncStateCheckerIntervalId = setInterval(this.checkLatestBlock.bind(this), syncCheckInterval)
+  }
+}
+
+HttpListProvider.prototype.checkLatestBlock = function() {
+  const payload = { jsonrpc: '2.0', id: 1, method: 'eth_blockNumber', params: [] }
+  this.send(payload, (error, result) => {
+    if (error) {
+      this.logger.warn({ oldBlock: this.latestBlock }, 'Failed to request latest block from all RPC urls')
+    } else if (result.error) {
+      this.logger.warn(
+        { oldBlock: this.latestBlock, error: result.error.message },
+        'Failed to make eth_blockNumber request due to unknown error, switching to fallback RPC'
+      )
+      this.switchToFallbackRPC()
+    } else {
+      const blockNumber = utils.hexToNumber(result.result)
+      if (blockNumber > this.latestBlock) {
+        this.logger.debug({ oldBlock: this.latestBlock, newBlock: blockNumber }, 'Updating latest block number')
+        this.latestBlock = blockNumber
+      } else {
+        this.logger.warn(
+          { oldBlock: this.latestBlock, newBlock: blockNumber },
+          'Latest block on the node was not updated since last request, switching to fallback RPC'
+        )
+        this.switchToFallbackRPC()
+      }
+    }
+  })
+}
+
+HttpListProvider.prototype.switchToFallbackRPC = function(index) {
+  const prevIndex = this.currentIndex
+  const newIndex = index || (prevIndex + 1) % this.urls.length
+  if (this.urls.length < 2 || prevIndex === newIndex) {
     return
   }
 
-  const prevIndex = this.currentIndex
-  const newIndex = (prevIndex + 1) % this.urls.length
   this.logger.info(
     { index: newIndex, oldURL: this.urls[prevIndex], newURL: this.urls[newIndex] },
     'Switching to fallback JSON-RPC URL'
@@ -80,11 +116,7 @@ HttpListProvider.prototype.send = async function send(payload, callback) {
 
     // if some of URLs failed to respond, current URL index is updated to the first URL that responded
     if (currentIndex !== index) {
-      this.logger.info(
-        { index, oldURL: this.urls[currentIndex], newURL: this.urls[index] },
-        'Switching to fallback JSON-RPC URL'
-      )
-      this.currentIndex = index
+      this.switchToFallbackRPC(index)
     }
     callback(null, result)
   } catch (e) {

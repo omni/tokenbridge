@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatTimestamp, formatTxHash, getExplorerTxUrl } from '../utils/networks'
 import { useWindowWidth } from '@react-hook/window-size'
-import { SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
+import { RECENT_AGE, SEARCHING_TX, VALIDATOR_CONFIRMATION_STATUS } from '../config/constants'
 import { SimpleLoading } from './commons/Loading'
 import styled from 'styled-components'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
@@ -31,7 +31,9 @@ export const ValidatorsConfirmations = ({
   const getValidatorStatusElement = (validatorStatus = '') => {
     switch (validatorStatus) {
       case VALIDATOR_CONFIRMATION_STATUS.SUCCESS:
-        return <SuccessLabel>{validatorStatus}</SuccessLabel>
+      case VALIDATOR_CONFIRMATION_STATUS.MANUAL:
+      case VALIDATOR_CONFIRMATION_STATUS.FAILED_VALID:
+        return <SuccessLabel>{VALIDATOR_CONFIRMATION_STATUS.SUCCESS}</SuccessLabel>
       case VALIDATOR_CONFIRMATION_STATUS.FAILED:
         return <RedLabel>{validatorStatus}</RedLabel>
       case VALIDATOR_CONFIRMATION_STATUS.PENDING:
@@ -58,26 +60,28 @@ export const ValidatorsConfirmations = ({
           </tr>
         </Thead>
         <tbody>
-          {validatorList.map((validator, i) => {
-            const filteredConfirmation = confirmations.filter(c => c.validator === validator)
-            const confirmation = filteredConfirmation.length > 0 ? filteredConfirmation[0] : null
-            const displayedStatus = confirmation && confirmation.status ? confirmation.status : ''
-            const explorerLink = confirmation && confirmation.txHash ? getExplorerTxUrl(confirmation.txHash, true) : ''
-            const elementIfNoTimestamp =
-              displayedStatus !== VALIDATOR_CONFIRMATION_STATUS.WAITING &&
-              displayedStatus !== VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED ? (
-                (displayedStatus === VALIDATOR_CONFIRMATION_STATUS.UNDEFINED || displayedStatus === '') &&
-                waitingBlocksResolved ? (
-                  SEARCHING_TX
-                ) : (
-                  <SimpleLoading />
-                )
-              ) : (
-                ''
-              )
+          {confirmations.map((confirmation, i) => {
+            const displayedStatus = confirmation.status
+            const explorerLink = getExplorerTxUrl(confirmation.txHash, true)
+            let elementIfNoTimestamp: any = <SimpleLoading />
+            switch (displayedStatus) {
+              case '':
+              case VALIDATOR_CONFIRMATION_STATUS.UNDEFINED:
+                if (waitingBlocksResolved) {
+                  elementIfNoTimestamp = SEARCHING_TX
+                }
+                break
+              case VALIDATOR_CONFIRMATION_STATUS.WAITING:
+              case VALIDATOR_CONFIRMATION_STATUS.NOT_REQUIRED:
+                elementIfNoTimestamp = ''
+                break
+              case VALIDATOR_CONFIRMATION_STATUS.MANUAL:
+                elementIfNoTimestamp = RECENT_AGE
+                break
+            }
             return (
               <tr key={i}>
-                <td>{windowWidth < 850 ? formatTxHash(validator) : validator}</td>
+                <td>{windowWidth < 850 ? formatTxHash(confirmation.validator) : confirmation.validator}</td>
                 <StatusTd className="text-center">{getValidatorStatusElement(displayedStatus)}</StatusTd>
                 <AgeTd className="text-center">
                   {confirmation && confirmation.timestamp > 0 ? (
@@ -94,7 +98,7 @@ export const ValidatorsConfirmations = ({
         </tbody>
       </table>
       <RequiredConfirmations>
-        {requiredSignatures} of {validatorList.length} confirmations required
+        At least <strong>{requiredSignatures}</strong> of <strong>{validatorList.length}</strong> confirmations required
       </RequiredConfirmations>
     </div>
   )

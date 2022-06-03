@@ -29,17 +29,16 @@ export interface useMessageConfirmationsParams {
   foreignStartBlock: Maybe<number>
   requiredSignatures: number
   validatorList: string[]
+  targetValidatorList: string[]
   blockConfirmations: number
 }
 
-export interface BasicConfirmationParam {
+export interface ConfirmationParam {
   validator: string
   status: string
-}
-
-export interface ConfirmationParam extends BasicConfirmationParam {
   txHash: string
   timestamp: number
+  signature?: string
 }
 
 export interface ExecutionData {
@@ -48,6 +47,7 @@ export interface ExecutionData {
   txHash: string
   timestamp: number
   executionResult: boolean
+  blockNumber: number
 }
 
 export const useMessageConfirmations = ({
@@ -58,6 +58,7 @@ export const useMessageConfirmations = ({
   foreignStartBlock,
   requiredSignatures,
   validatorList,
+  targetValidatorList,
   blockConfirmations
 }: useMessageConfirmationsParams) => {
   const { home, foreign } = useStateProvider()
@@ -65,7 +66,7 @@ export const useMessageConfirmations = ({
   const [status, setStatus] = useState(CONFIRMATIONS_STATUS.UNDEFINED)
   const [waitingBlocks, setWaitingBlocks] = useState(false)
   const [waitingBlocksResolved, setWaitingBlocksResolved] = useState(false)
-  const [signatureCollected, setSignatureCollected] = useState<boolean | string[]>(false)
+  const [signatureCollected, setSignatureCollected] = useState(false)
   const [executionEventsFetched, setExecutionEventsFetched] = useState(false)
   const [collectedSignaturesEvent, setCollectedSignaturesEvent] = useState<Maybe<EventData>>(null)
   const [executionData, setExecutionData] = useState<ExecutionData>({
@@ -73,7 +74,8 @@ export const useMessageConfirmations = ({
     validator: '',
     txHash: '',
     timestamp: 0,
-    executionResult: false
+    executionResult: false,
+    blockNumber: 0
   })
   const [waitingBlocksForExecution, setWaitingBlocksForExecution] = useState(false)
   const [waitingBlocksForExecutionResolved, setWaitingBlocksForExecutionResolved] = useState(false)
@@ -140,10 +142,9 @@ export const useMessageConfirmations = ({
   // The collected signature event is only fetched once the signatures are collected on tx from home to foreign, to calculate if
   // the execution tx on the foreign network is waiting for block confirmations
   // This is executed if the message is in Home to Foreign direction only
-  const hasCollectedSignatures = !!signatureCollected // true or string[]
   useEffect(
     () => {
-      if (!fromHome || !receipt || !home.web3 || !home.bridgeContract || !hasCollectedSignatures) return
+      if (!fromHome || !receipt || !home.web3 || !home.bridgeContract || !signatureCollected) return
 
       let timeoutId: number
       let isCancelled = false
@@ -179,7 +180,7 @@ export const useMessageConfirmations = ({
         isCancelled = true
       }
     },
-    [fromHome, home.bridgeContract, home.web3, message.data, receipt, hasCollectedSignatures]
+    [fromHome, home.bridgeContract, home.web3, message.data, receipt, signatureCollected]
   )
 
   // Check if the responsible validator is waiting for block confirmations to execute the message on foreign network
@@ -252,6 +253,35 @@ export const useMessageConfirmations = ({
       let timeoutId: number
       let isCancelled = false
 
+      if (fromHome) {
+        if (!targetValidatorList || !targetValidatorList.length) return
+        const msgHash = home.web3.utils.sha3(message.data)!
+        const allValidators = [...validatorList, ...targetValidatorList].filter((v, i, s) => s.indexOf(v) === i)
+        const manualConfirmations = []
+        for (let i = 0; i < allValidators.length; i++) {
+          try {
+            const overrideSignatures: {
+              [key: string]: string
+            } = require(`../snapshots/signatures_${allValidators[i]}.json`)
+            if (overrideSignatures[msgHash]) {
+              console.log(`Adding manual signature from ${allValidators[i]}`)
+              manualConfirmations.push({
+                status: VALIDATOR_CONFIRMATION_STATUS.MANUAL,
+                validator: allValidators[i],
+                timestamp: 0,
+                txHash: '',
+                signature: overrideSignatures[msgHash]
+              })
+            } else {
+              console.log(`No manual signature from ${allValidators[i]} was found`)
+            }
+          } catch (e) {
+            console.log(`Signatures overrides are not present for ${allValidators[i]}`)
+          }
+        }
+        setConfirmations(manualConfirmations)
+      }
+
       getConfirmationsForTx(
         message.data,
         home.web3,
@@ -284,7 +314,8 @@ export const useMessageConfirmations = ({
       home.bridgeContract,
       requiredSignatures,
       waitingBlocksResolved,
-      homeStartBlock
+      homeStartBlock,
+      targetValidatorList
     ]
   )
 
@@ -343,7 +374,10 @@ export const useMessageConfirmations = ({
   // Sets the message status based in the collected information
   useEffect(
     () => {
-      if (executionData.status === VALIDATOR_CONFIRMATION_STATUS.SUCCESS && existsConfirmation(confirmations)) {
+      if (
+        executionData.status === VALIDATOR_CONFIRMATION_STATUS.EXECUTION_SUCCESS &&
+        existsConfirmation(confirmations)
+      ) {
         const newStatus = executionData.executionResult
           ? CONFIRMATIONS_STATUS.SUCCESS
           : CONFIRMATIONS_STATUS.SUCCESS_MESSAGE_FAILED
