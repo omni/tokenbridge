@@ -206,7 +206,6 @@ services:
       --JsonRpc.Enabled true
       --JsonRpc.Host 0.0.0.0
       --Init.StoreReceipts false
-      --TxPool.Size 8192
       --Pruning.Mode Hybrid
       --Pruning.CacheMb 1024
       --Sync.FastSync true
