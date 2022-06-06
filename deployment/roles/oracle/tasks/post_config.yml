@@ -18,7 +18,7 @@
 
 - name: Get validator address for AMB
   become_user: "{{ compose_service_user }}"
-  shell: docker-compose run --rm -e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="{{ AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
+  shell: docker-compose run --rm -e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="{{ AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_amb_affirmation
   args:
     chdir: "{{ bridge_path }}/oracle"
   register: AMBVADDRESS
