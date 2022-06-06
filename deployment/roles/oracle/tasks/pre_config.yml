@@ -14,6 +14,6 @@
 
 - name: Copy docker-compose file
   copy:
-    src: ../../../../oracle/docker-compose-combined.yml
+    src: ../../../../oracle/docker-compose-amb.yml
     dest: "{{ bridge_path }}/oracle/docker-compose.yml"
     mode: '0755'

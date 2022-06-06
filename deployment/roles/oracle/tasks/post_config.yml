@@ -1,12 +1,4 @@
 ---
-- name: Get blocks for TokenBridge
-  become_user: "{{ compose_service_user }}"
-  shell: docker-compose run --rm --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_affirmation
-  args:
-    chdir: "{{ bridge_path }}/oracle"
-  register: TBBLOCKS
-  when: (TB_HOME_START_BLOCK is not defined) or (TB_FOREIGN_START_BLOCK is not defined)
-
 - name: Get blocks for AMB
   become_user: "{{ compose_service_user }}"
   shell: docker-compose run --rm --entrypoint "node scripts/getValidatorStartBlocks.js" bridge_amb_affirmation
@@ -14,15 +6,6 @@
     chdir: "{{ bridge_path }}/oracle"
   register: AMBBLOCKS
   when: (AMB_HOME_START_BLOCK is not defined) or (AMB_FOREIGN_START_BLOCK is not defined)
-
-- name: Write blocks for TokenBridge
-  blockinfile:
-    path: "{{ bridge_path }}/oracle/.env"
-    marker: "## {mark} Calculated by scripts/getValidatorStartBlocks.js"
-    block: |
-      TB_HOME_START_BLOCK={{ (TBBLOCKS.stdout | from_json).homeStartBlock }}
-      TB_FOREIGN_START_BLOCK={{ (TBBLOCKS.stdout | from_json).foreignStartBlock }}
-  when: (TB_HOME_START_BLOCK is not defined) or (TB_FOREIGN_START_BLOCK is not defined)
 
 - name: Write blocks for AMB
   blockinfile:
@@ -32,17 +15,6 @@
       AMB_HOME_START_BLOCK={{ (AMBBLOCKS.stdout | from_json).homeStartBlock }}
       AMB_FOREIGN_START_BLOCK={{ (AMBBLOCKS.stdout | from_json).foreignStartBlock }}
   when: (AMB_HOME_START_BLOCK is not defined) or (AMB_FOREIGN_START_BLOCK is not defined)
-
-- name: Get validator address for TokenBridge
-  become_user: "{{ compose_service_user }}"
-  shell: docker-compose run --rm -e ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="{{ TB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY }}" --entrypoint "node scripts/privateKeyToAddress.js" bridge_affirmation
-  args:
-    chdir: "{{ bridge_path }}/oracle"
-  register: TBVADDRESS
-
-- name: Set TB_ORACLE_VALIDATOR_ADDRESS variable
-  set_fact:
-    TB_ORACLE_VALIDATOR_ADDRESS: "{{ TBVADDRESS.stdout }}"
 
 - name: Get validator address for AMB
   become_user: "{{ compose_service_user }}"

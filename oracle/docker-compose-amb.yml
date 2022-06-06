@@ -1,97 +1,230 @@
 ---
 version: '2.4'
-services:
-  rabbit:
-    extends:
-      file: docker-compose.yml
-      service: rabbit
-    networks:
-      - net_rabbit_bridge_information
-  redis:
-    extends:
-      file: docker-compose.yml
-      service: redis
-    networks:
-      - net_db_bridge_information
-  bridge_request:
-    extends:
-      file: docker-compose.yml
-      service: bridge_request
-    networks:
-      - net_db_bridge_request
-      - net_rabbit_bridge_request
-  bridge_collected:
-    extends:
-      file: docker-compose.yml
-      service: bridge_collected
-    networks:
-      - net_db_bridge_request
-      - net_rabbit_bridge_request
-  bridge_affirmation:
-    extends:
-      file: docker-compose.yml
-      service: bridge_affirmation
-    networks:
-      - net_db_bridge_request
-      - net_rabbit_bridge_request
-  bridge_information:
-    cpus: 0.1
-    mem_limit: 500m
-    image: poanetwork/tokenbridge-oracle:latest
-    env_file: ./.env
-    environment:
-      - NODE_ENV=production
-      - ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}
-    restart: unless-stopped
-    entrypoint: yarn watcher:information-request
-    networks:
-      - net_db_bridge_information
-      - net_rabbit_bridge_information
-  bridge_senderhome:
-    extends:
-      file: docker-compose.yml
-      service: bridge_senderhome
-    networks:
-      - net_db_bridge_request
-      - net_rabbit_bridge_request
-  bridge_senderforeign:
-    extends:
-      file: docker-compose.yml
-      service: bridge_senderforeign
-    networks:
-      - net_db_bridge_request
-      - net_rabbit_bridge_request
-  bridge_shutdown:
-    extends:
-      file: docker-compose.yml
-      service: bridge_shutdown
-    networks:
-      - net_db_bridge_shutdown
-
 networks:
-  net_db_bridge_request:
-    driver: bridge
-  net_db_bridge_collected:
-    driver: bridge
-  net_db_bridge_affirmation:
-    driver: bridge
-  net_db_bridge_information:
-    driver: bridge
-  net_db_bridge_senderhome:
-    driver: bridge
-  net_db_bridge_senderforeign:
-    driver: bridge
-  net_rabbit_bridge_request:
-    driver: bridge
-  net_db_bridge_shutdown:
-    driver: bridge
-  net_rabbit_bridge_collected:
-    driver: bridge
-  net_rabbit_bridge_affirmation:
-    driver: bridge
-  net_rabbit_bridge_information:
-    driver: bridge
-  net_rabbit_bridge_senderhome:
-    driver: bridge
-  net_rabbit_bridge_senderforeign:
-    driver: bridge
+  net_db_bridge_amb_green: {driver: bridge}
+  net_db_bridge_amb_red: {driver: bridge}
+  net_rabbit_bridge_amb_green: {driver: bridge}
+  net_rabbit_bridge_amb_red: {driver: bridge}
+  net_ne_bridge_amb_red: {driver: bridge}
+  net_ne_bridge_amb_green: {driver: bridge}
+services:
+  bridge_amb_affirmation:
+    cpus: 0.1
+    entrypoint: yarn watcher:affirmation-request
+    env_file: ./.env
+    environment: [NODE_ENV=production,
+                  ORACLE_BRIDGE_MODE=ARBITRARY_MESSAGE,
+                  'COMMON_HOME_BRIDGE_ADDRESS=${AMB_HOME_BRIDGE_ADDRESS}',
+                  'COMMON_FOREIGN_BRIDGE_ADDRESS=${AMB_FOREIGN_BRIDGE_ADDRESS}',
+                  'ORACLE_QUEUE_URL=${AMB_QUEUE_URL}',
+                  'ORACLE_REDIS_URL=${AMB_REDIS_URL}',
+                  'ORACLE_FOREIGN_START_BLOCK=${AMB_FOREIGN_START_BLOCK}',
+                  'ORACLE_VALIDATOR_ADDRESS=${AMB_ORACLE_VALIDATOR_ADDRESS}']
+    image: poanetwork/tokenbridge-oracle:latest
+    logging:
+      driver: syslog
+      options: {tag: '{{.Name}}/{{.ID}}'}
+    mem_limit: 500m
+    networks: [net_db_bridge_amb_green, 
+               net_rabbit_bridge_amb_green,
+               net_ne_bridge_amb_green]
+    restart: unless-stopped
+    depends_on:
+      - redis-amb
+      - rabbit-amb
+  bridge_amb_information:
+    cpus: 0.1
+    entrypoint: yarn watcher:information-request
+    env_file: ./.env
+    environment: [NODE_ENV=production, 
+                  ORACLE_BRIDGE_MODE=ARBITRARY_MESSAGE,
+                  'COMMON_HOME_BRIDGE_ADDRESS=${AMB_HOME_BRIDGE_ADDRESS}',
+                  'COMMON_FOREIGN_BRIDGE_ADDRESS=${AMB_FOREIGN_BRIDGE_ADDRESS}',
+                  'ORACLE_QUEUE_URL=${AMB_QUEUE_URL}',
+                  'ORACLE_REDIS_URL=${AMB_REDIS_URL}',
+                  'ORACLE_HOME_START_BLOCK=${AMB_HOME_START_BLOCK}',
+                  'ORACLE_VALIDATOR_ADDRESS=${AMB_ORACLE_VALIDATOR_ADDRESS}']
+    image: poanetwork/tokenbridge-oracle:latest
+    logging:
+      driver: syslog
+      options: {tag: '{{.Name}}/{{.ID}}'}
+    mem_limit: 500m
+    networks: [net_db_bridge_amb_green,
+               net_rabbit_bridge_amb_green,
+               net_ne_bridge_amb_green]
+    restart: unless-stopped
+    depends_on:
+      - redis-amb
+      - rabbit-amb
+  bridge_amb_request:
+    cpus: 0.1
+    entrypoint: yarn watcher:signature-request
+    env_file: ./.env
+    environment: [NODE_ENV=production, 
+                  ORACLE_BRIDGE_MODE=ARBITRARY_MESSAGE,
+                  'COMMON_HOME_BRIDGE_ADDRESS=${AMB_HOME_BRIDGE_ADDRESS}',
+                  'COMMON_FOREIGN_BRIDGE_ADDRESS=${AMB_FOREIGN_BRIDGE_ADDRESS}',
+                  'ORACLE_QUEUE_URL=${AMB_QUEUE_URL}',
+                  'ORACLE_REDIS_URL=${AMB_REDIS_URL}', 
+                  'ORACLE_HOME_START_BLOCK=${AMB_HOME_START_BLOCK}',
+                  'ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}']
+    image: poanetwork/tokenbridge-oracle:latest
+    logging:
+      driver: syslog
+      options: {tag: '{{.Name}}/{{.ID}}'}
+    mem_limit: 500m
+    networks: [net_db_bridge_amb_red, 
+               net_rabbit_bridge_amb_red,
+               net_ne_bridge_amb_red]
+    restart: unless-stopped
+    depends_on:
+      - redis-amb
+      - rabbit-amb
+  bridge_amb_shutdown:
+    cpus: 0.1
+    entrypoint: yarn manager:shutdown
+    env_file: ./.env
+    environment: [NODE_ENV=production,
+                  ORACLE_BRIDGE_MODE=ARBITRARY_MESSAGE,
+                  'ORACLE_REDIS_URL=${AMB_REDIS_URL}',
+                  'ORACLE_SHUTDOWN_SERVICE_POLLING_INTERVAL=${AMB_SHUTDOWN_SERVICE_POLLING_INTERVAL}',
+                  'ORACLE_SIDE_RPC_URL=${AMB_SIDE_RPC_URL}',
+                  'ORACLE_SHUTDOWN_CONTRACT_ADDRESS=${AMB_SHUTDOWN_CONTRACT_ADDRESS}',
+                  'ORACLE_SHUTDOWN_CONTRACT_METHOD=${AMB_SHUTDOWN_CONTRACT_METHOD}']
+    image: poanetwork/tokenbridge-oracle:latest
+    logging:
+      driver: syslog
+      options: {tag: '{{.Name}}/{{.ID}}'}
+    mem_limit: 500m
+    networks: [net_db_bridge_amb_green]
+    restart: unless-stopped
+    depends_on:
+      - redis-amb
+  bridge_amb_senderhome:
+    cpus: 0.1
+    entrypoint: yarn sender:home
+    env_file: ./.env
+    environment: [NODE_ENV=production,
+                  ORACLE_BRIDGE_MODE=ARBITRARY_MESSAGE,
+                  'COMMON_HOME_BRIDGE_ADDRESS=${AMB_HOME_BRIDGE_ADDRESS}',
+                  'COMMON_FOREIGN_BRIDGE_ADDRESS=${AMB_FOREIGN_BRIDGE_ADDRESS}',
+                  'ORACLE_QUEUE_URL=${AMB_QUEUE_URL}',
+                  'ORACLE_REDIS_URL=${AMB_REDIS_URL}',
+                  'ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}']
+    image: poanetwork/tokenbridge-oracle:latest
+    logging:
+      driver: syslog
+      options: {tag: '{{.Name}}/{{.ID}}'}
+    mem_limit: 500m
+    networks: [net_db_bridge_amb_red, 
+               net_rabbit_bridge_amb_red,
+               net_ne_bridge_amb_red]
+    restart: unless-stopped
+    depends_on:
+      - redis-amb
+      - rabbit-amb
+
+  # bridge_amb_collected:
+  #   cpus: 0.1
+  #   entrypoint: yarn watcher:collected-signatures
+  #   env_file: ./.env
+  #   environment: [NODE_ENV=production, 
+  #                 ORACLE_BRIDGE_MODE=ARBITRARY_MESSAGE,
+  #                 'COMMON_HOME_BRIDGE_ADDRESS=${AMB_HOME_BRIDGE_ADDRESS}',
+  #                 'COMMON_FOREIGN_BRIDGE_ADDRESS=${AMB_FOREIGN_BRIDGE_ADDRESS}',
+  #                 'ORACLE_QUEUE_URL=${AMB_QUEUE_URL}',
+  #                 'ORACLE_REDIS_URL=${AMB_REDIS_URL}',
+  #                 'ORACLE_HOME_START_BLOCK=${AMB_HOME_START_BLOCK}',
+  #                 'ORACLE_ALWAYS_RELAY_SIGNATURES=true'
+  #                 'ORACLE_HOME_TO_FOREIGN_ALLOWANCE_LIST=/mono/oracle/access-lists/allowance_list.txt',
+  #                 'ORACLE_VALIDATOR_ADDRESS=${ORACLE_VALIDATOR_ADDRESS}']
+  #   image: poanetwork/tokenbridge-oracle:latest
+  #   volumes:
+  #     - '~/amb_bridge_data/access-lists/allowance_list.txt:/mono/oracle/access-lists/allowance_list.txt'
+  #   logging:
+  #     driver: syslog
+  #     options: {tag: '{{.Name}}/{{.ID}}'}
+  #   mem_limit: 500m
+  #   networks: [net_db_bridge_amb_green,
+  #              net_rabbit_bridge_amb_green,
+  #              net_ne_bridge_amb_green]
+  #   restart: unless-stopped
+  # bridge_amb_senderforeign:
+  #   cpus: 0.1
+  #   entrypoint: yarn sender:foreign
+  #   env_file: ./.env
+  #   environment: [NODE_ENV=production, 
+  #                 ORACLE_BRIDGE_MODE=ARBITRARY_MESSAGE,
+  #                 'COMMON_HOME_BRIDGE_ADDRESS=${AMB_HOME_BRIDGE_ADDRESS}',
+  #                 'COMMON_FOREIGN_BRIDGE_ADDRESS=${AMB_FOREIGN_BRIDGE_ADDRESS}',
+  #                 'ORACLE_QUEUE_URL=${AMB_QUEUE_URL}',
+  #                 'ORACLE_REDIS_URL=${AMB_REDIS_URL}',
+  #                 'ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=${ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY}']
+  #   image: poanetwork/tokenbridge-oracle:latest
+  #   logging:
+  #     driver: syslog
+  #     options: {tag: '{{.Name}}/{{.ID}}'}
+  #   mem_limit: 500m
+  #   networks: [net_db_bridge_amb_red, 
+  #              net_rabbit_bridge_amb_red]
+  #   restart: unless-stopped
+
+  rabbit-amb:
+    cpus: 0.3
+    environment: [RABBITMQ_NODENAME=node@rabbit-amb]
+    hostname: rabbit-amb
+    image: rabbitmq:3
+    logging:
+      driver: syslog
+      options: {tag: '{{.Name}}/{{.ID}}'}
+    mem_limit: 500m
+    networks: [net_rabbit_bridge_amb_red,
+               net_rabbit_bridge_amb_green]
+    restart: unless-stopped
+    volumes: ['~/amb_bridge_data/rabbitmq:/var/lib/rabbitmq/mnesia']
+  redis-amb:
+    command: [redis-server, --appendonly, 'yes']
+    cpus: 0.1
+    hostname: redis-amb
+    image: redis:4
+    logging:
+      driver: syslog
+      options: {tag: '{{.Name}}/{{.ID}}'}
+    mem_limit: 500m
+    networks: [net_db_bridge_amb_red, 
+               net_db_bridge_amb_green]
+    restart: unless-stopped
+    volumes: ['~/amb_bridge_data/redis:/data']
+  ne:
+    container_name: ne
+    image: nethermind/nethermind:latest
+    networks: [net_ne_bridge_amb_green,
+               net_ne_bridge_amb_red]
+    command:
+      --config xdai
+      --baseDbPath /nethermind
+      --JsonRpc.Enabled true
+      --JsonRpc.Host 0.0.0.0
+      --Init.StoreReceipts false
+      --TxPool.Size 8192
+      --Pruning.Mode Hybrid
+      --Pruning.CacheMb 1024
+      --Sync.FastSync true
+      --Sync.FastBlocks true
+      --Sync.DownloadBodiesInFastSync false
+      --Sync.DownloadReceiptsInFastSync false
+      --Sync.DownloadHeadersInFastSync false
+    volumes:
+      - ~/ne-data/logs:/nethermind/logs
+      - ~/ne-data/nethermind_db:/nethermind/nethermind_db
+    expose:
+      - "8545"
+    ports:
+      - "30304:30303/tcp"
+      - "30304:30303/udp"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "1"

@@ -14,8 +14,6 @@ WORKDIR="{{ '/home/' + compose_service_user | default('poadocker') + '/' + bridg
 
 #Getting path to private key file and variable name for parsing key file
 keyfile="{{ keyfile_path }}"
-tbvaddr="TB_ORACLE_VALIDATOR_ADDRESS="
-tbvkey="TB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="
 ambvaddr="AMB_ORACLE_VALIDATOR_ADDRESS="
 ambvkey="AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="
 
@@ -23,12 +21,6 @@ ambvkey="AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY="
 while read -r line
 do
     case $line in
-        $tbvaddr*)
-            tbvaddr=${line#$tbvaddr}
-            ;;
-        $tbvkey*)
-            tbvkey=${line#$tbvkey}
-            ;;
         $ambvaddr*)
             ambvaddr=${line#$ambvaddr}
             ;;
@@ -44,8 +36,6 @@ start(){
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose down -v
     sudo -u "{{ compose_service_user }}" /usr/local/bin/docker-compose rm -fv
     sudo -u "{{ compose_service_user }}" \
-      TB_ORACLE_VALIDATOR_ADDRESS=$tbvaddr \
-      TB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$tbvkey \
       AMB_ORACLE_VALIDATOR_ADDRESS=$ambvaddr \
       AMB_ORACLE_VALIDATOR_ADDRESS_PRIVATE_KEY=$ambvkey \
       /usr/local/bin/docker-compose up --detach
