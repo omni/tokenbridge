@@ -1,6 +1,6 @@
 runtime: nodejs12
 env: standard
-service: alm-gusandbox-ropsten
+service: alm-gusandbox-goerli
 
 handlers:
   - url: /static
