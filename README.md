@@ -19,7 +19,7 @@ Sub-repositories maintained within this monorepo are listed below.
 
 | Sub-repository | Description |
 | --- | --- |
-| [Oracle](oracle/README.md) | Oracle responsible for listening to bridge related events and authorizing asset transfers. |
+| [Oracle](oracle/README.md) | Responsible for listening to bridge related events and authorizing asset transfers. |
 | [Monitor](monitor/README.md) | Tool for checking balances and unprocessed events in bridged networks. |
 | [Deployment](deployment/README.md) | Ansible playbooks for deploying cross-chain bridges. |
 | [Oracle-E2E](oracle-e2e/README.md) | End to end tests for the Oracle |
