@@ -17,6 +17,11 @@ const OLD_AMB_USER_REQUEST_FOR_SIGNATURE_ABI = [
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        name: 'messageId',
+        type: 'bytes32'
+      },
+      {
         indexed: false,
         name: 'encodedData',
         type: 'bytes'
@@ -31,6 +36,11 @@ const OLD_AMB_USER_REQUEST_FOR_AFFIRMATION_ABI = [
   {
     anonymous: false,
     inputs: [
+      {
+        indexed: true,
+        name: 'messageId',
+        type: 'bytes32'
+      },
       {
         indexed: false,
         name: 'encodedData',
