@@ -40,20 +40,10 @@ jobs:
       - name: Build
         run: yarn build:alm --if-present
         env:
-          COMMON_HOME_BRIDGE_ADDRESS: '0xc39eAbae09273F00Ec7e56B6a8C189437a61C9C8'
-          COMMON_FOREIGN_BRIDGE_ADDRESS: '0x0F806D8dd8bb02Ad9dd9bA0e8e351B4319cc45e4'
-          COMMON_HOME_RPC_URL: 'https://sandbox1.japanopenchain.org:8545/'
-          COMMON_FOREIGN_RPC_URL: 'https://goerli.infura.io/v3/de84f086752247089b65994fc7de3619'
-          ALM_HOME_NETWORK_NAME: 'G.U.Sandbox'
-          ALM_FOREIGN_NETWORK_NAME: 'Goerli'
-          ALM_HOME_EXPLORER_TX_TEMPLATE: 'https://sandbox1.japanopenchain.org/tx/%s'
-          ALM_FOREIGN_EXPLORER_TX_TEMPLATE: 'https://goerli.etherscan.io/tx/%s'
-          ALM_HOME_EXPLORER_API: 'https://sandbox1.japanopenchain.org/api'
-          ALM_FOREIGN_EXPLORER_API: 'https://api-goerli.etherscan.io/?apikey=GMTSS17Q7R3H5W4CVUHUYD8MX48PIAPKTW'
           REACT_APP_COMMON_HOME_BRIDGE_ADDRESS: '0xc39eAbae09273F00Ec7e56B6a8C189437a61C9C8'
           REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS: '0x0F806D8dd8bb02Ad9dd9bA0e8e351B4319cc45e4'
           REACT_APP_COMMON_HOME_RPC_URL: 'https://sandbox1.japanopenchain.org:8545/'
-          REACT_APP_COMMON_FOREIGN_RPC_URL: 'https://goerli.infura.io/v3/de84f086752247089b65994fc7de3619'
+          REACT_APP_COMMON_FOREIGN_RPC_URL: 'https://eth-goerli.g.alchemy.com/v2/HkYkNKeP9ObMS1ukI2TmWtBTdzSBwT-k'
           REACT_APP_ALM_HOME_NETWORK_NAME: 'G.U.Sandbox'
           REACT_APP_ALM_FOREIGN_NETWORK_NAME: 'Goerli'
           REACT_APP_ALM_HOME_EXPLORER_TX_TEMPLATE: 'https://sandbox1.japanopenchain.org/tx/%s'
