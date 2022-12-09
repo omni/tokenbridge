@@ -1,0 +1,12 @@
+dispatch:
+  - url: dev.nft-bridge.gu.net/*
+    service: default
+
+  - url: test.nft-bridge.gu.net/*
+    service: nft-bridge-test
+
+  - url: alm.dev.nft-bridge.gu.net/*
+    service: alm-gusandbox-goerli
+
+  - url: alm.test.nft-bridge.gu.net/*
+    service: alm-gusandbox-goerli-test
