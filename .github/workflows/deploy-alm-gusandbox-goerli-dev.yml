@@ -1,4 +1,4 @@
-name: Deploy ALM GUSandbox-Goerli
+name: Deploy ALM GUSandbox-Goerli to Dev environment
 on:
   push:
     branches: ['main', 'dev-duy-test-ci']
@@ -58,7 +58,7 @@ jobs:
           service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
 
       - name: Deploy to App Engine
-        run: gcloud app deploy --appyaml=alm-gusandbox-goerli-app.yaml
+        run: gcloud app deploy alm-gusandbox-goerli-app-dev.yaml
 
       - name: Delete old versions
         run: gcloud app versions list --filter="service=${{env.SERVICE_ID}}" --format="value(version.id)" --sort-by="~version.createTime" | tail -n +11 | xargs -r gcloud app versions delete # Only keep 10 latest versions
