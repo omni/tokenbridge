@@ -1,0 +1,64 @@
+name: Deploy ALM GUSandbox-Goerli
+on:
+  push:
+    branches: ['main', 'dev-duy-test-ci']
+
+env:
+  PROJECT_ID: gu-bridge
+  SERVICE_ID: alm-gusandbox-goerli
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install
+        run: yarn initialize --frozen-lockfile
+
+      - name: Build
+        run: yarn build:alm --if-present
+        env:
+          REACT_APP_COMMON_HOME_BRIDGE_ADDRESS: '0xc39eAbae09273F00Ec7e56B6a8C189437a61C9C8'
+          REACT_APP_COMMON_FOREIGN_BRIDGE_ADDRESS: '0x0F806D8dd8bb02Ad9dd9bA0e8e351B4319cc45e4'
+          REACT_APP_COMMON_HOME_RPC_URL: 'https://sandbox1.japanopenchain.org:8545/'
+          REACT_APP_COMMON_FOREIGN_RPC_URL: 'https://eth-goerli.g.alchemy.com/v2/HkYkNKeP9ObMS1ukI2TmWtBTdzSBwT-k'
+          REACT_APP_ALM_HOME_NETWORK_NAME: 'G.U.Sandbox'
+          REACT_APP_ALM_FOREIGN_NETWORK_NAME: 'Goerli'
+          REACT_APP_ALM_HOME_EXPLORER_TX_TEMPLATE: 'https://sandbox1.japanopenchain.org/tx/%s'
+          REACT_APP_ALM_FOREIGN_EXPLORER_TX_TEMPLATE: 'https://goerli.etherscan.io/tx/%s'
+          REACT_APP_ALM_HOME_EXPLORER_API: 'https://sandbox1.japanopenchain.org/api'
+          REACT_APP_ALM_FOREIGN_EXPLORER_API: 'https://api-goerli.etherscan.io/?apikey=GMTSS17Q7R3H5W4CVUHUYD8MX48PIAPKTW'
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Deploy to App Engine
+        run: gcloud app deploy --appyaml=alm-gusandbox-goerli-app.yaml
+
+      - name: Delete old versions
+        run: gcloud app versions list --filter="service=${{env.SERVICE_ID}}" --format="value(version.id)" --sort-by="~version.createTime" | tail -n +11 | xargs -r gcloud app versions delete # Only keep 10 latest versions
