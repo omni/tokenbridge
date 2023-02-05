@@ -5,7 +5,7 @@ export const TRANSACTION_STATUS_DESCRIPTION: { [key: string]: string } = {
   SUCCESS_MULTIPLE_MESSAGES: 'was initiated %t and contains several bridge messages. Specify one of them:',
   SUCCESS_ONE_MESSAGE: 'was initiated %t',
   SUCCESS_NO_MESSAGES:
-    'successfully mined %t but it does not seem to contain any request to the bridge, \nso nothing needs to be confirmed by the validators. \nIf you are sure that the transaction should contain a request to the bridge,\ncontact to the validators by \nmessaging on %linkhttps://forum.poa.network/c/support',
+    'successfully mined %t but it does not seem to contain any request to the bridge, \nso nothing needs to be confirmed by the validators.',
   FAILED: 'failed %t',
   NOT_FOUND:
     'Transaction not found. \n1. Check that the transaction hash is correct. \n2. Wait several blocks for the transaction to be\nmined, gas price affects mining speed.'

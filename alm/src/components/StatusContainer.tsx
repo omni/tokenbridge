@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import styled from 'styled-components'
 import { useHistory, useParams } from 'react-router-dom'
 import { useTransactionStatus } from '../hooks/useTransactionStatus'
 import { formatTxHash, getExplorerTxUrl, getTransactionStatusDescription, validTxHash } from '../utils/networks'
@@ -11,6 +12,12 @@ import { ConfirmationsContainer } from './ConfirmationsContainer'
 import { TransactionReceipt } from 'web3-eth'
 import { BackButton } from './commons/BackButton'
 import { useClosestBlock } from '../hooks/useClosestBlock'
+
+const StatusContent = styled.div`
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+`
 
 export interface StatusContainerParam {
   onBackToMain: () => void
@@ -90,7 +97,7 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
   }
 
   return (
-    <div>
+    <StatusContent>
       {status && (
         <p>
           The transaction{' '}
@@ -113,6 +120,6 @@ export const StatusContainer = ({ onBackToMain, setNetworkFromParams, receiptPar
         />
       )}
       <BackButton onBackToMain={onBackToMain} />
-    </div>
+    </StatusContent>
   )
 }

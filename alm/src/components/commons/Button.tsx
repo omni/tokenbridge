@@ -1,10 +1,12 @@
 import styled from 'styled-components'
 
 export const Button = styled.button`
-  height: 36px;
-  color: var(--button-color);
-  border-color: var(--button-color);
+  height: 39px;
+  color: #ffffff !important;
+  background: var(--button-color) !important;
+  border-color: var(--button-color) !important;
+  font-weight: 600;
   &:focus {
-    outline: var(--button-color);
+    outline: none;
   }
 `

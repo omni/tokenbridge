@@ -15,6 +15,23 @@ import { useBlockConfirmations } from '../hooks/useBlockConfirmations'
 import { MultiLine } from './commons/MultiLine'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 
+const StatusWrapper = styled.div<{ status: string} >`
+  text-align: center;
+  background: rgb(255 239 209);
+  padding: 8px 18px;
+  border-radius: 5px;
+  margin-bottom: 4px;
+  display: inline-block;
+  ${({status}) => {
+    if (status === 'Success') {
+      return 'background: rgb(191 237 205);'
+    }
+    if (status === 'Execution failed') {
+      return 'background: rgb(255 209 209);'
+    }
+  }}}
+`
+
 const StatusLabel = styled.label`
   font-weight: bold;
   font-size: 18px;
@@ -32,8 +49,21 @@ const StyledConfirmationContainer = styled.div`
 `
 
 const StatusDescription = styled.div`
-  padding-top: 10px;
+  padding-top: 0px;
 `
+
+const StatusSection = styled.div`
+  font-size: 14px;
+`;
+
+const ToggleShow = styled.div`
+  color: #ccc;
+  cursor: pointer;
+`;
+
+const Toggled = styled.div<{ isHidden: boolean }>`
+  display: ${({isHidden}) => isHidden ? 'none' : 'block'};
+`;
 
 export interface ConfirmationsContainerParams {
   message: MessageObject
@@ -58,6 +88,7 @@ export const ConfirmationsContainer = ({
   const [executionBlockNumber, setExecutionBlockNumber] = useState(0)
   const dst = useValidatorContract(!fromHome, executionBlockNumber || 'latest')
   const { blockConfirmations } = useBlockConfirmations({ fromHome, receipt })
+  const [toggle, setToggle] = useState<boolean>(true)
   const {
     confirmations,
     status,
@@ -88,6 +119,10 @@ export const ConfirmationsContainer = ({
     [executionData.status, executionBlockNumber, executionData.blockNumber]
   )
 
+  const handleToggle = () => {
+    setToggle(!toggle)
+  }
+
   const statusLabel = fromHome ? CONFIRMATIONS_STATUS_LABEL_HOME : CONFIRMATIONS_STATUS_LABEL
 
   const parseDescription = () => {
@@ -104,33 +139,36 @@ export const ConfirmationsContainer = ({
     }
 
     return (
-      <div>
-        {description}
-        {link}
-      </div>
+      <StatusSection>
+        {console.log('tiglle', toggle)}
+        <ToggleShow onClick={handleToggle}>- {toggle ? 'Show' : 'Hide'} Details -</ToggleShow>
+        <Toggled isHidden={toggle}>
+          {description}
+          <ValidatorsConfirmations
+            confirmations={fromHome ? confirmations.filter(c => dst.validatorList.includes(c.validator)) : confirmations}
+            requiredSignatures={dst.requiredSignatures}
+            validatorList={dst.validatorList}
+            waitingBlocksResolved={waitingBlocksResolved}
+          />
+        </Toggled>
+      </StatusSection>
     )
   }
 
   return (
     <div className="row is-center">
-      <StyledConfirmationContainer className="col-9">
-        <div className="row is-center">
+      <StyledConfirmationContainer>
+        <StatusWrapper status={status ? statusLabel[status] : ''}>
           <StatusLabel>Status:</StatusLabel>
           <StatusResultLabel data-id="status">
             {status !== CONFIRMATIONS_STATUS.UNDEFINED ? statusLabel[status] : <SimpleLoading />}
           </StatusResultLabel>
-        </div>
+        </StatusWrapper>
         <StatusDescription className="row is-center">
-          <MultiLine className="col-10">
+          <MultiLine>
             {status !== CONFIRMATIONS_STATUS.UNDEFINED ? parseDescription() : ''}
           </MultiLine>
         </StatusDescription>
-        <ValidatorsConfirmations
-          confirmations={fromHome ? confirmations.filter(c => dst.validatorList.includes(c.validator)) : confirmations}
-          requiredSignatures={dst.requiredSignatures}
-          validatorList={dst.validatorList}
-          waitingBlocksResolved={waitingBlocksResolved}
-        />
         {signatureCollected && (
           <ExecutionConfirmation
             message={message}

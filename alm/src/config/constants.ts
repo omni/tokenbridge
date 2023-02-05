@@ -67,7 +67,7 @@ export const VALIDATOR_CONFIRMATION_STATUS = {
 
 export const RECENT_AGE = 'Recent'
 
-export const SEARCHING_TX = 'Searching Transaction...'
+export const SEARCHING_TX = 'No details...'
 
 export const INCORRECT_CHAIN_ERROR = `Incorrect chain chosen. Switch to ${FOREIGN_NETWORK_NAME} in the wallet.`
 

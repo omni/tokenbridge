@@ -1,11 +1,11 @@
 const theme = {
   backgroundColor: '#FFFFFF',
   fontColor: 'rgba(0, 0, 0, 0.65)',
-  buttonColor: '#1890ff',
+  buttonColor: 'rgb(104, 210, 210)',
   colorPrimary: '#BDBDBD',
-  colorGrey: '#1890ff',
-  colorLightGrey: '#1890ff',
-  linkColor: '#1890ff',
+  colorGrey: '#68d2d2',
+  colorLightGrey: '#68d2d2',
+  linkColor: '#68d2d2',
   success: {
     textColor: '#388E3C',
     backgroundColor: 'rgba(0,201,167,.1)'

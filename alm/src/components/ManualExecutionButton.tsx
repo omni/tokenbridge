@@ -17,13 +17,15 @@ import { TransactionReceipt } from 'web3-eth'
 import { ConfirmationParam } from '../hooks/useMessageConfirmations'
 
 const ActionButton = styled.button`
-  color: var(--button-color);
-  border-color: var(--font-color);
+  color: #ffffff;
+  font-weight: 600;
+  background: var(--button-color);
+  border-color: var(--button-color);
   margin-top: 10px;
   min-width: 120px;
   padding: 1rem;
   &:focus {
-    outline: var(--button-color);
+    outline: none;
   }
 `
 
@@ -206,7 +208,7 @@ export const ManualExecutionButton = ({
   return (
     <div>
       <div className="is-center">
-        <ActionButton disabled={!ready} className="button outline" onClick={() => setManualExecution(true)}>
+        <ActionButton disabled={!ready} className="button" onClick={() => setManualExecution(true)}>
           {title}
         </ActionButton>
       </div>

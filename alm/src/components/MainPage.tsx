@@ -6,6 +6,7 @@ import { StatusContainer } from './StatusContainer'
 import { useStateProvider } from '../state/StateProvider'
 import { TransactionReceipt } from 'web3-eth'
 import { InfoAlert } from './commons/InfoAlert'
+import { ColonyLogo } from '../components/commons/Colony'
 import { ExplorerTxLink } from './commons/ExplorerTxLink'
 import { FOREIGN_NETWORK_NAME, HOME_NETWORK_NAME } from '../config/constants'
 
@@ -14,10 +15,22 @@ const StyledMainPage = styled.div`
   min-height: 100vh;
 `
 
+const LogoHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  svg {
+    width: 140px;
+  }
+`
+
 const Header = styled.header`
-  background-color: #001529;
-  color: #ffffff;
+  background-color: rgb(246, 246, 246);
+  color: rgb(60, 68, 77);
+  font-weight: 600;
   margin-bottom: 50px;
+  border: 1px solid rgb(232, 232, 232);
 `
 
 const HeaderContainer = styled.header`
@@ -26,7 +39,7 @@ const HeaderContainer = styled.header`
   align-items: center;
   justify-content: space-between;
   font-size: 16px;
-  height: 64px;
+  height: 70px;
   line-height: 64px;
   padding: 0 50px;
 
@@ -107,28 +120,22 @@ export const MainPage = () => {
     <StyledMainPage>
       <Header>
         <HeaderContainer>
-          <span>AMB Live Monitoring</span>
+          <LogoHeader>
+            <ColonyLogo />
+            <span>Transaction Service</span>
+          </LogoHeader>
           <span>{networkName}</span>
         </HeaderContainer>
       </Header>
       <div className="container">
         {showInfoAlert && (
           <InfoAlert onClick={onAlertClose}>
-            <p className="is-left text-left">
-              The Arbitrary Message Bridge Live Monitoring application provides real-time status updates for messages
-              bridged between {HOME_NETWORK_NAME} and {FOREIGN_NETWORK_NAME}. You can check current tx status, view
-              validator info, and troubleshoot potential issues with bridge transfers.
-            </p>
-            <AlertP className="is-left text-left">
-              For more information refer to&nbsp;
-              <ExplorerTxLink
-                href="https://docs.tokenbridge.net/about-tokenbridge/components/amb-live-monitoring-application"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                the ALM documentation
-              </ExplorerTxLink>
-            </AlertP>
+            <span className="is-left text-left">
+              In order to execute the Safe transcation you will need to connect and cover the
+              gas cost of the transaction on {FOREIGN_NETWORK_NAME}.
+              This tool allows you to do this.
+            </span>
+            <span></span>
           </InfoAlert>
         )}
         <Route exact path={['/']} children={<Form onSubmit={onFormSubmit} />} />

@@ -4,8 +4,9 @@ import React from 'react'
 import styled from 'styled-components'
 
 const StyledButton = styled.button`
-  color: var(--button-color);
+  color: var(--font-color);
   border-color: var(--font-color);
+  background: none;
   margin-top: 10px;
   &:focus {
     outline: var(--button-color);
@@ -23,9 +24,9 @@ export interface BackButtonParam {
 
 export const BackButton = ({ onBackToMain }: BackButtonParam) => (
   <div className="row is-center">
-    <div className="col-9">
+    <div className="is-center">
       <Link to="/" onClick={onBackToMain}>
-        <StyledButton className="button outline is-left">
+        <StyledButton className="button is-center">
           <LeftArrow />
           <BackLabel>Search another transaction</BackLabel>
         </StyledButton>

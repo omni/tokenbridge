@@ -1,4 +1,4 @@
-FROM node:12 as contracts
+FROM node:14 as contracts
 
 WORKDIR /mono
 
@@ -6,7 +6,7 @@ COPY contracts/package.json contracts/package-lock.json ./contracts/
 
 WORKDIR /mono/contracts
 RUN npm install --only=prod
-
+#RUN yarn --ignore-engines --frozen-lockfile
 COPY ./contracts/truffle-config.js ./
 COPY ./contracts/contracts ./contracts
 RUN npm run compile
@@ -32,7 +32,7 @@ RUN yarn run build
 
 
 FROM node:12 as alm-production
-RUN yarn global add serve
+RUN yarn global add serve@13
 WORKDIR /app
 COPY --from=alm-builder /mono/alm/build .
 CMD serve -p $PORT -s .
