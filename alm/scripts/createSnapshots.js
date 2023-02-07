@@ -1,4 +1,4 @@
-const { BRIDGE_VALIDATORS_ABI, HOME_AMB_ABI } = require('commons')
+const { BRIDGE_VALIDATORS_ABI, HOME_AMB_ABI } = require('../../commons')
 
 const path = require('path')
 require('dotenv').config()
