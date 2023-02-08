@@ -1,14 +1,14 @@
-const HOME_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/HomeBridgeErcToNative').abi
-const FOREIGN_ERC_TO_NATIVE_ABI = require('../contracts/build/contracts/XDaiForeignBridge.json').abi
-const ERC20_ABI = require('../contracts/build/contracts/ERC20').abi
-const BLOCK_REWARD_ABI = require('../contracts/build/contracts/BlockRewardMock').abi
-const BRIDGE_VALIDATORS_ABI = require('../contracts/build/contracts/BridgeValidators').abi
-const REWARDABLE_VALIDATORS_ABI = require('../contracts/build/contracts/RewardableValidators').abi
-const HOME_AMB_ABI = require('../contracts/build/contracts/HomeAMB').abi
-const FOREIGN_AMB_ABI = require('../contracts/build/contracts/ForeignAMB').abi
-const BOX_ABI = require('../contracts/build/contracts/Box').abi
-const HOME_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/HomeAMBErc677ToErc677').abi
-const FOREIGN_AMB_ERC_TO_ERC_ABI = require('../contracts/build/contracts/ForeignAMBErc677ToErc677').abi
+const HOME_ERC_TO_NATIVE_ABI = require('../../contracts/build/contracts/HomeBridgeErcToNative').abi
+const FOREIGN_ERC_TO_NATIVE_ABI = require('../../contracts/build/contracts/XDaiForeignBridge.json').abi
+const ERC20_ABI = require('../../contracts/build/contracts/ERC20').abi
+const BLOCK_REWARD_ABI = require('../../contracts/build/contracts/BlockRewardMock').abi
+const BRIDGE_VALIDATORS_ABI = require('../../contracts/build/contracts/BridgeValidators').abi
+const REWARDABLE_VALIDATORS_ABI = require('../../contracts/build/contracts/RewardableValidators').abi
+const HOME_AMB_ABI = require('../../contracts/build/contracts/HomeAMB').abi
+const FOREIGN_AMB_ABI = require('../../contracts/build/contracts/ForeignAMB').abi
+const BOX_ABI = require('../../contracts/build/contracts/Box').abi
+const HOME_AMB_ERC_TO_ERC_ABI = require('../../contracts/build/contracts/HomeAMBErc677ToErc677').abi
+const FOREIGN_AMB_ERC_TO_ERC_ABI = require('../../contracts/build/contracts/ForeignAMBErc677ToErc677').abi
 
 const { BRIDGE_MODES } = require('./constants')
 
