@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "airbnb-base",
+    "../.eslintrc"
+  ],
+  "rules": {
+    "no-unused-expressions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "no-bitwise": "off"
+  },
+  "env": {
+    "mocha": true
+  }
+}
