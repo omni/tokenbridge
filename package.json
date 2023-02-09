@@ -6,9 +6,6 @@
   "author": "rzadp <przemek@ethworks.io>",
   "license": "MIT",
   "private": true,
-  "engines": {
-    "yarn": "1.22.19"
-  },
   "devDependencies": {
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
@@ -21,9 +18,7 @@
     "eslint-plugin-react-hooks": "^1.6.0",
     "mocha": "^5.2.0",
     "prettier": "1.14.3",
-    "wsrun": "3.6.5",
-    "sha3": "2.1.4",
-    "make": "0.8.1"
+    "wsrun": "3.6.5"
   },
   "workspaces": [
     "commons",

@@ -2,9 +2,6 @@
   "name": "alm",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": "18.x"
-  },
   "dependencies": {
     "@ethersproject/bignumber": ">=5.0.0-beta.130",
     "@react-hook/window-size": "^3.0.6",
@@ -25,8 +22,6 @@
     "date-fns": "^2.14.0",
     "dotenv": "^8.2.0",
     "fast-memoize": "^2.5.2",
-    "import-modules": "^3.1.0",
-    "sha3": "2.1.4",
     "promise-retry": "^2.0.1",
     "react": "^16.13.1",
     "react-app-rewired": "^2.1.6",
