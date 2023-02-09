@@ -6,6 +6,10 @@
   "author": "rzadp <przemek@ethworks.io>",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": "12.22.12",
+    "yarn": "~1.22.19"
+  },
   "devDependencies": {
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
