@@ -66,6 +66,8 @@ jobs:
   deploy:
     name: Deployment
     runs-on: ubuntu-latest
+    needs:
+      - build
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
