@@ -55,9 +55,9 @@ export const fetchAccountTransactions = async ({ account, startBlock, endBlock, 
   url.searchParams.append('module', 'account')
   url.searchParams.append('action', 'txlist')
   url.searchParams.append('address', account)
-  url.searchParams.append('filterby', 'to')
-  url.searchParams.append('startblock', startBlock.toString())
-  url.searchParams.append('endblock', endBlock.toString())
+  url.searchParams.append('filter_by', 'to')
+  url.searchParams.append('start_block', startBlock.toString())
+  url.searchParams.append('end_block', endBlock.toString())
 
   const result = await fetch(url.toString()).then(res => res.json())
 
