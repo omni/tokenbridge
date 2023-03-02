@@ -79,7 +79,7 @@ jobs:
       # Script to deploy to the Staging environment
       - name: 'Deploy to S3: Staging'
         if: github.ref == 'refs/heads/develop'
-        run: aws s3 sync public s3://${{ secrets.AWS_STAGING_BUCKET_NAME }} ./alm --delete
+        run: aws s3 sync public s3://${{ secrets.AWS_STAGING_BUCKET_NAME }} ./alm/* --delete
 
       # # Script to upload release files
       # - name: 'Upload release build files for production'
