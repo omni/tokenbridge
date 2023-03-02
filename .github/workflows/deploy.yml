@@ -69,8 +69,6 @@ jobs:
   #   needs:
   #     - build
   #   steps:
-      - name: print workdir
-        run: pwd && ls -la
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -81,7 +79,7 @@ jobs:
       # Script to deploy to the Staging environment
       - name: 'Deploy to S3: Staging'
         if: github.ref == 'refs/heads/develop'
-        run: cd alm/build && aws s3 sync public s3://${{ secrets.AWS_STAGING_BUCKET_NAME }} --delete
+        run: aws s3 sync alm/build s3://${{ secrets.AWS_STAGING_BUCKET_NAME }} --delete
 
       # # Script to upload release files
       # - name: 'Upload release build files for production'
