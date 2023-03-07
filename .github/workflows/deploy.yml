@@ -47,19 +47,13 @@ jobs:
       - name: yarn run build:alm
         run: yarn run build
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials for STG
+        if: github.ref == 'refs/heads/develop'
         uses: aws-actions/configure-aws-credentials@v1
-        with:
-          if github.ref == 'refs/heads/master'; then
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-          else
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-          fi
-          
+        with: 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
       # Step to deploy to the Staging environment
       - name: 'Deploy to S3: Staging'
@@ -70,8 +64,16 @@ jobs:
       # - name: 'Upload release build files for production'
       #   if: startsWith(github.ref, 'refs/tags/v')
       #   run: aws s3 sync public s3://${{ secrets.AWS_STAGING_BUCKET_NAME }}/releases/${{ github.event.release.tag_name }} --delete
-
-     # Step to deploy to the production environment
-     - name: 'Deploy to S3: PRODUCTION'
+    
+      - name: Configure AWS credentials for PROD
+        if: github.ref == 'refs/heads/master'
+        uses: aws-actions/configure-aws-credentials@v1
+        with: 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+  
+      # Step to deploy to the production environment
+      - name: 'Deploy to S3: PRODUCTION'
         if: github.ref == 'refs/heads/master'
         run: aws s3 sync alm/build s3://${{ secrets.AWS_PROD_BUCKET_NAME }} --delete
