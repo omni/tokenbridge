@@ -52,5 +52,8 @@
   },
   "resolutions": {
     "**/@mycrypto/eth-scan": "3.5.3"
+  },
+  "dependencies": {
+    "sha3": "^2.1.4"
   }
 }
