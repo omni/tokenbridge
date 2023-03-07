@@ -75,5 +75,5 @@ jobs:
   
       # Step to deploy to the production environment
       - name: 'Deploy to S3: PRODUCTION'
-         if: github.ref == 'refs/heads/master'
-         run: aws s3 sync alm/build s3://${{ secrets.AWS_PROD_BUCKET_NAME }} --delete
+        if: github.ref == 'refs/heads/master'
+        run: aws s3 sync alm/build s3://${{ secrets.AWS_PROD_BUCKET_NAME }} --delete
