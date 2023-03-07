@@ -1,6 +1,8 @@
 name: tokenbridge
 
-on: [push]
+on:
+  workflow_dispatch:
+    branches: [develop]
 
 env:
   DOCKER_REGISTRY: docker.pkg.github.com
