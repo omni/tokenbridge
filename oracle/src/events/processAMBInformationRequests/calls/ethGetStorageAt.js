@@ -3,7 +3,9 @@ const { toBN } = require('web3').utils
 const { ASYNC_CALL_ERRORS } = require('../../../utils/constants')
 
 async function call(web3, data, foreignBlock) {
-  const { 0: address, 1: slot } = web3.eth.abi.decodeParameters(['address', 'bytes32'], data)
+  const { 0: address, 1: slot } = web3.eth.abi.decodeParameters(['address', 'bytes32'], data).catch(() => {
+    return [false, ASYNC_CALL_ERRORS.INPUT_DATA_HAVE_INCORRECT_FORMAT]
+  })
 
   const value = await web3.eth.getStorageAt(address, slot, foreignBlock.number)
 
@@ -11,7 +13,9 @@ async function call(web3, data, foreignBlock) {
 }
 
 async function callArchive(web3, data, foreignBlock) {
-  const { 0: address, 1: slot, 2: blockNumber } = web3.eth.abi.decodeParameters(['address', 'bytes32', 'uint256'], data)
+  const { 0: address, 1: slot, 2: blockNumber } = web3.eth.abi.decodeParameters(['address', 'bytes32', 'uint256'], data).catch(() => {
+    return [false, ASYNC_CALL_ERRORS.INPUT_DATA_HAVE_INCORRECT_FORMAT]
+  })
 
   if (toBN(blockNumber).gt(toBN(foreignBlock.number))) {
     return [false, ASYNC_CALL_ERRORS.BLOCK_IS_IN_THE_FUTURE]
