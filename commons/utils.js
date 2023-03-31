@@ -3,6 +3,7 @@ const { GasPriceOracle } = require('gas-price-oracle')
 const fetch = require('node-fetch')
 const { BRIDGE_MODES } = require('./constants')
 const { REWARDABLE_VALIDATORS_ABI } = require('./abis')
+const Web3 = require("web3")
 
 const gasPriceOracle = new GasPriceOracle()
 
@@ -180,17 +181,20 @@ const normalizeGasPrice = (oracleGasPrice, factor, limits = null) => {
 }
 
 const gasPriceFromSupplier = async (url, options = {}) => {
+
   try {
-    let json
-    if (url === 'gas-price-oracle') {
-      json = await gasPriceOracle.fetchGasPricesOffChain()
-    } else if (url) {
-      const response = await fetch(url, { timeout: 2000 })
-      json = await response.json()
-    } else {
-      return null
-    }
-    const oracleGasPrice = json[options.speedType]
+    const web3 = new Web3(url);
+    let oracleGasPrice = await web3.eth.getGasPrice();
+    // let json
+    // if (url === 'gas-price-oracle') {
+    //   json = await gasPriceOracle.fetchGasPricesOffChain()
+    // } else if (url) {
+    //   const response = await fetch(url, { timeout: 2000 })
+    //   json = await response.json()
+    // } else {
+    //   return null
+    // }
+    // const oracleGasPrice = json[options.speedType]
 
     if (!oracleGasPrice) {
       options.logger &&
@@ -205,6 +209,7 @@ const gasPriceFromSupplier = async (url, options = {}) => {
       options.logger.debug &&
       options.logger.debug({ oracleGasPrice, normalizedGasPrice }, 'Gas price updated using the API')
 
+    console.log(`@yen normalized: ${normalizedGasPrice}`)
     return normalizedGasPrice
   } catch (e) {
     options.logger && options.logger.error && options.logger.error(`Gas Price API is not available. ${e.message}`)
