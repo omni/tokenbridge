@@ -11,10 +11,10 @@ yarn initialize
 
 ## Deploy Arbituary Message Bridge(AMB) bridge contracts
 
-AMB bridge contracts are deployed on both chains to interact with oracle to varify messages crossing chains. 
+AMB bridge contracts are deployed on both chains to interact with oracle to verify messages crossing chains. 
 * Use `.env.amb` as template for `.env`, more details [here](https://github.com/taisys-technologies/taisys-bridge/blob/master/CONFIGURATION.md). 
-* It is assumed that a target ERC20 address is already in mind. Put the chain with that ERC20 contract as `foreign chain`.
-* Double check key, addresses, rpc urls and **gasPrice** in `.env`.
+* Put the chain with ERC20 contract as `foreign chain`.
+* Double check keys, addresses, rpc urls and **gasPrice** in `.env`.
 ```bash
 cd contracts
 # cp deploy/.env.amb deploy/.env
@@ -40,11 +40,11 @@ Contracts Deployment have been saved to `bridgeDeploymentResults.json`
 ```
 
 ## Deploy mediator contracts
-Mediator contracts lock/release/burn/mint tokens when they receive varified message from AMB bridge contracts. With the home and foreign AMB bridges deployed, 
+Mediator contracts lock/release/burn/mint tokens when they receive verified message from AMB bridge contracts. With the home and foreign AMB bridges deployed, 
 * Renew `.env` file with the template, `.env.ambe2e`. Put addresses of new bridge contracts into the new `.env` file.
-* Double check key, addresses, rpc urls and **gasPrice** in `.env`.
+* Double check keys, addresses, rpc urls, and **gasPrice** in `.env`.
 ```bash
-# cp deploy/.env.amb deploy/.env
+# cp deploy/.env.ambe2e deploy/.env
 # vim deploy/.env
 docker-compose up --build
 docker-compose run bridge-contracts deploy.sh
@@ -80,9 +80,10 @@ Oracle is in charge of verifying and forwarding messages between two chains.
 * Put AMB bridge contract addresses and block heights in the `.env` file. 
 * Put addresses of both mediator contracts into `oracle/bridge_data/access-lists/allowance_list.txt`.
 * Provide address and private key of any validator provided in `.env` file when deploying bridge contracts as below.
+* At least `REQUIRED_NUMBER_OF_VALIDATORS`  distinct validators need to be running to keep oracle relaying transactions.
 ```
 cd oracle
-# vim bridge_data/allowance_list.txt
+# vim bridge_data/access-lists/allowance_list.txt
 # vim .env
 docker-compose -f docker-compose-build.yml build
 env ORACLE_VALIDATOR_ADDRESS=0x<address> \
@@ -151,39 +152,45 @@ const result = await contract.transferAndCall(
 );
 ```
 ## Deployments
+
+Between Goerli(foreign) and `https://lab-rpc.taisys.dev` (home).
 ```
-[   Home  ] HomeBridge: 0x959992B4b392f9e231D37b093aEbCfECe9314cd6 at block 23611338
-[ Foreign ] ForeignBridge: 0x974705E969381e75Cd248EF0A31EF9A3bea80123 at block 2387
+MyToken deployed to: 0x94E2994B7f8bcd1aFD7bD230A1859B2BFFAe92D6
+
+[   Home  ] HomeBridge: 0xbaefC73611b584a1DDb1b09b237AC6eD4F790EB6 at block 52234
+[ Foreign ] ForeignBridge: 0xF127350e4D96a9a5e7aA4EBdd6CC8a44ba510E03 at block 8744559
 Contracts Deployment have been saved to `bridgeDeploymentResults.json`
 {
     "homeBridge": {
-        "address": "0x959992B4b392f9e231D37b093aEbCfECe9314cd6",
-        "deployedBlockNumber": 23611338
+        "address": "0xbaefC73611b584a1DDb1b09b237AC6eD4F790EB6",
+        "deployedBlockNumber": 52234
     },
     "foreignBridge": {
-        "address": "0x974705E969381e75Cd248EF0A31EF9A3bea80123",
-        "deployedBlockNumber": 2387
+        "address": "0xF127350e4D96a9a5e7aA4EBdd6CC8a44ba510E03",
+        "deployedBlockNumber": 8744559
     }
 }
 
-[   Home  ] Bridge Mediator: 0xBac397F5020B1699434b95aF452ef0ce87e8fCC9
-[   Home  ] ERC677 Bridgeable Token: 0xa1765940dccDaC254Fa20dE4641E3400f17b7fa9
-[ Foreign ] Bridge Mediator: 0x9E49071ED3297575f484296c25DEa1f04C590b14
-[ Foreign ] ERC677 Token: 0x8bA54E3309577be16B0C7E2973CF90d67328158c
+
+[   Home  ] Bridge Mediator: 0x0974315d3D6CAFd70e3DB8577d20f0eBDF8e06fF
+[   Home  ] ERC677 Bridgeable Token: 0x5Cc3D0803F8c9a7D1F080eC22E819695AF91BC1E
+[ Foreign ] Bridge Mediator: 0xD6569a76B6Fec1d49F62351854E25f8B55E6514a
+[ Foreign ] ERC677 Token: 0x94E2994B7f8bcd1aFD7bD230A1859B2BFFAe92D6
 Contracts Deployment have been saved to `bridgeDeploymentResults.json`
 {
     "homeBridge": {
         "homeBridgeMediator": {
-            "address": "0xBac397F5020B1699434b95aF452ef0ce87e8fCC9"
+            "address": "0x0974315d3D6CAFd70e3DB8577d20f0eBDF8e06fF"
         },
         "bridgeableErc677": {
-            "address": "0xa1765940dccDaC254Fa20dE4641E3400f17b7fa9"
+            "address": "0x5Cc3D0803F8c9a7D1F080eC22E819695AF91BC1E"
         }
     },
     "foreignBridge": {
         "foreignBridgeMediator": {
-            "address": "0x9E49071ED3297575f484296c25DEa1f04C590b14"
+            "address": "0xD6569a76B6Fec1d49F62351854E25f8B55E6514a"
         }
     }
 }
+
 ```
