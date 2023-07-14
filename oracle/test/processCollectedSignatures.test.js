@@ -98,7 +98,7 @@ describe('processCollectedSignatures', () => {
       await expect(result).to.be.rejectedWith(errors.IncompatibleContractError)
     })
 
-    it('should throw an IncompatibleContractError if the signature is invalid', async () => {
+    it('should throw an InvalidValidatorError if the signature is invalid', async () => {
       // given
       const estimateGasStub = sinon.stub()
       estimateGasStub.rejects(new Error())
